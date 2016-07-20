@@ -516,6 +516,23 @@ public class Blacklist implements BetterjrEntity {
         this.businStatus = "0";
     }
 
+    public void initModifyValue(Blacklist request) {
+        this.id = request.getId();
+        this.businStatus = request.getBusinStatus();
+        this.operOrg = request.getOperOrg();
+        this.custNo = request.getCustNo();
+
+        this.regOperId = request.getRegOperId();
+        this.regOperName = request.getRegOperName();
+        this.regDate = request.getRegDate();
+        this.regTime = request.getRegTime();
+
+        this.modiOperId = UserUtils.getOperatorInfo().getId();
+        this.modiOperName = UserUtils.getOperatorInfo().getName();
+        this.modiDate = BetterDateUtils.getNumDate();
+        this.modiTime = BetterDateUtils.getNumTime();
+    }
+
     public void initLawName(String anCustType) {
         // 是否个人黑名单:custType,0-个人,1-机构
         if (BetterStringUtils.equals(anCustType, "0") == true) {

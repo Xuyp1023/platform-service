@@ -33,4 +33,12 @@ public class BlacklistDubboService implements IBlacklistService {
         return AjaxObject.newOk("黑名单录入成功", scfBlacklistService.addBlacklist(anBlacklist)).toJson();
     }
 
+    @Override
+    public String webSaveModifyBlacklist(Map<String, Object> anMap) {
+
+        Blacklist anBlacklist = (Blacklist) RuleServiceDubboFilterInvoker.getInputObj();
+
+        return AjaxObject.newOk("黑名单修改成功", scfBlacklistService.saveModifyBlacklist(anBlacklist)).toJson();
+    }
+
 }
