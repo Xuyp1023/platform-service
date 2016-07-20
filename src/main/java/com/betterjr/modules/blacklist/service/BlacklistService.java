@@ -183,6 +183,39 @@ public class BlacklistService extends BaseService<BlacklistMapper, Blacklist> {
     }
 
     /**
+     * 黑名单删除
+     * 
+     * @param anId
+     */
+    public int saveDeleteBlacklist(Long anId) {
+        logger.info("Begin to delete blacklist");
+
+        // 加载黑名单记录
+        Blacklist anBlacklist = this.selectByPrimaryKey(anId);
+        if (null == anBlacklist) {
+            logger.error("无法加载黑名单信息");
+            throw new BytterTradeException(40001, "无法加载黑名单信息");
+        }
+
+        // 检查当前操作员是否能删除该黑名单
+        CustOperatorInfo operator = UserUtils.getOperatorInfo();
+        if (BetterStringUtils.equals(operator.getOperOrg(), anBlacklist.getOperOrg()) == false) {
+            logger.warn("当前操作员不能删除该黑名单");
+            throw new BytterTradeException(40001, "当前操作员不能删除该黑名单");
+        }
+
+        // 不允许删除已生效(businStatus:1)的黑名单
+        String anBusinStatus = anBlacklist.getBusinStatus();
+        if (BetterStringUtils.equals("1", anBusinStatus) == true) {
+            logger.warn("当前黑名单已生效,不允许删除");
+            throw new BytterTradeException(40001, "当前黑名单已生效,不允许删除");
+        }
+
+        // 删除黑名单
+        return this.deleteByPrimaryKey(anId);
+    }
+
+    /**
      * 检查是否存在黑名单
      * 
      * @param anIdentNo

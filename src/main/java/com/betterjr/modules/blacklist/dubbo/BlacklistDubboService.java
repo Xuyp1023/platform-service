@@ -53,4 +53,10 @@ public class BlacklistDubboService implements IBlacklistService {
         return AjaxObject.newOk("黑名单注销成功", scfBlacklistService.saveCancelBlacklist(anId)).toJson();
     }
 
+    @Override
+    public int webSaveDeleteBlacklist(Long anId) {
+
+        return scfBlacklistService.saveDeleteBlacklist(anId);
+    }
+
 }
