@@ -7,9 +7,11 @@ import org.springframework.stereotype.Service;
 
 import com.betterjr.common.exception.BytterTradeException;
 import com.betterjr.common.service.BaseService;
+import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.mapper.pagehelper.Page;
+import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.betterjr.modules.blacklist.dao.BlacklistMapper;
 import com.betterjr.modules.blacklist.entity.Blacklist;
 
@@ -28,13 +30,13 @@ public class BlacklistService extends BaseService<BlacklistMapper, Blacklist> {
     public Page<Blacklist> queryBlacklist(Map<String, Object> anMap, String anFlag, int anPageNum, int anPageSize) {
         // 判断是否为平台用户(待确定...),保理商仅可以查询自己的黑名单记录
         anMap.put("operOrg", UserUtils.getOperatorInfo().getOperOrg());
-        
+
         // 查询黑名单记录
         Page<Blacklist> anBlacklist = this.selectPropertyByPage(Blacklist.class, anMap, anPageNum, anPageSize, "1".equals(anFlag));
 
         return anBlacklist;
     }
-    
+
     /**
      * 黑名单录入
      * 
@@ -60,7 +62,48 @@ public class BlacklistService extends BaseService<BlacklistMapper, Blacklist> {
 
         return anBlacklist;
     }
-    
+
+    /**
+     * 黑名单修改
+     * 
+     * @param anMap
+     * @param anId
+     * @return
+     */
+    public Blacklist saveModifyBlacklist(Blacklist anModiBlacklist) {
+        logger.info("Begin to modify blacklist");
+
+        // 加载原黑名单记录
+        Blacklist anBlacklist = this.selectByPrimaryKey(anModiBlacklist.getId());
+        if (null == anBlacklist) {
+            logger.error("无法加载原黑名单信息");
+            throw new BytterTradeException(40001, "无法加载原黑名单信息");
+        }
+
+        // 检查当前操作员是否能修改该黑名单
+        CustOperatorInfo operator = UserUtils.getOperatorInfo();
+        if (BetterStringUtils.equals(operator.getOperOrg(), anBlacklist.getOperOrg()) == false) {
+            logger.warn("当前操作员不能修改该黑名单信息");
+            throw new BytterTradeException(40001, "当前操作员不能修改该黑名单信息");
+        }
+
+        // 不允许修改已生效(businStatus:1)的黑名单
+        String status = anBlacklist.getBusinStatus();
+        if (BetterStringUtils.equals("1", status) == true) {
+            logger.warn("当前黑名单已生效,不允许修改");
+            throw new BytterTradeException(40001, "当前黑名单已生效,不允许修改");
+        }
+
+        // 初始化黑名单修改信息
+        anModiBlacklist.initModifyValue(anBlacklist);
+        anBlacklist.initLawName(anBlacklist.getCustType());
+
+        // 数据存盘
+        this.updateByPrimaryKey(anModiBlacklist);
+
+        return anModiBlacklist;
+    }
+
     /**
      * 检查是否存在黑名单
      * 
@@ -78,5 +121,5 @@ public class BlacklistService extends BaseService<BlacklistMapper, Blacklist> {
             return true;
         }
     }
-    
+
 }
