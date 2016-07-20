@@ -144,6 +144,45 @@ public class BlacklistService extends BaseService<BlacklistMapper, Blacklist> {
     }
 
     /**
+     * 黑名单注销
+     * 
+     * @param anId
+     * @return
+     */
+    public Blacklist saveCancelBlacklist(Long anId) {
+        logger.info("Begin to cancel blacklist");
+
+        // 获取黑名单记录
+        Blacklist anBlacklist = this.selectByPrimaryKey(anId);
+        if (null == anBlacklist) {
+            logger.error("无法获取黑名单信息");
+            throw new BytterTradeException(40001, "无法获取黑名单信息");
+        }
+
+        // 检查当前操作员是否能注销该黑名单
+        CustOperatorInfo operator = UserUtils.getOperatorInfo();
+        if (BetterStringUtils.equals(operator.getOperOrg(), anBlacklist.getOperOrg()) == false) {
+            logger.warn("当前操作员不能注销该黑名单");
+            throw new BytterTradeException(40001, "当前操作员不能注销该黑名单");
+        }
+
+        // 仅允许注销已生效(businStatus:1)的黑名单
+        String anBusinStatus = anBlacklist.getBusinStatus();
+        if (BetterStringUtils.equals("1", anBusinStatus) == false) {
+            logger.warn("当前黑名单未生效,不需要注销");
+            throw new BytterTradeException(40001, "当前黑名单未生效,不需要注销");
+        }
+
+        // 设置黑名单注销状态(businStatus:0)
+        anBlacklist.setBusinStatus("0");
+
+        // 数据存盘
+        this.updateByPrimaryKey(anBlacklist);
+
+        return anBlacklist;
+    }
+
+    /**
      * 检查是否存在黑名单
      * 
      * @param anIdentNo
