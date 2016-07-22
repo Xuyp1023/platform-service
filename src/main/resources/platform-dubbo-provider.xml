@@ -9,8 +9,12 @@
     http://code.alibabatech.com/schema/dubbo        
     http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
 	<!-- 扫描dubbo注解 -->
-	<dubbo:annotation
-		package="com.betterjr.modules.test,com.betterjr.modules.blacklist,com.betterjr.modules.account.dubbo,com.betterjr.dubbo.extend.filter" />
+	<dubbo:annotation package="com.betterjr.modules.test,
+		com.betterjr.modules.blacklist,
+		com.betterjr.modules.sys.dubbo,
+        com.betterjr.modules.account.dubbo,
+        com.betterjr.dubbo.extend.filter" />
+        
 	<!-- 提供方应用信息，用于计算依赖关系 -->
 	<dubbo:application name="platform-dubbo-provider" />
 
@@ -18,7 +22,7 @@
 	<dubbo:protocol name="dubbo" port="20880" serialization="fst" />
 	<!-- 声明所有服务接口的默认设置 -->
 	<dubbo:provider timeout="50000" retries="0" loadbalance="random"
-		accesslog="d:\\logs\\dubbo-provider-access.log" version="1.2" />
+		accesslog="d:\\logs\\dubbo-provider-access.log" version="1.8" />
 
 	<!-- 设定只有一个集群的注册中心， address="N/A" 表示不启用注册中心 -->
 	<dubbo:registry id="reg" address="zookeeper://192.168.2.43:2181"
