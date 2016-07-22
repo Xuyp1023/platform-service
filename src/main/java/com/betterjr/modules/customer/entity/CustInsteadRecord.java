@@ -1,8 +1,17 @@
 package com.betterjr.modules.customer.entity;
 
-import com.betterjr.common.annotation.*;
+import javax.persistence.Access;
+import javax.persistence.AccessType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import com.betterjr.common.annotation.MetaData;
 import com.betterjr.common.entity.BetterjrEntity;
-import javax.persistence.*;
+import com.betterjr.common.selectkey.SerialGenerator;
+import com.betterjr.common.utils.BetterDateUtils;
+import com.betterjr.common.utils.UserUtils;
 
 @Access(AccessType.FIELD)
 @Entity
@@ -31,10 +40,10 @@ public class CustInsteadRecord implements BetterjrEntity {
     private Long applyId;
 
     /**
-     * 代录项目: 0公司基本信息，1法人信息，2股东信息，3高管信息，4营业执照，5联系人信息，6银行账户 7开户代录，1公司基本信息，2法人信息，3股东信息，4高管信息，5营业执照，6联系人信息
+     * 代录项目: 0公司基本信息，1法人信息，2股东信息，3高管信息，4营业执照，5联系人信息，6银行账户, 7开户代录
      */
     @Column(name = "C_INSTEAD_ITEM",  columnDefinition="CHAR" )
-    @MetaData( value="代录项目: 0公司基本信息", comments = "代录项目: 0公司基本信息，1法人信息，2股东信息，3高管信息，4营业执照，5联系人信息，6银行账户 7开户代录，1公司基本信息，2法人信息，3股东信息，4高管信息，5营业执照，6联系人信息")
+    @MetaData( value="代录项目", comments = "代录项目: 0公司基本信息，1法人信息，2股东信息，3高管信息，4营业执照，5联系人信息，6银行账户 7开户代录")
     private String insteadItem;
 
     /**
@@ -344,5 +353,32 @@ public class CustInsteadRecord implements BetterjrEntity {
         result = prime * result + ((getLastStatus() == null) ? 0 : getLastStatus().hashCode());
         result = prime * result + ((getCustNo() == null) ? 0 : getCustNo().hashCode());
         return result;
+    }
+    
+    public void initAddValue(Long anApplyId, String anInsteadItem) {
+        this.id = SerialGenerator.getLongValue("CustInsteadRecord.id");
+        
+        this.regOperId = UserUtils.getOperatorInfo().getId();
+        this.regOperName = UserUtils.getOperatorInfo().getName();
+        this.regDate = BetterDateUtils.getNumDate();
+        this.regTime = BetterDateUtils.getNumTime();
+        
+        this.modiOperId = UserUtils.getOperatorInfo().getId();
+        this.modiOperName = UserUtils.getOperatorInfo().getName();
+        this.modiDate = BetterDateUtils.getNumDate();
+        this.modiTime = BetterDateUtils.getNumTime();
+        
+        this.applyId = anApplyId;
+        this.insteadItem = anInsteadItem; // 0 - 7
+        
+        this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
+        this.businStatus = "0";
+    }
+
+    public void initModifyValue() {
+        this.modiOperId = UserUtils.getOperatorInfo().getId();
+        this.modiOperName = UserUtils.getOperatorInfo().getName();
+        this.modiDate = BetterDateUtils.getNumDate();
+        this.modiTime = BetterDateUtils.getNumTime();
     }
 }

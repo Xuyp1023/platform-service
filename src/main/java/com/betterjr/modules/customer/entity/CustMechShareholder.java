@@ -11,6 +11,9 @@ import javax.persistence.Table;
 
 import com.betterjr.common.annotation.MetaData;
 import com.betterjr.common.entity.BetterjrEntity;
+import com.betterjr.common.selectkey.SerialGenerator;
+import com.betterjr.common.utils.BetterDateUtils;
+import com.betterjr.common.utils.UserUtils;
 
 @Access(AccessType.FIELD)
 @Entity
@@ -42,7 +45,7 @@ public class CustMechShareholder implements BetterjrEntity {
      * 证件类型:0-身份证，1-护照，2-军官证，3-士兵证，4-回乡证，5-户口本，6-外国护照
      */
     @Column(name = "C_IDENTTYPE",  columnDefinition="CHAR" )
-    @MetaData( value="证件类型:0-身份证", comments = "证件类型:0-身份证，1-护照，2-军官证，3-士兵证，4-回乡证，5-户口本，6-外国护照")
+    @MetaData( value="证件类型:", comments = "证件类型:0-身份证，1-护照，2-军官证，3-士兵证，4-回乡证，5-户口本，6-外国护照")
     private String identType;
 
     /**
@@ -457,5 +460,39 @@ public class CustMechShareholder implements BetterjrEntity {
         result = prime * result + ((getLastStatus() == null) ? 0 : getLastStatus().hashCode());
         result = prime * result + ((getCustNo() == null) ? 0 : getCustNo().hashCode());
         return result;
+    }
+    
+    public void initAddValue() {
+        this.id = SerialGenerator.getLongValue("CustMechShareholder.id");
+        
+        this.regOperId = UserUtils.getOperatorInfo().getId();
+        this.regOperName = UserUtils.getOperatorInfo().getName();
+        this.regDate = BetterDateUtils.getNumDate();
+        this.regTime = BetterDateUtils.getNumTime();
+        
+        this.modiOperId = UserUtils.getOperatorInfo().getId();
+        this.modiOperName = UserUtils.getOperatorInfo().getName();
+        this.modiDate = BetterDateUtils.getNumDate();
+        this.modiTime = BetterDateUtils.getNumTime();
+        
+        this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
+        this.businStatus = "0";
+    }
+
+    public void initModifyValue(final CustMechShareholder anCustMechShareholder) {
+        this.id = anCustMechShareholder.getId();
+/*
+        this.regOperId = anCustMechBaseTmp.getRegOperId();
+        this.regOperName = anCustMechBaseTmp.getRegOperName();
+        this.regDate = anCustMechBaseTmp.getRegDate();
+        this.regTime = anCustMechBaseTmp.getRegTime();
+*/
+        this.modiOperId = UserUtils.getOperatorInfo().getId();
+        this.modiOperName = UserUtils.getOperatorInfo().getName();
+        this.modiDate = BetterDateUtils.getNumDate();
+        this.modiTime = BetterDateUtils.getNumTime();
+
+        this.businStatus = anCustMechShareholder.getBusinStatus();
+        this.operOrg = anCustMechShareholder.getOperOrg();
     }
 }

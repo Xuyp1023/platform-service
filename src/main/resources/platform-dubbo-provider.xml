@@ -11,6 +11,7 @@
 	<!-- 扫描dubbo注解 -->
 	<dubbo:annotation package="com.betterjr.modules.test,
 		com.betterjr.modules.blacklist,
+		com.betterjr.modules.customer,
 		com.betterjr.modules.sys.dubbo,
         com.betterjr.modules.account.dubbo,
         com.betterjr.dubbo.extend.filter" />

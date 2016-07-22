@@ -1,8 +1,17 @@
 package com.betterjr.modules.customer.entity;
 
-import com.betterjr.common.annotation.*;
+import javax.persistence.Access;
+import javax.persistence.AccessType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import com.betterjr.common.annotation.MetaData;
 import com.betterjr.common.entity.BetterjrEntity;
-import javax.persistence.*;
+import com.betterjr.common.selectkey.SerialGenerator;
+import com.betterjr.common.utils.BetterDateUtils;
+import com.betterjr.common.utils.UserUtils;
 
 @Access(AccessType.FIELD)
 @Entity
@@ -431,5 +440,39 @@ public class CustMechManager implements BetterjrEntity {
         result = prime * result + ((getLastStatus() == null) ? 0 : getLastStatus().hashCode());
         result = prime * result + ((getCustNo() == null) ? 0 : getCustNo().hashCode());
         return result;
+    }
+    
+    public void initAddValue() {
+        this.id = SerialGenerator.getLongValue("CustMechManager.id");
+        
+        this.regOperId = UserUtils.getOperatorInfo().getId();
+        this.regOperName = UserUtils.getOperatorInfo().getName();
+        this.regDate = BetterDateUtils.getNumDate();
+        this.regTime = BetterDateUtils.getNumTime();
+        
+        this.modiOperId = UserUtils.getOperatorInfo().getId();
+        this.modiOperName = UserUtils.getOperatorInfo().getName();
+        this.modiDate = BetterDateUtils.getNumDate();
+        this.modiTime = BetterDateUtils.getNumTime();
+        
+        this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
+        this.businStatus = "0";
+    }
+
+    public void initModifyValue(final CustMechManager anCustMechManager) {
+        this.id = anCustMechManager.getId();
+/*
+        this.regOperId = anCustMechBaseTmp.getRegOperId();
+        this.regOperName = anCustMechBaseTmp.getRegOperName();
+        this.regDate = anCustMechBaseTmp.getRegDate();
+        this.regTime = anCustMechBaseTmp.getRegTime();
+*/
+        this.modiOperId = UserUtils.getOperatorInfo().getId();
+        this.modiOperName = UserUtils.getOperatorInfo().getName();
+        this.modiDate = BetterDateUtils.getNumDate();
+        this.modiTime = BetterDateUtils.getNumTime();
+
+        this.businStatus = anCustMechManager.getBusinStatus();
+        this.operOrg = anCustMechManager.getOperOrg();
     }
 }
