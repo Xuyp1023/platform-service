@@ -9,6 +9,9 @@ import javax.persistence.Table;
 
 import com.betterjr.common.annotation.MetaData;
 import com.betterjr.common.entity.BetterjrEntity;
+import com.betterjr.common.selectkey.SerialGenerator;
+import com.betterjr.common.utils.BetterDateUtils;
+import com.betterjr.common.utils.UserUtils;
 
 @Access(AccessType.FIELD)
 @Entity
@@ -90,7 +93,7 @@ public class CustOpenAccountTmp implements BetterjrEntity {
      */
     @Column(name = "C_ZIPCODE",  columnDefinition="VARCHAR" )
     @MetaData( value="邮编", comments = "邮编")
-    private String zipcode;
+    private String zipCode;
 
     /**
      * 电话
@@ -409,12 +412,12 @@ public class CustOpenAccountTmp implements BetterjrEntity {
         this.address = address == null ? null : address.trim();
     }
 
-    public String getZipcode() {
-        return zipcode;
+    public String getZipCode() {
+        return zipCode;
     }
 
-    public void setZipcode(String zipcode) {
-        this.zipcode = zipcode == null ? null : zipcode.trim();
+    public void setZipCode(String zipCode) {
+        this.zipCode = zipCode == null ? null : zipCode.trim();
     }
 
     public String getPhone() {
@@ -705,7 +708,7 @@ public class CustOpenAccountTmp implements BetterjrEntity {
         sb.append(", businLicenceRegDate=").append(businLicenceRegDate);
         sb.append(", businLicenceValidDate=").append(businLicenceValidDate);
         sb.append(", address=").append(address);
-        sb.append(", zipcode=").append(zipcode);
+        sb.append(", zipCode=").append(zipCode);
         sb.append(", phone=").append(phone);
         sb.append(", fax=").append(fax);
         sb.append(", email=").append(email);
@@ -767,7 +770,7 @@ public class CustOpenAccountTmp implements BetterjrEntity {
             && (this.getBusinLicenceRegDate() == null ? other.getBusinLicenceRegDate() == null : this.getBusinLicenceRegDate().equals(other.getBusinLicenceRegDate()))
             && (this.getBusinLicenceValidDate() == null ? other.getBusinLicenceValidDate() == null : this.getBusinLicenceValidDate().equals(other.getBusinLicenceValidDate()))
             && (this.getAddress() == null ? other.getAddress() == null : this.getAddress().equals(other.getAddress()))
-            && (this.getZipcode() == null ? other.getZipcode() == null : this.getZipcode().equals(other.getZipcode()))
+            && (this.getZipCode() == null ? other.getZipCode() == null : this.getZipCode().equals(other.getZipCode()))
             && (this.getPhone() == null ? other.getPhone() == null : this.getPhone().equals(other.getPhone()))
             && (this.getFax() == null ? other.getFax() == null : this.getFax().equals(other.getFax()))
             && (this.getEmail() == null ? other.getEmail() == null : this.getEmail().equals(other.getEmail()))
@@ -818,7 +821,7 @@ public class CustOpenAccountTmp implements BetterjrEntity {
         result = prime * result + ((getBusinLicenceRegDate() == null) ? 0 : getBusinLicenceRegDate().hashCode());
         result = prime * result + ((getBusinLicenceValidDate() == null) ? 0 : getBusinLicenceValidDate().hashCode());
         result = prime * result + ((getAddress() == null) ? 0 : getAddress().hashCode());
-        result = prime * result + ((getZipcode() == null) ? 0 : getZipcode().hashCode());
+        result = prime * result + ((getZipCode() == null) ? 0 : getZipCode().hashCode());
         result = prime * result + ((getPhone() == null) ? 0 : getPhone().hashCode());
         result = prime * result + ((getFax() == null) ? 0 : getFax().hashCode());
         result = prime * result + ((getEmail() == null) ? 0 : getEmail().hashCode());
@@ -854,5 +857,39 @@ public class CustOpenAccountTmp implements BetterjrEntity {
         result = prime * result + ((getTmpType() == null) ? 0 : getTmpType().hashCode());
         result = prime * result + ((getTmpOperType() == null) ? 0 : getTmpOperType().hashCode());
         return result;
+    }
+    
+    public void initAddValue() {
+        this.id = SerialGenerator.getLongValue("CustOpenAccountTmp.id");
+        
+        this.regOperId = UserUtils.getOperatorInfo().getId();
+        this.regOperName = UserUtils.getOperatorInfo().getName();
+        this.regDate = BetterDateUtils.getNumDate();
+        this.regTime = BetterDateUtils.getNumTime();
+        
+        this.modiOperId = UserUtils.getOperatorInfo().getId();
+        this.modiOperName = UserUtils.getOperatorInfo().getName();
+        this.modiDate = BetterDateUtils.getNumDate();
+        this.modiTime = BetterDateUtils.getNumTime();
+        
+        this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
+        this.businStatus = "0";
+    }
+
+    public void initModifyValue(final CustOpenAccountTmp anCustOpenAccountTmp) {
+        this.id = anCustOpenAccountTmp.getId();
+/*
+        this.regOperId = anCustMechBaseTmp.getRegOperId();
+        this.regOperName = anCustMechBaseTmp.getRegOperName();
+        this.regDate = anCustMechBaseTmp.getRegDate();
+        this.regTime = anCustMechBaseTmp.getRegTime();
+*/
+        this.modiOperId = UserUtils.getOperatorInfo().getId();
+        this.modiOperName = UserUtils.getOperatorInfo().getName();
+        this.modiDate = BetterDateUtils.getNumDate();
+        this.modiTime = BetterDateUtils.getNumTime();
+
+        this.businStatus = anCustOpenAccountTmp.getBusinStatus();
+        this.operOrg = anCustOpenAccountTmp.getOperOrg();
     }
 }

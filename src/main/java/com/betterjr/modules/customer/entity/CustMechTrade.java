@@ -11,10 +11,14 @@ import javax.persistence.Table;
 
 import com.betterjr.common.annotation.MetaData;
 import com.betterjr.common.entity.BetterjrEntity;
+import com.betterjr.common.selectkey.SerialGenerator;
+import com.betterjr.common.utils.BetterDateUtils;
+import com.betterjr.common.utils.UserUtils;
 
 @Access(AccessType.FIELD)
 @Entity
 @Table(name = "t_cust_mech_trade")
+
 public class CustMechTrade implements BetterjrEntity {
     /**
      * 编号
@@ -385,5 +389,39 @@ public class CustMechTrade implements BetterjrEntity {
         result = prime * result + ((getLastStatus() == null) ? 0 : getLastStatus().hashCode());
         result = prime * result + ((getCustNo() == null) ? 0 : getCustNo().hashCode());
         return result;
+    }
+    
+    public void initAddValue() {
+        this.id = SerialGenerator.getLongValue("CustMechTrade.id");
+        
+        this.regOperId = UserUtils.getOperatorInfo().getId();
+        this.regOperName = UserUtils.getOperatorInfo().getName();
+        this.regDate = BetterDateUtils.getNumDate();
+        this.regTime = BetterDateUtils.getNumTime();
+        
+        this.modiOperId = UserUtils.getOperatorInfo().getId();
+        this.modiOperName = UserUtils.getOperatorInfo().getName();
+        this.modiDate = BetterDateUtils.getNumDate();
+        this.modiTime = BetterDateUtils.getNumTime();
+        
+        this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
+        this.businStatus = "0";
+    }
+
+    public void initModifyValue(final CustMechTrade anCustMechTrade) {
+        this.id = anCustMechTrade.getId();
+/*
+        this.regOperId = anCustMechBaseTmp.getRegOperId();
+        this.regOperName = anCustMechBaseTmp.getRegOperName();
+        this.regDate = anCustMechBaseTmp.getRegDate();
+        this.regTime = anCustMechBaseTmp.getRegTime();
+*/
+        this.modiOperId = UserUtils.getOperatorInfo().getId();
+        this.modiOperName = UserUtils.getOperatorInfo().getName();
+        this.modiDate = BetterDateUtils.getNumDate();
+        this.modiTime = BetterDateUtils.getNumTime();
+
+        this.businStatus = anCustMechTrade.getBusinStatus();
+        this.operOrg = anCustMechTrade.getOperOrg();
     }
 }

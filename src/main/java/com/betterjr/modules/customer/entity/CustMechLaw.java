@@ -1,8 +1,18 @@
 package com.betterjr.modules.customer.entity;
 
-import com.betterjr.common.annotation.*;
+import javax.persistence.Access;
+import javax.persistence.AccessType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import com.betterjr.common.annotation.MetaData;
 import com.betterjr.common.entity.BetterjrEntity;
-import javax.persistence.*;
+import com.betterjr.common.selectkey.SerialGenerator;
+import com.betterjr.common.utils.BetterDateUtils;
+import com.betterjr.common.utils.UserUtils;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Access(AccessType.FIELD)
 @Entity
@@ -34,7 +44,7 @@ public class CustMechLaw implements BetterjrEntity {
      * 证件类型:0-身份证，1-护照，2-军官证，3-士兵证，4-回乡证，5-户口本，6-外国护照
      */
     @Column(name = "C_IDENTTYPE",  columnDefinition="CHAR" )
-    @MetaData( value="证件类型:0-身份证", comments = "证件类型:0-身份证，1-护照，2-军官证，3-士兵证，4-回乡证，5-户口本，6-外国护照")
+    @MetaData( value="证件类型", comments = "证件类型:0-身份证，1-护照，2-军官证，3-士兵证，4-回乡证，5-户口本，6-外国护照")
     private String identType;
 
     /**
@@ -76,7 +86,7 @@ public class CustMechLaw implements BetterjrEntity {
      * 教育水平 0初级中学 1高级中学 2大学专科 3大学本科 4硕士研究生 5博士研究生
      */
     @Column(name = "C_EDU_LEVEL",  columnDefinition="CHAR" )
-    @MetaData( value="教育水平 0初级中学 1高级中学 2大学专科 3大学本科 4硕士研究生 5博士研究生", comments = "教育水平 0初级中学 1高级中学 2大学专科 3大学本科 4硕士研究生 5博士研究生")
+    @MetaData( value="教育水平", comments = "教育水平 0初级中学 1高级中学 2大学专科 3大学本科 4硕士研究生 5博士研究生")
     private String eduLevel;
 
     /**
@@ -110,6 +120,7 @@ public class CustMechLaw implements BetterjrEntity {
     /**
      * 创建人(操作员)ID号
      */
+    @JsonIgnore
     @Column(name = "L_REG_OPERID",  columnDefinition="INTEGER" )
     @MetaData( value="创建人(操作员)ID号", comments = "创建人(操作员)ID号")
     private Long regOperId;
@@ -117,6 +128,7 @@ public class CustMechLaw implements BetterjrEntity {
     /**
      * 创建人(操作员)姓名
      */
+    @JsonIgnore
     @Column(name = "C_REG_OPERNAME",  columnDefinition="VARCHAR" )
     @MetaData( value="创建人(操作员)姓名", comments = "创建人(操作员)姓名")
     private String regOperName;
@@ -124,6 +136,7 @@ public class CustMechLaw implements BetterjrEntity {
     /**
      * 创建日期
      */
+    @JsonIgnore
     @Column(name = "D_REG_DATE",  columnDefinition="VARCHAR" )
     @MetaData( value="创建日期", comments = "创建日期")
     private String regDate;
@@ -131,6 +144,7 @@ public class CustMechLaw implements BetterjrEntity {
     /**
      * 创建时间
      */
+    @JsonIgnore
     @Column(name = "T_REG_TIME",  columnDefinition="VARCHAR" )
     @MetaData( value="创建时间", comments = "创建时间")
     private String regTime;
@@ -138,6 +152,7 @@ public class CustMechLaw implements BetterjrEntity {
     /**
      * 修改人(操作员)ID号
      */
+    @JsonIgnore
     @Column(name = "L_MODI_OPERID",  columnDefinition="INTEGER" )
     @MetaData( value="修改人(操作员)ID号", comments = "修改人(操作员)ID号")
     private Long modiOperId;
@@ -145,6 +160,7 @@ public class CustMechLaw implements BetterjrEntity {
     /**
      * 修改人(操作员)姓名
      */
+    @JsonIgnore
     @Column(name = "C_MODI_OPERNAME",  columnDefinition="VARCHAR" )
     @MetaData( value="修改人(操作员)姓名", comments = "修改人(操作员)姓名")
     private String modiOperName;
@@ -152,6 +168,7 @@ public class CustMechLaw implements BetterjrEntity {
     /**
      * 修改日期
      */
+    @JsonIgnore
     @Column(name = "D_MODI_DATE",  columnDefinition="VARCHAR" )
     @MetaData( value="修改日期", comments = "修改日期")
     private String modiDate;
@@ -159,6 +176,7 @@ public class CustMechLaw implements BetterjrEntity {
     /**
      * 修改时间
      */
+    @JsonIgnore
     @Column(name = "T_MODI_TIME",  columnDefinition="VARCHAR" )
     @MetaData( value="修改时间", comments = "修改时间")
     private String modiTime;
@@ -166,6 +184,7 @@ public class CustMechLaw implements BetterjrEntity {
     /**
      * 操作机构
      */
+    @JsonIgnore
     @Column(name = "C_OPERORG",  columnDefinition="VARCHAR" )
     @MetaData( value="操作机构", comments = "操作机构")
     private String operOrg;
@@ -181,6 +200,7 @@ public class CustMechLaw implements BetterjrEntity {
     /**
      * 客户编号
      */
+    @JsonIgnore
     @Column(name = "L_CUSTNO",  columnDefinition="INTEGER" )
     @MetaData( value="客户编号", comments = "客户编号")
     private Long custNo;
@@ -503,5 +523,39 @@ public class CustMechLaw implements BetterjrEntity {
         result = prime * result + ((getLastStatus() == null) ? 0 : getLastStatus().hashCode());
         result = prime * result + ((getCustNo() == null) ? 0 : getCustNo().hashCode());
         return result;
+    }
+    
+    public void initAddValue() {
+        this.id = SerialGenerator.getLongValue("CustMechLaw.id");
+        
+        this.regOperId = UserUtils.getOperatorInfo().getId();
+        this.regOperName = UserUtils.getOperatorInfo().getName();
+        this.regDate = BetterDateUtils.getNumDate();
+        this.regTime = BetterDateUtils.getNumTime();
+        
+        this.modiOperId = UserUtils.getOperatorInfo().getId();
+        this.modiOperName = UserUtils.getOperatorInfo().getName();
+        this.modiDate = BetterDateUtils.getNumDate();
+        this.modiTime = BetterDateUtils.getNumTime();
+        
+        this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
+        this.businStatus = "0";
+    }
+
+    public void initModifyValue(final CustMechLaw anCustMechLaw) {
+        this.id = anCustMechLaw.getId();
+/*
+        this.regOperId = anCustMechBaseTmp.getRegOperId();
+        this.regOperName = anCustMechBaseTmp.getRegOperName();
+        this.regDate = anCustMechBaseTmp.getRegDate();
+        this.regTime = anCustMechBaseTmp.getRegTime();
+*/
+        this.modiOperId = UserUtils.getOperatorInfo().getId();
+        this.modiOperName = UserUtils.getOperatorInfo().getName();
+        this.modiDate = BetterDateUtils.getNumDate();
+        this.modiTime = BetterDateUtils.getNumTime();
+
+        this.businStatus = anCustMechLaw.getBusinStatus();
+        this.operOrg = anCustMechLaw.getOperOrg();
     }
 }

@@ -11,18 +11,21 @@ import javax.persistence.Table;
 
 import com.betterjr.common.annotation.MetaData;
 import com.betterjr.common.entity.BetterjrEntity;
+import com.betterjr.common.selectkey.SerialGenerator;
+import com.betterjr.common.utils.BetterDateUtils;
+import com.betterjr.common.utils.UserUtils;
 
 @Access(AccessType.FIELD)
 @Entity
 @Table(name = "t_cust_mech_base_tmp")
 public class CustMechBaseTmp implements BetterjrEntity {
     /**
-     * 客户编号
+     * 编号
      */
     @Id
-    @Column(name = "L_CUSTNO",  columnDefinition="INTEGER" )
-    @MetaData( value="客户编号", comments = "客户编号")
-    private Long custNo;
+    @Column(name = "ID",  columnDefinition="INTEGER" )
+    @MetaData( value="编号", comments = "编号")
+    private Long id;
 
     /**
      * 数据版本号
@@ -228,11 +231,18 @@ public class CustMechBaseTmp implements BetterjrEntity {
     private String setupDate;
 
     /**
+     * 地址
+     */
+    @Column(name = "C_ADDRESS",  columnDefinition="VARCHAR" )
+    @MetaData( value="地址", comments = "地址")
+    private String address;
+    
+    /**
      * 邮编
      */
     @Column(name = "C_ZIPCODE",  columnDefinition="VARCHAR" )
     @MetaData( value="邮编", comments = "邮编")
-    private String zipcode;
+    private String zipCode;
 
     /**
      * 电话
@@ -401,12 +411,12 @@ public class CustMechBaseTmp implements BetterjrEntity {
 
     private static final long serialVersionUID = 1468812783857L;
 
-    public Long getCustNo() {
-        return custNo;
+    public Long getId() {
+        return id;
     }
 
-    public void setCustNo(Long custNo) {
-        this.custNo = custNo;
+    public void setId(Long anId) {
+        id = anId;
     }
 
     public Long getVersion() {
@@ -641,12 +651,20 @@ public class CustMechBaseTmp implements BetterjrEntity {
         this.setupDate = setupDate == null ? null : setupDate.trim();
     }
 
-    public String getZipcode() {
-        return zipcode;
+    public String getAddress() {
+        return address;
     }
 
-    public void setZipcode(String zipcode) {
-        this.zipcode = zipcode == null ? null : zipcode.trim();
+    public void setAddress(String anAddress) {
+        address = anAddress;
+    }
+
+    public String getZipCode() {
+        return zipCode;
+    }
+
+    public void setZipCode(String zipCode) {
+        this.zipCode = zipCode == null ? null : zipCode.trim();
     }
 
     public String getPhone() {
@@ -847,7 +865,7 @@ public class CustMechBaseTmp implements BetterjrEntity {
         sb.append(getClass().getSimpleName());
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
-        sb.append(", custNo=").append(custNo);
+        sb.append(", id=").append(id);
         sb.append(", version=").append(version);
         sb.append(", engName=").append(engName);
         sb.append(", category=").append(category);
@@ -877,7 +895,8 @@ public class CustMechBaseTmp implements BetterjrEntity {
         sb.append(", premisesAddress=").append(premisesAddress);
         sb.append(", businScope=").append(businScope);
         sb.append(", setupDate=").append(setupDate);
-        sb.append(", zipcode=").append(zipcode);
+        sb.append(", address=").append(address);
+        sb.append(", zipCode=").append(zipCode);
         sb.append(", phone=").append(phone);
         sb.append(", fax=").append(fax);
         sb.append(", mobile=").append(mobile);
@@ -919,7 +938,7 @@ public class CustMechBaseTmp implements BetterjrEntity {
             return false;
         }
         CustMechBaseTmp other = (CustMechBaseTmp) that;
-        return (this.getCustNo() == null ? other.getCustNo() == null : this.getCustNo().equals(other.getCustNo()))
+        return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
             && (this.getVersion() == null ? other.getVersion() == null : this.getVersion().equals(other.getVersion()))
             && (this.getEngName() == null ? other.getEngName() == null : this.getEngName().equals(other.getEngName()))
             && (this.getCategory() == null ? other.getCategory() == null : this.getCategory().equals(other.getCategory()))
@@ -949,7 +968,8 @@ public class CustMechBaseTmp implements BetterjrEntity {
             && (this.getPremisesAddress() == null ? other.getPremisesAddress() == null : this.getPremisesAddress().equals(other.getPremisesAddress()))
             && (this.getBusinScope() == null ? other.getBusinScope() == null : this.getBusinScope().equals(other.getBusinScope()))
             && (this.getSetupDate() == null ? other.getSetupDate() == null : this.getSetupDate().equals(other.getSetupDate()))
-            && (this.getZipcode() == null ? other.getZipcode() == null : this.getZipcode().equals(other.getZipcode()))
+            && (this.getAddress() == null ? other.getAddress() == null : this.getAddress().equals(other.getAddress()))
+            && (this.getZipCode() == null ? other.getZipCode() == null : this.getZipCode().equals(other.getZipCode()))
             && (this.getPhone() == null ? other.getPhone() == null : this.getPhone().equals(other.getPhone()))
             && (this.getFax() == null ? other.getFax() == null : this.getFax().equals(other.getFax()))
             && (this.getMobile() == null ? other.getMobile() == null : this.getMobile().equals(other.getMobile()))
@@ -980,7 +1000,7 @@ public class CustMechBaseTmp implements BetterjrEntity {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((getCustNo() == null) ? 0 : getCustNo().hashCode());
+        result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
         result = prime * result + ((getVersion() == null) ? 0 : getVersion().hashCode());
         result = prime * result + ((getEngName() == null) ? 0 : getEngName().hashCode());
         result = prime * result + ((getCategory() == null) ? 0 : getCategory().hashCode());
@@ -1010,7 +1030,8 @@ public class CustMechBaseTmp implements BetterjrEntity {
         result = prime * result + ((getPremisesAddress() == null) ? 0 : getPremisesAddress().hashCode());
         result = prime * result + ((getBusinScope() == null) ? 0 : getBusinScope().hashCode());
         result = prime * result + ((getSetupDate() == null) ? 0 : getSetupDate().hashCode());
-        result = prime * result + ((getZipcode() == null) ? 0 : getZipcode().hashCode());
+        result = prime * result + ((getAddress() == null) ? 0 : getAddress().hashCode());
+        result = prime * result + ((getZipCode() == null) ? 0 : getZipCode().hashCode());
         result = prime * result + ((getPhone() == null) ? 0 : getPhone().hashCode());
         result = prime * result + ((getFax() == null) ? 0 : getFax().hashCode());
         result = prime * result + ((getMobile() == null) ? 0 : getMobile().hashCode());
@@ -1036,5 +1057,42 @@ public class CustMechBaseTmp implements BetterjrEntity {
         result = prime * result + ((getTmpType() == null) ? 0 : getTmpType().hashCode());
         result = prime * result + ((getTmpOperType() == null) ? 0 : getTmpOperType().hashCode());
         return result;
+    }
+    
+    public void initAddValue(String anTmpType) {
+        this.id = SerialGenerator.getLongValue("CustMechBaseTmp.id");
+        
+        this.regOperId = UserUtils.getOperatorInfo().getId();
+        this.regOperName = UserUtils.getOperatorInfo().getName();
+        this.regDate = BetterDateUtils.getNumDate();
+        this.regTime = BetterDateUtils.getNumTime();
+        
+        this.modiOperId = UserUtils.getOperatorInfo().getId();
+        this.modiOperName = UserUtils.getOperatorInfo().getName();
+        this.modiDate = BetterDateUtils.getNumDate();
+        this.modiTime = BetterDateUtils.getNumTime();
+        
+        this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
+        this.businStatus = "0";
+        
+        this.tmpType = anTmpType;
+        this.tmpOperType = "0";
+    }
+
+    public void initModifyValue(final CustMechBaseTmp anCustMechBaseTmp) {
+        this.id = anCustMechBaseTmp.getId();
+/*
+        this.regOperId = anCustMechBaseTmp.getRegOperId();
+        this.regOperName = anCustMechBaseTmp.getRegOperName();
+        this.regDate = anCustMechBaseTmp.getRegDate();
+        this.regTime = anCustMechBaseTmp.getRegTime();
+*/
+        this.modiOperId = UserUtils.getOperatorInfo().getId();
+        this.modiOperName = UserUtils.getOperatorInfo().getName();
+        this.modiDate = BetterDateUtils.getNumDate();
+        this.modiTime = BetterDateUtils.getNumTime();
+
+        this.businStatus = anCustMechBaseTmp.getBusinStatus();
+//        this.operOrg = anCustMechBaseTmp.getOperOrg();
     }
 }
