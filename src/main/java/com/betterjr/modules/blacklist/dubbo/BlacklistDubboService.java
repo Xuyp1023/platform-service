@@ -34,11 +34,11 @@ public class BlacklistDubboService implements IBlacklistService {
     }
 
     @Override
-    public String webSaveModifyBlacklist(Map<String, Object> anMap) {
+    public String webSaveModifyBlacklist(Map<String, Object> anMap, Long anId) {
 
         Blacklist anBlacklist = (Blacklist) RuleServiceDubboFilterInvoker.getInputObj();
 
-        return AjaxObject.newOk("黑名单修改成功", scfBlacklistService.saveModifyBlacklist(anBlacklist)).toJson();
+        return AjaxObject.newOk("黑名单修改成功", scfBlacklistService.saveModifyBlacklist(anBlacklist, anId)).toJson();
     }
 
     @Override
@@ -57,6 +57,12 @@ public class BlacklistDubboService implements IBlacklistService {
     public int webSaveDeleteBlacklist(Long anId) {
 
         return scfBlacklistService.saveDeleteBlacklist(anId);
+    }
+
+    @Override
+    public boolean checkBlacklistExists(String anName, String anIdentNo, String anLawName) {
+
+        return scfBlacklistService.checkBlacklistExists(anName, anIdentNo, anLawName);
     }
 
 }
