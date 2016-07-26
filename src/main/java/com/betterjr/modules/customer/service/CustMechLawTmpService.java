@@ -1,14 +1,18 @@
 package com.betterjr.modules.customer.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javax.annotation.Resource;
+
 import org.springframework.stereotype.Service;
 
+import com.betterjr.common.exception.BytterTradeException;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
+import com.betterjr.common.utils.Collections3;
 import com.betterjr.modules.customer.dao.CustMechLawTmpMapper;
+import com.betterjr.modules.customer.entity.CustMechBaseTmp;
+import com.betterjr.modules.customer.entity.CustMechLaw;
 import com.betterjr.modules.customer.entity.CustMechLawTmp;
-import com.betterjr.modules.customer.entity.CustMechLawTmp;
+import com.betterjr.modules.customer.helper.IFormalDataService;
 
 /**
  * 
@@ -16,8 +20,9 @@ import com.betterjr.modules.customer.entity.CustMechLawTmp;
  *
  */
 @Service
-public class CustMechLawTmpService extends BaseService<CustMechLawTmpMapper, CustMechLawTmp> {
-    private static Logger logger = LoggerFactory.getLogger(CustMechLawTmpService.class);
+public class CustMechLawTmpService extends BaseService<CustMechLawTmpMapper, CustMechLawTmp>  implements IFormalDataService{
+    @Resource
+    private CustMechLawService custMechLawService;
 
     /**
      * 查询公司法人流水信息
@@ -48,15 +53,46 @@ public class CustMechLawTmpService extends BaseService<CustMechLawTmpMapper, Cus
     }
 
     /**
-     * 添加公司法人流水信息
+     * 添加客户基本信息流水信息
      * 
-     * @param anCustMechLawTmp
+     * 在初次添加基本信息时也需要添加
+     * 
+     * @param anCustMechBaseTmp
      * @return
      */
-    public int addCustMechLawTmp(CustMechLawTmp anCustMechLawTmp) {
-        BTAssert.notNull(anCustMechLawTmp, "公司法人流水信息编号不允许为空！");
+    public CustMechLawTmp addCustMechLawTmpByChange(CustMechLawTmp anCustMechLawTmp, String anTmpType) {
+        BTAssert.notNull(anCustMechLawTmp, "客户基本信息流水信息编号不允许为空！");
+        // 处理version 查询变更详情的时候使用
+
+        anCustMechLawTmp.initAddValue(anTmpType);
+        this.insert(anCustMechLawTmp);
+
+        // 回写
+        return anCustMechLawTmp;
+    }
+
+    /**
+     * 保存数据至正式表
+     */
+    @Override
+    public void saveFormalData(String ... anTmpIds) {
+        BTAssert.notEmpty(anTmpIds, "临时流水编号不允许为空！");
+
+        if (anTmpIds.length != 1) {
+            throw new BytterTradeException(20021, "临时流水编号只能有一位！");
+        }
         
-        anCustMechLawTmp.initAddValue();
-        return this.insert(anCustMechLawTmp);
+        Long tmpId = Long.valueOf(anTmpIds[0]);
+        
+        CustMechLawTmp mechLawTmp = this.selectByPrimaryKey(tmpId);
+        BTAssert.notNull(mechLawTmp, "没有找到临时流水信息！");
+        
+        Long id = mechLawTmp.getRefId();
+        CustMechLaw custMechLaw = custMechLawService.findCustMechLaw(id);
+        
+        BTAssert.notNull(custMechLaw, "没有找到正式表数据！");
+        
+        custMechLaw.initModifyValue(mechLawTmp);
+        custMechLawService.saveCustMechLaw(custMechLaw);
     }
 }

@@ -1,14 +1,12 @@
 package com.betterjr.modules.customer.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.modules.customer.dao.CustMechBusinLicenceTmpMapper;
 import com.betterjr.modules.customer.entity.CustMechBusinLicenceTmp;
-import com.betterjr.modules.customer.entity.CustMechBusinLicenceTmp;
+import com.betterjr.modules.customer.helper.IFormalDataService;
 
 /**
  * 营业执照流水
@@ -16,8 +14,7 @@ import com.betterjr.modules.customer.entity.CustMechBusinLicenceTmp;
  *
  */
 @Service
-public class CustMechBusinLicenceTmpService extends BaseService<CustMechBusinLicenceTmpMapper, CustMechBusinLicenceTmp> {
-    private static Logger logger = LoggerFactory.getLogger(CustMechBusinLicenceTmpService.class);
+public class CustMechBusinLicenceTmpService extends BaseService<CustMechBusinLicenceTmpMapper, CustMechBusinLicenceTmp> implements IFormalDataService{
 
     /**
      * 查询营业执照流水信息
@@ -55,5 +52,9 @@ public class CustMechBusinLicenceTmpService extends BaseService<CustMechBusinLic
         
         anCustMechBusinLicenceTmp.initAddValue();
         return this.insert(anCustMechBusinLicenceTmp);
+    }
+
+    @Override
+    public void saveFormalData(String ... anTmpIds) {
     }
 }

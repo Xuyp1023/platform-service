@@ -1,14 +1,12 @@
 package com.betterjr.modules.customer.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.modules.customer.dao.CustMechManagerTmpMapper;
 import com.betterjr.modules.customer.entity.CustMechManagerTmp;
-import com.betterjr.modules.customer.entity.CustMechManagerTmp;
+import com.betterjr.modules.customer.helper.IFormalDataService;
 
 /**
  * 
@@ -16,8 +14,7 @@ import com.betterjr.modules.customer.entity.CustMechManagerTmp;
  *
  */
 @Service
-public class CustMechManagerTmpService extends BaseService<CustMechManagerTmpMapper, CustMechManagerTmp> {
-    private static Logger logger = LoggerFactory.getLogger(CustMechManagerTmpService.class);
+public class CustMechManagerTmpService extends BaseService<CustMechManagerTmpMapper, CustMechManagerTmp>  implements IFormalDataService{
 
     /**
      * 查询公司高管流水信息
@@ -58,5 +55,9 @@ public class CustMechManagerTmpService extends BaseService<CustMechManagerTmpMap
         
         anCustMechManagerTmp.initAddValue();
         return this.insert(anCustMechManagerTmp);
+    }
+
+    @Override
+    public void saveFormalData(String ... anTmpIds) {
     }
 }

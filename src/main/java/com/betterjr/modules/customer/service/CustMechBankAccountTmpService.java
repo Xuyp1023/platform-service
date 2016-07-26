@@ -1,7 +1,5 @@
 package com.betterjr.modules.customer.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.service.BaseService;
@@ -16,7 +14,6 @@ import com.betterjr.modules.customer.entity.CustMechBankAccountTmp;
  */
 @Service
 public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccountTmpMapper,CustMechBankAccountTmp> {
-    private static Logger logger = LoggerFactory.getLogger(CustMechBankAccountTmpService.class);
 
     /**
      * 查询银行账户流水信息

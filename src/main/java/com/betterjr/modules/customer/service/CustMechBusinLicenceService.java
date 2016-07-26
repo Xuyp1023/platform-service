@@ -10,9 +10,10 @@ import org.springframework.stereotype.Service;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.Collections3;
+import com.betterjr.modules.customer.constant.CustomerConstants;
 import com.betterjr.modules.customer.dao.CustMechBusinLicenceMapper;
 import com.betterjr.modules.customer.entity.CustMechBusinLicence;
-import com.betterjr.modules.customer.entity.CustMechBusinLicence;
+import com.betterjr.modules.customer.helper.IFormalDataService;
 
 /**
  * 
@@ -20,8 +21,7 @@ import com.betterjr.modules.customer.entity.CustMechBusinLicence;
  *
  */
 @Service
-public class CustMechBusinLicenceService extends BaseService<CustMechBusinLicenceMapper,CustMechBusinLicence> {
-    private static final String CUST_NO = "custNo";
+public class CustMechBusinLicenceService extends BaseService<CustMechBusinLicenceMapper,CustMechBusinLicence>{
     
     private static Logger logger = LoggerFactory.getLogger(CustMechBusinLicenceService.class);
 
@@ -34,7 +34,7 @@ public class CustMechBusinLicenceService extends BaseService<CustMechBusinLicenc
     public CustMechBusinLicence findCustMechBusinLicenceByCustNo(Long anCustNo) {
         BTAssert.notNull(anCustNo, "客户编号不允许为空！");
         
-        final List<CustMechBusinLicence> BusinLicences = this.selectByProperty(CUST_NO, anCustNo);
+        final List<CustMechBusinLicence> BusinLicences = this.selectByProperty(CustomerConstants.CUST_NO, anCustNo);
         return Collections3.getFirst(BusinLicences);
     }
 
@@ -47,7 +47,7 @@ public class CustMechBusinLicenceService extends BaseService<CustMechBusinLicenc
     public CustMechBusinLicence saveCustMechBusinLicence(CustMechBusinLicence anCustMechBusinLicence, Long anCustNo) {
         BTAssert.notNull(anCustNo, "客户编号不允许为空");
         
-        final Collection<CustMechBusinLicence> custMechBusinLicences = this.selectByProperty(CUST_NO, anCustNo);
+        final Collection<CustMechBusinLicence> custMechBusinLicences = this.selectByProperty(CustomerConstants.CUST_NO, anCustNo);
         final CustMechBusinLicence tempCustMechBusinLicence = Collections3.getFirst(custMechBusinLicences);
         BTAssert.notNull(tempCustMechBusinLicence, "对应的营业执照信息没有找到！");
         
