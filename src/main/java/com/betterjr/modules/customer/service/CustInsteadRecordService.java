@@ -1,5 +1,8 @@
 package com.betterjr.modules.customer.service;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -8,6 +11,7 @@ import com.betterjr.common.exception.BytterTradeException;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterStringUtils;
+import com.betterjr.modules.customer.constant.CustomerConstants;
 import com.betterjr.modules.customer.dao.CustInsteadRecordMapper;
 import com.betterjr.modules.customer.entity.CustInsteadRecord;
 
@@ -19,10 +23,60 @@ import com.betterjr.modules.customer.entity.CustInsteadRecord;
  */
 @Service
 public class CustInsteadRecordService extends BaseService<CustInsteadRecordMapper, CustInsteadRecord> {
-    private static Logger logger = LoggerFactory.getLogger(CustInsteadRecordService.class);
+    
+    private final static String INSTEAD_ITEMS_REGEX = "^([01],){6}[01]$";
+    private final static String INSTEAD_ITEMS_INC_REGEX = "^.*1+.*$";
+    private final static Pattern INSTEAD_ITEMS_PATTERN;
+    private final static Pattern INSTEAD_ITEMS_INC_PATTERN;
+    
+    static {
+        INSTEAD_ITEMS_PATTERN = Pattern.compile(INSTEAD_ITEMS_REGEX);
+        INSTEAD_ITEMS_INC_PATTERN = Pattern.compile(INSTEAD_ITEMS_INC_REGEX);
+    }
+    
+    public static void main(String[] args) {
+        System.out.println(INSTEAD_ITEMS_PATTERN.matcher("0,1,0,0,0,0,0").matches());
+        System.out.println(INSTEAD_ITEMS_INC_PATTERN.matcher("0,0,0,1,0,0,0").matches());
+    }
+    
+    /**
+     * 根据代录申请类型，代录项目生成代录记录
+     * @param anApplyId
+     * @param anInsteadType
+     * @param anInsteadItems
+     */
+    public void addCustInsteadRecord(Long anApplyId, String anInsteadType, String anInsteadItems) {
+        // 0 开户代录 1 变更代录
+        if (BetterStringUtils.equals(anInsteadType, CustomerConstants.INSTEAD_APPLY_TYPE_OPENACCOUNT)) {
+            this.addCustInsteadRecord(anApplyId, CustomerConstants.ITEM_OPENACCOUNT);
+        }
+        else {
+            BTAssert.notNull(anInsteadItems, "代录项目不能为空");
+            
+            if (INSTEAD_ITEMS_PATTERN.matcher(anInsteadItems).matches() == true) {
+                if (INSTEAD_ITEMS_INC_PATTERN.matcher(anInsteadItems).matches() == true) {
+                    final String[] tempInsteadItems = BetterStringUtils.split(anInsteadItems, ",");
+                    int insteadItemIndex = 0;
+                    // 代录项目: 0公司基本信息，1法人信息，2股东信息，3高管信息，4营业执照，5联系人信息，6银行账户, 7开户代录
+                    for (String insteadItem : tempInsteadItems) {
+                        if (BetterStringUtils.equals(insteadItem, CustomerConstants.ITEM_ENABLED) == true) {
+                            // 代录项目: 0公司基本信息，1法人信息，2股东信息，3高管信息，4营业执照，5联系人信息，6银行账户, 7开户代录
+                            this.addCustInsteadRecord(anApplyId, String.valueOf(insteadItemIndex));
+                        }
+                        insteadItemIndex++;
+                    }
+                }
+                else {
+                    throw new BytterTradeException(20006, "至少需要一个代录项");
+                }
+            } else {
+                throw new BytterTradeException(20005, "代录项目数据不正确");
+            }
+        }
+    }
 
     /**
-     * 添加代录项目 空项目
+     * 添加代录项目 空代录项目
      * 
      * @param anRefId
      * @param anChangeItemBase
@@ -39,7 +93,8 @@ public class CustInsteadRecordService extends BaseService<CustInsteadRecordMappe
         this.insert(custInsteadRecord);
         return custInsteadRecord;
     }
-
+    
+    
     /**
      * 查找代录项目
      * 
@@ -57,21 +112,32 @@ public class CustInsteadRecordService extends BaseService<CustInsteadRecordMappe
      * 
      * @return
      */
-    public CustInsteadRecord saveCustInsteadRecord(Long anId, String anInsteadItem, String anTmpIds) {
+    public CustInsteadRecord saveCustInsteadRecord(Long anId, String anTmpIds) {
         BTAssert.notNull(anId, "代录项编号不能为空！");
-        BTAssert.notNull(anInsteadItem, "代录项目不能为空！");
         BTAssert.notNull(anTmpIds, "代录流水编号不能为空！");
 
         final CustInsteadRecord tempCustInsteadRecord = this.selectByPrimaryKey(anId);
         BTAssert.notNull(tempCustInsteadRecord, "没有找到对应的代录项目！");
 
-        final String insteadItem = tempCustInsteadRecord.getInsteadItem();
-        if (BetterStringUtils.equals(anInsteadItem, insteadItem) == false) {
-            throw new BytterTradeException(20006, "代录项目不匹配！");
-        }
+        tempCustInsteadRecord.initModifyValue(CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN, anTmpIds);
 
-        tempCustInsteadRecord.setTmpIds(anTmpIds);
-        tempCustInsteadRecord.initModifyValue();
+        this.updateByPrimaryKeySelective(tempCustInsteadRecord);
+        return tempCustInsteadRecord;
+    }
+    
+    /**
+     * 保存代录项目-修改状态
+     * 
+     * @return
+     */
+    public CustInsteadRecord saveCustInsteadRecordStatus(Long anId, String anBusinStatus) {
+        BTAssert.notNull(anId, "代录项编号不能为空！");
+        BTAssert.notNull(anBusinStatus, "状态不允许为空！");
+
+        final CustInsteadRecord tempCustInsteadRecord = this.selectByPrimaryKey(anId);
+        BTAssert.notNull(tempCustInsteadRecord, "没有找到对应的代录项目！");
+
+        tempCustInsteadRecord.initModifyValue(anBusinStatus);
 
         this.updateByPrimaryKeySelective(tempCustInsteadRecord);
         return tempCustInsteadRecord;

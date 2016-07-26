@@ -1,14 +1,12 @@
 package com.betterjr.modules.customer.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.modules.customer.dao.CustMechShareholderTmpMapper;
 import com.betterjr.modules.customer.entity.CustMechShareholderTmp;
-import com.betterjr.modules.customer.entity.CustMechShareholderTmp;
+import com.betterjr.modules.customer.helper.IFormalDataService;
 
 /**
  * 
@@ -16,8 +14,7 @@ import com.betterjr.modules.customer.entity.CustMechShareholderTmp;
  *
  */
 @Service
-public class CustMechShareholderTmpService extends BaseService<CustMechShareholderTmpMapper, CustMechShareholderTmp> {
-    private static Logger logger = LoggerFactory.getLogger(CustMechShareholderTmpService.class);
+public class CustMechShareholderTmpService extends BaseService<CustMechShareholderTmpMapper, CustMechShareholderTmp>  implements IFormalDataService{
     
     /**
      * 查询公司股东流水信息
@@ -58,5 +55,9 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
         
         anCustMechShareholderTmp.initAddValue();
         return this.insert(anCustMechShareholderTmp);
+    }
+
+    @Override
+    public void saveFormalData(String ... anTmpIds) {
     }
 }

@@ -5,6 +5,7 @@ import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
 import com.betterjr.common.annotation.MetaData;
@@ -38,7 +39,7 @@ public class CustAuditLog implements BetterjrEntity {
      * 审核类型 0开户审核 1代录申请审核 2代录审核 3变更审核 4客户关系审核
      */
     @Column(name = "C_AUDIT_TYPE", columnDefinition = "CHAR")
-    @MetaData(value = "审核类型 0开户审核 1代录申请审核 2代录审核 3变更审核 4客户关系审核", comments = "审核类型 0开户审核 1代录申请审核 2代录审核 3变更审核 4客户关系审核")
+    @MetaData(value = "审核类型", comments = "审核类型 0开户审核 1代录申请审核 2代录审核 3变更审核 4客户关系审核")
     private String auditType;
 
     /**
@@ -58,6 +59,7 @@ public class CustAuditLog implements BetterjrEntity {
     /**
      * 审核日期
      */
+    @OrderBy("DESC")
     @Column(name = "D_AUDIT_DATE", columnDefinition = "VARCHAR")
     @MetaData(value = "审核日期", comments = "审核日期")
     private String auditDate;
@@ -65,6 +67,7 @@ public class CustAuditLog implements BetterjrEntity {
     /**
      * 审核时间
      */
+    @OrderBy("DESC")
     @Column(name = "T_AUDIT_TIME", columnDefinition = "VARCHAR")
     @MetaData(value = "审核时间", comments = "审核时间")
     private String auditTime;
@@ -435,7 +438,7 @@ public class CustAuditLog implements BetterjrEntity {
         return result;
     }
 
-    public void initAddValue() {
+    public void initAddValue(String anAuditType, Long anBusinId, String anAuditResult, String anReason, String anAuditItem, Long anCustNo) {
         this.id = SerialGenerator.getLongValue("CustAuditLog.id");
 
         this.regOperId = UserUtils.getOperatorInfo().getId();
@@ -448,22 +451,19 @@ public class CustAuditLog implements BetterjrEntity {
         this.modiDate = BetterDateUtils.getNumDate();
         this.modiTime = BetterDateUtils.getNumTime();
 
+        this.auditDate = BetterDateUtils.getNumDate();;
+        this.auditTime = BetterDateUtils.getNumTime();
+        
+        this.auditItem = anAuditItem;
+        
+        this.auditType = anAuditType;
+        this.businId = anBusinId;
+        this.result = anAuditResult;
+        this.reason = anReason;
+        this.custNo = anCustNo;
+
         this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
         this.businStatus = "0";
     }
 
-    public void initModifyValue(final CustAuditLog anCustAuditLog) {
-        this.id = anCustAuditLog.getId();
-        /*
-         * this.regOperId = anCustMechBaseTmp.getRegOperId(); this.regOperName = anCustMechBaseTmp.getRegOperName(); this.regDate =
-         * anCustMechBaseTmp.getRegDate(); this.regTime = anCustMechBaseTmp.getRegTime();
-         */
-        this.modiOperId = UserUtils.getOperatorInfo().getId();
-        this.modiOperName = UserUtils.getOperatorInfo().getName();
-        this.modiDate = BetterDateUtils.getNumDate();
-        this.modiTime = BetterDateUtils.getNumTime();
-
-        this.businStatus = anCustAuditLog.getBusinStatus();
-        this.operOrg = anCustAuditLog.getOperOrg();
-    }
 }
