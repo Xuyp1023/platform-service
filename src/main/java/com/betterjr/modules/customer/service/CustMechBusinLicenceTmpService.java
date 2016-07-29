@@ -82,6 +82,7 @@ public class CustMechBusinLicenceTmpService extends BaseService<CustMechBusinLic
     public CustMechBusinLicenceTmp addCustMechBusinLicenceTmp(CustMechBusinLicenceTmp anCustMechBusinLicenceTmp, String anTmpType) {
         BTAssert.notNull(anCustMechBusinLicenceTmp, "营业执照流水信息不允许为空！");
 
+        anCustMechBusinLicenceTmp.setCustNo(anCustMechBusinLicenceTmp.getRefId());
         anCustMechBusinLicenceTmp.initAddValue(anTmpType);
         this.insert(anCustMechBusinLicenceTmp);
 

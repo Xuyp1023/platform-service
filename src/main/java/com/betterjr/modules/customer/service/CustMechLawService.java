@@ -56,20 +56,10 @@ public class CustMechLawService extends BaseService<CustMechLawMapper, CustMechL
     public CustMechLaw saveCustMechLaw(CustMechLawTmp anCustMechLawTmp) {
         BTAssert.notNull(anCustMechLawTmp, "法人流水信息不允许为空！");
 
-        CustMechLaw tempCustMechLaw = null;
         // 根据 类型区别保存数据方式
         String tmpType = anCustMechLawTmp.getTmpType();
-        if (BetterStringUtils.equals(CustomerConstants.TMP_TYPE_INSTEAD, tmpType) == true) {
-            Long custNo = anCustMechLawTmp.getRefId();
-            tempCustMechLaw = this.findCustMechLawByCustNo(custNo);
-        }
-        else if (BetterStringUtils.equals(CustomerConstants.TMP_TYPE_CHANGE, tmpType) == true) {
-            Long id = anCustMechLawTmp.getRefId();
-            tempCustMechLaw = this.findCustMechLaw(id);
-        }
-        else {
-            throw new BytterTradeException(20100, "法人流水类型不正确!");
-        }
+        Long custNo = anCustMechLawTmp.getRefId();
+        CustMechLaw tempCustMechLaw = this.findCustMechLawByCustNo(custNo);
 
         BTAssert.notNull(tempCustMechLaw, "没有找到法人信息!");
 

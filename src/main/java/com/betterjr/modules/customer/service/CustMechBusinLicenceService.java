@@ -66,18 +66,8 @@ public class CustMechBusinLicenceService extends BaseService<CustMechBusinLicenc
         BTAssert.notNull(anBusinLicenceTmp, "营业执照流水信息不允许为空！");
 
         String tmpType = anBusinLicenceTmp.getTmpType();
-        CustMechBusinLicence tempCustMechBusinLicence = null;
-        if (BetterStringUtils.equals(CustomerConstants.TMP_TYPE_INSTEAD, tmpType) == true) {
-            Long custNo = anBusinLicenceTmp.getRefId();
-            tempCustMechBusinLicence = this.findCustMechBusinLicenceByCustNo(custNo);
-        }
-        else if (BetterStringUtils.equals(CustomerConstants.TMP_TYPE_CHANGE, tmpType) == true) {
-            Long id = anBusinLicenceTmp.getRefId();
-            tempCustMechBusinLicence = this.findCustMechBusinLicence(id);
-        }
-        else {
-            throw new BytterTradeException(20100, "营业执照流水类型不正确!");
-        }
+        Long custNo = anBusinLicenceTmp.getRefId();
+        CustMechBusinLicence tempCustMechBusinLicence = this.findCustMechBusinLicenceByCustNo(custNo);
 
         BTAssert.notNull(tempCustMechBusinLicence, "没有找到营业执照信息!");
 
