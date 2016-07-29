@@ -31,6 +31,7 @@ public interface CustomerConstants {
     String TMP_TYPE_CHANGE = "1";
     String TMP_TYPE_TEMPSTORE = "2";
     String TMP_TYPE_INITDATA = "3";
+    String TMP_TYPE_INSTEADSTORE = "4";
 
     // 流水操作类型:0 新增 1 修改 2 删除 3 未改变
     String TMP_OPER_TYPE_ADD = "0";
