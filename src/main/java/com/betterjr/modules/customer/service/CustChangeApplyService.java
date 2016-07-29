@@ -36,12 +36,12 @@ public class CustChangeApplyService extends BaseService<CustChangeApplyMapper, C
      * @param anTmpIds
      * @return
      */
-    public CustChangeApply addCustChangeApply(Long anCustNo, String anChangeItem, String anTmpIds) {
+    public CustChangeApply addChangeApply(Long anCustNo, String anChangeItem, String anTmpIds) {
         BTAssert.notNull(anCustNo, "客户编号不允许为空！");
         BTAssert.notNull(anChangeItem, "变更项目不允许为空！");
         BTAssert.notNull(anTmpIds, "变更流水项不允许为空！");
 
-        if (checkExistChangeApply(anCustNo, anChangeItem) == true) {
+        if (checkExistChangeApply(anCustNo, anChangeItem, CustomerConstants.CHANGE_APPLY_STATUS_NEW) == true) {
             throw new BytterTradeException(40001, "不允许重复提交变更申请！");
         }
 
@@ -49,6 +49,19 @@ public class CustChangeApplyService extends BaseService<CustChangeApplyMapper, C
         custChangeApply.initAddValue(anCustNo, anChangeItem, anTmpIds);
         this.insert(custChangeApply);
         return custChangeApply;
+    }
+    
+    /**
+     * 变更申请 查询
+     * 
+     * @param anCustNo
+     * @param anChangeItem
+     * @param anTmpIds
+     * @return
+     */
+    public CustChangeApply findChangeApply(Long anId) {
+        BTAssert.notNull(anId, "变更申请 编号不允许为空！");
+        return this.selectByPrimaryKey(anId);
     }
 
     /**
@@ -59,14 +72,14 @@ public class CustChangeApplyService extends BaseService<CustChangeApplyMapper, C
      * @param anTmpIds
      * @return
      */
-    public Boolean checkExistChangeApply(Long anCustNo, String anChangeItem) {
+    public Boolean checkExistChangeApply(Long anCustNo, String anChangeItem, String anBusinStatus) {
         BTAssert.notNull(anCustNo, "客户编号不允许为空！");
         BTAssert.notNull(anChangeItem, "变更项目不允许为空！");
 
         final Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("custNo", anCustNo);
         conditionMap.put("changeItem", anChangeItem);
-        conditionMap.put("businStatus", CustomerConstants.NORMAL_STATUS);
+        conditionMap.put("businStatus", anBusinStatus);
 
         List<CustChangeApply> custChangeApplys = this.selectByProperty(conditionMap);
 
@@ -79,7 +92,7 @@ public class CustChangeApplyService extends BaseService<CustChangeApplyMapper, C
      * @param anCustChangeApply
      * @return
      */
-    public CustChangeApply saveCustChangeApplyStatus(Long anId, String anBusinStatus) {
+    public CustChangeApply saveChangeApplyStatus(Long anId, String anBusinStatus) {
         BTAssert.notNull(anId, "编号不允许为空！");
         BTAssert.notNull(anBusinStatus, "状态不允许为空！");
 
@@ -96,17 +109,16 @@ public class CustChangeApplyService extends BaseService<CustChangeApplyMapper, C
      * @return
      */
     public Page<CustChangeApply> queryCustChangeApply(Map<String, Object> anParam, int anFlag, int anPageNum, int anPageSize) {
+        final Page<CustChangeApply> changeApplys = this.selectPropertyByPage(anParam, anPageNum, anPageSize, anFlag == 1);
 
-        final Page<CustChangeApply> changeApplys = this.selectPropertyByPage(CustChangeApply.class, anParam, anPageNum, anPageSize, anFlag == 1);
-
-        for (CustChangeApply changeApply : changeApplys) {
+        changeApplys.forEach(changeApply -> {
             CustAuditLog auditLog = auditLogService.findCustAuditLogByCustChangeApply(changeApply);
             if (auditLog != null) {
                 changeApply.setAuditDate(auditLog.getAuditDate());
                 changeApply.setAuditTime(auditLog.getAuditTime());
                 changeApply.setAuditResult(auditLog.getResult());
             }
-        }
+        });
 
         return changeApplys;
     }

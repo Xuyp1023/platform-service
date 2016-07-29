@@ -9,9 +9,11 @@ import org.slf4j.LoggerFactory;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import com.betterjr.common.web.AjaxObject;
+import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.customer.ICustMechLawService;
 import com.betterjr.modules.customer.constant.CustomerConstants;
 import com.betterjr.modules.customer.entity.CustChangeApply;
+import com.betterjr.modules.customer.entity.CustMechBaseTmp;
 import com.betterjr.modules.customer.entity.CustMechLaw;
 import com.betterjr.modules.customer.entity.CustMechLawTmp;
 import com.betterjr.modules.customer.service.CustChangeService;
@@ -39,70 +41,53 @@ public class CustMechLawDubboService implements ICustMechLawService {
     @Resource
     private CustChangeService changeService;
 
-    @Resource
-    private CustInsteadService insteadService;
-
     @Override
     public String webFindLawInfo(Long anCustNo) {
-        return AjaxObject.newOk("法人信息查询成功", lawService.findCustMechLawByCustNo(anCustNo)).toJson();
-    }
-
-    @Override
-    public Object saveLawInfo(Object anCustMechLaw, Long anId) {
-        return AjaxObject.newOk("公司法人信息修改成功", lawService.saveCustMechLaw((CustMechLaw) anCustMechLaw, anId)).toJson();
-    }
-
-    @Override
-    public Object addLawInfo(Object anCustMechLaw, Long anId) {
-        return AjaxObject.newOk("公司法人信息添加成功", lawService.addCustMechLaw((CustMechLaw) anCustMechLaw)).toJson();
-    }
-
-    @Override
-    public String webAddChangeApply(Map<String, Object> anParam, Long anCustNo, Long anId) {
-        final CustMechLawTmp custMechLawTmp = (CustMechLawTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return AjaxObject.newOk("公司法人信息-变更-添加 成功", changeService.addCustChangeApply(custMechLawTmp)).toJson();
+        final CustMechLaw custMechLaw = lawService.findCustMechLawByCustNo(anCustNo);
+        return AjaxObject.newOk("法人信息-详情查询 成功", custMechLaw).toJson();
     }
 
     @Override
     public String webFindChangeApply(Long anId) {
         final CustChangeApply changeApply = changeService.findChangeApply(anId, CustomerConstants.ITEM_LAW);
-        return AjaxObject.newOk("公司法人信息-变更申请-查询 成功", changeApply).toJson();
-    }
-
-    @Override
-    public String webConfirmChangeApply(Long anChangeId, Long anCustNo, Long anId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public String webCancelChangeApply(Long anChangeId, Long anCustNo, Long anId) {
-        // TODO Auto-generated method stub
-        return null;
+        return AjaxObject.newOk("法人信息-变更详情查询 成功", changeApply).toJson();
     }
 
     @Override
     public String webQueryChangeApply(Long anCustNo, int anFlag, int anPageNum, int anPageSize) {
-        // TODO Auto-generated method stub
-        return null;
+        final Page<CustChangeApply> changeApplys = changeService.queryChangeApply(anCustNo, CustomerConstants.ITEM_LAW, anFlag, anPageNum,
+                anPageSize);
+        return AjaxObject.newOkWithPage("法人信息-变更列表查询 成功", changeApplys).toJson();
     }
 
     @Override
-    public String webAddInsteadRecord(Map<String, Object> anParam, Long anCustNo, Long anId) {
-        // TODO Auto-generated method stub
-        return null;
+    public String webAddChangeApply(Map<String, Object> anParam, String anFileList) {
+        final CustMechLawTmp custMechLawTmp = (CustMechLawTmp) RuleServiceDubboFilterInvoker.getInputObj();
+        return AjaxObject.newOk("法人信息-变更申请 成功", lawTmpService.addChangeApply(custMechLawTmp, anFileList)).toJson();
     }
 
     @Override
-    public String webConfirmInsteadRecord(Long anInsteadId, Long anCustNo, Long anId) {
-        // TODO Auto-generated method stub
-        return null;
+    public String webSaveChangeApply(Map<String, Object> anParam, Long anApplyId, String anFileList) {
+        final CustMechLawTmp custMechLawTmp = (CustMechLawTmp) RuleServiceDubboFilterInvoker.getInputObj();
+        return AjaxObject.newOk("法人信息-变更修改 成功", lawTmpService.saveChangeApply(custMechLawTmp, anApplyId, anFileList)).toJson();
     }
 
     @Override
-    public String webCancelInsteadRecord(Long anInsteadId, Long anCustNo, Long anId) {
-        // TODO Auto-generated method stub
-        return null;
+    public String webAddInsteadRecord(Map<String, Object> anParam, Long anInsteadRecordId, String anFileList) {
+        final CustMechLawTmp custMechLawTmp = (CustMechLawTmp) RuleServiceDubboFilterInvoker.getInputObj();
+        return AjaxObject.newOk("法人信息-代录添加 成功", lawTmpService.addInsteadRecord(custMechLawTmp, anInsteadRecordId, anFileList)).toJson();
     }
+
+    @Override
+    public String webSaveInsteadRecord(Map<String, Object> anParam, Long anInsteadRecordId, String anFileList) {
+        final CustMechLawTmp custMechLawTmp = (CustMechLawTmp) RuleServiceDubboFilterInvoker.getInputObj();
+        return AjaxObject.newOk("法人信息-代录修改 成功", lawTmpService.saveInsteadRecord(custMechLawTmp, anInsteadRecordId, anFileList)).toJson();
+    }
+
+    @Override
+    public String webFindInsteadRecord(Long anInsteadRecordId) {
+        return AjaxObject.newOk("法人信息-代录详情 成功", lawTmpService.findCustMechLawTmpByInsteadRecordId(anInsteadRecordId)).toJson();
+    }
+
 
 }

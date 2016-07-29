@@ -4,21 +4,28 @@ import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.betterjr.common.annotation.MetaData;
 import com.betterjr.common.entity.BetterjrEntity;
+import com.betterjr.common.mapper.CustDateJsonSerializer;
 import com.betterjr.common.selectkey.SerialGenerator;
 import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.UserUtils;
+import com.betterjr.modules.customer.constant.CustomerConstants;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @Access(AccessType.FIELD)
 @Entity
-@Table(name = "t_cust_relation")
-public class CustRelation implements BetterjrEntity {
+@Table(name = "t_cust_change_apply")
+public class CustChangeApply implements BetterjrEntity {
     /**
      * 编号
      */
+    @Id
     @Column(name = "ID",  columnDefinition="INTEGER" )
     @MetaData( value="编号", comments = "编号")
     private Long id;
@@ -31,81 +38,33 @@ public class CustRelation implements BetterjrEntity {
     private Long custNo;
 
     /**
-     * 客户全称
+     * 变更项目: 0公司基本信息，1法人信息，2股东信息，3高管信息，4营业执照，5联系人信息，6银行账户
      */
-    @Column(name = "C_CUSTNAME",  columnDefinition="VARCHAR" )
-    @MetaData( value="客户全称", comments = "客户全称")
-    private String custName;
+    @Column(name = "C_CHANGE_ITEM",  columnDefinition="CHAR" )
+    @MetaData( value="变更项目", comments = "变更项目: 0公司基本信息，1法人信息，2股东信息，3高管信息，4营业执照，5联系人信息，6银行账户")
+    private String changeItem;
 
     /**
-     * 银行账号
+     * 变更描述
      */
-    @Column(name = "C_BANK_ACCO",  columnDefinition="VARCHAR" )
-    @MetaData( value="银行账号", comments = "银行账号")
-    private String bankAcco;
+    @Column(name = "C_DESCRIPTION",  columnDefinition="VARCHAR" )
+    @MetaData( value="变更描述", comments = "变更描述")
+    private String description;
 
     /**
-     * 银行户名
+     * 临时流水编号列表
      */
-    @Column(name = "C_BANK_ACCONAME",  columnDefinition="VARCHAR" )
-    @MetaData( value="银行户名", comments = "银行户名")
-    private String bankAccoName;
+    @Column(name = "C_TMP_IDS",  columnDefinition="VARCHAR" )
+    @MetaData( value="临时流水编号列表", comments = "临时流水编号列表")
+    private String tmpIds;
 
     /**
-     * 客户类型：0：机构；1：个人
+     * 数据版本号
      */
-    @Column(name = "C_CUSTTYPE",  columnDefinition="CHAR" )
-    @MetaData( value="客户类型：0：机构", comments = "客户类型：0：机构；1：个人")
-    private String custType;
-
-    /**
-     * 客户在资金管理系统中的客户号
-     */
-    @Column(name = "C_BT_NO",  columnDefinition="VARCHAR" )
-    @MetaData( value="客户在资金管理系统中的客户号", comments = "客户在资金管理系统中的客户号")
-    private String btNo;
-
-    /**
-     * 所属单位ID
-     */
-    @Column(name = "C_CORP_ID",  columnDefinition="VARCHAR" )
-    @MetaData( value="所属单位ID", comments = "所属单位ID")
-    private String corpId;
-
-    /**
-     * 关系客户编号
-     */
-    @Column(name = "L_RELATE_CUSTNO",  columnDefinition="INTEGER" )
-    @MetaData( value="关系客户编号", comments = "关系客户编号")
-    private Long relateCustNo;
-
-    /**
-     * 关系客户名称
-     */
-    @Column(name = "C_RELATE_CUSTNAME",  columnDefinition="VARCHAR" )
-    @MetaData( value="关系客户名称", comments = "关系客户名称")
-    private String relateCustName;
-
-    /**
-     * 关系类型:0供应商与保理公司 1供应商与核心企业 2核心企业与保理公司 3经销商与保理公司 4经销商与核心企业
-     */
-    @Column(name = "C_RELATE_TYPE",  columnDefinition="CHAR" )
-    @MetaData( value="关系类型", comments = "关系类型:0供应商与保理公司 1供应商与核心企业 2核心企业与保理公司 3经销商与保理公司 4经销商与核心企业")
-    private String relateType;
-
-    /**
-     * 操作员编号
-     */
-    @Column(name = "L_OPERID",  columnDefinition="INTEGER" )
-    @MetaData( value="操作员编号", comments = "操作员编号")
-    private Long operId;
-
-    /**
-     * 操作员姓名
-     */
-    @Column(name = "C_OPERNAME",  columnDefinition="VARCHAR" )
-    @MetaData( value="操作员姓名", comments = "操作员姓名")
-    private String operName;
+    @JsonIgnore
+    @Column(name = "N_VERSION",  columnDefinition="INTEGER" )
+    @MetaData( value="数据版本号", comments = "数据版本号")
+    private Long version;
 
     /**
      * 创建人(操作员)ID号
@@ -124,6 +83,7 @@ public class CustRelation implements BetterjrEntity {
     /**
      * 创建日期
      */
+    @JsonSerialize(using = CustDateJsonSerializer.class)
     @Column(name = "D_REG_DATE",  columnDefinition="VARCHAR" )
     @MetaData( value="创建日期", comments = "创建日期")
     private String regDate;
@@ -138,6 +98,7 @@ public class CustRelation implements BetterjrEntity {
     /**
      * 修改人(操作员)ID号
      */
+    @JsonIgnore
     @Column(name = "L_MODI_OPERID",  columnDefinition="INTEGER" )
     @MetaData( value="修改人(操作员)ID号", comments = "修改人(操作员)ID号")
     private Long modiOperId;
@@ -145,6 +106,7 @@ public class CustRelation implements BetterjrEntity {
     /**
      * 修改人(操作员)姓名
      */
+    @JsonIgnore
     @Column(name = "C_MODI_OPERNAME",  columnDefinition="VARCHAR" )
     @MetaData( value="修改人(操作员)姓名", comments = "修改人(操作员)姓名")
     private String modiOperName;
@@ -152,6 +114,7 @@ public class CustRelation implements BetterjrEntity {
     /**
      * 修改日期
      */
+    @JsonIgnore
     @Column(name = "D_MODI_DATE",  columnDefinition="VARCHAR" )
     @MetaData( value="修改日期", comments = "修改日期")
     private String modiDate;
@@ -159,29 +122,42 @@ public class CustRelation implements BetterjrEntity {
     /**
      * 修改时间
      */
+    @JsonIgnore
     @Column(name = "T_MODI_TIME",  columnDefinition="VARCHAR" )
     @MetaData( value="修改时间", comments = "修改时间")
     private String modiTime;
 
     /**
-     * 登陆机构
+     * 操作机构
      */
+    @JsonIgnore
     @Column(name = "C_OPERORG",  columnDefinition="VARCHAR" )
-    @MetaData( value="登陆机构", comments = "登陆机构")
+    @MetaData( value="操作机构", comments = "操作机构")
     private String operOrg;
 
     /**
-     * 状态，0未处理，1正常，2申请中， 3取消中，4取消
+     * 状态：0未审核 1审核通过 2审核驳回
      */
     @Column(name = "C_BUSIN_STATUS",  columnDefinition="CHAR" )
-    @MetaData( value="状态", comments = "状态，0未处理，1正常，2申请中， 3取消中，4取消")
+    @MetaData( value="状态", comments = "状态：0未审核 1审核通过 2审核驳回")
     private String businStatus;
 
     @Column(name = "C_LAST_STATUS",  columnDefinition="CHAR" )
     @MetaData( value="", comments = "")
     private String lastStatus;
+    
+    // 最后一次审批情况
+    @Transient
+    @JsonSerialize(using = CustDateJsonSerializer.class)
+    private String auditDate;
+    
+    @Transient
+    private String auditTime;
+    
+    @Transient
+    private String auditResult;
 
-    private static final long serialVersionUID = 1468812783874L;
+    private static final long serialVersionUID = 1468812783843L;
 
     public Long getId() {
         return id;
@@ -199,92 +175,36 @@ public class CustRelation implements BetterjrEntity {
         this.custNo = custNo;
     }
 
-    public String getCustName() {
-        return custName;
+    public String getChangeItem() {
+        return changeItem;
     }
 
-    public void setCustName(String custName) {
-        this.custName = custName == null ? null : custName.trim();
+    public void setChangeItem(String changeItem) {
+        this.changeItem = changeItem == null ? null : changeItem.trim();
     }
 
-    public String getBankAcco() {
-        return bankAcco;
+    public String getDescription() {
+        return description;
     }
 
-    public void setBankAcco(String bankAcco) {
-        this.bankAcco = bankAcco == null ? null : bankAcco.trim();
+    public void setDescription(String description) {
+        this.description = description == null ? null : description.trim();
     }
 
-    public String getBankAccoName() {
-        return bankAccoName;
+    public String getTmpIds() {
+        return tmpIds;
     }
 
-    public void setBankAccoName(String bankAccoName) {
-        this.bankAccoName = bankAccoName == null ? null : bankAccoName.trim();
+    public void setTmpIds(String tmpIds) {
+        this.tmpIds = tmpIds == null ? null : tmpIds.trim();
     }
 
-    public String getCustType() {
-        return custType;
+    public Long getVersion() {
+        return version;
     }
 
-    public void setCustType(String custType) {
-        this.custType = custType == null ? null : custType.trim();
-    }
-
-    public String getBtNo() {
-        return btNo;
-    }
-
-    public void setBtNo(String btNo) {
-        this.btNo = btNo == null ? null : btNo.trim();
-    }
-
-    public String getCorpId() {
-        return corpId;
-    }
-
-    public void setCorpId(String corpId) {
-        this.corpId = corpId == null ? null : corpId.trim();
-    }
-
-    public Long getRelateCustNo() {
-        return relateCustNo;
-    }
-
-    public void setRelateCustNo(Long relateCustNo) {
-        this.relateCustNo = relateCustNo;
-    }
-
-    public String getRelateCustName() {
-        return relateCustName;
-    }
-
-    public void setRelateCustName(String relateCustName) {
-        this.relateCustName = relateCustName == null ? null : relateCustName.trim();
-    }
-
-    public String getRelateType() {
-        return relateType;
-    }
-
-    public void setRelateType(String relateType) {
-        this.relateType = relateType == null ? null : relateType.trim();
-    }
-
-    public Long getOperId() {
-        return operId;
-    }
-
-    public void setOperId(Long operId) {
-        this.operId = operId;
-    }
-
-    public String getOperName() {
-        return operName;
-    }
-
-    public void setOperName(String operName) {
-        this.operName = operName == null ? null : operName.trim();
+    public void setVersion(Long version) {
+        this.version = version;
     }
 
     public Long getRegOperId() {
@@ -374,7 +294,7 @@ public class CustRelation implements BetterjrEntity {
     public void setLastStatus(String lastStatus) {
         this.lastStatus = lastStatus == null ? null : lastStatus.trim();
     }
-
+    
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -383,17 +303,10 @@ public class CustRelation implements BetterjrEntity {
         sb.append("Hash = ").append(hashCode());
         sb.append(", id=").append(id);
         sb.append(", custNo=").append(custNo);
-        sb.append(", custName=").append(custName);
-        sb.append(", bankAcco=").append(bankAcco);
-        sb.append(", bankAccoName=").append(bankAccoName);
-        sb.append(", custType=").append(custType);
-        sb.append(", btNo=").append(btNo);
-        sb.append(", corpId=").append(corpId);
-        sb.append(", relateCustNo=").append(relateCustNo);
-        sb.append(", relateCustName=").append(relateCustName);
-        sb.append(", relateType=").append(relateType);
-        sb.append(", operId=").append(operId);
-        sb.append(", operName=").append(operName);
+        sb.append(", changeItem=").append(changeItem);
+        sb.append(", description=").append(description);
+        sb.append(", tmpIds=").append(tmpIds);
+        sb.append(", version=").append(version);
         sb.append(", regOperId=").append(regOperId);
         sb.append(", regOperName=").append(regOperName);
         sb.append(", regDate=").append(regDate);
@@ -421,20 +334,13 @@ public class CustRelation implements BetterjrEntity {
         if (getClass() != that.getClass()) {
             return false;
         }
-        CustRelation other = (CustRelation) that;
+        CustChangeApply other = (CustChangeApply) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
             && (this.getCustNo() == null ? other.getCustNo() == null : this.getCustNo().equals(other.getCustNo()))
-            && (this.getCustName() == null ? other.getCustName() == null : this.getCustName().equals(other.getCustName()))
-            && (this.getBankAcco() == null ? other.getBankAcco() == null : this.getBankAcco().equals(other.getBankAcco()))
-            && (this.getBankAccoName() == null ? other.getBankAccoName() == null : this.getBankAccoName().equals(other.getBankAccoName()))
-            && (this.getCustType() == null ? other.getCustType() == null : this.getCustType().equals(other.getCustType()))
-            && (this.getBtNo() == null ? other.getBtNo() == null : this.getBtNo().equals(other.getBtNo()))
-            && (this.getCorpId() == null ? other.getCorpId() == null : this.getCorpId().equals(other.getCorpId()))
-            && (this.getRelateCustNo() == null ? other.getRelateCustNo() == null : this.getRelateCustNo().equals(other.getRelateCustNo()))
-            && (this.getRelateCustName() == null ? other.getRelateCustName() == null : this.getRelateCustName().equals(other.getRelateCustName()))
-            && (this.getRelateType() == null ? other.getRelateType() == null : this.getRelateType().equals(other.getRelateType()))
-            && (this.getOperId() == null ? other.getOperId() == null : this.getOperId().equals(other.getOperId()))
-            && (this.getOperName() == null ? other.getOperName() == null : this.getOperName().equals(other.getOperName()))
+            && (this.getChangeItem() == null ? other.getChangeItem() == null : this.getChangeItem().equals(other.getChangeItem()))
+            && (this.getDescription() == null ? other.getDescription() == null : this.getDescription().equals(other.getDescription()))
+            && (this.getTmpIds() == null ? other.getTmpIds() == null : this.getTmpIds().equals(other.getTmpIds()))
+            && (this.getVersion() == null ? other.getVersion() == null : this.getVersion().equals(other.getVersion()))
             && (this.getRegOperId() == null ? other.getRegOperId() == null : this.getRegOperId().equals(other.getRegOperId()))
             && (this.getRegOperName() == null ? other.getRegOperName() == null : this.getRegOperName().equals(other.getRegOperName()))
             && (this.getRegDate() == null ? other.getRegDate() == null : this.getRegDate().equals(other.getRegDate()))
@@ -454,17 +360,10 @@ public class CustRelation implements BetterjrEntity {
         int result = 1;
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
         result = prime * result + ((getCustNo() == null) ? 0 : getCustNo().hashCode());
-        result = prime * result + ((getCustName() == null) ? 0 : getCustName().hashCode());
-        result = prime * result + ((getBankAcco() == null) ? 0 : getBankAcco().hashCode());
-        result = prime * result + ((getBankAccoName() == null) ? 0 : getBankAccoName().hashCode());
-        result = prime * result + ((getCustType() == null) ? 0 : getCustType().hashCode());
-        result = prime * result + ((getBtNo() == null) ? 0 : getBtNo().hashCode());
-        result = prime * result + ((getCorpId() == null) ? 0 : getCorpId().hashCode());
-        result = prime * result + ((getRelateCustNo() == null) ? 0 : getRelateCustNo().hashCode());
-        result = prime * result + ((getRelateCustName() == null) ? 0 : getRelateCustName().hashCode());
-        result = prime * result + ((getRelateType() == null) ? 0 : getRelateType().hashCode());
-        result = prime * result + ((getOperId() == null) ? 0 : getOperId().hashCode());
-        result = prime * result + ((getOperName() == null) ? 0 : getOperName().hashCode());
+        result = prime * result + ((getChangeItem() == null) ? 0 : getChangeItem().hashCode());
+        result = prime * result + ((getDescription() == null) ? 0 : getDescription().hashCode());
+        result = prime * result + ((getTmpIds() == null) ? 0 : getTmpIds().hashCode());
+        result = prime * result + ((getVersion() == null) ? 0 : getVersion().hashCode());
         result = prime * result + ((getRegOperId() == null) ? 0 : getRegOperId().hashCode());
         result = prime * result + ((getRegOperName() == null) ? 0 : getRegOperName().hashCode());
         result = prime * result + ((getRegDate() == null) ? 0 : getRegDate().hashCode());
@@ -479,8 +378,8 @@ public class CustRelation implements BetterjrEntity {
         return result;
     }
     
-    public void initAddValue() {
-        this.id = SerialGenerator.getLongValue("CustRelation.id");
+    public void initAddValue(Long anCustNo, String anChangeItem, String anTmpIds) {
+        this.id = SerialGenerator.getLongValue("CustChangeApply.id");
         
         this.regOperId = UserUtils.getOperatorInfo().getId();
         this.regOperName = UserUtils.getOperatorInfo().getName();
@@ -493,23 +392,44 @@ public class CustRelation implements BetterjrEntity {
         this.modiTime = BetterDateUtils.getNumTime();
         
         this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
-        this.businStatus = "0";
+        this.businStatus = CustomerConstants.CHANGE_APPLY_STATUS_NEW;
+        
+        this.custNo = anCustNo;
+        this.changeItem = anChangeItem;
+        this.tmpIds = anTmpIds;
     }
 
-    public void initModifyValue(final CustRelation anCustRelation) {
-        this.id = anCustRelation.getId();
-/*
-        this.regOperId = anCustMechBaseTmp.getRegOperId();
-        this.regOperName = anCustMechBaseTmp.getRegOperName();
-        this.regDate = anCustMechBaseTmp.getRegDate();
-        this.regTime = anCustMechBaseTmp.getRegTime();
-*/
+    public void initModifyValue(final String anBusinStatus) {
         this.modiOperId = UserUtils.getOperatorInfo().getId();
         this.modiOperName = UserUtils.getOperatorInfo().getName();
         this.modiDate = BetterDateUtils.getNumDate();
         this.modiTime = BetterDateUtils.getNumTime();
+        
+        this.lastStatus = this.businStatus;
+        this.businStatus = anBusinStatus;
+    }
 
-        this.businStatus = anCustRelation.getBusinStatus();
-        this.operOrg = anCustRelation.getOperOrg();
+    public String getAuditDate() {
+        return auditDate;
+    }
+
+    public void setAuditDate(String anAuditDate) {
+        auditDate = anAuditDate;
+    }
+
+    public String getAuditTime() {
+        return auditTime;
+    }
+
+    public void setAuditTime(String anAuditTime) {
+        auditTime = anAuditTime;
+    }
+
+    public String getAuditResult() {
+        return auditResult;
+    }
+
+    public void setAuditResult(String anAuditResult) {
+        auditResult = anAuditResult;
     }
 }

@@ -16,8 +16,13 @@ import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.customer.constant.CustomerConstants;
 import com.betterjr.modules.customer.entity.CustAuditLog;
 import com.betterjr.modules.customer.entity.CustChangeApply;
+import com.betterjr.modules.customer.entity.CustMechBankAccountTmp;
 import com.betterjr.modules.customer.entity.CustMechBaseTmp;
+import com.betterjr.modules.customer.entity.CustMechBusinLicenceTmp;
+import com.betterjr.modules.customer.entity.CustMechContacterTmp;
 import com.betterjr.modules.customer.entity.CustMechLawTmp;
+import com.betterjr.modules.customer.entity.CustMechManagerTmp;
+import com.betterjr.modules.customer.entity.CustMechShareholderTmp;
 import com.betterjr.modules.customer.helper.FormalDataServiceHelper;
 import com.betterjr.modules.customer.helper.IFormalDataService;
 
@@ -35,60 +40,6 @@ public class CustChangeService {
 
     @Resource
     private CustAuditLogService auditLogService;
-
-    @Resource
-    private CustMechBaseTmpService baseTmpService;
-
-    @Resource
-    private CustMechLawTmpService lawTmpService;
-
-    /*
-     * 
-     * 
-     * @Resource private CustMechBankAccountTmpService bankAccountTmpService;
-     * 
-     * @Resource private CustMechBusinLicenceTmpService businLicenceTmpService;
-     * 
-     * 
-     * 
-     * @Resource private CustMechContacterTmpService contacterTmpService;
-     * 
-     * @Resource private CustMechManagerTmpService managerTmpService;
-     * 
-     * @Resource private CustMechShareholderTmpService shareholderTmpService;
-     * 
-     * @Resource private CustOpenAccountTmpService openAccountTmpService;
-     */
-    /**
-     * 基本信息变更申请
-     * 
-     */
-    public CustChangeApply addCustChangeApply(CustMechBaseTmp anCustMechBaseTmp) {
-        BTAssert.notNull(anCustMechBaseTmp, "基本信息变更申请不能为空");
-
-        CustMechBaseTmp custMechBaseTmp = baseTmpService.addCustMechBaseTmpByChange(anCustMechBaseTmp, CustomerConstants.TMP_TYPE_CHANGE);
-
-        CustChangeApply custChangeApply = changeApplyService.addCustChangeApply(custMechBaseTmp.getRefId(), CustomerConstants.ITEM_BASE,
-                String.valueOf(custMechBaseTmp.getId()));
-
-        return custChangeApply;
-    }
-
-    /**
-     * 法人信息变更申请
-     * @param anCustMechLawTmp
-     * @return
-     */
-    public CustChangeApply addCustChangeApply(CustMechLawTmp anCustMechLawTmp) {
-        BTAssert.notNull(anCustMechLawTmp, "基本信息变更申请不能为空");
-
-        CustMechLawTmp custMechLawTmp = lawTmpService.addCustMechLawTmpByChange(anCustMechLawTmp, CustomerConstants.TMP_TYPE_CHANGE);
-
-        CustChangeApply custChangeApply = changeApplyService.addCustChangeApply(custMechLawTmp.getRefId(), CustomerConstants.ITEM_LAW,
-                String.valueOf(custMechLawTmp.getId()));
-
-        return custChangeApply;
-    }
 
     /**
      * 查询变更申请详情
@@ -117,7 +68,7 @@ public class CustChangeService {
      * @param anCustNo
      * @return
      */
-    public Page<CustChangeApply> queryChangeApplyList(Long anCustNo, String anChangeItem, int anFlag, int anPageNum, int anPageSize) {
+    public Page<CustChangeApply> queryChangeApply(Long anCustNo, String anChangeItem, int anFlag, int anPageNum, int anPageSize) {
         BTAssert.notNull(anCustNo, "客户编号不允许为空!");
         BTAssert.notNull(anChangeItem, "变更项不允许为空!");
 
@@ -157,7 +108,7 @@ public class CustChangeService {
         }
 
         // 修改审核状态为通过
-        final CustChangeApply changeApply = changeApplyService.saveCustChangeApplyStatus(anId, CustomerConstants.CHANGE_APPLY_STATUS_AUDIT_PASS);
+        final CustChangeApply changeApply = changeApplyService.saveChangeApplyStatus(anId, CustomerConstants.CHANGE_APPLY_STATUS_AUDIT_PASS);
         BTAssert.notNull(changeApply, "修改变更申请审核状态失败！");
 
         // 保存相应数据至正式表
@@ -168,8 +119,6 @@ public class CustChangeService {
         formalDataService.saveFormalData(tmpIds);
 
         // 添加审核
-        CustAuditLog tempAuditLog = new CustAuditLog();
-
         CustAuditLog auditLog = auditLogService.addCustAuditLog(CustomerConstants.AUDIT_TYPE_CHANGEAPPLY, anId, CustomerConstants.AUDIT_RESULT_PASS,
                 anReason, changeApply.getChangeItem(), changeApply.getCustNo());
         BTAssert.notNull(auditLog, "审核记录添加失败!");
@@ -194,7 +143,7 @@ public class CustChangeService {
         }
 
         // 修改审核状态为 驳回
-        final CustChangeApply changeApply = changeApplyService.saveCustChangeApplyStatus(anId, CustomerConstants.CHANGE_APPLY_STATUS_AUDIT_REJECT);
+        final CustChangeApply changeApply = changeApplyService.saveChangeApplyStatus(anId, CustomerConstants.CHANGE_APPLY_STATUS_AUDIT_REJECT);
 
         // 添加审核记录
         CustAuditLog auditLog = auditLogService.addCustAuditLog(CustomerConstants.AUDIT_TYPE_CHANGEAPPLY, anId, CustomerConstants.AUDIT_RESULT_REJECT,

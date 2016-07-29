@@ -40,53 +40,51 @@ public class CustMechBaseDubboService implements ICustMechBaseService {
     @Resource
     private CustChangeService changeService;
 
-    @Resource
-    private CustInsteadService insteadService;
-
     @Override
     public String webFindBaseInfo(final Long anCustNo) {
-        final CustMechBase custMechBase = baseService.findCustMechBase(anCustNo);
-        return AjaxObject.newOk("查询公司基本信息成功", custMechBase).toJson();
-    }
-
-    @Override
-    public CustMechBase addBaseInfo(CustMechBase anCustMechBase, Long anCustNo) {
-        return baseService.addCustMechBase(anCustMechBase, anCustNo);
-    }
-
-    @Override
-    public CustMechBase saveBaseInfo(CustMechBase anCustMechBase, Long anCustNo) {
-        return baseService.saveCustMechBase(anCustMechBase, anCustNo);
+        final CustMechBase custMechBase = baseService.findCustMechBaseByCustNo(anCustNo);
+        return AjaxObject.newOk("公司基本信息-详情查询 成功", custMechBase).toJson();
     }
 
     @Override
     public String webFindChangeApply(Long anId) {
         final CustChangeApply changeApply = changeService.findChangeApply(anId, CustomerConstants.ITEM_BASE);
-        return AjaxObject.newOk("公司基本信息-变更申请-查询 成功", changeApply).toJson();
+        return AjaxObject.newOk("公司基本信息-变更详情查询 成功", changeApply).toJson();
     }
 
     @Override
     public String webQueryChangeApply(Long anCustNo, int anFlag, int anPageNum, int anPageSize) {
-        final Page<CustChangeApply> changeApplys = changeService.queryChangeApplyList(anCustNo, CustomerConstants.ITEM_BASE, anFlag, anPageNum,
+        final Page<CustChangeApply> changeApplys = changeService.queryChangeApply(anCustNo, CustomerConstants.ITEM_BASE, anFlag, anPageNum,
                 anPageSize);
-        return AjaxObject.newOkWithPage("公司基本信息-变更申请-查询列表 成功", changeApplys).toJson();
+        return AjaxObject.newOkWithPage("公司基本信息-变更列表 成功", changeApplys).toJson();
     }
 
     @Override
-    public String webAddChangeApply(Map<String, Object> anParam, Long anCustNo) {
+    public String webAddChangeApply(Map<String, Object> anParam, String anFileList) {
         final CustMechBaseTmp custMechBaseTmp = (CustMechBaseTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return AjaxObject.newOk("公司基本信息-变更-添加 成功", changeService.addCustChangeApply(custMechBaseTmp)).toJson();
+        return AjaxObject.newOk("公司基本信息-变更申请 成功", baseTmpService.addChangeApply(custMechBaseTmp, anFileList)).toJson();
     }
 
     @Override
-    public String webFindInsteadRecord(Long anId) {
-        return AjaxObject.newOk("公司基本信息-代录-查询 成功", baseTmpService.findCustMechBaseTmp(anId)).toJson();
-    }
-
-    @Override
-    public String webAddInsteadRecord(Map<String, Object> anParam, Long anInsteadRecordId) {
+    public String webSaveChangeApply(Map<String, Object> anParam, Long anApplyId, String anFileList) {
         final CustMechBaseTmp custMechBaseTmp = (CustMechBaseTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return AjaxObject.newOk("公司基本信息-代录-添加 成功", baseTmpService.addCustMechBaseTmpByInstead(custMechBaseTmp, anInsteadRecordId, CustomerConstants.ITEM_BASE)).toJson();
+        return AjaxObject.newOk("公司基本信息-变更修改 成功", baseTmpService.saveChangeApply(custMechBaseTmp, anApplyId, anFileList)).toJson();
     }
 
+    @Override
+    public String webFindInsteadRecord(Long anInsteadRecordId) {
+        return AjaxObject.newOk("公司基本信息-代录详情 成功", baseTmpService.findCustMechBaseTmp(anInsteadRecordId)).toJson();
+    }
+
+    @Override
+    public String webAddInsteadRecord(Map<String, Object> anParam, Long anInsteadRecordId, String anFileList) {
+        final CustMechBaseTmp custMechBaseTmp = (CustMechBaseTmp) RuleServiceDubboFilterInvoker.getInputObj();
+        return AjaxObject.newOk("公司基本信息-添加代录 成功", baseTmpService.addInsteadRecord(custMechBaseTmp, anInsteadRecordId, anFileList)).toJson();
+    }
+
+    @Override
+    public String webSaveInsteadRecord(Map<String, Object> anParam, Long anInsteadRecordId, String anFileList) {
+        final CustMechBaseTmp custMechBaseTmp = (CustMechBaseTmp) RuleServiceDubboFilterInvoker.getInputObj();
+        return AjaxObject.newOk("公司基本信息-代录修改 成功", baseTmpService.saveInsteadRecord(custMechBaseTmp, anInsteadRecordId, anFileList)).toJson();
+    }
 }
