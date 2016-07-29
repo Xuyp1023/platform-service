@@ -4,6 +4,7 @@ import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
 import com.betterjr.common.annotation.MetaData;
@@ -14,98 +15,78 @@ import com.betterjr.common.utils.UserUtils;
 
 @Access(AccessType.FIELD)
 @Entity
-@Table(name = "t_cust_relation")
-public class CustRelation implements BetterjrEntity {
+@Table(name = "t_cust_mech_manager")
+public class CustMechManager implements BetterjrEntity {
     /**
      * 编号
      */
+    @Id
     @Column(name = "ID",  columnDefinition="INTEGER" )
     @MetaData( value="编号", comments = "编号")
     private Long id;
 
     /**
-     * 客户编号
+     * 数据版本号
      */
-    @Column(name = "L_CUSTNO",  columnDefinition="INTEGER" )
-    @MetaData( value="客户编号", comments = "客户编号")
-    private Long custNo;
+    @Column(name = "N_VERSION",  columnDefinition="INTEGER" )
+    @MetaData( value="数据版本号", comments = "数据版本号")
+    private Long version;
 
     /**
-     * 客户全称
+     * 姓名
      */
-    @Column(name = "C_CUSTNAME",  columnDefinition="VARCHAR" )
-    @MetaData( value="客户全称", comments = "客户全称")
-    private String custName;
+    @Column(name = "C_NAME",  columnDefinition="VARCHAR" )
+    @MetaData( value="姓名", comments = "姓名")
+    private String name;
 
     /**
-     * 银行账号
+     * 证件类型:0-身份证，1-护照，2-军官证，3-士兵证，4-回乡证，5-户口本，6-外国护照
      */
-    @Column(name = "C_BANK_ACCO",  columnDefinition="VARCHAR" )
-    @MetaData( value="银行账号", comments = "银行账号")
-    private String bankAcco;
+    @Column(name = "C_IDENTTYPE",  columnDefinition="CHAR" )
+    @MetaData( value="证件类型:0-身份证", comments = "证件类型:0-身份证，1-护照，2-军官证，3-士兵证，4-回乡证，5-户口本，6-外国护照")
+    private String identType;
 
     /**
-     * 银行户名
+     * 证件号码
      */
-    @Column(name = "C_BANK_ACCONAME",  columnDefinition="VARCHAR" )
-    @MetaData( value="银行户名", comments = "银行户名")
-    private String bankAccoName;
+    @Column(name = "C_IDENTNO",  columnDefinition="VARCHAR" )
+    @MetaData( value="证件号码", comments = "证件号码")
+    private String identNo;
 
     /**
-     * 客户类型：0：机构；1：个人
+     * 性别 0女 1男
      */
-    @Column(name = "C_CUSTTYPE",  columnDefinition="CHAR" )
-    @MetaData( value="客户类型：0：机构", comments = "客户类型：0：机构；1：个人")
-    private String custType;
+    @Column(name = "C_SEX",  columnDefinition="CHAR" )
+    @MetaData( value="性别 0女 1男", comments = "性别 0女 1男")
+    private String sex;
 
     /**
-     * 客户在资金管理系统中的客户号
+     * 出生日期
      */
-    @Column(name = "C_BT_NO",  columnDefinition="VARCHAR" )
-    @MetaData( value="客户在资金管理系统中的客户号", comments = "客户在资金管理系统中的客户号")
-    private String btNo;
+    @Column(name = "D_BIRTHDATE",  columnDefinition="VARCHAR" )
+    @MetaData( value="出生日期", comments = "出生日期")
+    private String birthdate;
 
     /**
-     * 所属单位ID
+     * 教育水平 0初级中学 1高级中学 2大学专科 3大学本科 4硕士研究生 5博士研究生
      */
-    @Column(name = "C_CORP_ID",  columnDefinition="VARCHAR" )
-    @MetaData( value="所属单位ID", comments = "所属单位ID")
-    private String corpId;
+    @Column(name = "C_EDU_LEVEL",  columnDefinition="CHAR" )
+    @MetaData( value="教育水平 0初级中学 1高级中学 2大学专科 3大学本科 4硕士研究生 5博士研究生", comments = "教育水平 0初级中学 1高级中学 2大学专科 3大学本科 4硕士研究生 5博士研究生")
+    private String eduLevel;
 
     /**
-     * 关系客户编号
+     * 职位: 0首席执行官 1总裁 2总经理 3董事长 4监事
      */
-    @Column(name = "L_RELATE_CUSTNO",  columnDefinition="INTEGER" )
-    @MetaData( value="关系客户编号", comments = "关系客户编号")
-    private Long relateCustNo;
+    @Column(name = "C_POSITION",  columnDefinition="CHAR" )
+    @MetaData( value="职位: 0首席执行官 1总裁 2总经理 3董事长 4监事", comments = "职位: 0首席执行官 1总裁 2总经理 3董事长 4监事")
+    private String position;
 
     /**
-     * 关系客户名称
+     * 附件
      */
-    @Column(name = "C_RELATE_CUSTNAME",  columnDefinition="VARCHAR" )
-    @MetaData( value="关系客户名称", comments = "关系客户名称")
-    private String relateCustName;
-
-    /**
-     * 关系类型:0供应商与保理公司 1供应商与核心企业 2核心企业与保理公司 3经销商与保理公司 4经销商与核心企业
-     */
-    @Column(name = "C_RELATE_TYPE",  columnDefinition="CHAR" )
-    @MetaData( value="关系类型", comments = "关系类型:0供应商与保理公司 1供应商与核心企业 2核心企业与保理公司 3经销商与保理公司 4经销商与核心企业")
-    private String relateType;
-
-    /**
-     * 操作员编号
-     */
-    @Column(name = "L_OPERID",  columnDefinition="INTEGER" )
-    @MetaData( value="操作员编号", comments = "操作员编号")
-    private Long operId;
-
-    /**
-     * 操作员姓名
-     */
-    @Column(name = "C_OPERNAME",  columnDefinition="VARCHAR" )
-    @MetaData( value="操作员姓名", comments = "操作员姓名")
-    private String operName;
+    @Column(name = "N_BATCHNO",  columnDefinition="INTEGER" )
+    @MetaData( value="附件", comments = "附件")
+    private Long batchNo;
 
     /**
      * 创建人(操作员)ID号
@@ -164,24 +145,28 @@ public class CustRelation implements BetterjrEntity {
     private String modiTime;
 
     /**
-     * 登陆机构
+     * 操作机构
      */
     @Column(name = "C_OPERORG",  columnDefinition="VARCHAR" )
-    @MetaData( value="登陆机构", comments = "登陆机构")
+    @MetaData( value="操作机构", comments = "操作机构")
     private String operOrg;
 
-    /**
-     * 状态，0未处理，1正常，2申请中， 3取消中，4取消
-     */
     @Column(name = "C_BUSIN_STATUS",  columnDefinition="CHAR" )
-    @MetaData( value="状态", comments = "状态，0未处理，1正常，2申请中， 3取消中，4取消")
+    @MetaData( value="", comments = "")
     private String businStatus;
 
     @Column(name = "C_LAST_STATUS",  columnDefinition="CHAR" )
     @MetaData( value="", comments = "")
     private String lastStatus;
 
-    private static final long serialVersionUID = 1468812783874L;
+    /**
+     * 客户编号
+     */
+    @Column(name = "L_CUSTNO",  columnDefinition="INTEGER" )
+    @MetaData( value="客户编号", comments = "客户编号")
+    private Long custNo;
+
+    private static final long serialVersionUID = 1468812783867L;
 
     public Long getId() {
         return id;
@@ -191,100 +176,76 @@ public class CustRelation implements BetterjrEntity {
         this.id = id;
     }
 
-    public Long getCustNo() {
-        return custNo;
+    public Long getVersion() {
+        return version;
     }
 
-    public void setCustNo(Long custNo) {
-        this.custNo = custNo;
+    public void setVersion(Long version) {
+        this.version = version;
     }
 
-    public String getCustName() {
-        return custName;
+    public String getName() {
+        return name;
     }
 
-    public void setCustName(String custName) {
-        this.custName = custName == null ? null : custName.trim();
+    public void setName(String name) {
+        this.name = name == null ? null : name.trim();
     }
 
-    public String getBankAcco() {
-        return bankAcco;
+    public String getIdentType() {
+        return identType;
     }
 
-    public void setBankAcco(String bankAcco) {
-        this.bankAcco = bankAcco == null ? null : bankAcco.trim();
+    public void setIdentType(String identType) {
+        this.identType = identType == null ? null : identType.trim();
     }
 
-    public String getBankAccoName() {
-        return bankAccoName;
+    public String getIdentNo() {
+        return identNo;
     }
 
-    public void setBankAccoName(String bankAccoName) {
-        this.bankAccoName = bankAccoName == null ? null : bankAccoName.trim();
+    public void setIdentNo(String identNo) {
+        this.identNo = identNo == null ? null : identNo.trim();
     }
 
-    public String getCustType() {
-        return custType;
+    public String getSex() {
+        return sex;
     }
 
-    public void setCustType(String custType) {
-        this.custType = custType == null ? null : custType.trim();
+    public void setSex(String sex) {
+        this.sex = sex == null ? null : sex.trim();
     }
 
-    public String getBtNo() {
-        return btNo;
+    public String getBirthdate() {
+        return birthdate;
     }
 
-    public void setBtNo(String btNo) {
-        this.btNo = btNo == null ? null : btNo.trim();
+    public void setBirthdate(String birthdate) {
+        this.birthdate = birthdate == null ? null : birthdate.trim();
     }
 
-    public String getCorpId() {
-        return corpId;
+    public String getEduLevel() {
+        return eduLevel;
     }
 
-    public void setCorpId(String corpId) {
-        this.corpId = corpId == null ? null : corpId.trim();
+    public void setEduLevel(String eduLevel) {
+        this.eduLevel = eduLevel == null ? null : eduLevel.trim();
     }
 
-    public Long getRelateCustNo() {
-        return relateCustNo;
+    public String getPosition() {
+        return position;
     }
 
-    public void setRelateCustNo(Long relateCustNo) {
-        this.relateCustNo = relateCustNo;
+    public void setPosition(String position) {
+        this.position = position == null ? null : position.trim();
     }
 
-    public String getRelateCustName() {
-        return relateCustName;
+    public Long getBatchNo() {
+        return batchNo;
     }
 
-    public void setRelateCustName(String relateCustName) {
-        this.relateCustName = relateCustName == null ? null : relateCustName.trim();
-    }
-
-    public String getRelateType() {
-        return relateType;
-    }
-
-    public void setRelateType(String relateType) {
-        this.relateType = relateType == null ? null : relateType.trim();
-    }
-
-    public Long getOperId() {
-        return operId;
-    }
-
-    public void setOperId(Long operId) {
-        this.operId = operId;
-    }
-
-    public String getOperName() {
-        return operName;
-    }
-
-    public void setOperName(String operName) {
-        this.operName = operName == null ? null : operName.trim();
+    public void setBatchNo(Long batchNo) {
+        this.batchNo = batchNo;
     }
 
     public Long getRegOperId() {
@@ -375,6 +336,14 @@ public class CustRelation implements BetterjrEntity {
         this.lastStatus = lastStatus == null ? null : lastStatus.trim();
     }
 
+    public Long getCustNo() {
+        return custNo;
+    }
+
+    public void setCustNo(Long custNo) {
+        this.custNo = custNo;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -382,18 +351,15 @@ public class CustRelation implements BetterjrEntity {
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
         sb.append(", id=").append(id);
-        sb.append(", custNo=").append(custNo);
-        sb.append(", custName=").append(custName);
-        sb.append(", bankAcco=").append(bankAcco);
-        sb.append(", bankAccoName=").append(bankAccoName);
-        sb.append(", custType=").append(custType);
-        sb.append(", btNo=").append(btNo);
-        sb.append(", corpId=").append(corpId);
-        sb.append(", relateCustNo=").append(relateCustNo);
-        sb.append(", relateCustName=").append(relateCustName);
-        sb.append(", relateType=").append(relateType);
-        sb.append(", operId=").append(operId);
-        sb.append(", operName=").append(operName);
+        sb.append(", version=").append(version);
+        sb.append(", name=").append(name);
+        sb.append(", identType=").append(identType);
+        sb.append(", identNo=").append(identNo);
+        sb.append(", sex=").append(sex);
+        sb.append(", birthdate=").append(birthdate);
+        sb.append(", eduLevel=").append(eduLevel);
+        sb.append(", position=").append(position);
+        sb.append(", batchNo=").append(batchNo);
         sb.append(", regOperId=").append(regOperId);
         sb.append(", regOperName=").append(regOperName);
         sb.append(", regDate=").append(regDate);
@@ -405,6 +371,7 @@ public class CustRelation implements BetterjrEntity {
         sb.append(", operOrg=").append(operOrg);
         sb.append(", businStatus=").append(businStatus);
         sb.append(", lastStatus=").append(lastStatus);
+        sb.append(", custNo=").append(custNo);
         sb.append(", serialVersionUID=").append(serialVersionUID);
         sb.append("]");
         return sb.toString();
@@ -421,20 +388,17 @@ public class CustRelation implements BetterjrEntity {
         if (getClass() != that.getClass()) {
             return false;
         }
-        CustRelation other = (CustRelation) that;
+        CustMechManager other = (CustMechManager) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-            && (this.getCustNo() == null ? other.getCustNo() == null : this.getCustNo().equals(other.getCustNo()))
-            && (this.getCustName() == null ? other.getCustName() == null : this.getCustName().equals(other.getCustName()))
-            && (this.getBankAcco() == null ? other.getBankAcco() == null : this.getBankAcco().equals(other.getBankAcco()))
-            && (this.getBankAccoName() == null ? other.getBankAccoName() == null : this.getBankAccoName().equals(other.getBankAccoName()))
-            && (this.getCustType() == null ? other.getCustType() == null : this.getCustType().equals(other.getCustType()))
-            && (this.getBtNo() == null ? other.getBtNo() == null : this.getBtNo().equals(other.getBtNo()))
-            && (this.getCorpId() == null ? other.getCorpId() == null : this.getCorpId().equals(other.getCorpId()))
-            && (this.getRelateCustNo() == null ? other.getRelateCustNo() == null : this.getRelateCustNo().equals(other.getRelateCustNo()))
-            && (this.getRelateCustName() == null ? other.getRelateCustName() == null : this.getRelateCustName().equals(other.getRelateCustName()))
-            && (this.getRelateType() == null ? other.getRelateType() == null : this.getRelateType().equals(other.getRelateType()))
-            && (this.getOperId() == null ? other.getOperId() == null : this.getOperId().equals(other.getOperId()))
-            && (this.getOperName() == null ? other.getOperName() == null : this.getOperName().equals(other.getOperName()))
+            && (this.getVersion() == null ? other.getVersion() == null : this.getVersion().equals(other.getVersion()))
+            && (this.getName() == null ? other.getName() == null : this.getName().equals(other.getName()))
+            && (this.getIdentType() == null ? other.getIdentType() == null : this.getIdentType().equals(other.getIdentType()))
+            && (this.getIdentNo() == null ? other.getIdentNo() == null : this.getIdentNo().equals(other.getIdentNo()))
+            && (this.getSex() == null ? other.getSex() == null : this.getSex().equals(other.getSex()))
+            && (this.getBirthdate() == null ? other.getBirthdate() == null : this.getBirthdate().equals(other.getBirthdate()))
+            && (this.getEduLevel() == null ? other.getEduLevel() == null : this.getEduLevel().equals(other.getEduLevel()))
+            && (this.getPosition() == null ? other.getPosition() == null : this.getPosition().equals(other.getPosition()))
+            && (this.getBatchNo() == null ? other.getBatchNo() == null : this.getBatchNo().equals(other.getBatchNo()))
             && (this.getRegOperId() == null ? other.getRegOperId() == null : this.getRegOperId().equals(other.getRegOperId()))
             && (this.getRegOperName() == null ? other.getRegOperName() == null : this.getRegOperName().equals(other.getRegOperName()))
             && (this.getRegDate() == null ? other.getRegDate() == null : this.getRegDate().equals(other.getRegDate()))
@@ -445,7 +409,8 @@ public class CustRelation implements BetterjrEntity {
             && (this.getModiTime() == null ? other.getModiTime() == null : this.getModiTime().equals(other.getModiTime()))
             && (this.getOperOrg() == null ? other.getOperOrg() == null : this.getOperOrg().equals(other.getOperOrg()))
             && (this.getBusinStatus() == null ? other.getBusinStatus() == null : this.getBusinStatus().equals(other.getBusinStatus()))
-            && (this.getLastStatus() == null ? other.getLastStatus() == null : this.getLastStatus().equals(other.getLastStatus()));
+            && (this.getLastStatus() == null ? other.getLastStatus() == null : this.getLastStatus().equals(other.getLastStatus()))
+            && (this.getCustNo() == null ? other.getCustNo() == null : this.getCustNo().equals(other.getCustNo()));
     }
 
     @Override
@@ -453,18 +418,15 @@ public class CustRelation implements BetterjrEntity {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
-        result = prime * result + ((getCustNo() == null) ? 0 : getCustNo().hashCode());
-        result = prime * result + ((getCustName() == null) ? 0 : getCustName().hashCode());
-        result = prime * result + ((getBankAcco() == null) ? 0 : getBankAcco().hashCode());
-        result = prime * result + ((getBankAccoName() == null) ? 0 : getBankAccoName().hashCode());
-        result = prime * result + ((getCustType() == null) ? 0 : getCustType().hashCode());
-        result = prime * result + ((getBtNo() == null) ? 0 : getBtNo().hashCode());
-        result = prime * result + ((getCorpId() == null) ? 0 : getCorpId().hashCode());
-        result = prime * result + ((getRelateCustNo() == null) ? 0 : getRelateCustNo().hashCode());
-        result = prime * result + ((getRelateCustName() == null) ? 0 : getRelateCustName().hashCode());
-        result = prime * result + ((getRelateType() == null) ? 0 : getRelateType().hashCode());
-        result = prime * result + ((getOperId() == null) ? 0 : getOperId().hashCode());
-        result = prime * result + ((getOperName() == null) ? 0 : getOperName().hashCode());
+        result = prime * result + ((getVersion() == null) ? 0 : getVersion().hashCode());
+        result = prime * result + ((getName() == null) ? 0 : getName().hashCode());
+        result = prime * result + ((getIdentType() == null) ? 0 : getIdentType().hashCode());
+        result = prime * result + ((getIdentNo() == null) ? 0 : getIdentNo().hashCode());
+        result = prime * result + ((getSex() == null) ? 0 : getSex().hashCode());
+        result = prime * result + ((getBirthdate() == null) ? 0 : getBirthdate().hashCode());
+        result = prime * result + ((getEduLevel() == null) ? 0 : getEduLevel().hashCode());
+        result = prime * result + ((getPosition() == null) ? 0 : getPosition().hashCode());
+        result = prime * result + ((getBatchNo() == null) ? 0 : getBatchNo().hashCode());
         result = prime * result + ((getRegOperId() == null) ? 0 : getRegOperId().hashCode());
         result = prime * result + ((getRegOperName() == null) ? 0 : getRegOperName().hashCode());
         result = prime * result + ((getRegDate() == null) ? 0 : getRegDate().hashCode());
@@ -476,11 +438,12 @@ public class CustRelation implements BetterjrEntity {
         result = prime * result + ((getOperOrg() == null) ? 0 : getOperOrg().hashCode());
         result = prime * result + ((getBusinStatus() == null) ? 0 : getBusinStatus().hashCode());
         result = prime * result + ((getLastStatus() == null) ? 0 : getLastStatus().hashCode());
+        result = prime * result + ((getCustNo() == null) ? 0 : getCustNo().hashCode());
         return result;
     }
     
     public void initAddValue() {
-        this.id = SerialGenerator.getLongValue("CustRelation.id");
+        this.id = SerialGenerator.getLongValue("CustMechManager.id");
         
         this.regOperId = UserUtils.getOperatorInfo().getId();
         this.regOperName = UserUtils.getOperatorInfo().getName();
@@ -496,8 +459,8 @@ public class CustRelation implements BetterjrEntity {
         this.businStatus = "0";
     }
 
-    public void initModifyValue(final CustRelation anCustRelation) {
-        this.id = anCustRelation.getId();
+    public void initModifyValue(final CustMechManager anCustMechManager) {
+        this.id = anCustMechManager.getId();
 /*
         this.regOperId = anCustMechBaseTmp.getRegOperId();
         this.regOperName = anCustMechBaseTmp.getRegOperName();
@@ -509,7 +472,7 @@ public class CustRelation implements BetterjrEntity {
         this.modiDate = BetterDateUtils.getNumDate();
         this.modiTime = BetterDateUtils.getNumTime();
 
-        this.businStatus = anCustRelation.getBusinStatus();
-        this.operOrg = anCustRelation.getOperOrg();
+        this.businStatus = anCustMechManager.getBusinStatus();
+        this.operOrg = anCustMechManager.getOperOrg();
     }
 }

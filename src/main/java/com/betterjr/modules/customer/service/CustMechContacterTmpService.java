@@ -1,10 +1,14 @@
 package com.betterjr.modules.customer.service;
 
+import javax.annotation.Resource;
+
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
+import com.betterjr.modules.customer.constant.CustomerConstants;
 import com.betterjr.modules.customer.dao.CustMechContacterTmpMapper;
+import com.betterjr.modules.customer.entity.CustChangeApply;
 import com.betterjr.modules.customer.entity.CustMechContacterTmp;
 import com.betterjr.modules.customer.helper.IFormalDataService;
 
@@ -14,7 +18,15 @@ import com.betterjr.modules.customer.helper.IFormalDataService;
  *
  */
 @Service
-public class CustMechContacterTmpService extends BaseService<CustMechContacterTmpMapper, CustMechContacterTmp> implements IFormalDataService{
+public class CustMechContacterTmpService extends BaseService<CustMechContacterTmpMapper, CustMechContacterTmp> implements IFormalDataService {
+    @Resource
+    private CustMechContacterService contacterService;
+
+    @Resource
+    private CustInsteadRecordService insteadRecordService;
+
+    @Resource
+    private CustChangeApplyService changeApplyService;
 
     /**
      * 查询联系人流水信息
@@ -53,11 +65,31 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
     public int addCustMechContacterTmp(CustMechContacterTmp anCustMechContacterTmp) {
         BTAssert.notNull(anCustMechContacterTmp, "联系人流水信息编号不允许为空！");
 
-        anCustMechContacterTmp.initAddValue();
+        // anCustMechContacterTmp.initAddValue();
         return this.insert(anCustMechContacterTmp);
     }
 
+    /**
+     * 法人信息变更申请
+     * 
+     * @param anCustMechLawTmp
+     * @return
+     */
+    public CustChangeApply addCustChangeApply(CustMechContacterTmp anCustMechContacterTmp) {
+        BTAssert.notNull(anCustMechContacterTmp, "基本信息变更申请不能为空");
+
+        anCustMechContacterTmp.initAddValue(CustomerConstants.TMP_TYPE_CHANGE);
+        this.insert(anCustMechContacterTmp);
+
+        // 发起变更申请
+        CustChangeApply custChangeApply = changeApplyService.addChangeApply(anCustMechContacterTmp.getRefId(), CustomerConstants.ITEM_CONTACTER,
+                String.valueOf(anCustMechContacterTmp.getId()));
+
+        return custChangeApply;
+    }
+
     @Override
-    public void saveFormalData(String ... anTmpIds) {
+    public void saveFormalData(String... anTmpIds) {
+
     }
 }

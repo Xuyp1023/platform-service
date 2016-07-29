@@ -1,10 +1,10 @@
 package com.betterjr.modules.customer.service;
 
-import java.util.regex.Matcher;
+import java.util.List;
 import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javax.annotation.Resource;
+
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.exception.BytterTradeException;
@@ -13,6 +13,7 @@ import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.modules.customer.constant.CustomerConstants;
 import com.betterjr.modules.customer.dao.CustInsteadRecordMapper;
+import com.betterjr.modules.customer.entity.CustInsteadApply;
 import com.betterjr.modules.customer.entity.CustInsteadRecord;
 
 /**
@@ -34,16 +35,11 @@ public class CustInsteadRecordService extends BaseService<CustInsteadRecordMappe
         INSTEAD_ITEMS_INC_PATTERN = Pattern.compile(INSTEAD_ITEMS_INC_REGEX);
     }
     
-    public static void main(String[] args) {
-        System.out.println(INSTEAD_ITEMS_PATTERN.matcher("0,1,0,0,0,0,0").matches());
-        System.out.println(INSTEAD_ITEMS_INC_PATTERN.matcher("0,0,0,1,0,0,0").matches());
-    }
+    @Resource
+    private CustInsteadApplyService insteadApplyService;
     
     /**
      * 根据代录申请类型，代录项目生成代录记录
-     * @param anApplyId
-     * @param anInsteadType
-     * @param anInsteadItems
      */
     public void addCustInsteadRecord(Long anApplyId, String anInsteadType, String anInsteadItems) {
         // 0 开户代录 1 变更代录
@@ -77,11 +73,6 @@ public class CustInsteadRecordService extends BaseService<CustInsteadRecordMappe
 
     /**
      * 添加代录项目 空代录项目
-     * 
-     * @param anRefId
-     * @param anChangeItemBase
-     * @param anValueOf
-     * @return
      */
     public CustInsteadRecord addCustInsteadRecord(Long anApplyId, String anInsteadItem) {
         BTAssert.notNull(anApplyId, "代录申请编号不能为空！");
@@ -97,20 +88,42 @@ public class CustInsteadRecordService extends BaseService<CustInsteadRecordMappe
     
     /**
      * 查找代录项目
-     * 
-     * @param anCustNo
-     * @param anId
-     * @return
      */
     public CustInsteadRecord findCustInsteadRecord(Long anId) {
         BTAssert.notNull(anId, "代录记录编号不能为空！");
         return this.selectByPrimaryKey(anId);
     }
+    
+    /**
+     * 根据代录申请编号找到代录记录
+     */
+    public List<CustInsteadRecord> findCustInsteadRecordByApplyId(Long anApplyId) {
+        // 检查代录申请是否正确
+        checkInsteadApply(anApplyId);
+        
+        return this.selectByProperty("applyId", anApplyId);
+    }
+    
+    /**
+     * 保存代录项目暂存
+     * 
+     * @return
+     */
+    public CustInsteadRecord saveCustInsteadRecordTmp(Long anId, String anTmpIds) {
+        BTAssert.notNull(anId, "代录项编号不能为空！");
+        BTAssert.notNull(anTmpIds, "代录流水编号不能为空！");
+
+        final CustInsteadRecord tempCustInsteadRecord = this.selectByPrimaryKey(anId);
+        BTAssert.notNull(tempCustInsteadRecord, "没有找到对应的代录项目！");
+
+        tempCustInsteadRecord.initModifyValue(CustomerConstants.INSTEAD_RECORD_STATUS_NEW, anTmpIds);
+
+        this.updateByPrimaryKeySelective(tempCustInsteadRecord);
+        return tempCustInsteadRecord;
+    }
 
     /**
      * 保存代录项目
-     * 
-     * @return
      */
     public CustInsteadRecord saveCustInsteadRecord(Long anId, String anTmpIds) {
         BTAssert.notNull(anId, "代录项编号不能为空！");
@@ -127,8 +140,6 @@ public class CustInsteadRecordService extends BaseService<CustInsteadRecordMappe
     
     /**
      * 保存代录项目-修改状态
-     * 
-     * @return
      */
     public CustInsteadRecord saveCustInsteadRecordStatus(Long anId, String anBusinStatus) {
         BTAssert.notNull(anId, "代录项编号不能为空！");
@@ -161,4 +172,15 @@ public class CustInsteadRecordService extends BaseService<CustInsteadRecordMappe
         return tempCustInsteadRecord;
     }
 
+    /**
+     * 检查代录申请
+     */
+    private CustInsteadApply checkInsteadApply(Long anApplyId) {
+        BTAssert.notNull(anApplyId, "代录申请编号不能为空！");
+        
+        final CustInsteadApply insteadApply = insteadApplyService.findCustInsteadApply(anApplyId);
+        BTAssert.notNull(insteadApply, "没有找到对应代录申请!");
+        
+        return insteadApply;
+    }
 }

@@ -90,8 +90,10 @@ public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper,
      * @param anId
      * @return
      */
-    public CustInsteadApply findCustInsteadApply(Long anCustNo, Long anId) {
-        return null;
+    public CustInsteadApply findCustInsteadApply(Long anId) {
+        BTAssert.notNull(anId, "编号不允许为空！");
+        
+        return this.selectByPrimaryKey(anId);
     }
 
     /**
