@@ -76,6 +76,7 @@ public class CustMechBaseTmpService extends BaseService<CustMechBaseTmpMapper, C
         BTAssert.notNull(anCustMechBaseTmp, "公司基本信息-流水信息 不能为空！");
         BTAssert.notNull(anTmpType, "流水类型  不能为空！");
 
+        anCustMechBaseTmp.setCustNo(anCustMechBaseTmp.getRefId()); //处理custNo
         anCustMechBaseTmp.initAddValue(anTmpType);
         this.insert(anCustMechBaseTmp);
 
@@ -94,7 +95,7 @@ public class CustMechBaseTmpService extends BaseService<CustMechBaseTmpMapper, C
         final CustMechBaseTmp tempCustMechBaseTmp = this.selectByPrimaryKey(anId);
         BTAssert.notNull(tempCustMechBaseTmp, "公司基本信息-流水信息 没有找到！");
 
-        tempCustMechBaseTmp.initModifyValue(anCustMechBaseTmp);
+        tempCustMechBaseTmp.setCustNo(anCustMechBaseTmp.getRefId());
         this.updateByPrimaryKeySelective(tempCustMechBaseTmp);
 
         return tempCustMechBaseTmp;
@@ -245,7 +246,7 @@ public class CustMechBaseTmpService extends BaseService<CustMechBaseTmpMapper, C
         CustInsteadApply insteadApply = insteadApplyService.findCustInsteadApply(applyId);
 
         List<String> applyAllowStatus = Arrays.asList(new String[] { CustomerConstants.INSTEAD_APPLY_STATUS_AUDIT_PASS,
-                CustomerConstants.INSTEAD_APPLY_STATUS_CONFIRM_REJECT, CustomerConstants.INSTEAD_APPLY_STATUS_CONFIRM_REJECT });
+                CustomerConstants.INSTEAD_APPLY_STATUS_REVIEW_REJECT, CustomerConstants.INSTEAD_APPLY_STATUS_CONFIRM_REJECT });
         if (applyAllowStatus.contains(insteadApply.getBusinStatus()) == false) {
             throw new BytterTradeException(20073, "此代录申请状态不正确！");
         }

@@ -71,6 +71,7 @@ public class CustMechLawTmpService extends BaseService<CustMechLawTmpMapper, Cus
         BTAssert.notNull(anCustMechLawTmp, "法人信息-流水信息  不能为空！");
         BTAssert.notNull(anTmpType, "流水类型  不能为空！");
 
+        anCustMechLawTmp.setCustNo(anCustMechLawTmp.getRefId());
         anCustMechLawTmp.initAddValue(anTmpType);
         this.insert(anCustMechLawTmp);
 
