@@ -39,8 +39,16 @@ public class CustMechBaseTmp implements BetterjrEntity {
     private Long custNo;
     
     /**
+     * 客户全称
+     */
+    @Column(name = "C_CUSTNAME",  columnDefinition="VARCHAR" )
+    @MetaData( value="客户全称", comments = "客户全称")
+    private String custName;
+    
+    /**
      * 数据版本号
      */
+    @JsonIgnore
     @Column(name = "N_VERSION", columnDefinition = "INTEGER")
     @MetaData(value = "数据版本号", comments = "数据版本号")
     private Long version;
@@ -48,6 +56,7 @@ public class CustMechBaseTmp implements BetterjrEntity {
     /**
      * 英文名称
      */
+    @JsonIgnore
     @Column(name = "C_ENG_NAME", columnDefinition = "VARCHAR")
     @MetaData(value = "英文名称", comments = "英文名称")
     private String engName;
@@ -56,13 +65,22 @@ public class CustMechBaseTmp implements BetterjrEntity {
      * 机构类别；企业法人、机关法人、事业法人、社团法人、工会法人、其他非金融机构法人、证券公司、银行、信托投资公司、基金管理公司、保险公司、其他金融机构法人、普通合伙企业、特殊普通合伙企业、有限合伙企业、非法人非合伙制创投企业、境外一般机构、境外代理人、境外证券公司、境外基金公司、破产管理人
      * 、中国金融期货交易所、其他
      */
+    @JsonIgnore
     @Column(name = "C_CATEGORY", columnDefinition = "VARCHAR")
     @MetaData(value = "机构类别", comments = "机构类别；企业法人、机关法人、事业法人、社团法人、工会法人、其他非金融机构法人、证券公司、银行、信托投资公司、基金管理公司、保险公司、其他金融机构法人、普通合伙企业、特殊普通合伙企业、有限合伙企业、非法人非合伙制创投企业、境外一般机构、境外代理人、境外证券公司、境外基金公司、破产管理人、中国金融期货交易所、其他")
     private String category;
 
     /**
+     * 企业类型: 0国有企业 1集体所有制企业 2私营企业 3股份制企业 4联营企业 5外商投资企业 6港澳台投资企业 7股份合作企业
+     */
+    @Column(name = "C_CORP_TYPE",  columnDefinition="VARCHAR" )
+    @MetaData( value="企业类型", comments = "企业类型: 0国有企业 1集体所有制企业 2私营企业 3股份制企业 4联营企业 5外商投资企业 6港澳台投资企业 7股份合作企业")
+    private String corpType;
+    
+    /**
      * 国有属性；国务院国资委管辖、地方国资委管辖、其他国有企业、非国有
      */
+    @JsonIgnore
     @Column(name = "C_NATION_TYPE", columnDefinition = "VARCHAR")
     @MetaData(value = "国有属性", comments = "国有属性；国务院国资委管辖、地方国资委管辖、其他国有企业、非国有")
     private String nationType;
@@ -70,6 +88,7 @@ public class CustMechBaseTmp implements BetterjrEntity {
     /**
      * 资本属性；境内资本、三资（合资、合作、外资）、境外资本
      */
+    @JsonIgnore
     @Column(name = "C_CAPITAL_TYPE", columnDefinition = "CHAR")
     @MetaData(value = "资本属性", comments = "资本属性；境内资本、三资（合资、合作、外资）、境外资本")
     private String capitalType;
@@ -77,6 +96,7 @@ public class CustMechBaseTmp implements BetterjrEntity {
     /**
      * 法人姓名
      */
+    @JsonIgnore
     @Column(name = "C_LAW_NAME", columnDefinition = "VARCHAR")
     @MetaData(value = "法人姓名", comments = "法人姓名")
     private String lawName;
@@ -84,6 +104,7 @@ public class CustMechBaseTmp implements BetterjrEntity {
     /**
      * 法人代表联系电话
      */
+    @JsonIgnore
     @Column(name = "C_LAW_PHONE", columnDefinition = "VARCHAR")
     @MetaData(value = "法人代表联系电话", comments = "法人代表联系电话")
     private String lawPhone;
@@ -91,6 +112,7 @@ public class CustMechBaseTmp implements BetterjrEntity {
     /**
      * 法人证件号码
      */
+    @JsonIgnore
     @Column(name = "C_LAW_IDENTNO", columnDefinition = "VARCHAR")
     @MetaData(value = "法人证件号码", comments = "法人证件号码")
     private String lawIdentNo;
@@ -98,6 +120,7 @@ public class CustMechBaseTmp implements BetterjrEntity {
     /**
      * 法人证件类型:0-身份证，1-护照，2-军官证，3-士兵证，4-回乡证，5-户口本，6-外国护照
      */
+    @JsonIgnore
     @Column(name = "C_LAW_IDENTTYPE", columnDefinition = "CHAR")
     @MetaData(value = "法人证件类型:0-身份证", comments = "法人证件类型:0-身份证，1-护照，2-军官证，3-士兵证，4-回乡证，5-户口本，6-外国护照")
     private String lawIdentType;
@@ -105,7 +128,7 @@ public class CustMechBaseTmp implements BetterjrEntity {
     /**
      * 法人证件有效期
      */
-    @JsonSerialize(using = CustDateJsonSerializer.class)
+    @JsonIgnore
     @Column(name = "D_LAW_VALIDDATE", columnDefinition = "VARCHAR")
     @MetaData(value = "法人证件有效期", comments = "法人证件有效期")
     private String lawValidDate;
@@ -120,6 +143,7 @@ public class CustMechBaseTmp implements BetterjrEntity {
     /**
      * 行业
      */
+    @JsonIgnore
     @Column(name = "C_CORP_VOCATION", columnDefinition = "VARCHAR")
     @MetaData(value = "行业", comments = "行业")
     private String corpVocation;
@@ -127,6 +151,7 @@ public class CustMechBaseTmp implements BetterjrEntity {
     /**
      * 企业性质；0-国企，1-民营，2-合资，3-境外资本，9-其它
      */
+    @JsonIgnore
     @Column(name = "C_CORP_PROPERTY", columnDefinition = "CHAR")
     @MetaData(value = "企业性质", comments = "企业性质；0-国企，1-民营，2-合资，3-境外资本，9-其它")
     private String corpProperty;
@@ -134,6 +159,7 @@ public class CustMechBaseTmp implements BetterjrEntity {
     /**
      * 投资经历 0：无经验，1：1-3年，2：3-5年，3：5-10年，4：10年以上
      */
+    @JsonIgnore
     @Column(name = "C_INVEST", columnDefinition = "CHAR")
     @MetaData(value = "投资经历 0：无经验", comments = "投资经历 0：无经验，1：1-3年，2：3-5年，3：5-10年，4：10年以上")
     private String invest;
@@ -141,6 +167,7 @@ public class CustMechBaseTmp implements BetterjrEntity {
     /**
      * 机构类型；0-保险机构，1-基金公司，2-上市公司，3-信托公司，4-证券公司，5-理财产品，6-企业年金，7-社保基金，8-其他机构
      */
+    @JsonIgnore
     @Column(name = "C_INST_TYPE", columnDefinition = "CHAR")
     @MetaData(value = "机构类型", comments = "机构类型；0-保险机构，1-基金公司，2-上市公司，3-信托公司，4-证券公司，5-理财产品，6-企业年金，7-社保基金，8-其他机构")
     private String instType;
@@ -148,6 +175,7 @@ public class CustMechBaseTmp implements BetterjrEntity {
     /**
      * 客户分类；01普通客户；02企业年金计划；03银行、券商、信托公司等的理财产品或理财计划；04保险产品；05社保基金组合；09其他
      */
+    @JsonIgnore
     @Column(name = "C_CUST_CLASS", columnDefinition = "CHAR")
     @MetaData(value = "客户分类", comments = "客户分类；01普通客户；02企业年金计划；03银行、券商、信托公司等的理财产品或理财计划；04保险产品；05社保基金组合；09其他")
     private String custClass;
@@ -169,7 +197,7 @@ public class CustMechBaseTmp implements BetterjrEntity {
     /**
      * 营业执照登记日期
      */
-    @JsonSerialize(using = CustDateJsonSerializer.class)
+    @JsonIgnore
     @Column(name = "D_BUSIN_LICENCE_REGDATE", columnDefinition = "VARCHAR")
     @MetaData(value = "营业执照登记日期", comments = "营业执照登记日期")
     private String businLicenceRegDate;
@@ -177,6 +205,7 @@ public class CustMechBaseTmp implements BetterjrEntity {
     /**
      * 营业执照截止日期
      */
+    @JsonIgnore
     @Column(name = "D_BUSIN_LICENCE_VALIDDATE", columnDefinition = "VARCHAR")
     @MetaData(value = "营业执照截止日期", comments = "营业执照截止日期")
     private String businLicenceValidDate;
@@ -254,6 +283,7 @@ public class CustMechBaseTmp implements BetterjrEntity {
     /**
      * 邮编
      */
+    @JsonIgnore
     @Column(name = "C_ZIPCODE", columnDefinition = "VARCHAR")
     @MetaData(value = "邮编", comments = "邮编")
     private String zipCode;
@@ -268,6 +298,7 @@ public class CustMechBaseTmp implements BetterjrEntity {
     /**
      * 传真
      */
+    @JsonIgnore
     @Column(name = "C_FAX", columnDefinition = "VARCHAR")
     @MetaData(value = "传真", comments = "传真")
     private String fax;
@@ -275,6 +306,7 @@ public class CustMechBaseTmp implements BetterjrEntity {
     /**
      * 移动电话
      */
+    @JsonIgnore
     @Column(name = "C_MOBILE", columnDefinition = "VARCHAR")
     @MetaData(value = "移动电话", comments = "移动电话")
     private String mobile;
@@ -289,6 +321,7 @@ public class CustMechBaseTmp implements BetterjrEntity {
     /**
      * 微信
      */
+    @JsonIgnore
     @Column(name = "C_WECHAT", columnDefinition = "VARCHAR")
     @MetaData(value = "微信", comments = "微信")
     private String wechat;
@@ -296,6 +329,7 @@ public class CustMechBaseTmp implements BetterjrEntity {
     /**
      * QQ
      */
+    @JsonIgnore
     @Column(name = "C_QQ", columnDefinition = "VARCHAR")
     @MetaData(value = "QQ", comments = "QQ")
     private String qq;
@@ -303,6 +337,7 @@ public class CustMechBaseTmp implements BetterjrEntity {
     /**
      * 网址
      */
+    @JsonIgnore
     @Column(name = "C_WEBADDR", columnDefinition = "VARCHAR")
     @MetaData(value = "网址", comments = "网址")
     private String webaddr;
@@ -310,6 +345,7 @@ public class CustMechBaseTmp implements BetterjrEntity {
     /**
      * 企业名称
      */
+    @JsonIgnore
     @Column(name = "C_CORPNAME", columnDefinition = "VARCHAR")
     @MetaData(value = "企业名称", comments = "企业名称")
     private String corpName;
@@ -317,6 +353,7 @@ public class CustMechBaseTmp implements BetterjrEntity {
     /**
      * 城市地区代码
      */
+    @JsonIgnore
     @Column(name = "C_CITYNO", columnDefinition = "VARCHAR")
     @MetaData(value = "城市地区代码", comments = "城市地区代码")
     private String cityNo;
@@ -449,6 +486,14 @@ public class CustMechBaseTmp implements BetterjrEntity {
     public void setCustNo(Long anCustNo) {
         custNo = anCustNo;
     }
+    
+    public String getCustName() {
+        return custName;
+    }
+
+    public void setCustName(String anCustName) {
+        custName = anCustName;
+    }
 
     public Long getVersion() {
         return version;
@@ -472,6 +517,14 @@ public class CustMechBaseTmp implements BetterjrEntity {
 
     public void setCategory(String category) {
         this.category = category == null ? null : category.trim();
+    }
+
+    public String getCorpType() {
+        return corpType;
+    }
+
+    public void setCorpType(String anCorpType) {
+        corpType = anCorpType;
     }
 
     public String getNationType() {
@@ -898,9 +951,11 @@ public class CustMechBaseTmp implements BetterjrEntity {
         sb.append("Hash = ").append(hashCode());
         sb.append(", id=").append(id);
         sb.append(", custNo=").append(custNo);
+        sb.append(", custName=").append(custName);
         sb.append(", version=").append(version);
         sb.append(", engName=").append(engName);
         sb.append(", category=").append(category);
+        sb.append(", corpType=").append(corpType);
         sb.append(", nationType=").append(nationType);
         sb.append(", capitalType=").append(capitalType);
         sb.append(", lawName=").append(lawName);
@@ -972,9 +1027,11 @@ public class CustMechBaseTmp implements BetterjrEntity {
         CustMechBaseTmp other = (CustMechBaseTmp) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
                 && (this.getCustNo() == null ? other.getCustNo() == null : this.getCustNo().equals(other.getCustNo()))
+                && (this.getCustName() == null ? other.getCustName() == null : this.getCustName().equals(other.getCustName()))
                 && (this.getVersion() == null ? other.getVersion() == null : this.getVersion().equals(other.getVersion()))
                 && (this.getEngName() == null ? other.getEngName() == null : this.getEngName().equals(other.getEngName()))
                 && (this.getCategory() == null ? other.getCategory() == null : this.getCategory().equals(other.getCategory()))
+                && (this.getCorpType() == null ? other.getCorpType() == null : this.getCorpType().equals(other.getCorpType()))
                 && (this.getNationType() == null ? other.getNationType() == null : this.getNationType().equals(other.getNationType()))
                 && (this.getCapitalType() == null ? other.getCapitalType() == null : this.getCapitalType().equals(other.getCapitalType()))
                 && (this.getLawName() == null ? other.getLawName() == null : this.getLawName().equals(other.getLawName()))
@@ -1038,9 +1095,11 @@ public class CustMechBaseTmp implements BetterjrEntity {
         int result = 1;
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
         result = prime * result + ((getCustNo() == null) ? 0 : getCustNo().hashCode());
+        result = prime * result + ((getCustName() == null) ? 0 : getCustName().hashCode());
         result = prime * result + ((getVersion() == null) ? 0 : getVersion().hashCode());
         result = prime * result + ((getEngName() == null) ? 0 : getEngName().hashCode());
         result = prime * result + ((getCategory() == null) ? 0 : getCategory().hashCode());
+        result = prime * result + ((getCorpType() == null) ? 0 : getCorpType().hashCode());
         result = prime * result + ((getNationType() == null) ? 0 : getNationType().hashCode());
         result = prime * result + ((getCapitalType() == null) ? 0 : getCapitalType().hashCode());
         result = prime * result + ((getLawName() == null) ? 0 : getLawName().hashCode());
@@ -1096,7 +1155,7 @@ public class CustMechBaseTmp implements BetterjrEntity {
         return result;
     }
 
-    public void initAddValue(String anTmpType) {
+    public void initAddValue(String anTmpType, Long anCustNo) {
         this.id = SerialGenerator.getLongValue("CustMechBaseTmp.id");
 
         this.regOperId = UserUtils.getOperatorInfo().getId();
@@ -1111,6 +1170,8 @@ public class CustMechBaseTmp implements BetterjrEntity {
 
         this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
         this.businStatus = CustomerConstants.TMP_STATUS_NEW;
+        
+        this.custNo = anCustNo;
 
         this.tmpType = anTmpType;
         this.tmpOperType = CustomerConstants.TMP_OPER_TYPE_MODIFY;// 单表只有修改操作
@@ -1130,13 +1191,16 @@ public class CustMechBaseTmp implements BetterjrEntity {
         this.modiOperName = UserUtils.getOperatorInfo().getName();
         this.modiDate = BetterDateUtils.getNumDate();
         this.modiTime = BetterDateUtils.getNumTime();
-        
+        /*
         this.custNo = anCustMechBaseTmp.getCustNo();
+        */
+        this.custName = anCustMechBaseTmp.getCustName();
         this.address = anCustMechBaseTmp.getAddress();
         this.businLicence = anCustMechBaseTmp.getBusinLicence();
         this.businScope = anCustMechBaseTmp.getBusinScope();
         this.capitalType = anCustMechBaseTmp.getCapitalType();
         this.category = anCustMechBaseTmp.getCategory();
+        this.corpType = anCustMechBaseTmp.getCorpType();
         this.cityNo = anCustMechBaseTmp.getCityNo();
         this.corpName = anCustMechBaseTmp.getCorpName();
         this.engName = anCustMechBaseTmp.getEngName();

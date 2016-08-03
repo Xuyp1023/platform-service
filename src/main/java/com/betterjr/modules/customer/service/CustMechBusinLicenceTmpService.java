@@ -12,15 +12,13 @@ import com.betterjr.common.exception.BytterTradeException;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterStringUtils;
+import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.customer.constant.CustomerConstants;
 import com.betterjr.modules.customer.dao.CustMechBusinLicenceTmpMapper;
 import com.betterjr.modules.customer.entity.CustChangeApply;
 import com.betterjr.modules.customer.entity.CustInsteadApply;
 import com.betterjr.modules.customer.entity.CustInsteadRecord;
-import com.betterjr.modules.customer.entity.CustMechBusinLicence;
 import com.betterjr.modules.customer.entity.CustMechBusinLicenceTmp;
-import com.betterjr.modules.customer.entity.CustMechLaw;
-import com.betterjr.modules.customer.entity.CustMechLawTmp;
 import com.betterjr.modules.customer.helper.IFormalDataService;
 
 /**
@@ -43,6 +41,9 @@ public class CustMechBusinLicenceTmpService extends BaseService<CustMechBusinLic
 
     @Resource
     private CustChangeApplyService changeApplyService;
+
+    @Resource
+    private CustAccountService custAccountService;
 
     /**
      * 营业执照流水信息-查询
@@ -82,8 +83,11 @@ public class CustMechBusinLicenceTmpService extends BaseService<CustMechBusinLic
     public CustMechBusinLicenceTmp addCustMechBusinLicenceTmp(CustMechBusinLicenceTmp anCustMechBusinLicenceTmp, String anTmpType) {
         BTAssert.notNull(anCustMechBusinLicenceTmp, "营业执照流水信息不允许为空！");
 
-        anCustMechBusinLicenceTmp.setCustNo(anCustMechBusinLicenceTmp.getRefId());
-        anCustMechBusinLicenceTmp.initAddValue(anTmpType);
+        final Long custNo = anCustMechBusinLicenceTmp.getRefId();
+        anCustMechBusinLicenceTmp.setCustNo(custNo);
+        
+        final String custName = custAccountService.queryCustName(custNo);
+        anCustMechBusinLicenceTmp.initAddValue(anTmpType, custNo, custName);
         this.insert(anCustMechBusinLicenceTmp);
 
         return anCustMechBusinLicenceTmp;

@@ -72,7 +72,7 @@ public class CustInsteadService {
 
         Long applyId = custInsteadApply.getId();
         String insteadItems = (String) anParam.get("insteadItems");
-        insteadRecordService.addCustInsteadRecord(applyId, insteadType, insteadItems);
+        insteadRecordService.addCustInsteadRecord(custInsteadApply, insteadType, insteadItems);
 
         return custInsteadApply;
     }

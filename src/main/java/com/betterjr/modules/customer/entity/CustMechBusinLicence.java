@@ -37,17 +37,38 @@ public class CustMechBusinLicence implements BetterjrEntity {
     private Long version;
 
     /**
-     * 工商登记号
+     * 统一社会信用代码
+     */
+    @Column(name = "C_UNIFIED_CODE",  columnDefinition="VARCHAR" )
+    @MetaData( value="统一社会信用代码", comments = "统一社会信用代码")
+    private String unifiedCode;
+    
+    /**
+     * 注册号
      */
     @Column(name = "C_REG_NO",  columnDefinition="VARCHAR" )
-    @MetaData( value="工商登记号", comments = "工商登记号")
+    @MetaData( value="注册号", comments = "注册号")
     private String regNo;
+    
+    /**
+     * 组织机构代码证号
+     */
+    @Column(name = "C_ORG_CODE",  columnDefinition="VARCHAR" )
+    @MetaData( value="组织机构代码证号", comments = "组织机构代码证号")
+    private String orgCode;
+    
+    /**
+     * 税务登记证号
+     */
+    @Column(name = "C_TAX_NO",  columnDefinition="VARCHAR" )
+    @MetaData( value="税务登记证号", comments = "税务登记证号")
+    private String taxNo;
 
     /**
-     * 企业类型 0国有企业 1集体所有制企业 2私营企业 3股份制企业 4联营企业 5外商投资企业 6港澳台投资企业 7股份合作企业
+     * 企业类型: 0国有企业 1集体所有制企业 2私营企业 3股份制企业 4联营企业 5外商投资企业 6港澳台投资企业 7股份合作企业
      */
     @Column(name = "C_CORP_TYPE",  columnDefinition="VARCHAR" )
-    @MetaData( value="企业类型 0国有企业 1集体所有制企业 2私营企业 3股份制企业 4联营企业 5外商投资企业 6港澳台投资企业 7股份合作企业", comments = "企业类型 0国有企业 1集体所有制企业 2私营企业 3股份制企业 4联营企业 5外商投资企业 6港澳台投资企业 7股份合作企业")
+    @MetaData( value="企业类型", comments = "企业类型: 0国有企业 1集体所有制企业 2私营企业 3股份制企业 4联营企业 5外商投资企业 6港澳台投资企业 7股份合作企业")
     private String corpType;
 
     /**
@@ -217,6 +238,13 @@ public class CustMechBusinLicence implements BetterjrEntity {
     @Column(name = "L_CUSTNO",  columnDefinition="INTEGER" )
     @MetaData( value="客户编号", comments = "客户编号")
     private Long custNo;
+    
+    /**
+     * 客户全称
+     */
+    @Column(name = "C_CUSTNAME",  columnDefinition="VARCHAR" )
+    @MetaData( value="客户全称", comments = "客户全称")
+    private String custName;
 
     private static final long serialVersionUID = 1468812783858L;
 
@@ -235,6 +263,14 @@ public class CustMechBusinLicence implements BetterjrEntity {
     public void setVersion(Long version) {
         this.version = version;
     }
+    
+    public String getUnifiedCode() {
+        return unifiedCode;
+    }
+
+    public void setUnifiedCode(String anUnifiedCode) {
+        unifiedCode = anUnifiedCode;
+    }
 
     public String getRegNo() {
         return regNo;
@@ -242,6 +278,22 @@ public class CustMechBusinLicence implements BetterjrEntity {
 
     public void setRegNo(String regNo) {
         this.regNo = regNo == null ? null : regNo.trim();
+    }
+    
+    public String getOrgCode() {
+        return orgCode;
+    }
+
+    public void setOrgCode(String anOrgCode) {
+        orgCode = anOrgCode;
+    }
+
+    public String getTaxNo() {
+        return taxNo;
+    }
+
+    public void setTaxNo(String anTaxNo) {
+        taxNo = anTaxNo;
     }
 
     public String getCorpType() {
@@ -435,6 +487,14 @@ public class CustMechBusinLicence implements BetterjrEntity {
     public void setCustNo(Long custNo) {
         this.custNo = custNo;
     }
+    
+    public String getCustName() {
+        return custName;
+    }
+
+    public void setCustName(String anCustName) {
+        custName = anCustName;
+    }
 
     @Override
     public String toString() {
@@ -444,7 +504,10 @@ public class CustMechBusinLicence implements BetterjrEntity {
         sb.append("Hash = ").append(hashCode());
         sb.append(", id=").append(id);
         sb.append(", version=").append(version);
+        sb.append(", unifiedCode=").append(unifiedCode);
         sb.append(", regNo=").append(regNo);
+        sb.append(", orgCode=").append(orgCode);
+        sb.append(", taxNo=").append(taxNo);
         sb.append(", corpType=").append(corpType);
         sb.append(", address=").append(address);
         sb.append(", lawName=").append(lawName);
@@ -469,6 +532,7 @@ public class CustMechBusinLicence implements BetterjrEntity {
         sb.append(", businStatus=").append(businStatus);
         sb.append(", lastStatus=").append(lastStatus);
         sb.append(", custNo=").append(custNo);
+        sb.append(", custName=").append(custName);
         sb.append(", serialVersionUID=").append(serialVersionUID);
         sb.append("]");
         return sb.toString();
@@ -488,7 +552,10 @@ public class CustMechBusinLicence implements BetterjrEntity {
         CustMechBusinLicence other = (CustMechBusinLicence) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
             && (this.getVersion() == null ? other.getVersion() == null : this.getVersion().equals(other.getVersion()))
+            && (this.getUnifiedCode() == null ? other.getUnifiedCode() == null : this.getUnifiedCode().equals(other.getUnifiedCode()))
             && (this.getRegNo() == null ? other.getRegNo() == null : this.getRegNo().equals(other.getRegNo()))
+            && (this.getOrgCode() == null ? other.getOrgCode() == null : this.getOrgCode().equals(other.getOrgCode()))
+            && (this.getTaxNo() == null ? other.getTaxNo() == null : this.getTaxNo().equals(other.getTaxNo()))
             && (this.getCorpType() == null ? other.getCorpType() == null : this.getCorpType().equals(other.getCorpType()))
             && (this.getAddress() == null ? other.getAddress() == null : this.getAddress().equals(other.getAddress()))
             && (this.getLawName() == null ? other.getLawName() == null : this.getLawName().equals(other.getLawName()))
@@ -512,7 +579,8 @@ public class CustMechBusinLicence implements BetterjrEntity {
             && (this.getOperOrg() == null ? other.getOperOrg() == null : this.getOperOrg().equals(other.getOperOrg()))
             && (this.getBusinStatus() == null ? other.getBusinStatus() == null : this.getBusinStatus().equals(other.getBusinStatus()))
             && (this.getLastStatus() == null ? other.getLastStatus() == null : this.getLastStatus().equals(other.getLastStatus()))
-            && (this.getCustNo() == null ? other.getCustNo() == null : this.getCustNo().equals(other.getCustNo()));
+            && (this.getCustNo() == null ? other.getCustNo() == null : this.getCustNo().equals(other.getCustNo()))
+            && (this.getCustName() == null ? other.getCustName() == null : this.getCustName().equals(other.getCustName()));
     }
 
     @Override
@@ -521,7 +589,10 @@ public class CustMechBusinLicence implements BetterjrEntity {
         int result = 1;
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
         result = prime * result + ((getVersion() == null) ? 0 : getVersion().hashCode());
+        result = prime * result + ((getUnifiedCode() == null) ? 0 : getUnifiedCode().hashCode());
         result = prime * result + ((getRegNo() == null) ? 0 : getRegNo().hashCode());
+        result = prime * result + ((getOrgCode() == null) ? 0 : getOrgCode().hashCode());
+        result = prime * result + ((getTaxNo() == null) ? 0 : getTaxNo().hashCode());
         result = prime * result + ((getCorpType() == null) ? 0 : getCorpType().hashCode());
         result = prime * result + ((getAddress() == null) ? 0 : getAddress().hashCode());
         result = prime * result + ((getLawName() == null) ? 0 : getLawName().hashCode());
@@ -546,10 +617,11 @@ public class CustMechBusinLicence implements BetterjrEntity {
         result = prime * result + ((getBusinStatus() == null) ? 0 : getBusinStatus().hashCode());
         result = prime * result + ((getLastStatus() == null) ? 0 : getLastStatus().hashCode());
         result = prime * result + ((getCustNo() == null) ? 0 : getCustNo().hashCode());
+        result = prime * result + ((getCustName() == null) ? 0 : getCustName().hashCode());
         return result;
     }
     
-    public void initAddValue() {
+    public void initAddValue(Long anCustNo, String anCustName) {
         this.id = SerialGenerator.getLongValue("CustMechBusinLicence.id");
         
         this.regOperId = UserUtils.getOperatorInfo().getId();
@@ -562,6 +634,9 @@ public class CustMechBusinLicence implements BetterjrEntity {
         this.modiDate = BetterDateUtils.getNumDate();
         this.modiTime = BetterDateUtils.getNumTime();
         
+        this.custNo = anCustNo;
+        this.custName = anCustName;
+        
         this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
         this.businStatus = "0";
     }
@@ -572,7 +647,10 @@ public class CustMechBusinLicence implements BetterjrEntity {
         this.modiDate = BetterDateUtils.getNumDate();
         this.modiTime = BetterDateUtils.getNumTime();
         
+        this.unifiedCode = anCustMechBusinLicence.getUnifiedCode();
         this.regNo = anCustMechBusinLicence.getRegNo();
+        this.orgCode = anCustMechBusinLicence.getOrgCode();
+        this.taxNo = anCustMechBusinLicence.getTaxNo();
         this.corpType = anCustMechBusinLicence.getCorpType();
         this.address = anCustMechBusinLicence.getAddress();
         this.lawName = anCustMechBusinLicence.getLawName();
@@ -585,6 +663,9 @@ public class CustMechBusinLicence implements BetterjrEntity {
         this.certifiedDate = anCustMechBusinLicence.getCertifiedDate();
         this.businScope = anCustMechBusinLicence.getBusinScope();
         this.batchNo = anCustMechBusinLicence.getBatchNo();
+        /*
+        this.custNo = anCustMechBusinLicence.getCustNo();
+        this.custName = anCustMechBusinLicence.getCustName();*/
 
         this.businStatus = anCustMechBusinLicence.getBusinStatus();
     }
@@ -595,7 +676,10 @@ public class CustMechBusinLicence implements BetterjrEntity {
         this.modiDate = BetterDateUtils.getNumDate();
         this.modiTime = BetterDateUtils.getNumTime();
         
+        this.unifiedCode = anBusinLicenceTmp.getUnifiedCode();
         this.regNo = anBusinLicenceTmp.getRegNo();
+        this.orgCode = anBusinLicenceTmp.getOrgCode();
+        this.taxNo = anBusinLicenceTmp.getTaxNo();
         this.corpType = anBusinLicenceTmp.getCorpType();
         this.address = anBusinLicenceTmp.getAddress();
         this.lawName = anBusinLicenceTmp.getLawName();
@@ -608,5 +692,8 @@ public class CustMechBusinLicence implements BetterjrEntity {
         this.certifiedDate = anBusinLicenceTmp.getCertifiedDate();
         this.businScope = anBusinLicenceTmp.getBusinScope();
         this.batchNo = anBusinLicenceTmp.getBatchNo();
+        /*
+        this.custNo = anBusinLicenceTmp.getCustNo();
+        this.custName = anBusinLicenceTmp.getCustName();*/
     }
 }

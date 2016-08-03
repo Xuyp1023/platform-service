@@ -36,6 +36,13 @@ public class CustChangeApply implements BetterjrEntity {
     @Column(name = "L_CUSTNO",  columnDefinition="INTEGER" )
     @MetaData( value="客户编号", comments = "客户编号")
     private Long custNo;
+    
+    /**
+     * 客户全称
+     */
+    @Column(name = "C_CUSTNAME",  columnDefinition="VARCHAR" )
+    @MetaData( value="客户全称", comments = "客户全称")
+    private String custName;
 
     /**
      * 变更项目: 0公司基本信息，1法人信息，2股东信息，3高管信息，4营业执照，5联系人信息，6银行账户
@@ -114,7 +121,7 @@ public class CustChangeApply implements BetterjrEntity {
     /**
      * 修改日期
      */
-    @JsonIgnore
+    @JsonSerialize(using = CustDateJsonSerializer.class)
     @Column(name = "D_MODI_DATE",  columnDefinition="VARCHAR" )
     @MetaData( value="修改日期", comments = "修改日期")
     private String modiDate;
@@ -156,6 +163,9 @@ public class CustChangeApply implements BetterjrEntity {
     
     @Transient
     private String auditResult;
+    
+    @Transient
+    private String auditReason;
 
     private static final long serialVersionUID = 1468812783843L;
 
@@ -173,6 +183,14 @@ public class CustChangeApply implements BetterjrEntity {
 
     public void setCustNo(Long custNo) {
         this.custNo = custNo;
+    }
+    
+    public String getCustName() {
+        return custName;
+    }
+
+    public void setCustName(String anCustName) {
+        custName = anCustName;
     }
 
     public String getChangeItem() {
@@ -303,6 +321,7 @@ public class CustChangeApply implements BetterjrEntity {
         sb.append("Hash = ").append(hashCode());
         sb.append(", id=").append(id);
         sb.append(", custNo=").append(custNo);
+        sb.append(", custName=").append(custName);
         sb.append(", changeItem=").append(changeItem);
         sb.append(", description=").append(description);
         sb.append(", tmpIds=").append(tmpIds);
@@ -337,6 +356,7 @@ public class CustChangeApply implements BetterjrEntity {
         CustChangeApply other = (CustChangeApply) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
             && (this.getCustNo() == null ? other.getCustNo() == null : this.getCustNo().equals(other.getCustNo()))
+            && (this.getCustName() == null ? other.getCustName() == null : this.getCustName().equals(other.getCustName()))
             && (this.getChangeItem() == null ? other.getChangeItem() == null : this.getChangeItem().equals(other.getChangeItem()))
             && (this.getDescription() == null ? other.getDescription() == null : this.getDescription().equals(other.getDescription()))
             && (this.getTmpIds() == null ? other.getTmpIds() == null : this.getTmpIds().equals(other.getTmpIds()))
@@ -360,6 +380,7 @@ public class CustChangeApply implements BetterjrEntity {
         int result = 1;
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
         result = prime * result + ((getCustNo() == null) ? 0 : getCustNo().hashCode());
+        result = prime * result + ((getCustName() == null) ? 0 : getCustName().hashCode());
         result = prime * result + ((getChangeItem() == null) ? 0 : getChangeItem().hashCode());
         result = prime * result + ((getDescription() == null) ? 0 : getDescription().hashCode());
         result = prime * result + ((getTmpIds() == null) ? 0 : getTmpIds().hashCode());
@@ -378,7 +399,7 @@ public class CustChangeApply implements BetterjrEntity {
         return result;
     }
     
-    public void initAddValue(Long anCustNo, String anChangeItem, String anTmpIds) {
+    public void initAddValue(Long anCustNo, String anCustName, String anChangeItem, String anTmpIds) {
         this.id = SerialGenerator.getLongValue("CustChangeApply.id");
         
         this.regOperId = UserUtils.getOperatorInfo().getId();
@@ -395,6 +416,7 @@ public class CustChangeApply implements BetterjrEntity {
         this.businStatus = CustomerConstants.CHANGE_APPLY_STATUS_NEW;
         
         this.custNo = anCustNo;
+        this.custName = anCustName;
         this.changeItem = anChangeItem;
         this.tmpIds = anTmpIds;
     }
@@ -431,5 +453,13 @@ public class CustChangeApply implements BetterjrEntity {
 
     public void setAuditResult(String anAuditResult) {
         auditResult = anAuditResult;
+    }
+
+    public String getAuditReason() {
+        return auditReason;
+    }
+
+    public void setAuditReason(String anAuditReason) {
+        auditReason = anAuditReason;
     }
 }

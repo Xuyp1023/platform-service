@@ -12,6 +12,7 @@ import com.betterjr.common.exception.BytterTradeException;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterStringUtils;
+import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.customer.constant.CustomerConstants;
 import com.betterjr.modules.customer.dao.CustMechBaseTmpMapper;
 import com.betterjr.modules.customer.entity.CustChangeApply;
@@ -40,6 +41,9 @@ public class CustMechBaseTmpService extends BaseService<CustMechBaseTmpMapper, C
 
     @Resource
     private CustChangeApplyService changeApplyService;
+    
+    @Resource
+    private CustAccountService custAccountService;
 
     /**
      * 公司基本信息-流水信息-详情
@@ -76,8 +80,9 @@ public class CustMechBaseTmpService extends BaseService<CustMechBaseTmpMapper, C
         BTAssert.notNull(anCustMechBaseTmp, "公司基本信息-流水信息 不能为空！");
         BTAssert.notNull(anTmpType, "流水类型  不能为空！");
 
-        anCustMechBaseTmp.setCustNo(anCustMechBaseTmp.getRefId()); //处理custNo
-        anCustMechBaseTmp.initAddValue(anTmpType);
+        final Long custNo = anCustMechBaseTmp.getRefId();
+        
+        anCustMechBaseTmp.initAddValue(anTmpType, custNo);
         this.insert(anCustMechBaseTmp);
 
         return anCustMechBaseTmp;
