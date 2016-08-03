@@ -11,8 +11,10 @@ import org.springframework.stereotype.Service;
 import com.betterjr.common.exception.BytterTradeException;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
+import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.mapper.pagehelper.Page;
+import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.customer.constant.CustomerConstants;
 import com.betterjr.modules.customer.dao.CustChangeApplyMapper;
 import com.betterjr.modules.customer.entity.CustAuditLog;
@@ -27,6 +29,9 @@ import com.betterjr.modules.customer.entity.CustChangeApply;
 public class CustChangeApplyService extends BaseService<CustChangeApplyMapper, CustChangeApply> {
     @Resource
     private CustAuditLogService auditLogService;
+
+    @Resource
+    private CustAccountService custAccountService;
 
     /**
      * 添加变更申请
@@ -46,11 +51,12 @@ public class CustChangeApplyService extends BaseService<CustChangeApplyMapper, C
         }
 
         final CustChangeApply custChangeApply = new CustChangeApply();
-        custChangeApply.initAddValue(anCustNo, anChangeItem, anTmpIds);
+        final String custName = custAccountService.queryCustName(anCustNo);
+        custChangeApply.initAddValue(anCustNo, custName, anChangeItem, anTmpIds);
         this.insert(custChangeApply);
         return custChangeApply;
     }
-    
+
     /**
      * 变更申请 查询
      * 
@@ -109,6 +115,13 @@ public class CustChangeApplyService extends BaseService<CustChangeApplyMapper, C
      * @return
      */
     public Page<CustChangeApply> queryCustChangeApply(Map<String, Object> anParam, int anFlag, int anPageNum, int anPageSize) {
+        final String custName = (String) anParam.get("LIKEcustName");
+        if (BetterStringUtils.isBlank(custName)) {
+            anParam.remove("LIKEcustName");
+        }
+        else {
+            anParam.put("LIKEcustName", "%" + custName + "%");
+        }
         final Page<CustChangeApply> changeApplys = this.selectPropertyByPage(anParam, anPageNum, anPageSize, anFlag == 1);
 
         changeApplys.forEach(changeApply -> {
@@ -117,6 +130,7 @@ public class CustChangeApplyService extends BaseService<CustChangeApplyMapper, C
                 changeApply.setAuditDate(auditLog.getAuditDate());
                 changeApply.setAuditTime(auditLog.getAuditTime());
                 changeApply.setAuditResult(auditLog.getResult());
+                changeApply.setAuditReason(auditLog.getReason());
             }
         });
 

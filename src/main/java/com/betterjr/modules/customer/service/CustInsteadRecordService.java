@@ -41,10 +41,10 @@ public class CustInsteadRecordService extends BaseService<CustInsteadRecordMappe
     /**
      * 根据代录申请类型，代录项目生成代录记录
      */
-    public void addCustInsteadRecord(Long anApplyId, String anInsteadType, String anInsteadItems) {
+    public void addCustInsteadRecord(CustInsteadApply anInsteadApply, String anInsteadType, String anInsteadItems) {
         // 0 开户代录 1 变更代录
         if (BetterStringUtils.equals(anInsteadType, CustomerConstants.INSTEAD_APPLY_TYPE_OPENACCOUNT)) {
-            this.addCustInsteadRecord(anApplyId, CustomerConstants.ITEM_OPENACCOUNT);
+            this.addCustInsteadRecord(anInsteadApply, CustomerConstants.ITEM_OPENACCOUNT);
         }
         else {
             BTAssert.notNull(anInsteadItems, "代录项目不能为空");
@@ -57,7 +57,7 @@ public class CustInsteadRecordService extends BaseService<CustInsteadRecordMappe
                     for (String insteadItem : tempInsteadItems) {
                         if (BetterStringUtils.equals(insteadItem, CustomerConstants.ITEM_ENABLED) == true) {
                             // 代录项目: 0公司基本信息，1法人信息，2股东信息，3高管信息，4营业执照，5联系人信息，6银行账户, 7开户代录
-                            this.addCustInsteadRecord(anApplyId, String.valueOf(insteadItemIndex));
+                            this.addCustInsteadRecord(anInsteadApply, String.valueOf(insteadItemIndex));
                         }
                         insteadItemIndex++;
                     }
@@ -74,12 +74,15 @@ public class CustInsteadRecordService extends BaseService<CustInsteadRecordMappe
     /**
      * 添加代录项目 空代录项目
      */
-    public CustInsteadRecord addCustInsteadRecord(Long anApplyId, String anInsteadItem) {
-        BTAssert.notNull(anApplyId, "代录申请编号不能为空！");
+    public CustInsteadRecord addCustInsteadRecord(CustInsteadApply anInsteadApply, String anInsteadItem) {
+        BTAssert.notNull(anInsteadApply, "代录申请不能为空！");
         BTAssert.notNull(anInsteadItem, "代录项目不能为空！");
 
+        final Long applyId = anInsteadApply.getId();
+        final Long custNo = anInsteadApply.getCustNo();
+        
         final CustInsteadRecord custInsteadRecord = new CustInsteadRecord();
-        custInsteadRecord.initAddValue(anApplyId, anInsteadItem);
+        custInsteadRecord.initAddValue(applyId, custNo, anInsteadItem);
 
         this.insert(custInsteadRecord);
         return custInsteadRecord;

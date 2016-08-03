@@ -11,9 +11,11 @@ import javax.persistence.Table;
 
 import com.betterjr.common.annotation.MetaData;
 import com.betterjr.common.entity.BetterjrEntity;
+import com.betterjr.common.mapper.CustDateJsonSerializer;
 import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.UserUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @Access(AccessType.FIELD)
 @Entity
@@ -26,6 +28,13 @@ public class CustMechBase implements BetterjrEntity {
     @Column(name = "L_CUSTNO",  columnDefinition="INTEGER" )
     @MetaData( value="客户编号", comments = "客户编号")
     private Long custNo;
+    
+    /**
+     * 客户全称
+     */
+    @Column(name = "C_CUSTNAME",  columnDefinition="VARCHAR" )
+    @MetaData( value="客户全称", comments = "客户全称")
+    private String custName;
 
     /**
      * 数据版本号
@@ -46,10 +55,18 @@ public class CustMechBase implements BetterjrEntity {
     /**
      * 机构类别；企业法人、机关法人、事业法人、社团法人、工会法人、其他非金融机构法人、证券公司、银行、信托投资公司、基金管理公司、保险公司、其他金融机构法人、普通合伙企业、特殊普通合伙企业、有限合伙企业、非法人非合伙制创投企业、境外一般机构、境外代理人、境外证券公司、境外基金公司、破产管理人、中国金融期货交易所、其他
      */
+    @JsonIgnore
     @Column(name = "C_CATEGORY",  columnDefinition="VARCHAR" )
     @MetaData( value="机构类别", comments = "机构类别；企业法人、机关法人、事业法人、社团法人、工会法人、其他非金融机构法人、证券公司、银行、信托投资公司、基金管理公司、保险公司、其他金融机构法人、普通合伙企业、特殊普通合伙企业、有限合伙企业、非法人非合伙制创投企业、境外一般机构、境外代理人、境外证券公司、境外基金公司、破产管理人、中国金融期货交易所、其他")
     private String category;
 
+    /**
+     * 企业类型: 0国有企业 1集体所有制企业 2私营企业 3股份制企业 4联营企业 5外商投资企业 6港澳台投资企业 7股份合作企业
+     */
+    @Column(name = "C_CORP_TYPE",  columnDefinition="VARCHAR" )
+    @MetaData( value="企业类型", comments = "企业类型: 0国有企业 1集体所有制企业 2私营企业 3股份制企业 4联营企业 5外商投资企业 6港澳台投资企业 7股份合作企业")
+    private String corpType;
+    
     /**
      * 国有属性；国务院国资委管辖、地方国资委管辖、其他国有企业、非国有
      */
@@ -273,6 +290,7 @@ public class CustMechBase implements BetterjrEntity {
     /**
      * 传真
      */
+    @JsonIgnore
     @Column(name = "C_FAX",  columnDefinition="VARCHAR" )
     @MetaData( value="传真", comments = "传真")
     private String fax;
@@ -319,6 +337,7 @@ public class CustMechBase implements BetterjrEntity {
     /**
      * 企业名称
      */
+    @JsonIgnore
     @Column(name = "C_CORPNAME",  columnDefinition="VARCHAR" )
     @MetaData( value="企业名称", comments = "企业名称")
     private String corpName;
@@ -357,7 +376,7 @@ public class CustMechBase implements BetterjrEntity {
     /**
      * 创建日期
      */
-    @JsonIgnore
+    @JsonSerialize(using = CustDateJsonSerializer.class)
     @Column(name = "D_REG_DATE",  columnDefinition="VARCHAR" )
     @MetaData( value="创建日期", comments = "创建日期")
     private String regDate;
@@ -389,7 +408,7 @@ public class CustMechBase implements BetterjrEntity {
     /**
      * 修改日期
      */
-    @JsonIgnore
+    @JsonSerialize(using = CustDateJsonSerializer.class)
     @Column(name = "D_MODI_DATE",  columnDefinition="VARCHAR" )
     @MetaData( value="修改日期", comments = "修改日期")
     private String modiDate;
@@ -429,6 +448,14 @@ public class CustMechBase implements BetterjrEntity {
     public void setCustNo(Long custNo) {
         this.custNo = custNo;
     }
+    
+    public String getCustName() {
+        return custName;
+    }
+
+    public void setCustName(String anCustName) {
+        custName = anCustName;
+    }
 
     public Long getVersion() {
         return version;
@@ -452,6 +479,14 @@ public class CustMechBase implements BetterjrEntity {
 
     public void setCategory(String category) {
         this.category = category == null ? null : category.trim();
+    }
+    
+    public String getCorpType() {
+        return corpType;
+    }
+
+    public void setCorpType(String anCorpType) {
+        corpType = anCorpType;
     }
 
     public String getNationType() {
@@ -853,9 +888,11 @@ public class CustMechBase implements BetterjrEntity {
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
         sb.append(", custNo=").append(custNo);
+        sb.append(", custName=").append(custName);
         sb.append(", version=").append(version);
         sb.append(", engName=").append(engName);
         sb.append(", category=").append(category);
+        sb.append(", corpType=").append(corpType);
         sb.append(", nationType=").append(nationType);
         sb.append(", capitalType=").append(capitalType);
         sb.append(", lawName=").append(lawName);
@@ -923,9 +960,11 @@ public class CustMechBase implements BetterjrEntity {
         }
         CustMechBase other = (CustMechBase) that;
         return (this.getCustNo() == null ? other.getCustNo() == null : this.getCustNo().equals(other.getCustNo()))
+                && (this.getCustName() == null ? other.getCustName() == null : this.getCustName().equals(other.getCustName()))
             && (this.getVersion() == null ? other.getVersion() == null : this.getVersion().equals(other.getVersion()))
             && (this.getEngName() == null ? other.getEngName() == null : this.getEngName().equals(other.getEngName()))
             && (this.getCategory() == null ? other.getCategory() == null : this.getCategory().equals(other.getCategory()))
+            && (this.getCorpType() == null ? other.getCorpType() == null : this.getCorpType().equals(other.getCorpType()))
             && (this.getNationType() == null ? other.getNationType() == null : this.getNationType().equals(other.getNationType()))
             && (this.getCapitalType() == null ? other.getCapitalType() == null : this.getCapitalType().equals(other.getCapitalType()))
             && (this.getLawName() == null ? other.getLawName() == null : this.getLawName().equals(other.getLawName()))
@@ -982,9 +1021,11 @@ public class CustMechBase implements BetterjrEntity {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((getCustNo() == null) ? 0 : getCustNo().hashCode());
+        result = prime * result + ((getCustName() == null) ? 0 : getCustName().hashCode());
         result = prime * result + ((getVersion() == null) ? 0 : getVersion().hashCode());
         result = prime * result + ((getEngName() == null) ? 0 : getEngName().hashCode());
         result = prime * result + ((getCategory() == null) ? 0 : getCategory().hashCode());
+        result = prime * result + ((getCorpType() == null) ? 0 : getCorpType().hashCode());
         result = prime * result + ((getNationType() == null) ? 0 : getNationType().hashCode());
         result = prime * result + ((getCapitalType() == null) ? 0 : getCapitalType().hashCode());
         result = prime * result + ((getLawName() == null) ? 0 : getLawName().hashCode());
@@ -1038,21 +1079,35 @@ public class CustMechBase implements BetterjrEntity {
     }
     
     public void initAddValue(Long anCustNo) {
+        this.initAddValue(anCustNo, null);
+    }
+    
+    public void initAddValue(Long anCustNo, String anCustName) {
         this.custNo = anCustNo;
+        this.custName = anCustName;
+        
         this.regDate = BetterDateUtils.getNumDate();
         this.regTime = BetterDateUtils.getNumTime();
         this.regOperId = UserUtils.getOperatorInfo().getId();
         this.regOperName = UserUtils.getOperatorInfo().getName();
         this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
+        
+        this.modiOperId = UserUtils.getOperatorInfo().getId();
+        this.modiOperName = UserUtils.getOperatorInfo().getName();
+        this.modiDate = BetterDateUtils.getNumDate();
+        this.modiTime = BetterDateUtils.getNumTime();
     }
 
     public void initModifyValue(CustMechBase anCustMechBase) {
         //
+        this.custName = anCustMechBase.getCustName();
+        
         this.address = anCustMechBase.getAddress();
         this.businLicence = anCustMechBase.getBusinLicence();
         this.businScope = anCustMechBase.getBusinScope();
         this.capitalType = anCustMechBase.getCapitalType();
         this.category = anCustMechBase.getCategory();
+        this.corpType = anCustMechBase.getCorpType();
         this.cityNo = anCustMechBase.getCityNo();
         this.corpName = anCustMechBase.getCorpName();
         this.engName = anCustMechBase.getEngName();
@@ -1091,11 +1146,14 @@ public class CustMechBase implements BetterjrEntity {
 
     // 将临时表数据转入正式表
     public void initModifyValue(CustMechBaseTmp anMechBaseTmp) {
+        this.custName = anMechBaseTmp.getCustName();
+        
         this.address = anMechBaseTmp.getAddress();
         this.businLicence = anMechBaseTmp.getBusinLicence();
         this.businScope = anMechBaseTmp.getBusinScope();
         this.capitalType = anMechBaseTmp.getCapitalType();
         this.category = anMechBaseTmp.getCategory();
+        this.corpType = anMechBaseTmp.getCorpType();
         this.cityNo = anMechBaseTmp.getCityNo();
         this.corpName = anMechBaseTmp.getCorpName();
         this.engName = anMechBaseTmp.getEngName();

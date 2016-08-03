@@ -209,6 +209,13 @@ public class CustMechLaw implements BetterjrEntity {
     @MetaData( value="客户编号", comments = "客户编号")
     private Long custNo;
 
+    /**
+     * 客户全称
+     */
+    @Column(name = "C_CUSTNAME",  columnDefinition="VARCHAR" )
+    @MetaData( value="客户全称", comments = "客户全称")
+    private String custName;
+    
     private static final long serialVersionUID = 1468812783864L;
 
     public Long getId() {
@@ -419,6 +426,14 @@ public class CustMechLaw implements BetterjrEntity {
         this.custNo = custNo;
     }
 
+    public String getCustName() {
+        return custName;
+    }
+
+    public void setCustName(String anCustName) {
+        custName = anCustName;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -451,6 +466,7 @@ public class CustMechLaw implements BetterjrEntity {
         sb.append(", businStatus=").append(businStatus);
         sb.append(", lastStatus=").append(lastStatus);
         sb.append(", custNo=").append(custNo);
+        sb.append(", custName=").append(custName);
         sb.append(", serialVersionUID=").append(serialVersionUID);
         sb.append("]");
         return sb.toString();
@@ -493,7 +509,8 @@ public class CustMechLaw implements BetterjrEntity {
             && (this.getOperOrg() == null ? other.getOperOrg() == null : this.getOperOrg().equals(other.getOperOrg()))
             && (this.getBusinStatus() == null ? other.getBusinStatus() == null : this.getBusinStatus().equals(other.getBusinStatus()))
             && (this.getLastStatus() == null ? other.getLastStatus() == null : this.getLastStatus().equals(other.getLastStatus()))
-            && (this.getCustNo() == null ? other.getCustNo() == null : this.getCustNo().equals(other.getCustNo()));
+            && (this.getCustNo() == null ? other.getCustNo() == null : this.getCustNo().equals(other.getCustNo()))
+            && (this.getCustName() == null ? other.getCustName() == null : this.getCustName().equals(other.getCustName()));
     }
 
     @Override
@@ -526,10 +543,15 @@ public class CustMechLaw implements BetterjrEntity {
         result = prime * result + ((getBusinStatus() == null) ? 0 : getBusinStatus().hashCode());
         result = prime * result + ((getLastStatus() == null) ? 0 : getLastStatus().hashCode());
         result = prime * result + ((getCustNo() == null) ? 0 : getCustNo().hashCode());
+        result = prime * result + ((getCustName() == null) ? 0 : getCustName().hashCode());
         return result;
     }
     
     public void initAddValue() {
+        this.initAddValue(null, null);
+    }
+    
+    public void initAddValue(Long anCustNo, String anCustName) {
         this.id = SerialGenerator.getLongValue("CustMechLaw.id");
         
         this.regOperId = UserUtils.getOperatorInfo().getId();
@@ -541,6 +563,9 @@ public class CustMechLaw implements BetterjrEntity {
         this.modiOperName = UserUtils.getOperatorInfo().getName();
         this.modiDate = BetterDateUtils.getNumDate();
         this.modiTime = BetterDateUtils.getNumTime();
+        
+        this.custNo = anCustNo;
+        this.custName = anCustName;
         
         this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
         this.businStatus = "0";
@@ -559,6 +584,11 @@ public class CustMechLaw implements BetterjrEntity {
         this.phone = anCustMechLaw.getPhone();
         this.sex = anCustMechLaw.getSex();
         this.validDate = anCustMechLaw.getValidDate();
+        
+        /*
+        this.custNo = anCustMechLaw.getCustNo();
+        this.custName = anCustMechLaw.getCustName();
+        */
         
         this.modiOperId = UserUtils.getOperatorInfo().getId();
         this.modiOperName = UserUtils.getOperatorInfo().getName();
@@ -579,6 +609,11 @@ public class CustMechLaw implements BetterjrEntity {
         this.phone = anMechLawTmp.getPhone();
         this.sex = anMechLawTmp.getSex();
         this.validDate = anMechLawTmp.getValidDate();
+        
+        /*
+        this.custNo = anMechLawTmp.getCustNo();
+        this.custName = anMechLawTmp.getCustName();
+        */
         
         this.modiOperId = UserUtils.getOperatorInfo().getId();
         this.modiOperName = UserUtils.getOperatorInfo().getName();

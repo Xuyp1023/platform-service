@@ -1,5 +1,6 @@
 package com.betterjr.modules.customer.dubbo;
 
+import java.util.Collection;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -8,8 +9,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.betterjr.common.utils.UserUtils;
 import com.betterjr.common.web.AjaxObject;
 import com.betterjr.mapper.pagehelper.Page;
+import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.customer.ICustMechBaseService;
 import com.betterjr.modules.customer.constant.CustomerConstants;
 import com.betterjr.modules.customer.entity.CustChangeApply;
@@ -40,6 +43,17 @@ public class CustMechBaseDubboService implements ICustMechBaseService {
     @Resource
     private CustChangeService changeService;
 
+    @Override
+    public String webQueryCustInfo() {
+        Collection<CustInfo> custInfos = queryCustInfo();
+        return AjaxObject.newOk("查询操作员所有的公司列表成功", custInfos).toJson();
+    }
+
+    @Override
+    public Collection<CustInfo> queryCustInfo() {
+        return UserUtils.findCustInfoList();
+    }
+    
     @Override
     public String webFindBaseInfo(final Long anCustNo) {
         final CustMechBase custMechBase = baseService.findCustMechBaseByCustNo(anCustNo);

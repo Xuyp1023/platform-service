@@ -12,15 +12,12 @@ import com.betterjr.common.exception.BytterTradeException;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterStringUtils;
-import com.betterjr.common.utils.Collections3;
+import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.customer.constant.CustomerConstants;
 import com.betterjr.modules.customer.dao.CustMechLawTmpMapper;
 import com.betterjr.modules.customer.entity.CustChangeApply;
 import com.betterjr.modules.customer.entity.CustInsteadApply;
 import com.betterjr.modules.customer.entity.CustInsteadRecord;
-import com.betterjr.modules.customer.entity.CustMechBase;
-import com.betterjr.modules.customer.entity.CustMechBaseTmp;
-import com.betterjr.modules.customer.entity.CustMechLaw;
 import com.betterjr.modules.customer.entity.CustMechLawTmp;
 import com.betterjr.modules.customer.helper.IFormalDataService;
 
@@ -42,6 +39,9 @@ public class CustMechLawTmpService extends BaseService<CustMechLawTmpMapper, Cus
 
     @Resource
     private CustChangeApplyService changeApplyService;
+    
+    @Resource
+    private CustAccountService custAccountService;
 
     /**
      * 法人信息-流水信息-详情
@@ -71,8 +71,10 @@ public class CustMechLawTmpService extends BaseService<CustMechLawTmpMapper, Cus
         BTAssert.notNull(anCustMechLawTmp, "法人信息-流水信息  不能为空！");
         BTAssert.notNull(anTmpType, "流水类型  不能为空！");
 
+        final Long custNo = anCustMechLawTmp.getRefId();
         anCustMechLawTmp.setCustNo(anCustMechLawTmp.getRefId());
-        anCustMechLawTmp.initAddValue(anTmpType);
+        final String custName = custAccountService.queryCustName(custNo);
+        anCustMechLawTmp.initAddValue(anTmpType, custNo, custName);
         this.insert(anCustMechLawTmp);
 
         return anCustMechLawTmp;

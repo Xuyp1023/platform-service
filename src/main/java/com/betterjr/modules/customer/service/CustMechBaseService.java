@@ -1,9 +1,12 @@
 package com.betterjr.modules.customer.service;
 
+import javax.annotation.Resource;
+
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
+import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.customer.dao.CustMechBaseMapper;
 import com.betterjr.modules.customer.entity.CustMechBase;
 import com.betterjr.modules.customer.entity.CustMechBaseTmp;
@@ -16,6 +19,9 @@ import com.betterjr.modules.customer.entity.CustMechBaseTmp;
  */
 @Service
 public class CustMechBaseService extends BaseService<CustMechBaseMapper, CustMechBase> {
+    @Resource
+    private CustAccountService custAccountService;
+    
     /**
      * 公司基本信息-查询详情
      * 
@@ -65,7 +71,8 @@ public class CustMechBaseService extends BaseService<CustMechBaseMapper, CustMec
         CustMechBase tempCustMechBase = findCustMechBaseByCustNo(anCustNo);
         BTAssert.isNull(tempCustMechBase, "客户基本信息已存在，不允许重复录入！");
 
-        anCustMechBase.initAddValue(anCustNo);
+        final String custName = custAccountService.queryCustName(anCustNo);
+        anCustMechBase.initAddValue(anCustNo, custName);
         this.insert(anCustMechBase);
         return anCustMechBase;
     }

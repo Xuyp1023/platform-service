@@ -2,13 +2,14 @@ package com.betterjr.modules.customer.service;
 
 import java.util.List;
 
+import javax.annotation.Resource;
+
 import org.springframework.stereotype.Service;
 
-import com.betterjr.common.exception.BytterTradeException;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
-import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
+import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.customer.constant.CustomerConstants;
 import com.betterjr.modules.customer.dao.CustMechLawMapper;
 import com.betterjr.modules.customer.entity.CustMechLaw;
@@ -21,7 +22,9 @@ import com.betterjr.modules.customer.entity.CustMechLawTmp;
  */
 @Service
 public class CustMechLawService extends BaseService<CustMechLawMapper, CustMechLaw> {
-
+    @Resource
+    private CustAccountService custAccountService;
+    
     /**
      * 查询法人信息
      * 
@@ -78,7 +81,9 @@ public class CustMechLawService extends BaseService<CustMechLawMapper, CustMechL
     public CustMechLaw addCustMechLaw(CustMechLaw anCustMechLaw) {
         BTAssert.notNull(anCustMechLaw, "法人信息不允许为空！");
 
-        anCustMechLaw.initAddValue();
+        final Long custNo = anCustMechLaw.getCustNo();
+        final String custName = custAccountService.queryCustName(custNo);
+        anCustMechLaw.initAddValue(custNo, custName);
         this.insert(anCustMechLaw);
         return anCustMechLaw;
     }

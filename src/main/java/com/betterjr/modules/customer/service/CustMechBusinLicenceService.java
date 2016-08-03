@@ -2,15 +2,16 @@ package com.betterjr.modules.customer.service;
 
 import java.util.List;
 
+import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.betterjr.common.exception.BytterTradeException;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
-import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
+import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.customer.constant.CustomerConstants;
 import com.betterjr.modules.customer.dao.CustMechBusinLicenceMapper;
 import com.betterjr.modules.customer.entity.CustMechBusinLicence;
@@ -26,6 +27,9 @@ public class CustMechBusinLicenceService extends BaseService<CustMechBusinLicenc
 
     private static Logger logger = LoggerFactory.getLogger(CustMechBusinLicenceService.class);
 
+    @Resource
+    private CustAccountService custAccountService;
+    
     /**
      * 营业执照信息-查询详情
      * 
@@ -86,7 +90,10 @@ public class CustMechBusinLicenceService extends BaseService<CustMechBusinLicenc
     public CustMechBusinLicence addCustMechBusinLicence(CustMechBusinLicence anCustMechBusinLicence) {
         BTAssert.notNull(anCustMechBusinLicence, "营业执照信息不允许为空！");
 
-        anCustMechBusinLicence.initAddValue();
+        final Long custNo = anCustMechBusinLicence.getCustNo();
+        final String custName = custAccountService.queryCustName(custNo);
+        
+        anCustMechBusinLicence.initAddValue(custNo, custName);
         this.insert(anCustMechBusinLicence);
         return anCustMechBusinLicence;
     }

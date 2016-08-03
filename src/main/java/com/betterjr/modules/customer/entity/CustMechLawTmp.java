@@ -212,6 +212,13 @@ public class CustMechLawTmp implements BetterjrEntity {
     @Column(name = "L_CUSTNO",  columnDefinition="INTEGER" )
     @MetaData( value="客户编号", comments = "客户编号")
     private Long custNo;
+    
+    /**
+     * 客户全称
+     */
+    @Column(name = "C_CUSTNAME",  columnDefinition="VARCHAR" )
+    @MetaData( value="客户全称", comments = "客户全称")
+    private String custName;
 
     /**
      * 引用编号
@@ -443,6 +450,14 @@ public class CustMechLawTmp implements BetterjrEntity {
     public void setCustNo(Long custNo) {
         this.custNo = custNo;
     }
+    
+    public String getCustName() {
+        return custName;
+    }
+
+    public void setCustName(String anCustName) {
+        custName = anCustName;
+    }
 
     public Long getRefId() {
         return refId;
@@ -500,6 +515,7 @@ public class CustMechLawTmp implements BetterjrEntity {
         sb.append(", businStatus=").append(businStatus);
         sb.append(", lastStatus=").append(lastStatus);
         sb.append(", custNo=").append(custNo);
+        sb.append(", custName=").append(custName);
         sb.append(", refId=").append(refId);
         sb.append(", tmpType=").append(tmpType);
         sb.append(", tmpOperType=").append(tmpOperType);
@@ -546,6 +562,7 @@ public class CustMechLawTmp implements BetterjrEntity {
             && (this.getBusinStatus() == null ? other.getBusinStatus() == null : this.getBusinStatus().equals(other.getBusinStatus()))
             && (this.getLastStatus() == null ? other.getLastStatus() == null : this.getLastStatus().equals(other.getLastStatus()))
             && (this.getCustNo() == null ? other.getCustNo() == null : this.getCustNo().equals(other.getCustNo()))
+            && (this.getCustName() == null ? other.getCustName() == null : this.getCustName().equals(other.getCustName()))
             && (this.getRefId() == null ? other.getRefId() == null : this.getRefId().equals(other.getRefId()))
             && (this.getTmpType() == null ? other.getTmpType() == null : this.getTmpType().equals(other.getTmpType()))
             && (this.getTmpOperType() == null ? other.getTmpOperType() == null : this.getTmpOperType().equals(other.getTmpOperType()));
@@ -581,13 +598,14 @@ public class CustMechLawTmp implements BetterjrEntity {
         result = prime * result + ((getBusinStatus() == null) ? 0 : getBusinStatus().hashCode());
         result = prime * result + ((getLastStatus() == null) ? 0 : getLastStatus().hashCode());
         result = prime * result + ((getCustNo() == null) ? 0 : getCustNo().hashCode());
+        result = prime * result + ((getCustName() == null) ? 0 : getCustName().hashCode());
         result = prime * result + ((getRefId() == null) ? 0 : getRefId().hashCode());
         result = prime * result + ((getTmpType() == null) ? 0 : getTmpType().hashCode());
         result = prime * result + ((getTmpOperType() == null) ? 0 : getTmpOperType().hashCode());
         return result;
     }
     
-    public void initAddValue(String anTmpType) {
+    public void initAddValue(String anTmpType, Long anCustNo, String anCustName) {
         this.id = SerialGenerator.getLongValue("CustMechLawTmp.id");
         
         this.regOperId = UserUtils.getOperatorInfo().getId();
@@ -602,6 +620,9 @@ public class CustMechLawTmp implements BetterjrEntity {
         
         this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
         this.businStatus = CustomerConstants.TMP_STATUS_NEW;
+        
+        this.custNo = anCustNo;
+        this.custName = anCustName;
         
         this.tmpType = anTmpType;
         this.tmpOperType = CustomerConstants.TMP_OPER_TYPE_MODIFY;// 只有修改操作
@@ -634,6 +655,9 @@ public class CustMechLawTmp implements BetterjrEntity {
         this.phone = anCustMechLawTmp.getPhone();
         this.sex = anCustMechLawTmp.getSex();
         this.validDate = anCustMechLawTmp.getValidDate();
+        /*
+        this.custNo = anCustMechLawTmp.getCustNo();
+        this.custName = anCustMechLawTmp.getCustName();*/
 
         this.businStatus = anCustMechLawTmp.getBusinStatus();
     }

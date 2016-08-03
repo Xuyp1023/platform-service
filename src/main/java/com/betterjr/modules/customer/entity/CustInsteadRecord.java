@@ -367,7 +367,7 @@ public class CustInsteadRecord implements BetterjrEntity {
         return result;
     }
     
-    public void initAddValue(Long anApplyId, String anInsteadItem) {
+    public void initAddValue(Long anApplyId, Long anCustNo, String anInsteadItem) {
         this.id = SerialGenerator.getLongValue("CustInsteadRecord.id");
         
         this.regOperId = UserUtils.getOperatorInfo().getId();
@@ -382,6 +382,8 @@ public class CustInsteadRecord implements BetterjrEntity {
         
         this.applyId = anApplyId;
         this.insteadItem = anInsteadItem; // 0 - 7
+        
+        this.custNo = anCustNo;
         
         this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
         this.businStatus = CustomerConstants.INSTEAD_RECORD_STATUS_NEW;
