@@ -19,6 +19,7 @@
 		base-package="com.betterjr.modules.test;
 		com.betterjr.modules.blacklist;
 		com.betterjr.modules.customer;
+		com.betterjr.modules.document;
 		com.betterjr.modules.account.service;
         com.betterjr.modules.rule.service;
         com.betterjr.modules.rule.validator;
@@ -113,26 +114,6 @@
 	<bean id="sqlMapper" class="com.betterjr.common.dao.SqlMapper"
 		scope="prototype">
 		<constructor-arg ref="sqlSession" />
-	</bean>
-
-
-	<bean id="validator"
-		class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
-		<property name="providerClass" value="org.hibernate.validator.HibernateValidator" />
-		<property name="validationMessageSource" ref="messageSource" />
-	</bean>
-
-	<bean id="messageSource"
-		class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
-		<property name="basenames">
-			<list>
-				<value>classpath:messages</value>
-				<value>classpath:ValidationMessages</value>
-			</list>
-		</property>
-		<property name="useCodeAsDefaultMessage" value="false" />
-		<property name="defaultEncoding" value="UTF-8" />
-		<property name="cacheSeconds" value="60" />
 	</bean>
 
 	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
