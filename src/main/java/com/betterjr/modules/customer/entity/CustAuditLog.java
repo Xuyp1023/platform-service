@@ -10,10 +10,13 @@ import javax.persistence.Table;
 
 import com.betterjr.common.annotation.MetaData;
 import com.betterjr.common.entity.BetterjrEntity;
+import com.betterjr.common.mapper.CustDateJsonSerializer;
+import com.betterjr.common.mapper.CustTimeJsonSerializer;
 import com.betterjr.common.selectkey.SerialGenerator;
 import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.UserUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @Access(AccessType.FIELD)
 @Entity
@@ -59,6 +62,7 @@ public class CustAuditLog implements BetterjrEntity {
     /**
      * 审核日期
      */
+    @JsonSerialize(using = CustDateJsonSerializer.class)
     @OrderBy("DESC")
     @Column(name = "D_AUDIT_DATE", columnDefinition = "VARCHAR")
     @MetaData(value = "审核日期", comments = "审核日期")
@@ -67,6 +71,7 @@ public class CustAuditLog implements BetterjrEntity {
     /**
      * 审核时间
      */
+    @JsonSerialize(using = CustTimeJsonSerializer.class)
     @OrderBy("DESC")
     @Column(name = "T_AUDIT_TIME", columnDefinition = "VARCHAR")
     @MetaData(value = "审核时间", comments = "审核时间")

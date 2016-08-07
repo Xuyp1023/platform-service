@@ -11,6 +11,7 @@ import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
+import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.customer.constant.CustomerConstants;
 import com.betterjr.modules.customer.dao.CustAuditLogMapper;
 import com.betterjr.modules.customer.entity.CustAuditLog;
@@ -34,7 +35,8 @@ public class CustAuditLogService extends BaseService<CustAuditLogMapper, CustAud
      * @param anReason
      * @return
      */
-    public CustAuditLog addCustAuditLog(String anAuditType, Long anBusinId, String anAuditResult, String anReason, String anAuditItem, Long anCustNo) {
+    public CustAuditLog addCustAuditLog(String anAuditType, Long anBusinId, String anAuditResult, String anReason, String anAuditItem,
+            Long anCustNo) {
         if (BetterStringUtils.isBlank(anAuditType) == true) {
             throw new BytterTradeException(20030, "审核类型不允许为空！");
         }
@@ -43,28 +45,120 @@ public class CustAuditLogService extends BaseService<CustAuditLogMapper, CustAud
         }
 
         BTAssert.notNull(anBusinId, "业务编号不允许为空！");
-        
+
         CustAuditLog custAuditLog = new CustAuditLog();
         custAuditLog.initAddValue(anAuditType, anBusinId, anAuditResult, anReason, anAuditItem, anCustNo);
         this.insert(custAuditLog);
         return custAuditLog;
     }
-    
+
     /**
      * 根据条件找回最新的审核记录
+     * 
      * @param anChangeApply
      * @return
      */
     public CustAuditLog findCustAuditLogByCustChangeApply(CustChangeApply anChangeApply) {
         BTAssert.notNull(anChangeApply, "变更申请不允许为空！");
-        
+
         Map<String, Object> conditionMap = new HashMap<>();
-        
+
         conditionMap.put("auditType", CustomerConstants.AUDIT_TYPE_CHANGEAPPLY);
         conditionMap.put("businId", anChangeApply.getId());
-        
+
         List<CustAuditLog> auditLogs = this.selectByProperty(conditionMap);
         return Collections3.getFirst(auditLogs);
     }
+
+    /**
+     * 
+     * @param anBusinId
+     * @param anFlag
+     * @param anPageNum
+     * @param anPageSize
+     * @return
+     */
+    public Page<CustAuditLog> queryCustAuditLogOpenAccountByBusinId(Long anBusinId, int anFlag, int anPageNum, int anPageSize) {
+        BTAssert.notNull(anBusinId, "业务编号不允许为空!");
+
+        Map<String, Object> conditionMap = new HashMap<>();
+
+        conditionMap.put("auditType", CustomerConstants.AUDIT_TYPE_OPENACCOUNT);
+        conditionMap.put("businId", anBusinId);
+
+        return this.selectPropertyByPage(conditionMap, anPageNum, anPageSize, anFlag == 1);
+    }
+
+    /**
+     * 
+     * @param anBusinId
+     * @param anFlag
+     * @param anPageNum
+     * @param anPageSize
+     * @return
+     */
+    public Page<CustAuditLog> queryCustAuditLogInsteadApplyByBusinId(Long anBusinId, int anFlag, int anPageNum, int anPageSize) {
+        BTAssert.notNull(anBusinId, "业务编号不允许为空!");
+
+        Map<String, Object> conditionMap = new HashMap<>();
+
+        conditionMap.put("auditType", CustomerConstants.AUDIT_TYPE_INSTEADAPPLY);
+        conditionMap.put("businId", anBusinId);
+
+        return this.selectPropertyByPage(conditionMap, anPageNum, anPageSize, anFlag == 1);
+    }
+
+    /**
+     * 
+     * @param anBusinId
+     * @param anFlag
+     * @param anPageNum
+     * @param anPageSize
+     * @return
+     */
+    public Page<CustAuditLog> queryCustAuditLogInsteadRecordByBusinId(Long anBusinId, int anFlag, int anPageNum, int anPageSize) {
+        BTAssert.notNull(anBusinId, "业务编号不允许为空!");
+
+        Map<String, Object> conditionMap = new HashMap<>();
+
+        conditionMap.put("auditType", CustomerConstants.AUDIT_TYPE_INSTEADRECORD);
+        conditionMap.put("businId", anBusinId);
+
+        return this.selectPropertyByPage(conditionMap, anPageNum, anPageSize, anFlag == 1);
+    }
+
+    /**
+     * 
+     * @param anBusinId
+     * @param anFlag
+     * @param anPageNum
+     * @param anPageSize
+     * @return
+     */
+    public Page<CustAuditLog> queryCustAuditLogChangeApplyByBusinId(Long anBusinId, int anFlag, int anPageNum, int anPageSize) {
+        BTAssert.notNull(anBusinId, "业务编号不允许为空!");
+
+        Map<String, Object> conditionMap = new HashMap<>();
+
+        conditionMap.put("auditType", CustomerConstants.AUDIT_TYPE_CHANGEAPPLY);
+        conditionMap.put("businId", anBusinId);
+
+        return this.selectPropertyByPage(conditionMap, anPageNum, anPageSize, anFlag == 1);
+    }
+
+    /**
+     * 
+     * @param anId
+     * @return
+     */
+    public CustAuditLog findCustAuditLog(Long anId) {
+        BTAssert.notNull(anId, "审核日志编号不允许为空!");
+        
+        final CustAuditLog custAuditLog = this.selectByPrimaryKey(anId);
+        BTAssert.notNull(custAuditLog, "没有找到对应的审核日志!");
+        
+        return custAuditLog;
+    }
+
 
 }

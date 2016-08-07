@@ -18,6 +18,7 @@ import com.betterjr.modules.customer.constant.CustomerConstants;
 import com.betterjr.modules.customer.entity.CustChangeApply;
 import com.betterjr.modules.customer.entity.CustMechBase;
 import com.betterjr.modules.customer.entity.CustMechBaseTmp;
+import com.betterjr.modules.customer.helper.ChangeDetailBean;
 import com.betterjr.modules.customer.service.CustChangeService;
 import com.betterjr.modules.customer.service.CustInsteadService;
 import com.betterjr.modules.customer.service.CustMechBaseService;
@@ -45,15 +46,10 @@ public class CustMechBaseDubboService implements ICustMechBaseService {
 
     @Override
     public String webQueryCustInfo() {
-        Collection<CustInfo> custInfos = queryCustInfo();
+        Collection<CustInfo> custInfos = baseService.queryCustInfo();
         return AjaxObject.newOk("查询操作员所有的公司列表成功", custInfos).toJson();
     }
 
-    @Override
-    public Collection<CustInfo> queryCustInfo() {
-        return UserUtils.findCustInfoList();
-    }
-    
     @Override
     public String webFindBaseInfo(final Long anCustNo) {
         final CustMechBase custMechBase = baseService.findCustMechBaseByCustNo(anCustNo);
@@ -63,7 +59,18 @@ public class CustMechBaseDubboService implements ICustMechBaseService {
     @Override
     public String webFindChangeApply(Long anId) {
         final CustChangeApply changeApply = changeService.findChangeApply(anId, CustomerConstants.ITEM_BASE);
-        return AjaxObject.newOk("公司基本信息-变更详情查询 成功", changeApply).toJson();
+        // 通过changeApply找到 
+        final Long tmpId = Long.valueOf(changeApply.getTmpIds());
+        
+        final CustMechBaseTmp nowData = baseTmpService.findCustMechBaseTmp(tmpId);
+        final CustMechBaseTmp befData = baseTmpService.findCustMechBaseTmpPrevVersion(nowData);
+        
+        ChangeDetailBean<CustMechBaseTmp> changeDetailBean = new ChangeDetailBean<>();
+        changeDetailBean.setChangeApply(changeApply);
+        changeDetailBean.setNowData(nowData);
+        changeDetailBean.setBefData(befData);
+        
+        return AjaxObject.newOk("公司基本信息-变更详情查询 成功", changeDetailBean).toJson();
     }
 
     @Override
@@ -87,7 +94,7 @@ public class CustMechBaseDubboService implements ICustMechBaseService {
 
     @Override
     public String webFindInsteadRecord(Long anInsteadRecordId) {
-        return AjaxObject.newOk("公司基本信息-代录详情 成功", baseTmpService.findCustMechBaseTmp(anInsteadRecordId)).toJson();
+        return AjaxObject.newOk("公司基本信息-代录详情 成功", baseTmpService.findCustMechBaseTmpByInsteadRecord(anInsteadRecordId)).toJson();
     }
 
     @Override

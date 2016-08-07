@@ -1,7 +1,9 @@
 package com.betterjr.modules.customer.service;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -12,14 +14,18 @@ import com.betterjr.common.exception.BytterTradeException;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterStringUtils;
+import com.betterjr.common.utils.Collections3;
 import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.customer.constant.CustomerConstants;
 import com.betterjr.modules.customer.dao.CustMechLawTmpMapper;
 import com.betterjr.modules.customer.entity.CustChangeApply;
 import com.betterjr.modules.customer.entity.CustInsteadApply;
 import com.betterjr.modules.customer.entity.CustInsteadRecord;
+import com.betterjr.modules.customer.entity.CustMechBaseTmp;
+import com.betterjr.modules.customer.entity.CustMechLaw;
 import com.betterjr.modules.customer.entity.CustMechLawTmp;
 import com.betterjr.modules.customer.helper.IFormalDataService;
+import com.betterjr.modules.customer.helper.VersionHelper;
 
 /**
  * 
@@ -39,14 +45,44 @@ public class CustMechLawTmpService extends BaseService<CustMechLawTmpMapper, Cus
 
     @Resource
     private CustChangeApplyService changeApplyService;
-    
+
     @Resource
     private CustAccountService custAccountService;
 
     /**
+     * 
+     * @param anId
+     * @return
+     */
+    public CustMechLawTmp findCustMechLawTmp(Long anId) {
+        BTAssert.notNull(anId, "编号不允许为空！");
+
+        return this.selectByPrimaryKey(anId);
+    }
+
+    /**
+     * 取上一版本
+     * @param anCustMechLawTmp
+     * @return
+     */
+    public CustMechLawTmp findCustMechLawTmpPrevVersion(CustMechLawTmp anCustMechLawTmp) {
+        Long refId = anCustMechLawTmp.getRefId();
+        Long version = anCustMechLawTmp.getVersion();
+        
+        Long befVersion = this.mapper.selectPrevVersion(refId, version);
+        
+        Map<String, Object> conditionMap = new HashMap<>();
+        conditionMap.put("version", befVersion);
+        conditionMap.put("refId", refId);
+        
+        List<CustMechLawTmp> befDatas =  this.selectByProperty(conditionMap);
+        return Collections3.getFirst(befDatas);
+    }
+    
+    /**
      * 法人信息-流水信息-详情
      */
-    public CustMechLawTmp findCustMechLawTmpByInsteadRecordId(Long anInsteadRecordId) {
+    public CustMechLawTmp findCustMechLawTmpByInsteadRecord(Long anInsteadRecordId) {
         BTAssert.notNull(anInsteadRecordId, "代录项目编号不允许为空！");
 
         CustInsteadRecord insteadRecord = insteadRecordService.findCustInsteadRecord(anInsteadRecordId);
@@ -58,7 +94,7 @@ public class CustMechLawTmpService extends BaseService<CustMechLawTmpMapper, Cus
 
         Long tmpId = Long.valueOf(insteadRecord.getTmpIds());
 
-        final CustMechLawTmp custMechLawTmp = this.selectByPrimaryKey(tmpId);
+        final CustMechLawTmp custMechLawTmp = findCustMechLawTmp(tmpId);
         BTAssert.notNull(custMechLawTmp, "没有找到对应法人流水信息!");
 
         return custMechLawTmp;
@@ -75,9 +111,29 @@ public class CustMechLawTmpService extends BaseService<CustMechLawTmpMapper, Cus
         anCustMechLawTmp.setCustNo(anCustMechLawTmp.getRefId());
         final String custName = custAccountService.queryCustName(custNo);
         anCustMechLawTmp.initAddValue(anTmpType, custNo, custName);
+
+        anCustMechLawTmp.setVersion(VersionHelper.generateVersion(this.mapper, custNo));
         this.insert(anCustMechLawTmp);
 
         return anCustMechLawTmp;
+    }
+
+    /**
+     * 法人信息-流水信息-添加 从法人信息建立流水
+     */
+    public CustMechLawTmp addCustMechLawTmp(CustMechLaw anCustMechLaw) {
+        BTAssert.notNull(anCustMechLaw, "公司法人信息 不能为空！");
+
+        final CustMechLawTmp custMechLawTmp = new CustMechLawTmp();
+
+        // 初始数据一开始为 已使用
+        custMechLawTmp.initAddValue(anCustMechLaw, CustomerConstants.TMP_TYPE_INITDATA, CustomerConstants.TMP_STATUS_USED);
+        custMechLawTmp.setVersion(VersionHelper.generateVersion(this.mapper, anCustMechLaw.getCustNo()));
+        custMechLawTmp.setRefId(anCustMechLaw.getCustNo());
+
+        this.insert(custMechLawTmp);
+
+        return custMechLawTmp;
     }
 
     /**

@@ -678,8 +678,8 @@ public class CustMechBusinLicenceTmp implements BetterjrEntity {
         result = prime * result + ((getTmpOperType() == null) ? 0 : getTmpOperType().hashCode());
         return result;
     }
-
-    public void initAddValue(String anTmpType, Long anCustNo, String anCustName) {
+    
+    public void initAddValue(String anTmpType, String anBusinStatus, Long anCustNo, String anCustName) {
         this.id = SerialGenerator.getLongValue("CustMechBusinLicenceTmp.id");
 
         this.regOperId = UserUtils.getOperatorInfo().getId();
@@ -693,13 +693,39 @@ public class CustMechBusinLicenceTmp implements BetterjrEntity {
         this.modiTime = BetterDateUtils.getNumTime();
 
         this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
-        this.businStatus = CustomerConstants.TMP_STATUS_NEW;
         
+        this.businStatus = anBusinStatus;
         this.custNo = anCustNo;
         this.custName = anCustName;
-
         this.tmpType = anTmpType;
+        
         this.tmpOperType = CustomerConstants.TMP_OPER_TYPE_MODIFY;// 只有修改操作
+    }
+
+    public void initAddValue(String anTmpType, Long anCustNo, String anCustName) {
+        this.initAddValue(anTmpType, CustomerConstants.TMP_STATUS_NEW, anCustNo, anCustName);
+    }
+    
+    // 通过 营业执照 建立 流水 
+    public void initAddValue(CustMechBusinLicence anCustMechBusinLicence, String anTmpType, String anBusinStatus) {
+        this.initAddValue(anTmpType, anBusinStatus, anCustMechBusinLicence.getCustNo(), anCustMechBusinLicence.getCustName());
+     
+        this.unifiedCode = anCustMechBusinLicence.getUnifiedCode();
+        this.regNo = anCustMechBusinLicence.getRegNo();
+        this.orgCode = anCustMechBusinLicence.getOrgCode();
+        this.taxNo = anCustMechBusinLicence.getTaxNo();
+        this.corpType = anCustMechBusinLicence.getCorpType();
+        this.address = anCustMechBusinLicence.getAddress();
+        this.lawName = anCustMechBusinLicence.getLawName();
+        this.regCapital = anCustMechBusinLicence.getRegCapital();
+        this.paidCapital = anCustMechBusinLicence.getPaidCapital();
+        this.setupDate = anCustMechBusinLicence.getSetupDate();
+        this.startDate = anCustMechBusinLicence.getStartDate();
+        this.endDate = anCustMechBusinLicence.getEndDate();
+        this.regBranch = anCustMechBusinLicence.getRegBranch();
+        this.certifiedDate = anCustMechBusinLicence.getCertifiedDate();
+        this.businScope = anCustMechBusinLicence.getBusinScope();
+        this.batchNo = anCustMechBusinLicence.getBatchNo();
     }
 
     public void initModifyValue(final String anBusinStatus) {
@@ -741,4 +767,6 @@ public class CustMechBusinLicenceTmp implements BetterjrEntity {
         
         this.businStatus = anBusinLicenceTmp.getBusinStatus();
     }
+
+
 }

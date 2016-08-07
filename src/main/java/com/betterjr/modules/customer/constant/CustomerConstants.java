@@ -54,6 +54,7 @@ public interface CustomerConstants {
     String CHANGE_APPLY_STATUS_NEW = "0";
     String CHANGE_APPLY_STATUS_AUDIT_PASS = "1";
     String CHANGE_APPLY_STATUS_AUDIT_REJECT = "2";
+    String CHANGE_APPLY_STATUS_CANCEL = "3";
 
     // 申请类型：0开户代录，1变更代录
     String INSTEAD_APPLY_TYPE_OPENACCOUNT = "0";

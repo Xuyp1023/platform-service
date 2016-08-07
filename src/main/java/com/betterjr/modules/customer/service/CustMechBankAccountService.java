@@ -1,7 +1,8 @@
 package com.betterjr.modules.customer.service;
 
-import java.util.Collection;
 import java.util.List;
+
+import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +12,6 @@ import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.modules.customer.dao.CustMechBankAccountMapper;
-import com.betterjr.modules.customer.entity.CustMechBankAccount;
 import com.betterjr.modules.customer.entity.CustMechBankAccount;
 
 /**
@@ -25,6 +25,9 @@ public class CustMechBankAccountService extends BaseService<CustMechBankAccountM
     
     private static Logger logger = LoggerFactory.getLogger(CustMechBankAccountService.class);
 
+    @Resource
+    private CustMechBankAccountTmpService bankAccountTmpService;
+    
     /**
      * 查询银行账户信息
      * 

@@ -23,7 +23,7 @@ import com.betterjr.modules.customer.entity.CustMechContacterTmp;
 import com.betterjr.modules.customer.entity.CustMechLawTmp;
 import com.betterjr.modules.customer.entity.CustMechManagerTmp;
 import com.betterjr.modules.customer.entity.CustMechShareholderTmp;
-import com.betterjr.modules.customer.helper.FormalDataServiceHelper;
+import com.betterjr.modules.customer.helper.FormalDataHelper;
 import com.betterjr.modules.customer.helper.IFormalDataService;
 
 /**
@@ -112,7 +112,7 @@ public class CustChangeService {
         BTAssert.notNull(changeApply, "修改变更申请审核状态失败！");
 
         // 保存相应数据至正式表
-        IFormalDataService formalDataService = FormalDataServiceHelper.getFormalDataService(changeApply);
+        IFormalDataService formalDataService = FormalDataHelper.getFormalDataService(changeApply);
         BTAssert.notNull(formalDataService, "变更项目不正确！");
 
         String[] tmpIds = BetterStringUtils.split(changeApply.getTmpIds(), ",");

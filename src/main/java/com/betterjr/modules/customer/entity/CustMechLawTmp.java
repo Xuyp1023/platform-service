@@ -605,7 +605,7 @@ public class CustMechLawTmp implements BetterjrEntity {
         return result;
     }
     
-    public void initAddValue(String anTmpType, Long anCustNo, String anCustName) {
+    public void initAddValue(String anTmpType, String anBusinStatus, Long anCustNo, String anCustName) {
         this.id = SerialGenerator.getLongValue("CustMechLawTmp.id");
         
         this.regOperId = UserUtils.getOperatorInfo().getId();
@@ -619,7 +619,7 @@ public class CustMechLawTmp implements BetterjrEntity {
         this.modiTime = BetterDateUtils.getNumTime();
         
         this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
-        this.businStatus = CustomerConstants.TMP_STATUS_NEW;
+        this.businStatus = anBusinStatus;
         
         this.custNo = anCustNo;
         this.custName = anCustName;
@@ -627,7 +627,30 @@ public class CustMechLawTmp implements BetterjrEntity {
         this.tmpType = anTmpType;
         this.tmpOperType = CustomerConstants.TMP_OPER_TYPE_MODIFY;// 只有修改操作
     }
+    
+    public void initAddValue(String anTmpType, Long anCustNo, String anCustName) {
+        this.initAddValue(anTmpType, CustomerConstants.TMP_STATUS_NEW, anCustNo, anCustName);
+    }
 
+    // 从法人信息建立 流水记录
+    public void initAddValue(CustMechLaw anCustMechLaw, String anTmpType, String anBusinStatus) {
+        this.initAddValue(anTmpType, anBusinStatus, anCustMechLaw.getCustNo(), anCustMechLaw.getCustName());
+        
+        this.address = anCustMechLaw.getAddress();
+        this.batchNo = anCustMechLaw.getBatchNo();
+        this.birthdate = anCustMechLaw.getBirthdate();
+        this.eduLevel = anCustMechLaw.getEduLevel();
+        this.identNo = anCustMechLaw.getIdentNo();
+        this.identType = anCustMechLaw.getIdentType();
+        this.martialStatus = anCustMechLaw.getMartialStatus();
+        this.name = anCustMechLaw.getName();
+        this.nativePlace = anCustMechLaw.getNativePlace();
+        this.phone = anCustMechLaw.getPhone();
+        this.sex = anCustMechLaw.getSex();
+        this.validDate = anCustMechLaw.getValidDate();
+    }
+    
+    
     public void initModifyValue(final String anBusinStatus) {
         this.modiOperId = UserUtils.getOperatorInfo().getId();
         this.modiOperName = UserUtils.getOperatorInfo().getName();
@@ -657,8 +680,11 @@ public class CustMechLawTmp implements BetterjrEntity {
         this.validDate = anCustMechLawTmp.getValidDate();
         /*
         this.custNo = anCustMechLawTmp.getCustNo();
-        this.custName = anCustMechLawTmp.getCustName();*/
+        */
+        this.custName = anCustMechLawTmp.getCustName();
 
         this.businStatus = anCustMechLawTmp.getBusinStatus();
     }
+
+
 }

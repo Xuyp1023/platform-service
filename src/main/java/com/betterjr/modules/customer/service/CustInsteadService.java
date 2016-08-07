@@ -29,7 +29,7 @@ import com.betterjr.modules.customer.constant.CustomerConstants;
 import com.betterjr.modules.customer.entity.CustAuditLog;
 import com.betterjr.modules.customer.entity.CustInsteadApply;
 import com.betterjr.modules.customer.entity.CustInsteadRecord;
-import com.betterjr.modules.customer.helper.FormalDataServiceHelper;
+import com.betterjr.modules.customer.helper.FormalDataHelper;
 import com.betterjr.modules.customer.helper.IFormalDataService;
 
 /**
@@ -63,8 +63,8 @@ public class CustInsteadService {
                 || insteadType.equals(CustomerConstants.INSTEAD_APPLY_TYPE_CHANGE)) == false) {
             throw new BytterTradeException(20040, "代录类型不正确");
         }
-        
-        // TODO 处理上传  代录申请附件
+
+        // TODO 处理上传 代录申请附件
 
         String tempCustNo = (String) anParam.get("custNo");
         Long custNo = Long.valueOf(tempCustNo);
@@ -76,16 +76,16 @@ public class CustInsteadService {
 
         return custInsteadApply;
     }
-    
+
     /**
      * 代录申请 - 修改申请
      * 
      * @return
      */
     public CustInsteadApply saveInsteadApply(Map<String, Object> anParam, Long anApplyId, String anFileList) {
-        
-        // TODO 处理上传  代录申请附件
-        
+
+        // TODO 处理上传 代录申请附件
+
         return null;
     }
 
@@ -105,6 +105,22 @@ public class CustInsteadService {
     }
 
     /**
+     * 代录拥有列表 
+     * 
+     * @param anParam
+     * @param anFlag
+     * @param anPageNum
+     * @param anPageSize
+     * @return
+     */
+    public Page<CustInsteadApply> queryInsteadApplyOwnList(Map<String, Object> anParam, int anFlag, int anPageNum, int anPageSize) {
+        BTAssert.notEmpty(anParam, "查询参数不允许为空！");
+
+        anParam.put("operOrg", UserUtils.getOperatorInfo().getOperOrg());
+        return insteadApplyService.queryCustInsteadApply(anParam, anFlag, anPageNum, anPageSize);
+    }
+    
+    /**
      * 代录申请列表 待审核 待录入 复核驳回
      * 
      * @param anParam
@@ -117,7 +133,7 @@ public class CustInsteadService {
         BTAssert.notEmpty(anParam, "查询参数不允许为空！");
 
         String[] businStatues = { CustomerConstants.INSTEAD_APPLY_STATUS_NEW, CustomerConstants.INSTEAD_APPLY_STATUS_AUDIT_PASS,
-                CustomerConstants.INSTEAD_APPLY_STATUS_REVIEW_REJECT };
+                CustomerConstants.INSTEAD_APPLY_STATUS_REVIEW_REJECT, CustomerConstants.INSTEAD_APPLY_STATUS_CONFIRM_REJECT };
         anParam.put("businStatus", businStatues);
         return insteadApplyService.queryCustInsteadApply(anParam, anFlag, anPageNum, anPageSize);
     }
@@ -158,15 +174,16 @@ public class CustInsteadService {
 
     /**
      * 查询代录项
+     * 
      * @param anApplyId
      * @return
      */
     public List<CustInsteadRecord> queryInsteadRecordByApply(Long anApplyId) {
         BTAssert.notNull(anApplyId, "代录申请编号不允许为空");
-        
+
         return insteadRecordService.findCustInsteadRecordByApplyId(anApplyId);
     }
-    
+
     /**
      * 修改代录申请状态： 审核通过
      * 
@@ -210,6 +227,114 @@ public class CustInsteadService {
     }
 
     /**
+     * 复核提交
+     * 
+     * @param anId
+     * @return
+     */
+    public CustInsteadApply saveSubmitReviewInsteadApply(Long anId) {
+        // 检查代录申请
+        checkInsteadApply(anId, CustomerConstants.INSTEAD_APPLY_STATUS_TYPE_IN);
+
+        // 当前申请下所有代录记录 均复核，才可以通过
+        List<CustInsteadRecord> insteadRecords = insteadRecordService.findCustInsteadRecordByApplyId(anId);
+        List<String> businStatus = Arrays.asList(CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_PASS,
+                CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT, CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_PASS);
+        boolean includeReviewRejectFlag = false;
+        for (CustInsteadRecord insteadRecord : insteadRecords) {
+            if (businStatus.contains(insteadRecord.getBusinStatus()) == false) {
+                throw new BytterTradeException(20008, "还有未复核代录项目！");
+            }
+            if (BetterStringUtils.equals(insteadRecord.getBusinStatus(), CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT)) {
+                includeReviewRejectFlag = true;
+            }
+        }
+
+        if (includeReviewRejectFlag) { // 复核驳回
+            // 修改代录申请状态： 复核驳回
+            final CustInsteadApply insteadApply = saveInsteadApplyStatus(anId, CustomerConstants.INSTEAD_APPLY_STATUS_REVIEW_REJECT);
+
+            // 添加审核日志
+            addCustAuditLog(CustomerConstants.AUDIT_TYPE_INSTEADAPPLY, anId, CustomerConstants.AUDIT_RESULT_REJECT, "复核提交驳回", null,
+                    insteadApply.getCustNo());
+
+            return insteadApply;
+        }
+        else { // 审核通过
+               // 修改代录申请状态： 复核通过
+            final CustInsteadApply insteadApply = saveInsteadApplyStatus(anId, CustomerConstants.INSTEAD_APPLY_STATUS_REVIEW_PASS);
+
+            // 添加审核日志
+            addCustAuditLog(CustomerConstants.AUDIT_TYPE_INSTEADAPPLY, anId, CustomerConstants.AUDIT_RESULT_PASS, "复核提交通过", null,
+                    insteadApply.getCustNo());
+
+            return insteadApply;
+        }
+
+    }
+
+    /**
+     * 确认提交 这里只处理 变更代录
+     * 
+     * @param anId
+     * @return
+     */
+    public CustInsteadApply saveSubmitConfirmInsteadApply(Long anId) {
+        // 检查并取得代录申请
+        final CustInsteadApply tempInsteadApply = checkInsteadApply(anId, CustomerConstants.INSTEAD_APPLY_STATUS_REVIEW_PASS);
+
+        // 将数据存入正式表
+        String insteadType = tempInsteadApply.getInsteadType();
+        if (BetterStringUtils.equals(insteadType, CustomerConstants.INSTEAD_APPLY_TYPE_OPENACCOUNT) == true) {
+            throw new BytterTradeException(20009, "开户代录不需要确认提交!");
+        }
+
+        // 当前申请下所有代录记录 均确认，才可以通过
+        List<CustInsteadRecord> insteadRecords = insteadRecordService.selectByProperty("applyId", anId);
+        List<String> businStatus = Arrays.asList(CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_PASS,
+                CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_REJECT);
+        boolean includeConfirmRejectFlag = false;
+        for (CustInsteadRecord insteadRecord : insteadRecords) {
+
+            if (businStatus.contains(insteadRecord.getBusinStatus()) == false) {
+                throw new BytterTradeException(20007, "还有代录项目未确认！");
+            }
+
+            if (BetterStringUtils.equals(insteadRecord.getBusinStatus(), CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_REJECT)) {
+                includeConfirmRejectFlag = true;
+            }
+        }
+
+        if (includeConfirmRejectFlag) {
+            // 修改代录申请状态： 确认通过
+            final CustInsteadApply insteadApply = saveInsteadApplyStatus(anId, CustomerConstants.INSTEAD_APPLY_STATUS_CONFIRM_REJECT);
+
+            // 添加审核日志
+            addCustAuditLog(CustomerConstants.AUDIT_TYPE_INSTEADAPPLY, anId, CustomerConstants.AUDIT_RESULT_REJECT, "确认提交驳回", null,
+                    insteadApply.getCustNo());
+
+            return insteadApply;
+        }
+        else {
+            for (CustInsteadRecord insteadRecord : insteadRecords) {
+                IFormalDataService formalDataService = FormalDataHelper.getFormalDataService(insteadRecord);
+                String[] tmpIds = BetterStringUtils.split(insteadRecord.getTmpIds(), ",");
+                formalDataService.saveFormalData(tmpIds);
+            }
+
+            // 修改代录申请状态： 确认通过
+            final CustInsteadApply insteadApply = saveInsteadApplyStatus(anId, CustomerConstants.INSTEAD_APPLY_STATUS_CONFIRM_PASS);
+
+            // 添加审核日志
+            addCustAuditLog(CustomerConstants.AUDIT_TYPE_INSTEADAPPLY, anId, CustomerConstants.AUDIT_RESULT_PASS, "确认提交通过", null,
+                    insteadApply.getCustNo());
+
+            return insteadApply;
+        }
+    }
+
+    /**
+     * 录入提交
      * 
      * @param anId
      * @return
@@ -218,13 +343,17 @@ public class CustInsteadService {
         // 检查代录申请
         checkInsteadApply(anId, CustomerConstants.INSTEAD_APPLY_STATUS_AUDIT_PASS, CustomerConstants.INSTEAD_APPLY_STATUS_REVIEW_REJECT,
                 CustomerConstants.INSTEAD_APPLY_STATUS_CONFIRM_REJECT);
-        
+
         // 检查所有子项状态 符合已录入，审核通过，确认通过
-        checkInsteadRecordByApplyId(anId, CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN, 
-                CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_PASS, CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_PASS);
-        
+        checkInsteadRecordByApplyId(anId, CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN, CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_PASS,
+                CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_PASS);
+
         // 修改代录申请状态：已录入待审核
         final CustInsteadApply insteadApply = saveInsteadApplyStatus(anId, CustomerConstants.INSTEAD_APPLY_STATUS_TYPE_IN);
+
+        // 写入审核记录表
+        addCustAuditLog(CustomerConstants.AUDIT_TYPE_INSTEADAPPLY, anId, CustomerConstants.AUDIT_RESULT_PASS, "录入提交", null,
+                insteadApply.getCustNo());
 
         return insteadApply;
     }
@@ -236,13 +365,15 @@ public class CustInsteadService {
      * @param anReason
      * @return
      */
+    @Deprecated
     public CustInsteadApply saveReviewPassInsteadApply(Long anId, String anReason) {
         // 检查代录申请
         checkInsteadApply(anId, CustomerConstants.INSTEAD_APPLY_STATUS_TYPE_IN);
 
         // 当前申请下所有代录记录 均复核，才可以通过
         List<CustInsteadRecord> insteadRecords = insteadRecordService.selectByProperty("applyId", anId);
-        List<String> businStatus = Arrays.asList(CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_PASS, CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_PASS);
+        List<String> businStatus = Arrays.asList(CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_PASS,
+                CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_PASS);
         for (CustInsteadRecord insteadRecord : insteadRecords) {
             if (businStatus.contains(insteadRecord.getBusinStatus()) == false) {
                 throw new BytterTradeException(20008, "还有未复核代录项目！");
@@ -266,6 +397,7 @@ public class CustInsteadService {
      * @param anReason
      * @return
      */
+    @Deprecated
     public CustInsteadApply saveReviewRejectInsteadApply(Long anId, String anReason) {
         // 检查代录申请
         checkInsteadApply(anId, CustomerConstants.INSTEAD_APPLY_STATUS_TYPE_IN);
@@ -287,6 +419,7 @@ public class CustInsteadService {
      * @param anReason
      * @return
      */
+    @Deprecated
     public CustInsteadApply saveConfirmPassInsteadApply(Long anId, String anReason) {
         // 检查并取得代录申请
         final CustInsteadApply tempInsteadApply = checkInsteadApply(anId, CustomerConstants.INSTEAD_APPLY_STATUS_REVIEW_PASS);
@@ -302,13 +435,13 @@ public class CustInsteadService {
             List<CustInsteadRecord> insteadRecords = insteadRecordService.selectByProperty("applyId", anId);
             for (CustInsteadRecord insteadRecord : insteadRecords) {
                 String businStatus = insteadRecord.getBusinStatus();
-                
+
                 if (BetterStringUtils.equals(businStatus, CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_PASS) == false) {
                     throw new BytterTradeException(20007, "还有代录项目未确认！");
                 }
             }
             for (CustInsteadRecord insteadRecord : insteadRecords) {
-                IFormalDataService formalDataService = FormalDataServiceHelper.getFormalDataService(insteadRecord);
+                IFormalDataService formalDataService = FormalDataHelper.getFormalDataService(insteadRecord);
                 String[] tmpIds = BetterStringUtils.split(insteadRecord.getTmpIds(), ",");
                 formalDataService.saveFormalData(tmpIds);
             }
@@ -331,6 +464,7 @@ public class CustInsteadService {
      * @param anReason
      * @return
      */
+    @Deprecated
     public CustInsteadApply saveConfirmRejectInsteadApply(Long anId, String anReason) {
         // 检查代录申请
         checkInsteadApply(anId, CustomerConstants.INSTEAD_APPLY_STATUS_REVIEW_PASS);
@@ -389,12 +523,34 @@ public class CustInsteadService {
     /**
      * 修改代录记录状态： 确认通过
      * 
+     * 这里需要处理 开户的情况 如果是开户,需要将 申请也一并处理
+     * 
      * @param anId
      * @return
      */
     public CustInsteadRecord saveConfirmPassInsteadRecord(Long anId, String anReason) {
+
         // 检查代录记录
-        checkInsteadRecord(anId, CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_PASS);
+        CustInsteadRecord tempInsteadRecord = checkInsteadRecord(anId, CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_PASS);
+
+        // 检查并取得代录申请
+        final CustInsteadApply tempInsteadApply = checkInsteadApply(tempInsteadRecord.getApplyId(),
+                CustomerConstants.INSTEAD_APPLY_STATUS_REVIEW_PASS);
+
+        String insteadType = tempInsteadApply.getInsteadType();
+        if (BetterStringUtils.equals(insteadType, CustomerConstants.INSTEAD_APPLY_TYPE_OPENACCOUNT) == true) {
+            // 修改代录申请状态： 确认通过
+            final CustInsteadApply insteadApply = saveInsteadApplyStatus(anId, CustomerConstants.INSTEAD_APPLY_STATUS_CONFIRM_PASS);
+
+            // 添加审核日志
+            addCustAuditLog(CustomerConstants.AUDIT_TYPE_INSTEADAPPLY, anId, CustomerConstants.AUDIT_RESULT_PASS, "确认提交通过", null,
+                    insteadApply.getCustNo());
+
+            // 将开户数据存入正式表
+            IFormalDataService formalDataService = FormalDataHelper.getFormalDataService(tempInsteadRecord);
+            String[] tmpIds = BetterStringUtils.split(tempInsteadRecord.getTmpIds(), ",");
+            formalDataService.saveFormalData(tmpIds);
+        }
 
         // 修改代录记录状态： 确认通过
         final CustInsteadRecord insteadRecord = saveInsteadRecordStatus(anId, CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_PASS);
@@ -414,8 +570,22 @@ public class CustInsteadService {
      * @return
      */
     public CustInsteadRecord saveConfirmRejectInsteadRecord(Long anId, String anReason) {
-        // 检查代录记录
-        checkInsteadRecord(anId, CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_PASS);
+        CustInsteadRecord tempInsteadRecord = checkInsteadRecord(anId, CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_PASS);
+
+        // 检查并取得代录申请
+        final CustInsteadApply tempInsteadApply = checkInsteadApply(tempInsteadRecord.getApplyId(),
+                CustomerConstants.INSTEAD_APPLY_STATUS_REVIEW_PASS);
+
+        // 将数据存入正式表
+        String insteadType = tempInsteadApply.getInsteadType();
+        if (BetterStringUtils.equals(insteadType, CustomerConstants.INSTEAD_APPLY_TYPE_OPENACCOUNT) == true) {
+            // 修改代录申请状态： 确认驳回
+            final CustInsteadApply insteadApply = saveInsteadApplyStatus(anId, CustomerConstants.INSTEAD_APPLY_STATUS_CONFIRM_REJECT);
+
+            // 添加审核日志
+            addCustAuditLog(CustomerConstants.AUDIT_TYPE_INSTEADAPPLY, anId, CustomerConstants.AUDIT_RESULT_REJECT, "确认提交驳回", null,
+                    insteadApply.getCustNo());
+        }
 
         // 修改代录记录状态： 确认驳回
         final CustInsteadRecord insteadRecord = saveInsteadRecordStatus(anId, CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_REJECT);
@@ -446,35 +616,36 @@ public class CustInsteadService {
 
     /**
      * 检查所有代录记录状态是否符合
+     * 
      * @param anApplyId
      * @param businStatues
      */
-    private void checkInsteadRecordByApplyId(Long anApplyId, String ... businStatues) {
+    private void checkInsteadRecordByApplyId(Long anApplyId, String... businStatues) {
         BTAssert.notNull(anApplyId, "代录记录编号不允许为空！");
         BTAssert.notEmpty(businStatues, "状态不允许为空！");
-        
+
         List<String> businStatusList = Arrays.asList(businStatues);
         List<CustInsteadRecord> insteadRecords = insteadRecordService.findCustInsteadRecordByApplyId(anApplyId);
-        for (CustInsteadRecord insteadRecord: insteadRecords) {
+        for (CustInsteadRecord insteadRecord : insteadRecords) {
             String businStatus = insteadRecord.getBusinStatus();
             if (businStatusList.contains(businStatus) == false) {
                 throw new BytterTradeException(20009, "代录项目状态不正确！");
             }
         }
     }
-    
+
     /**
      * 检查代录记录编号是否有效
      * 
      * @param anId
      */
-    public CustInsteadRecord checkInsteadRecord(Long anId, String ... anBusinStatus) {
+    public CustInsteadRecord checkInsteadRecord(Long anId, String... anBusinStatus) {
         BTAssert.notNull(anId, "代录记录编号不允许为空！");
         final CustInsteadRecord tempInsteadRecord = insteadRecordService.selectByPrimaryKey(anId);
         BTAssert.notNull(tempInsteadRecord, "没有找到相应的代录记录！");
-        
+
         List<String> businStatus = Arrays.asList(anBusinStatus);
-        
+
         if (businStatus.contains(tempInsteadRecord.getBusinStatus()) == false) {
             throw new BytterTradeException(20099, "代录记录状态不正确!");
         }
@@ -520,6 +691,5 @@ public class CustInsteadService {
         CustAuditLog auditLog = auditLogService.addCustAuditLog(anAuditType, anBusinId, anAuditResult, anReason, anInsteadItem, anCustNo);
         BTAssert.notNull(auditLog, "审核记录添加失败!");
     }
-
 
 }
