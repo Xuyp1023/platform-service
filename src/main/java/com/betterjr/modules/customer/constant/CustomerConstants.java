@@ -82,18 +82,69 @@ public interface CustomerConstants {
     // 字段
     String ID = "id";
     String CUST_NO = "custNo";
-    
-    //关系 0供应商与保理公司 1供应商与核心企业 2核心企业与保理公司 3经销商与保理公司 4经销商与核心企业
-    String RELATION_SUPPLIER_FACTOR = "0";
-    String RELATION_SUPPLIER_CORE = "1";
-    String RELATION_CORE_FACTOR = "2";
-    String RELATION_DEALER_FACTOR = "3";
-    String RELATION_DEALER_CORE = "4";
-    
-    //关系状态 0未处理，1正常，2申请中， 3取消中，4取消
-    String RELATION_STATUS_UNUSE = "0";
-    String RELATION_STATUS_NORMAL = "1";
-    String RELATION_STATUS_APPLYING = "2";
-    String RELATION_STATUS_CANCELING = "3";
-    String RELATION_STATUS_CANCELED = "4";
+
+    /**
+     * 关联关系类型:0-供应商与保理公司;
+     */
+    String RELATE_TYPE_SUPPLIER_FACTOR = "0";
+    /**
+     * 关联关系类型:1-供应商与核心企业;
+     */
+    String RELATE_TYPE_SUPPLIER_CORE = "1";
+    /**
+     * 关联关系类型:2-核心企业与保理公司;
+     */
+    String RELATE_TYPE_CORE_FACTOR = "2";
+    /**
+     * 关联关系类型:3-经销商与保理公司;
+     */
+    String RELATE_TYPE_SELLER_FACTOR = "3";
+    /**
+     * 关联关系类型:4-经销商与核心企业;
+     */
+    String RELATE_TYPE_SELLER_CORE = "4";
+    /**
+     * 关联关系类型:5-客户(供应商,经销商,核心企业,保理机构)与电子合同服务商
+     */
+    String RELATE_TYPE_ELEC_CONTRACT = "5";
+    /**
+     * 客户白名单状态：0-未开通;
+     */
+    String RELATE_STATUS_UNDO = "0";
+    /**
+     * 客户白名单状态：1-已申请;
+     */
+    String RELATE_STATUS_APPLY = "1";
+    /**
+     * 客户白名单状态：2-已受理;
+     */
+    String RELATE_STATUS_ACCEPT = "2";
+    /**
+     * 客户白名单状态：3-已审核;
+     */
+    String RELATE_STATUS_AUDIT = "3";
+    /**
+     * 客户白名单状态：4-已驳回;
+     */
+    String RELATE_STATUS_REFUSE = "4";
+    /**
+     * 开通保理融资业务状态:0-未开通保理融资业务
+     */
+    String FACTOR_STATUS_UNDO = "0";
+    /**
+     * 开通保理融资业务状态:1-可开通保理融资业务
+     */
+    String FACTOR_STATUS_WAIT = "1";
+    /**
+     * 开通保理融资业务状态:2-已开通保理融资业务
+     */
+    String FACTOR_STATUS_DONE = "2";
+    /**
+     * 开通保理融资业务申请:0-申请提交成功;
+     */
+    String FACTOR_STATUS_SUCCESS = "0";
+    /**
+     * 开通保理融资业务申请:1-申请提交失败;
+     */
+    String FACTOR_STATUS_FAILD = "1";
 }
