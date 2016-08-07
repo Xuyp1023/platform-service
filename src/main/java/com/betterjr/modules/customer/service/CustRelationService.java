@@ -170,6 +170,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
             throw new BytterTradeException("当前状态不允许执行受理操作");
         }
         anCustRelation.setBusinStatus(CustomerConstants.RELATE_STATUS_ACCEPT);
+        anCustRelation.setLastStatus(CustomerConstants.RELATE_STATUS_ACCEPT);
         this.updateByPrimaryKeySelective(anCustRelation);
         custRelationAuditService.addAuditCustRelation(anCustRelation, anAuditOpinion, "开通保理融资业务受理");
         return anCustRelation;
@@ -191,6 +192,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
             throw new BytterTradeException("当前状态不允许执行受理操作");
         }
         anCustRelation.setBusinStatus(CustomerConstants.RELATE_STATUS_REFUSE);
+        anCustRelation.setLastStatus(CustomerConstants.RELATE_STATUS_REFUSE);
         this.updateByPrimaryKeySelective(anCustRelation);
         custRelationAuditService.addRefuseCustRelation(anCustRelation, anAuditOpinion, "开通保理融资业务受理");
         return anCustRelation;
@@ -238,6 +240,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
             throw new BytterTradeException("当前状态不允许执行审批操作");
         }
         anCustRelation.setBusinStatus(CustomerConstants.RELATE_STATUS_AUDIT);
+        anCustRelation.setLastStatus(CustomerConstants.RELATE_STATUS_AUDIT);
         this.updateByPrimaryKeySelective(anCustRelation);
         custRelationAuditService.addAuditCustRelation(anCustRelation, anAuditOpinion, "开通保理融资业务审批");
         return anCustRelation;
@@ -259,6 +262,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
             throw new BytterTradeException("当前状态不允许执行审批操作");
         }
         anCustRelation.setBusinStatus(CustomerConstants.RELATE_STATUS_REFUSE);
+        anCustRelation.setLastStatus(CustomerConstants.RELATE_STATUS_REFUSE);
         this.updateByPrimaryKeySelective(anCustRelation);
         custRelationAuditService.addRefuseCustRelation(anCustRelation, anAuditOpinion, "开通保理融资业务审批");
         return anCustRelation;
@@ -317,6 +321,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
                 else {
                     if (BetterStringUtils.equals(anTempCustRelation.getBusinStatus(), CustomerConstants.RELATE_STATUS_REFUSE) == true) {
                         anTempCustRelation.setBusinStatus(CustomerConstants.RELATE_STATUS_APPLY);
+                        anTempCustRelation.setLastStatus(CustomerConstants.RELATE_STATUS_APPLY);
                         this.updateByPrimaryKeySelective(anTempCustRelation);
                         custRelationAuditService.addAuditCustRelation(anTempCustRelation, anPostscript, "开通保理融资业务申请");
                     }
