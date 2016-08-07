@@ -25,7 +25,7 @@ public abstract class BasicServiceTest<T> {
 	}
 	
 	public T getServiceObject(){
-		T service = (T) this.getCtx().getBean(this.getTargetServiceClass());
+		T service = (T) this.getCtx().getBean(getTargetServiceClass());
 		return service;
 	}
 	

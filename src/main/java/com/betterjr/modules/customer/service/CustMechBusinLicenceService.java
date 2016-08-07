@@ -28,7 +28,10 @@ public class CustMechBusinLicenceService extends BaseService<CustMechBusinLicenc
     private static Logger logger = LoggerFactory.getLogger(CustMechBusinLicenceService.class);
 
     @Resource
-    private CustAccountService custAccountService;
+    private CustAccountService accountService;
+    
+    @Resource
+    private CustMechBusinLicenceTmpService businLicenceTmpService;
     
     /**
      * 营业执照信息-查询详情
@@ -40,7 +43,6 @@ public class CustMechBusinLicenceService extends BaseService<CustMechBusinLicenc
         BTAssert.notNull(anCustNo, "客户编号不允许为空！");
 
         final List<CustMechBusinLicence> businLicences = this.selectByProperty(CustomerConstants.CUST_NO, anCustNo);
-        BTAssert.notEmpty(businLicences, "没有找到营业执照信息!");
 
         return Collections3.getFirst(businLicences);
     }
@@ -87,14 +89,17 @@ public class CustMechBusinLicenceService extends BaseService<CustMechBusinLicenc
      * @param anCustMechBusinLicence
      * @return
      */
-    public CustMechBusinLicence addCustMechBusinLicence(CustMechBusinLicence anCustMechBusinLicence) {
+    public CustMechBusinLicence addCustMechBusinLicence(CustMechBusinLicence anCustMechBusinLicence, Long anCustNo) {
         BTAssert.notNull(anCustMechBusinLicence, "营业执照信息不允许为空！");
 
-        final Long custNo = anCustMechBusinLicence.getCustNo();
-        final String custName = custAccountService.queryCustName(custNo);
+        final String custName = accountService.queryCustName(anCustNo);
         
-        anCustMechBusinLicence.initAddValue(custNo, custName);
+        anCustMechBusinLicence.initAddValue(anCustNo, custName);
         this.insert(anCustMechBusinLicence);
+        
+        // 建立初始流水记录
+        businLicenceTmpService.addCustMechBusinLicenceTmp(anCustMechBusinLicence);
+        
         return anCustMechBusinLicence;
     }
 

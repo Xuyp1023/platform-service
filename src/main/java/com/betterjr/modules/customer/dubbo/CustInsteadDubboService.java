@@ -34,6 +34,12 @@ public class CustInsteadDubboService implements ICustInsteadService {
     }
     
     @Override
+    public String webQueryInsteadApplyOwnList(Map<String, Object> anParam, int anFlag, int anPageNum, int anPageSize) {
+        Map<String, Object> param = (Map<String, Object>) RuleServiceDubboFilterInvoker.getInputObj();
+        return AjaxObject.newOkWithPage("代录申请 拥有列表 查询成功", insteadService.queryInsteadApplyOwnList(param, anFlag, anPageNum, anPageSize)).toJson();
+    }
+    
+    @Override
     public String webQueryInsteadApplyAuditList(Map<String, Object> anParam, int anFlag, int anPageNum, int anPageSize) {
         Map<String, Object> param = (Map<String, Object>) RuleServiceDubboFilterInvoker.getInputObj();
         return AjaxObject.newOkWithPage("代录申请 审核列表 查询成功", insteadService.queryInsteadApplyAuditList(param, anFlag, anPageNum, anPageSize)).toJson();
@@ -67,8 +73,18 @@ public class CustInsteadDubboService implements ICustInsteadService {
     }
     
     @Override
+    public String webSubmitReviewInsteadApply(Long anId) {
+        return AjaxObject.newOk("代录申请 复核提交", insteadService.saveSubmitReviewInsteadApply(anId)).toJson();
+    }
+    
+    @Override
+    public String webSubmitConfirmInsteadApply(Long anId) {
+        return AjaxObject.newOk("代录申请 确认提交", insteadService.saveSubmitConfirmInsteadApply(anId)).toJson();
+    }
+    
+    @Override
     public String webSubmitTypeInInsteadApply(Long anId) {
-        return AjaxObject.newOk("代录申请 提交复核", insteadService.saveSubmitTypeInInsteadApply(anId)).toJson();
+        return AjaxObject.newOk("代录申请 录入提交", insteadService.saveSubmitTypeInInsteadApply(anId)).toJson();
     }
     
     @Override

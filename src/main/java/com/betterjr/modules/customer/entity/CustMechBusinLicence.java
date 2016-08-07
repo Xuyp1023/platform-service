@@ -621,6 +621,10 @@ public class CustMechBusinLicence implements BetterjrEntity {
         return result;
     }
     
+    public void initAddValue() {
+        this.initAddValue(null, null);
+    }
+    
     public void initAddValue(Long anCustNo, String anCustName) {
         this.id = SerialGenerator.getLongValue("CustMechBusinLicence.id");
         
@@ -665,7 +669,8 @@ public class CustMechBusinLicence implements BetterjrEntity {
         this.batchNo = anCustMechBusinLicence.getBatchNo();
         /*
         this.custNo = anCustMechBusinLicence.getCustNo();
-        this.custName = anCustMechBusinLicence.getCustName();*/
+        */
+        this.custName = anCustMechBusinLicence.getCustName();
 
         this.businStatus = anCustMechBusinLicence.getBusinStatus();
     }
@@ -694,6 +699,7 @@ public class CustMechBusinLicence implements BetterjrEntity {
         this.batchNo = anBusinLicenceTmp.getBatchNo();
         /*
         this.custNo = anBusinLicenceTmp.getCustNo();
-        this.custName = anBusinLicenceTmp.getCustName();*/
+        */
+        this.custName = anBusinLicenceTmp.getCustName();
     }
 }

@@ -1,7 +1,9 @@
 package com.betterjr.modules.customer.service;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -12,6 +14,7 @@ import com.betterjr.common.exception.BytterTradeException;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterStringUtils;
+import com.betterjr.common.utils.Collections3;
 import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.customer.constant.CustomerConstants;
 import com.betterjr.modules.customer.dao.CustMechBaseTmpMapper;
@@ -21,6 +24,7 @@ import com.betterjr.modules.customer.entity.CustInsteadRecord;
 import com.betterjr.modules.customer.entity.CustMechBase;
 import com.betterjr.modules.customer.entity.CustMechBaseTmp;
 import com.betterjr.modules.customer.helper.IFormalDataService;
+import com.betterjr.modules.customer.helper.VersionHelper;
 
 /**
  * 客户基本信息流水信息管理
@@ -52,7 +56,39 @@ public class CustMechBaseTmpService extends BaseService<CustMechBaseTmpMapper, C
      * @param anCustNo
      * @return
      */
-    public CustMechBaseTmp findCustMechBaseTmp(Long anInsteadRecordId) {
+    public CustMechBaseTmp findCustMechBaseTmp(Long anId) {
+        BTAssert.notNull(anId, "流水编号不允许为空！");
+
+        return this.selectByPrimaryKey(anId);
+    }
+    
+    /**
+     * 根据当前流水,找上一条有效流水
+     * @param anCustMechBaseTmp
+     * @return
+     */
+    public CustMechBaseTmp findCustMechBaseTmpPrevVersion(CustMechBaseTmp anCustMechBaseTmp) {
+        Long refId = anCustMechBaseTmp.getRefId();
+        Long version = anCustMechBaseTmp.getVersion();
+        
+        Long befVersion = this.mapper.selectPrevVersion(refId, version);
+        
+        Map<String, Object> conditionMap = new HashMap<>();
+        conditionMap.put("version", befVersion);
+        conditionMap.put("refId", refId);
+        
+        List<CustMechBaseTmp> befDatas =  this.selectByProperty(conditionMap);
+        return Collections3.getFirst(befDatas);
+    }
+
+    /**
+     * 公司基本信息-流水信息-详情
+     * 
+     * @param anId
+     * @param anCustNo
+     * @return
+     */
+    public CustMechBaseTmp findCustMechBaseTmpByInsteadRecord(Long anInsteadRecordId) {
         BTAssert.notNull(anInsteadRecordId, "代录项目编号不允许为空！");
 
         CustInsteadRecord insteadRecord = insteadRecordService.findCustInsteadRecord(anInsteadRecordId);
@@ -64,7 +100,7 @@ public class CustMechBaseTmpService extends BaseService<CustMechBaseTmpMapper, C
 
         Long tmpId = Long.valueOf(insteadRecord.getTmpIds());
 
-        CustMechBaseTmp custMechBaseTmp = this.selectByPrimaryKey(tmpId);
+        CustMechBaseTmp custMechBaseTmp = this.findCustMechBaseTmp(tmpId);
         BTAssert.notNull(custMechBaseTmp, "没有找到对应的流水信息!");
 
         return custMechBaseTmp;
@@ -83,10 +119,33 @@ public class CustMechBaseTmpService extends BaseService<CustMechBaseTmpMapper, C
         final Long custNo = anCustMechBaseTmp.getRefId();
         
         anCustMechBaseTmp.initAddValue(anTmpType, custNo);
+        anCustMechBaseTmp.setVersion(VersionHelper.generateVersion(this.mapper, custNo));
         this.insert(anCustMechBaseTmp);
 
         return anCustMechBaseTmp;
     }
+    
+    /**
+     * 公司基本信息-流水信息-添加  开户时建立
+     * 
+     * @param anCustMechBaseTmp
+     * @return
+     */
+    public CustMechBaseTmp addCustMechBaseTmp(CustMechBase anCustMechBase) {
+        BTAssert.notNull(anCustMechBase, "公司基本信息 不能为空！");
+
+        final CustMechBaseTmp custMechBaseTmp = new CustMechBaseTmp();
+        
+        // 初始数据一开始为 已使用
+        custMechBaseTmp.initAddValue(anCustMechBase, CustomerConstants.TMP_TYPE_INITDATA, CustomerConstants.TMP_STATUS_USED);
+        custMechBaseTmp.setVersion(VersionHelper.generateVersion(this.mapper, anCustMechBase.getCustNo()));
+        custMechBaseTmp.setRefId(anCustMechBase.getCustNo());
+        
+        this.insert(custMechBaseTmp);
+
+        return custMechBaseTmp;
+    }
+
 
     /**
      * 公司基本信息-流水信息-修改
@@ -143,7 +202,7 @@ public class CustMechBaseTmpService extends BaseService<CustMechBaseTmpMapper, C
 
         return custMechBaseTmp;
     }
-
+    
     /**
      * 公司基本信息-添加代录
      * 

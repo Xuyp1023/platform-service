@@ -119,11 +119,15 @@ public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper,
      */
     public Page<CustInsteadApply> queryCustInsteadApply(Map<String, Object> anParam, int anFlag, int anPageNum, int anPageSize) {
         final String custName = (String) anParam.get("LIKEcustName");
+        final String businStatus = (String) anParam.get("businStatus");
         if (BetterStringUtils.isBlank(custName)) {
             anParam.remove("LIKEcustName");
         }
         else {
             anParam.put("LIKEcustName", "%" + custName + "%");
+        }
+        if (BetterStringUtils.isBlank(businStatus)) {
+            anParam.remove("businStatus");
         }
         return this.selectPropertyByPage(CustInsteadApply.class, anParam, anPageNum, anPageSize, anFlag == 1);
     }

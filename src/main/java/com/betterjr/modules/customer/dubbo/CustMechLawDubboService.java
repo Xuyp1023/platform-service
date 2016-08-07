@@ -14,8 +14,10 @@ import com.betterjr.modules.customer.ICustMechLawService;
 import com.betterjr.modules.customer.constant.CustomerConstants;
 import com.betterjr.modules.customer.entity.CustChangeApply;
 import com.betterjr.modules.customer.entity.CustMechBaseTmp;
+import com.betterjr.modules.customer.entity.CustMechBusinLicenceTmp;
 import com.betterjr.modules.customer.entity.CustMechLaw;
 import com.betterjr.modules.customer.entity.CustMechLawTmp;
+import com.betterjr.modules.customer.helper.ChangeDetailBean;
 import com.betterjr.modules.customer.service.CustChangeService;
 import com.betterjr.modules.customer.service.CustInsteadService;
 import com.betterjr.modules.customer.service.CustMechLawService;
@@ -50,7 +52,18 @@ public class CustMechLawDubboService implements ICustMechLawService {
     @Override
     public String webFindChangeApply(Long anId) {
         final CustChangeApply changeApply = changeService.findChangeApply(anId, CustomerConstants.ITEM_LAW);
-        return AjaxObject.newOk("法人信息-变更详情查询 成功", changeApply).toJson();
+        
+        final Long tmpId = Long.valueOf(changeApply.getTmpIds());
+        
+        final CustMechLawTmp nowData = lawTmpService.findCustMechLawTmp(tmpId);
+        final CustMechLawTmp befData = lawTmpService.findCustMechLawTmpPrevVersion(nowData);
+        
+        ChangeDetailBean<CustMechLawTmp> changeDetailBean = new ChangeDetailBean<>();
+        changeDetailBean.setChangeApply(changeApply);
+        changeDetailBean.setNowData(nowData);
+        changeDetailBean.setBefData(befData);
+        
+        return AjaxObject.newOk("法人信息-变更详情查询 成功", changeDetailBean).toJson();
     }
 
     @Override
@@ -86,7 +99,7 @@ public class CustMechLawDubboService implements ICustMechLawService {
 
     @Override
     public String webFindInsteadRecord(Long anInsteadRecordId) {
-        return AjaxObject.newOk("法人信息-代录详情 成功", lawTmpService.findCustMechLawTmpByInsteadRecordId(anInsteadRecordId)).toJson();
+        return AjaxObject.newOk("法人信息-代录详情 成功", lawTmpService.findCustMechLawTmpByInsteadRecord(anInsteadRecordId)).toJson();
     }
 
 

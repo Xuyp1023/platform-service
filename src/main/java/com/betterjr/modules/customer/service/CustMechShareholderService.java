@@ -2,6 +2,8 @@ package com.betterjr.modules.customer.service;
 
 import java.util.List;
 
+import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,9 @@ import com.betterjr.modules.customer.entity.CustMechShareholder;
 @Service
 public class CustMechShareholderService extends BaseService<CustMechShareholderMapper, CustMechShareholder> {
     private static Logger logger = LoggerFactory.getLogger(CustMechShareholderService.class);
+    
+    @Resource
+    private CustMechShareholderTmpService shareholderTmpService;
 
     /**
      * 查询股东列表

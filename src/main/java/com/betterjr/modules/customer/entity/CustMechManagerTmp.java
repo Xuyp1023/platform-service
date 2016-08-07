@@ -500,6 +500,10 @@ public class CustMechManagerTmp implements BetterjrEntity {
     }
     
     public void initAddValue(String anBusinStatus) {
+        this.initAddValue(anBusinStatus, null, null);
+    }
+    
+    public void initAddValue(String anBusinStatus, String anTmpType, Long anVersion) {
         this.id = SerialGenerator.getLongValue("CustMechManagerTmp.id");
         
         this.regOperId = UserUtils.getOperatorInfo().getId();
@@ -514,22 +518,24 @@ public class CustMechManagerTmp implements BetterjrEntity {
         
         this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
         this.businStatus = anBusinStatus;
+        this.version = anVersion;
+        
+        this.tmpType = anTmpType;
     }
-
+    
     public void initModifyValue(final CustMechManagerTmp anCustMechManagerTmp) {
-        this.id = anCustMechManagerTmp.getId();
-/*
-        this.regOperId = anCustMechBaseTmp.getRegOperId();
-        this.regOperName = anCustMechBaseTmp.getRegOperName();
-        this.regDate = anCustMechBaseTmp.getRegDate();
-        this.regTime = anCustMechBaseTmp.getRegTime();
-*/
         this.modiOperId = UserUtils.getOperatorInfo().getId();
         this.modiOperName = UserUtils.getOperatorInfo().getName();
         this.modiDate = BetterDateUtils.getNumDate();
         this.modiTime = BetterDateUtils.getNumTime();
 
-        this.businStatus = anCustMechManagerTmp.getBusinStatus();
-        this.operOrg = anCustMechManagerTmp.getOperOrg();
+        this.name = anCustMechManagerTmp.getName();
+        this.sex = anCustMechManagerTmp.getSex();
+        this.identType = anCustMechManagerTmp.getIdentType();
+        this.identNo = anCustMechManagerTmp.getIdentNo();
+        this.birthdate = anCustMechManagerTmp.getBirthdate();
+        this.eduLevel = anCustMechManagerTmp.getEduLevel();
+        this.position = anCustMechManagerTmp.getPosition();
+        this.batchNo = anCustMechManagerTmp.getBatchNo();
     }
 }

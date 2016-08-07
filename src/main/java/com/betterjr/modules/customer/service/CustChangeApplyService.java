@@ -116,12 +116,17 @@ public class CustChangeApplyService extends BaseService<CustChangeApplyMapper, C
      */
     public Page<CustChangeApply> queryCustChangeApply(Map<String, Object> anParam, int anFlag, int anPageNum, int anPageSize) {
         final String custName = (String) anParam.get("LIKEcustName");
+        final String businStatus = (String) anParam.get("businStatus");
         if (BetterStringUtils.isBlank(custName)) {
             anParam.remove("LIKEcustName");
         }
         else {
             anParam.put("LIKEcustName", "%" + custName + "%");
         }
+        if (BetterStringUtils.isBlank(businStatus)) {
+            anParam.remove("businStatus");
+        }
+        
         final Page<CustChangeApply> changeApplys = this.selectPropertyByPage(anParam, anPageNum, anPageSize, anFlag == 1);
 
         changeApplys.forEach(changeApply -> {

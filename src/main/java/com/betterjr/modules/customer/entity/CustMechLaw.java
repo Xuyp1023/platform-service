@@ -584,11 +584,10 @@ public class CustMechLaw implements BetterjrEntity {
         this.phone = anCustMechLaw.getPhone();
         this.sex = anCustMechLaw.getSex();
         this.validDate = anCustMechLaw.getValidDate();
-        
         /*
         this.custNo = anCustMechLaw.getCustNo();
-        this.custName = anCustMechLaw.getCustName();
         */
+        this.custName = anCustMechLaw.getCustName();
         
         this.modiOperId = UserUtils.getOperatorInfo().getId();
         this.modiOperName = UserUtils.getOperatorInfo().getName();
@@ -609,11 +608,10 @@ public class CustMechLaw implements BetterjrEntity {
         this.phone = anMechLawTmp.getPhone();
         this.sex = anMechLawTmp.getSex();
         this.validDate = anMechLawTmp.getValidDate();
-        
         /*
         this.custNo = anMechLawTmp.getCustNo();
+         */
         this.custName = anMechLawTmp.getCustName();
-        */
         
         this.modiOperId = UserUtils.getOperatorInfo().getId();
         this.modiOperName = UserUtils.getOperatorInfo().getName();

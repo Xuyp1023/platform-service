@@ -3,6 +3,8 @@ package com.betterjr.modules.customer.service;
 import java.util.Collection;
 import java.util.List;
 
+import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,9 @@ public class CustMechContacterService extends BaseService<CustMechContacterMappe
     private static final String CUST_NO = "custNo";
 
     private static Logger logger = LoggerFactory.getLogger(CustMechContacterService.class);
+    
+    @Resource
+    private CustMechContacterTmpService contacterTmpService;
 
     /**
      * 查询联系人信息

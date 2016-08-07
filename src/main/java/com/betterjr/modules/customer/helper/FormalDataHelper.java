@@ -18,7 +18,7 @@ import com.betterjr.modules.customer.service.CustOpenAccountTmpService;
  * @author liuwl
  *
  */
-public class FormalDataServiceHelper {
+public final class FormalDataHelper {
 
     public static IFormalDataService getFormalDataService(CustChangeApply anCustChangeApply) {
         return getFormalDataService(anCustChangeApply.getChangeItem());

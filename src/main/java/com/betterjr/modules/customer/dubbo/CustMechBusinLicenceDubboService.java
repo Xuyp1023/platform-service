@@ -13,6 +13,7 @@ import com.betterjr.modules.customer.entity.CustChangeApply;
 import com.betterjr.modules.customer.entity.CustMechBaseTmp;
 import com.betterjr.modules.customer.entity.CustMechBusinLicence;
 import com.betterjr.modules.customer.entity.CustMechBusinLicenceTmp;
+import com.betterjr.modules.customer.helper.ChangeDetailBean;
 import com.betterjr.modules.customer.service.CustChangeService;
 import com.betterjr.modules.customer.service.CustInsteadService;
 import com.betterjr.modules.customer.service.CustMechBusinLicenceService;
@@ -49,7 +50,17 @@ public class CustMechBusinLicenceDubboService implements ICustMechBusinLicenceSe
     @Override
     public String webFindChangeApply(Long anId) {
         final CustChangeApply changeApply = changeService.findChangeApply(anId, CustomerConstants.ITEM_BUSINLICENCE);
-        return AjaxObject.newOk("营业执照信息-变更详情查询 成功", changeApply).toJson();
+        
+        final Long tmpId = Long.valueOf(changeApply.getTmpIds());
+        
+        final CustMechBusinLicenceTmp nowData = businLicenceTmpService.findBusinLicenceTmp(tmpId);
+        final CustMechBusinLicenceTmp befData = businLicenceTmpService.findBusinLicenceTmpPrevVersion(nowData);
+        
+        ChangeDetailBean<CustMechBusinLicenceTmp> changeDetailBean = new ChangeDetailBean<>();
+        changeDetailBean.setChangeApply(changeApply);
+        changeDetailBean.setNowData(nowData);
+        changeDetailBean.setBefData(befData);
+        return AjaxObject.newOk("营业执照信息-变更详情查询 成功", changeDetailBean).toJson();
     }
 
     @Override

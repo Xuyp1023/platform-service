@@ -1154,8 +1154,12 @@ public class CustMechBaseTmp implements BetterjrEntity {
         result = prime * result + ((getTmpOperType() == null) ? 0 : getTmpOperType().hashCode());
         return result;
     }
-
+    
     public void initAddValue(String anTmpType, Long anCustNo) {
+        this.initAddValue(anTmpType, CustomerConstants.TMP_STATUS_NEW, anCustNo);
+    }
+    
+    public void initAddValue(String anTmpType, String anBusinStatus, Long anCustNo) {
         this.id = SerialGenerator.getLongValue("CustMechBaseTmp.id");
 
         this.regOperId = UserUtils.getOperatorInfo().getId();
@@ -1169,14 +1173,61 @@ public class CustMechBaseTmp implements BetterjrEntity {
         this.modiTime = BetterDateUtils.getNumTime();
 
         this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
-        this.businStatus = CustomerConstants.TMP_STATUS_NEW;
         
+        this.businStatus = anBusinStatus;
         this.custNo = anCustNo;
-
         this.tmpType = anTmpType;
+        
         this.tmpOperType = CustomerConstants.TMP_OPER_TYPE_MODIFY;// 单表只有修改操作
     }
 
+    /**
+     * 使用正式表数据建立流水数据
+     * @param anCustMechBase
+     */
+    public void initAddValue(CustMechBase anCustMechBase, String anTmpType, String anBusinStatus) {
+        // 初始化公共字段
+        initAddValue(anTmpType, anBusinStatus, anCustMechBase.getCustNo());
+        
+        // 从CustMechBase 取参数值
+        this.custName = anCustMechBase.getCustName();
+        this.address = anCustMechBase.getAddress();
+        this.businLicence = anCustMechBase.getBusinLicence();
+        this.businScope = anCustMechBase.getBusinScope();
+        this.capitalType = anCustMechBase.getCapitalType();
+        this.category = anCustMechBase.getCategory();
+        this.corpType = anCustMechBase.getCorpType();
+        this.cityNo = anCustMechBase.getCityNo();
+        this.corpName = anCustMechBase.getCorpName();
+        this.engName = anCustMechBase.getEngName();
+        this.corpProperty = anCustMechBase.getCorpProperty();
+        this.corpVocation = anCustMechBase.getCorpVocation();
+        this.custClass = anCustMechBase.getCustClass();
+        this.email = anCustMechBase.getEmail();
+        this.fax = anCustMechBase.getFax();
+        this.instType = anCustMechBase.getInstType();
+        this.invest = anCustMechBase.getInvest();
+        this.lawIdentNo = anCustMechBase.getLawIdentNo();
+        this.lawIdentType = anCustMechBase.getLawIdentType();
+        this.lawName = anCustMechBase.getLawName();
+        this.lawPhone = anCustMechBase.getLawPhone();
+        this.lawValidDate = anCustMechBase.getLawValidDate();
+        this.mobile = anCustMechBase.getMobile();
+        this.orgCode = anCustMechBase.getOrgCode();
+        this.paidCapital = anCustMechBase.getPaidCapital();
+        this.person = anCustMechBase.getPerson();
+        this.phone = anCustMechBase.getPhone();
+        this.premisesAddress = anCustMechBase.getPremisesAddress();
+        this.premisesArea = anCustMechBase.getPremisesArea();
+        this.premisesType = anCustMechBase.getPremisesType();
+        this.premisesYear = anCustMechBase.getPremisesYear();
+        this.qq = anCustMechBase.getQq();
+        this.regAddress = anCustMechBase.getRegAddress();
+        this.webaddr = anCustMechBase.getWebaddr();
+        this.wechat = anCustMechBase.getWechat();
+        this.zipCode = anCustMechBase.getZipCode();
+    }
+    
     public void initModifyValue(final String anBusinStatus) {
         this.modiOperId = UserUtils.getOperatorInfo().getId();
         this.modiOperName = UserUtils.getOperatorInfo().getName();

@@ -23,7 +23,10 @@ import com.betterjr.modules.customer.entity.CustMechLawTmp;
 @Service
 public class CustMechLawService extends BaseService<CustMechLawMapper, CustMechLaw> {
     @Resource
-    private CustAccountService custAccountService;
+    private CustAccountService accountService;
+    
+    @Resource
+    private CustMechLawTmpService lawTmpService;
     
     /**
      * 查询法人信息
@@ -35,6 +38,7 @@ public class CustMechLawService extends BaseService<CustMechLawMapper, CustMechL
         BTAssert.notNull(anCustNo, "客户编号不允许为空！");
 
         final List<CustMechLaw> lawes = this.selectByProperty(CustomerConstants.CUST_NO, anCustNo);
+        
         return Collections3.getFirst(lawes);
     }
 
@@ -78,13 +82,15 @@ public class CustMechLawService extends BaseService<CustMechLawMapper, CustMechL
      * @param anCustMechLaw
      * @return
      */
-    public CustMechLaw addCustMechLaw(CustMechLaw anCustMechLaw) {
+    public CustMechLaw addCustMechLaw(CustMechLaw anCustMechLaw, Long anCustNo) {
         BTAssert.notNull(anCustMechLaw, "法人信息不允许为空！");
 
-        final Long custNo = anCustMechLaw.getCustNo();
-        final String custName = custAccountService.queryCustName(custNo);
-        anCustMechLaw.initAddValue(custNo, custName);
+        final String custName = accountService.queryCustName(anCustNo);
+        anCustMechLaw.initAddValue(anCustNo, custName);
         this.insert(anCustMechLaw);
+        
+        lawTmpService.addCustMechLawTmp(anCustMechLaw);
+        
         return anCustMechLaw;
     }
 

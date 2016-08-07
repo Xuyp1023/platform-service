@@ -28,6 +28,7 @@ import com.betterjr.modules.customer.dao.CustOpenAccountTmpMapper;
 import com.betterjr.modules.customer.entity.CustInsteadRecord;
 import com.betterjr.modules.customer.entity.CustMechBankAccount;
 import com.betterjr.modules.customer.entity.CustMechBase;
+import com.betterjr.modules.customer.entity.CustMechBusinLicence;
 import com.betterjr.modules.customer.entity.CustMechLaw;
 import com.betterjr.modules.customer.entity.CustOpenAccountTmp;
 import com.betterjr.modules.customer.helper.IFormalDataService;
@@ -42,6 +43,9 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
 
     @Autowired
     private CustMechLawService custMechLawService;
+    
+    @Autowired
+    private CustMechBusinLicenceService custMechBusinLicenceService;
 
     @Autowired
     private CustAccountService custAccountService;
@@ -98,19 +102,27 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         CustMechBase custBaseInfo = new CustMechBase();
         custBaseInfo.initAddValue(custInfo.getCustNo());
         initCustBaseInfo(anOpenAccountData, custBaseInfo);
-        custMechBaseService.insert(custBaseInfo);
+//        custMechBaseService.insert(custBaseInfo); TODO LIUWL
+        custMechBaseService.addCustMechBase(custBaseInfo, custInfo.getCustNo());
 
         // 数据存盘,机构银行账户信息
         CustMechBankAccount custBankAccount = new CustMechBankAccount();
         custBankAccount.initAddValue();
         initCustBankAccount(anOpenAccountData, custBankAccount, custInfo.getCustNo());
-        custMechBankAccountService.insert(custBankAccount);
+        custMechBankAccountService.insert(custBankAccount); // TODO LIUWL
 
         // 数据存盘,机构法人信息
         CustMechLaw custLaw = new CustMechLaw();
         custLaw.initAddValue();
         initCustLaw(anOpenAccountData, custLaw, custInfo.getCustNo());
-        custMechLawService.insert(custLaw);
+//        custMechLawService.insert(custLaw); TODO LIUWL
+        custMechLawService.addCustMechLaw(custLaw, custInfo.getCustNo());
+        
+        // TODO LIUWL
+        CustMechBusinLicence businLicence = new CustMechBusinLicence();
+        businLicence.initAddValue();
+        initBusinLicence(anOpenAccountData, businLicence, custInfo.getCustNo());
+        custMechBusinLicenceService.addCustMechBusinLicence(businLicence,  custInfo.getCustNo());
 
         if (anId != null) {
             CustOpenAccountTmp anTempData = this.selectByPrimaryKey(anId);
@@ -124,6 +136,14 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         }
 
         return anOpenAccountData;
+    }
+
+    private void initBusinLicence(CustOpenAccountTmp anOpenAccountData, CustMechBusinLicence anBusinLicence, Long anCustNo) {
+        anBusinLicence.setRegNo(anOpenAccountData.getBusinLicence());
+        anBusinLicence.setCertifiedDate(anOpenAccountData.getBusinLicenceRegDate());
+        anBusinLicence.setOrgCode(anOpenAccountData.getOrgCode());
+        anBusinLicence.setLawName(anOpenAccountData.getLawName());
+        anBusinLicence.setEndDate(anOpenAccountData.getBusinLicenceValidDate());
     }
 
     private void initCustBaseInfo(CustOpenAccountTmp anOpenAccountData, CustMechBase custBaseInfo) {
