@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
+	default-lazy-init="true">
+
+	<description>SnakerEngine配置 </description>
+	<bean class="org.snaker.engine.spring.SpringSnakerEngine">
+		<property name="processService" ref="snakerProcessService"/>
+		<property name="orderService" ref="snakerOrderService"/>
+		<property name="taskService" ref="snakerTaskService"/>
+		<property name="queryService" ref="snakerQueryService"/>
+		<property name="managerService" ref="snakerManagerService"/>
+	</bean>
+	
+	<bean id="dbAccess" class="org.snaker.engine.access.mybatis.MybatisAccess">
+		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+	</bean>
+	
+	<bean id="snakerProcessService" class="com.betterjr.modules.workflow.service.BetterProcessService">
+		<property name="access" ref="dbAccess"/>
+		<!-- <property name="cacheManager" ref="cacheManager"/> -->
+	</bean>
+	<bean id="snakerOrderService" class="org.snaker.engine.core.OrderService">
+		<property name="access" ref="dbAccess"/>
+	</bean>
+	<bean id="snakerTaskService" class="org.snaker.engine.core.TaskService">
+		<property name="access" ref="dbAccess"/>
+	</bean>
+	<bean id="snakerManagerService" class="org.snaker.engine.core.ManagerService">
+		<property name="access" ref="dbAccess"/>
+	</bean>
+	<bean id="snakerQueryService" class="org.snaker.engine.core.QueryService">
+		<property name="access" ref="dbAccess"/>
+	</bean>
+	
+<!-- 
+	<bean id="cacheManager" class="org.snaker.engine.cache.memory.MemoryCacheManager"/> -->
+
+
+</beans>
