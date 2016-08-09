@@ -12,4 +12,10 @@ public interface IFormalDataService {
      * @return
      */
     public void saveFormalData(String... anTmpIds);
+    
+    /**
+     * 作废数据状态回写接口
+     * @param anTmpIds
+     */
+    public void saveCancelData(String... anTmpIds);
 }

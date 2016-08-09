@@ -98,7 +98,7 @@ public class CustChangeService {
      * @return
      */
     public CustChangeApply saveAuditPassChangeApply(Long anId, String anReason) {
-        BTAssert.notNull(anId, "变更审核编号不允许为空!");
+        BTAssert.notNull(anId, "变更申请编号不允许为空!");
 
         final CustChangeApply tempChangeApply = changeApplyService.selectByPrimaryKey(anId);
         BTAssert.notNull(tempChangeApply, "没有找到相应的变更申请！");
@@ -133,7 +133,7 @@ public class CustChangeService {
      * @return
      */
     public CustChangeApply saveAuditRejectChangeApply(Long anId, String anReason) {
-        BTAssert.notNull(anId, "变更审核编号不允许为空!");
+        BTAssert.notNull(anId, "变更申请编号不允许为空!");
 
         final CustChangeApply tempChangeApply = changeApplyService.selectByPrimaryKey(anId);
         BTAssert.notNull(tempChangeApply, "没有找到相应的变更申请！");
@@ -156,12 +156,35 @@ public class CustChangeService {
     /**
      * 作废变更申请
      * 
-     * @param anCustNo
      * @param anId
+     * @param anReason 
      * @return
      */
-    public CustChangeApply saveCancelChangeApply(Long anCustNo, Long anId) {
-        return null;
+    public CustChangeApply saveCancelChangeApply(Long anId, String anReason) {
+        BTAssert.notNull(anId, "变更申请编号不允许为空!");
+
+        final CustChangeApply tempChangeApply = changeApplyService.selectByPrimaryKey(anId);
+        BTAssert.notNull(tempChangeApply, "没有找到相应的变更申请！");
+
+        // 检查变更申请状态
+        
+        // 修改审核状态为作废
+        final CustChangeApply changeApply = changeApplyService.saveChangeApplyStatus(anId, CustomerConstants.CHANGE_APPLY_STATUS_CANCEL);
+        BTAssert.notNull(changeApply, "修改变更申请审核状态失败！");
+        
+        // 回调变更申请方法
+        IFormalDataService formalDataService = FormalDataHelper.getFormalDataService(changeApply);
+        BTAssert.notNull(formalDataService, "变更项目不正确！");
+
+        String[] tmpIds = BetterStringUtils.split(changeApply.getTmpIds(), ",");
+        formalDataService.saveCancelData(tmpIds);
+        
+        // 添加审核记录
+        CustAuditLog auditLog = auditLogService.addCustAuditLog(CustomerConstants.AUDIT_TYPE_CHANGEAPPLY, anId, CustomerConstants.AUDIT_RESULT_CANCEL,
+                anReason, changeApply.getChangeItem(), changeApply.getCustNo());
+        BTAssert.notNull(auditLog, "审核记录添加失败!");
+        
+        return tempChangeApply;
     }
 
 }

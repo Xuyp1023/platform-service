@@ -109,8 +109,7 @@ public class CustInsteadDubboService implements ICustInsteadService {
 
     @Override
     public String webCancelInsteadApply(Long anId, String anReason) {
-        // TODO Auto-generated method stub
-        return null;
+        return AjaxObject.newOk("代录申请 作废成功", insteadService.saveCancelInsteadApply(anId, anReason)).toJson();
     }
 
     @Override

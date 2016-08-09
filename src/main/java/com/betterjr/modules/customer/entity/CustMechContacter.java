@@ -406,11 +406,9 @@ public class CustMechContacter implements BetterjrEntity {
         return result;
     }
     
-    public void initAddValue() {
+    public void initAddValue(Long anCustNo, String anCustName, Long anRegOperId, String anRegOperName, String anOperOrg) {
         this.id = SerialGenerator.getLongValue("CustMechContacter.id");
         
-        this.regOperId = UserUtils.getOperatorInfo().getId();
-        this.regOperName = UserUtils.getOperatorInfo().getName();
         this.regDate = BetterDateUtils.getNumDate();
         this.regTime = BetterDateUtils.getNumTime();
         
@@ -419,7 +417,11 @@ public class CustMechContacter implements BetterjrEntity {
         this.modiDate = BetterDateUtils.getNumDate();
         this.modiTime = BetterDateUtils.getNumTime();
         
-        this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
+        this.regOperId = anRegOperId;
+        this.regOperName = anRegOperName;
+        this.operOrg = anOperOrg;
+        this.custNo = anCustNo;
+        
         this.businStatus = "0";
     }
 

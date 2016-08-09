@@ -622,14 +622,16 @@ public class CustMechBusinLicence implements BetterjrEntity {
     }
     
     public void initAddValue() {
-        this.initAddValue(null, null);
+        this.initAddValue(null, null, null, null, null);
     }
     
-    public void initAddValue(Long anCustNo, String anCustName) {
+    public void initAddValue(Long anCustNo, String anCustName, Long anRegOperId, String anRegOperName, String anOperOrg) {
         this.id = SerialGenerator.getLongValue("CustMechBusinLicence.id");
         
-        this.regOperId = UserUtils.getOperatorInfo().getId();
-        this.regOperName = UserUtils.getOperatorInfo().getName();
+        this.regOperId = anRegOperId;
+        this.regOperName = anRegOperName;
+        this.operOrg = anOperOrg;
+        
         this.regDate = BetterDateUtils.getNumDate();
         this.regTime = BetterDateUtils.getNumTime();
         
@@ -641,7 +643,6 @@ public class CustMechBusinLicence implements BetterjrEntity {
         this.custNo = anCustNo;
         this.custName = anCustName;
         
-        this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
         this.businStatus = "0";
     }
 

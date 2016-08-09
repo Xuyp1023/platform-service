@@ -21,7 +21,6 @@ import com.betterjr.modules.customer.dao.CustMechLawTmpMapper;
 import com.betterjr.modules.customer.entity.CustChangeApply;
 import com.betterjr.modules.customer.entity.CustInsteadApply;
 import com.betterjr.modules.customer.entity.CustInsteadRecord;
-import com.betterjr.modules.customer.entity.CustMechBaseTmp;
 import com.betterjr.modules.customer.entity.CustMechLaw;
 import com.betterjr.modules.customer.entity.CustMechLawTmp;
 import com.betterjr.modules.customer.helper.IFormalDataService;
@@ -211,7 +210,7 @@ public class CustMechLawTmpService extends BaseService<CustMechLawTmpMapper, Cus
      */
     public CustMechLawTmp saveInsteadRecord(CustMechLawTmp anCustMechLawTmp, Long anInsteadRecordId, String anFileList) {
         // 校验参数 并获取代录记录 在驳回的状态下可以修改
-        CustInsteadRecord insteadRecord = checkInsteadRecord(anCustMechLawTmp, anInsteadRecordId,
+        CustInsteadRecord insteadRecord = checkInsteadRecord(anCustMechLawTmp, anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN,
                 CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT, CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_REJECT);
 
         Long tmpId = Long.valueOf(insteadRecord.getTmpIds());
@@ -225,24 +224,6 @@ public class CustMechLawTmpService extends BaseService<CustMechLawTmpMapper, Cus
         return custMechLawTmp;
     }
 
-    /**
-     * 保存数据至正式表
-     */
-    @Override
-    public void saveFormalData(String... anTmpIds) {
-        BTAssert.notEmpty(anTmpIds, "临时流水编号不允许为空！");
-
-        if (anTmpIds.length != 1) {
-            throw new BytterTradeException(20021, "临时流水编号只能有一位！");
-        }
-
-        Long tmpId = Long.valueOf(anTmpIds[0]);
-
-        final CustMechLawTmp custMechLawTmp = saveCustMechLawTmpStatus(tmpId, CustomerConstants.TMP_STATUS_USED);
-
-        // 根据 类型区别保存数据方式
-        lawService.saveCustMechLaw(custMechLawTmp);
-    }
 
     /**
      * 检查并返回变更申请
@@ -250,7 +231,7 @@ public class CustMechLawTmpService extends BaseService<CustMechLawTmpMapper, Cus
      * @param anApplyId
      * @return
      */
-    public CustChangeApply checkChangeApply(Long anApplyId) {
+    public CustChangeApply checkChangeApply(Long anApplyId, String... anBusinStatus) {
         BTAssert.notNull(anApplyId, "变更申请-编号 不能为空");
         // 查询 变更申请
         CustChangeApply changeApply = changeApplyService.findChangeApply(anApplyId);
@@ -316,4 +297,32 @@ public class CustMechLawTmpService extends BaseService<CustMechLawTmpMapper, Cus
         return custMechLawTmp;
     }
 
+    
+    /**
+     * 保存数据至正式表
+     */
+    @Override
+    public void saveFormalData(String... anTmpIds) {
+        BTAssert.notEmpty(anTmpIds, "临时流水编号不允许为空！");
+
+        if (anTmpIds.length != 1) {
+            throw new BytterTradeException(20021, "临时流水编号只能有一位！");
+        }
+
+        Long tmpId = Long.valueOf(anTmpIds[0]);
+
+        final CustMechLawTmp custMechLawTmp = saveCustMechLawTmpStatus(tmpId, CustomerConstants.TMP_STATUS_USED);
+
+        // 根据 类型区别保存数据方式
+        lawService.saveCustMechLaw(custMechLawTmp);
+    }
+    
+    /**
+     * 回写作废记录
+     * @param anTmpIds
+     */
+    @Override
+    public void saveCancelData(String... anTmpIds) {
+        
+    }
 }

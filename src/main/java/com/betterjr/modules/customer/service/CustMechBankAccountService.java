@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.Collections3;
+import com.betterjr.modules.account.entity.CustInfo;
+import com.betterjr.modules.account.service.CustAccountService;
+import com.betterjr.modules.customer.constant.CustomerConstants;
 import com.betterjr.modules.customer.dao.CustMechBankAccountMapper;
 import com.betterjr.modules.customer.entity.CustMechBankAccount;
 
@@ -20,14 +23,12 @@ import com.betterjr.modules.customer.entity.CustMechBankAccount;
  *
  */
 @Service
-public class CustMechBankAccountService extends BaseService<CustMechBankAccountMapper,CustMechBankAccount> {
-    private static final String CUST_NO = "custNo";
-    
-    private static Logger logger = LoggerFactory.getLogger(CustMechBankAccountService.class);
-
+public class CustMechBankAccountService extends BaseService<CustMechBankAccountMapper, CustMechBankAccount> {
+    @Resource
+    private CustAccountService accountService;
     @Resource
     private CustMechBankAccountTmpService bankAccountTmpService;
-    
+
     /**
      * 查询银行账户信息
      * 
@@ -36,8 +37,8 @@ public class CustMechBankAccountService extends BaseService<CustMechBankAccountM
      */
     public CustMechBankAccount findCustMechBankAccountByCustNo(Long anCustNo) {
         BTAssert.notNull(anCustNo, "客户编号不允许为空！");
-        
-        final List<CustMechBankAccount> BankAccounts = this.selectByProperty(CUST_NO, anCustNo);
+
+        final List<CustMechBankAccount> BankAccounts = this.selectByProperty(CustomerConstants.CUST_NO, anCustNo);
         return Collections3.getFirst(BankAccounts);
     }
 
@@ -51,22 +52,25 @@ public class CustMechBankAccountService extends BaseService<CustMechBankAccountM
         BTAssert.notNull(anId, "银行账户编号不允许为空");
         final CustMechBankAccount tempCustMechBankAccount = this.selectByPrimaryKey(anId);
         BTAssert.notNull(tempCustMechBankAccount, "对应的银行账户信息没有找到！");
-        
+
         tempCustMechBankAccount.initModifyValue(anCustMechBankAccount);
         this.updateByPrimaryKeySelective(tempCustMechBankAccount);
         return tempCustMechBankAccount;
     }
-    
+
     /**
      * 添加银行账户信息
      * 
      * @param anCustMechBankAccount
      * @return
      */
-    public CustMechBankAccount addCustMechBankAccount(CustMechBankAccount anCustMechBankAccount) {
+    public CustMechBankAccount addCustMechBankAccount(CustMechBankAccount anCustMechBankAccount, Long anCustNo) {
         BTAssert.notNull(anCustMechBankAccount, "银行账户信息不允许为空！");
-        
-        anCustMechBankAccount.initAddValue();
+        BTAssert.notNull(anCustNo, "客户编号不允许为空！");
+
+        final CustInfo custInfo = accountService.selectByPrimaryKey(anCustNo);
+        anCustMechBankAccount.initAddValue(anCustNo, custInfo.getCustName(), custInfo.getRegOperId(), custInfo.getRegOperName(),
+                custInfo.getOperOrg());
         this.insert(anCustMechBankAccount);
         return anCustMechBankAccount;
     }

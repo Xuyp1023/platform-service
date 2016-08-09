@@ -16,4 +16,10 @@ public interface CustMechManagerTmpMapper extends Mapper<CustMechManagerTmp>,IVe
     @ResultType(Long.class)
     @Override
     public Long selectMaxVersion(@Param("refId") Long refId);
+    
+    // 列表类型需要使用 L_CUSTNO
+    @Select("SELECT MAX(n_version) FROM t_cust_mech_manager_tmp WHERE L_CUSTNO=#{refId} AND C_BUSIN_STATUS='2'")
+    @ResultType(Long.class)
+    @Override
+    public Long selectPrevVersion(@Param("refId") Long refId, @Param("version") Long version);
 }

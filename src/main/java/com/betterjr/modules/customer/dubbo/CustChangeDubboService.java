@@ -32,9 +32,8 @@ public class CustChangeDubboService implements ICustChangeService {
     }
 
     @Override
-    public String webCancelChangeApply(Long anId) {
-        // TODO Auto-generated method stub
-        return null;
+    public String webCancelChangeApply(Long anId, String anReason) {
+        return AjaxObject.newOk("审核通过成功！", changeService.saveCancelChangeApply(anId, anReason)).toJson();
     }
 
 }

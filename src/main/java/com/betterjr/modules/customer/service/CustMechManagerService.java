@@ -12,6 +12,7 @@ import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.modules.customer.dao.CustMechManagerMapper;
 import com.betterjr.modules.customer.entity.CustMechManager;
+import com.betterjr.modules.customer.entity.CustMechManagerTmp;
 
 /**
  * 高管信息管理
@@ -48,15 +49,17 @@ public class CustMechManagerService extends BaseService<CustMechManagerMapper, C
     
     /**
      * 添加高管信息
-     * @param anCustMechManager
+     * @param anManagerTmp
      * @return
      */
-    public CustMechManager addCustMechManager(CustMechManager anCustMechManager) {
-        BTAssert.notNull(anCustMechManager, "高管信息不允许为空！");
+    public CustMechManager addCustMechManager(CustMechManagerTmp anManagerTmp) {
+        BTAssert.notNull(anManagerTmp, "高管流水信息不允许为空！");
         
-        anCustMechManager.initAddValue();
-        this.insert(anCustMechManager);
-        return anCustMechManager;
+        CustMechManager manager = new CustMechManager();
+        manager.initAddValue(anManagerTmp);
+        
+        this.insert(manager);
+        return manager;
     }
     
     /**
@@ -73,6 +76,17 @@ public class CustMechManagerService extends BaseService<CustMechManagerMapper, C
         BTAssert.notNull(tempCustMechManager, "对应的高管信息没有找到！");
         
         tempCustMechManager.initModifyValue(anCustMechManager);
+        this.updateByPrimaryKeySelective(tempCustMechManager);
+        return tempCustMechManager;
+    }
+
+    public CustMechManager saveCustMechManager(CustMechManagerTmp anManagerTmp) {
+        BTAssert.notNull(anManagerTmp, "高管流水编号不允许为空！");
+        
+        final CustMechManager tempCustMechManager = this.selectByPrimaryKey(anManagerTmp.getRefId());
+        BTAssert.notNull(tempCustMechManager, "对应的高管信息没有找到！");
+        
+        tempCustMechManager.initModifyValue(anManagerTmp);
         this.updateByPrimaryKeySelective(tempCustMechManager);
         return tempCustMechManager;
     }
