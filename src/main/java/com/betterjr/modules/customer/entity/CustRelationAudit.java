@@ -41,7 +41,7 @@ public class CustRelationAudit implements BetterjrEntity {
     @Column(name = "C_CUSTNAME", columnDefinition = "VARCHAR")
     @MetaData(value = "客户全称", comments = "客户全称")
     private String custName;
-    
+
     /**
      * 关系ID
      */
@@ -62,14 +62,14 @@ public class CustRelationAudit implements BetterjrEntity {
     @Column(name = "C_RELATE_CUSTNAME", columnDefinition = "VARCHAR")
     @MetaData(value = "关系客户名称", comments = "关系客户名称")
     private String relateCustname;
-    
+
     /**
      * 关系类型:0供应商与保理公司 1供应商与核心企业 2核心企业与保理公司 3经销商与保理公司 4经销商与核心企业
      */
     @Column(name = "C_RELATE_TYPE", columnDefinition = "CHAR")
     @MetaData(value = "关系类型:0供应商与保理公司 1供应商与核心企业 2核心企业与保理公司 3经销商与保理公司 4经销商与核心企业", comments = "关系类型:0供应商与保理公司 1供应商与核心企业 2核心企业与保理公司 3经销商与保理公司 4经销商与核心企业")
     private String relateType;
-    
+
     /**
      * 任务名称
      */
@@ -338,12 +338,11 @@ public class CustRelationAudit implements BetterjrEntity {
 
         this.custNo = anCustRelation.getCustNo();
         this.custName = anCustRelation.getCustName();
-        
         this.relateId = anCustRelation.getId();
         this.relateCustno = anCustRelation.getRelateCustno();
         this.relateCustname = anCustRelation.getRelateCustname();
         this.relateType = anCustRelation.getRelateType();
-
+        
         this.auditOpinion = anAuditOpinion;// 处理意见
         this.taskName = anTaskName;
     }

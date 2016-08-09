@@ -9,10 +9,13 @@ import javax.persistence.Table;
 
 import com.betterjr.common.annotation.MetaData;
 import com.betterjr.common.entity.BetterjrEntity;
+import com.betterjr.common.mapper.CustDateJsonSerializer;
+import com.betterjr.common.mapper.CustTimeJsonSerializer;
 import com.betterjr.common.selectkey.SerialGenerator;
 import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.UserUtils;
-import com.betterjr.modules.customer.constant.CustomerConstants;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @Access(AccessType.FIELD)
 @Entity
@@ -27,11 +30,11 @@ public class CustOpenAccountTmp implements BetterjrEntity {
     private Long id;
 
     /**
-     * 数据版本号
+     * 客户编号
      */
-    @Column(name = "N_VERSION", columnDefinition = "INTEGER")
-    @MetaData(value = "数据版本号", comments = "数据版本号")
-    private Long version;
+    @Column(name = "L_CUSTNO", columnDefinition = "INTEGER")
+    @MetaData(value = "客户编号", comments = "客户编号")
+    private Long custNo;
 
     /**
      * 客户名称
@@ -71,6 +74,7 @@ public class CustOpenAccountTmp implements BetterjrEntity {
     /**
      * 营业执照登记日期
      */
+    @JsonSerialize(using = CustDateJsonSerializer.class)
     @Column(name = "D_BUSIN_LICENCE_REGDATE", columnDefinition = "VARCHAR")
     @MetaData(value = "营业执照登记日期", comments = "营业执照登记日期")
     private String businLicenceRegDate;
@@ -78,6 +82,7 @@ public class CustOpenAccountTmp implements BetterjrEntity {
     /**
      * 营业执照截止日期
      */
+    @JsonSerialize(using = CustDateJsonSerializer.class)
     @Column(name = "D_BUSIN_LICENCE_VALIDDATE", columnDefinition = "VARCHAR")
     @MetaData(value = "营业执照截止日期", comments = "营业执照截止日期")
     private String businLicenceValidDate;
@@ -176,6 +181,7 @@ public class CustOpenAccountTmp implements BetterjrEntity {
     /**
      * 经办人证件有效期
      */
+    @JsonSerialize(using = CustDateJsonSerializer.class)
     @Column(name = "D_OPER_VALIDDATE", columnDefinition = "VARCHAR")
     @MetaData(value = "经办人证件有效期", comments = "经办人证件有效期")
     private String operValiddate;
@@ -232,6 +238,7 @@ public class CustOpenAccountTmp implements BetterjrEntity {
     /**
      * 法人证件有限期
      */
+    @JsonSerialize(using = CustDateJsonSerializer.class)
     @Column(name = "D_LAW_VALIDDATE", columnDefinition = "VARCHAR")
     @MetaData(value = "法人证件有限期", comments = "法人证件有限期")
     private String lawValidDate;
@@ -246,6 +253,7 @@ public class CustOpenAccountTmp implements BetterjrEntity {
     /**
      * 创建人(操作员)ID号
      */
+    @JsonIgnore
     @Column(name = "L_REG_OPERID", columnDefinition = "INTEGER")
     @MetaData(value = "创建人(操作员)ID号", comments = "创建人(操作员)ID号")
     private Long regOperId;
@@ -253,6 +261,7 @@ public class CustOpenAccountTmp implements BetterjrEntity {
     /**
      * 创建人(操作员)姓名
      */
+    @JsonIgnore
     @Column(name = "C_REG_OPERNAME", columnDefinition = "VARCHAR")
     @MetaData(value = "创建人(操作员)姓名", comments = "创建人(操作员)姓名")
     private String regOperName;
@@ -260,6 +269,7 @@ public class CustOpenAccountTmp implements BetterjrEntity {
     /**
      * 创建日期
      */
+    @JsonSerialize(using = CustDateJsonSerializer.class)
     @Column(name = "D_REG_DATE", columnDefinition = "VARCHAR")
     @MetaData(value = "创建日期", comments = "创建日期")
     private String regDate;
@@ -267,6 +277,7 @@ public class CustOpenAccountTmp implements BetterjrEntity {
     /**
      * 创建时间
      */
+    @JsonSerialize(using = CustTimeJsonSerializer.class)
     @Column(name = "T_REG_TIME", columnDefinition = "VARCHAR")
     @MetaData(value = "创建时间", comments = "创建时间")
     private String regTime;
@@ -274,6 +285,7 @@ public class CustOpenAccountTmp implements BetterjrEntity {
     /**
      * 修改人(操作员)ID号
      */
+    @JsonIgnore
     @Column(name = "L_MODI_OPERID", columnDefinition = "INTEGER")
     @MetaData(value = "修改人(操作员)ID号", comments = "修改人(操作员)ID号")
     private Long modiOperId;
@@ -281,6 +293,7 @@ public class CustOpenAccountTmp implements BetterjrEntity {
     /**
      * 修改人(操作员)姓名
      */
+    @JsonIgnore
     @Column(name = "C_MODI_OPERNAME", columnDefinition = "VARCHAR")
     @MetaData(value = "修改人(操作员)姓名", comments = "修改人(操作员)姓名")
     private String modiOperName;
@@ -288,6 +301,7 @@ public class CustOpenAccountTmp implements BetterjrEntity {
     /**
      * 修改日期
      */
+    @JsonSerialize(using = CustDateJsonSerializer.class)
     @Column(name = "D_MODI_DATE", columnDefinition = "VARCHAR")
     @MetaData(value = "修改日期", comments = "修改日期")
     private String modiDate;
@@ -295,6 +309,7 @@ public class CustOpenAccountTmp implements BetterjrEntity {
     /**
      * 修改时间
      */
+    @JsonSerialize(using = CustTimeJsonSerializer.class)
     @Column(name = "T_MODI_TIME", columnDefinition = "VARCHAR")
     @MetaData(value = "修改时间", comments = "修改时间")
     private String modiTime;
@@ -313,12 +328,13 @@ public class CustOpenAccountTmp implements BetterjrEntity {
     /**
      * 操作机构
      */
+    @JsonIgnore
     @Column(name = "C_OPERORG", columnDefinition = "VARCHAR")
     @MetaData(value = "操作机构", comments = "操作机构")
     private String operOrg;
 
     /**
-     * 流水类型:0 代录   2 自己暂存 4 代录暂存
+     * 流水类型:0 代录 2 自己暂存 4 代录暂存
      */
     @Column(name = "C_TMP_TYPE", columnDefinition = "CHAR")
     @MetaData(value = "流水类型:", comments = "流水类型:0 代录   2 自己暂存 4 代录暂存")
@@ -334,10 +350,10 @@ public class CustOpenAccountTmp implements BetterjrEntity {
     /**
      * 组织机构代码证
      */
-    @Column(name = "C_ORG_CODE",  columnDefinition="VARCHAR" )
-    @MetaData( value="组织机构代码证", comments = "组织机构代码证")
+    @Column(name = "C_ORG_CODE", columnDefinition = "VARCHAR")
+    @MetaData(value = "组织机构代码证", comments = "组织机构代码证")
     private String orgCode;
-    
+
     private static final long serialVersionUID = 1468812783872L;
 
     public Long getId() {
@@ -348,12 +364,12 @@ public class CustOpenAccountTmp implements BetterjrEntity {
         this.id = id;
     }
 
-    public Long getVersion() {
-        return version;
+    public Long getCustNo() {
+        return custNo;
     }
 
-    public void setVersion(Long version) {
-        this.version = version;
+    public void setCustNo(Long custNo) {
+        this.custNo = custNo;
     }
 
     public String getCustName() {
@@ -715,7 +731,7 @@ public class CustOpenAccountTmp implements BetterjrEntity {
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
         sb.append(", id=").append(id);
-        sb.append(", version=").append(version);
+        sb.append(", custNo=").append(custNo);
         sb.append(", custName=").append(custName);
         sb.append(", identNo=").append(identNo);
         sb.append(", identType=").append(identType);
@@ -778,7 +794,7 @@ public class CustOpenAccountTmp implements BetterjrEntity {
         }
         CustOpenAccountTmp other = (CustOpenAccountTmp) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-                && (this.getVersion() == null ? other.getVersion() == null : this.getVersion().equals(other.getVersion()))
+                && (this.getCustNo() == null ? other.getCustNo() == null : this.getCustNo().equals(other.getCustNo()))
                 && (this.getCustName() == null ? other.getCustName() == null : this.getCustName().equals(other.getCustName()))
                 && (this.getIdentNo() == null ? other.getIdentNo() == null : this.getIdentNo().equals(other.getIdentNo()))
                 && (this.getIdentType() == null ? other.getIdentType() == null : this.getIdentType().equals(other.getIdentType()))
@@ -832,7 +848,7 @@ public class CustOpenAccountTmp implements BetterjrEntity {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
-        result = prime * result + ((getVersion() == null) ? 0 : getVersion().hashCode());
+        result = prime * result + ((getCustNo() == null) ? 0 : getCustNo().hashCode());
         result = prime * result + ((getCustName() == null) ? 0 : getCustName().hashCode());
         result = prime * result + ((getIdentNo() == null) ? 0 : getIdentNo().hashCode());
         result = prime * result + ((getIdentType() == null) ? 0 : getIdentType().hashCode());
@@ -882,28 +898,20 @@ public class CustOpenAccountTmp implements BetterjrEntity {
 
     public void initAddValue() {
         this.id = SerialGenerator.getLongValue("CustOpenAccountTmp.id");
-
         this.regOperId = UserUtils.getOperatorInfo().getId();
         this.regOperName = UserUtils.getOperatorInfo().getName();
         this.regDate = BetterDateUtils.getNumDate();
         this.regTime = BetterDateUtils.getNumTime();
-
         this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
-        this.businStatus = CustomerConstants.TMP_STATUS_NEW;
-        this.lastStatus = CustomerConstants.TMP_STATUS_NEW;
     }
 
-    public void initModifyValue(final CustOpenAccountTmp anCustOpenAccountTmp) {
-        this.id = anCustOpenAccountTmp.getId();
-        this.operOrg = anCustOpenAccountTmp.getOperOrg();
-        this.businStatus = anCustOpenAccountTmp.getBusinStatus();
-        this.lastStatus = anCustOpenAccountTmp.getLastStatus();
-        this.tmpType = anCustOpenAccountTmp.getTmpType();
-
+    public void initModifyValue(final CustOpenAccountTmp anOpenAccountInfo) {
+        this.id = anOpenAccountInfo.getId();
+        this.operOrg = anOpenAccountInfo.getOperOrg();
+        this.tmpType = anOpenAccountInfo.getTmpType();
         this.modiOperId = UserUtils.getOperatorInfo().getId();
         this.modiOperName = UserUtils.getOperatorInfo().getName();
         this.modiDate = BetterDateUtils.getNumDate();
         this.modiTime = BetterDateUtils.getNumTime();
-
     }
 }

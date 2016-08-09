@@ -284,6 +284,10 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
             BTAssert.notNull(anFactorCustList, "请选择保理机构");
             BTAssert.notNull(anPostscript, "请填写附言");
             CustInfo anCustInfo = custAccountService.selectByPrimaryKey(anCustNo);
+            if (anCustInfo.getIdentValid() == false) {
+                logger.warn("客户未进行实名验证,不允许提交");
+                throw new BytterTradeException(40001,"客户未进行实名验证,不允许提交");
+            }
             saveProviderRelation(anCustInfo, anProviderCustList);
             saveFactorRelation(anCustInfo, anFactorCustList, anPostscript);
         }
