@@ -64,7 +64,7 @@ public class CustOpenAccountDubboService implements ICustOpenAccountService {
 
         CustOpenAccountTmp anOpenAccountInfo = (CustOpenAccountTmp) RuleServiceDubboFilterInvoker.getInputObj();
 
-        return AjaxObject.newOk("代录开户资料暂存成功", custOpenAccountTmpService.saveOpenAccountInfoByInstead(anOpenAccountInfo, anInsteadId)).toJson();
+        return AjaxObject.newOk("代录开户资料提交成功", custOpenAccountTmpService.saveOpenAccountInfoByInstead(anOpenAccountInfo, anInsteadId)).toJson();
     }
 
     @Override
