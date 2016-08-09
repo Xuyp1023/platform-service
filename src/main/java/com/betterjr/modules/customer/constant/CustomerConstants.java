@@ -149,4 +149,13 @@ public interface CustomerConstants {
      * 开通保理融资业务申请:1-申请提交失败;
      */
     String FACTOR_STATUS_FAILD = "1";
+    /**
+     * 客户类型:0-机构;
+     */
+    String CUSTOMER_TYPE_ENTERPRISE = "0";
+    /**
+     * 客户类型:1-个人;
+     */
+    String CUSTOMER_TYPE_PERSONAL = "1";
+    
 }
