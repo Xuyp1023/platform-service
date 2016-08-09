@@ -280,6 +280,12 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         // 更新数据
         this.updateByPrimaryKeySelective(anOpenAccountInfo);
     }
+    
+    @Override
+    public void saveCancelData(String... anTmpIds) {
+        // TODO Auto-generated method stub
+        
+    }
 
     private void checkPlatformUser() {
         if (UserUtils.platformUser() == false) {
@@ -344,7 +350,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         custMechBankAccountInfo.setRegOperId(anOperId);
         custMechBankAccountInfo.setRegOperName(anOperName);
         custMechBankAccountInfo.setOperOrg(anOperOrg);
-        custMechBankAccountService.addCustMechBankAccount(custMechBankAccountInfo);
+        custMechBankAccountService.addCustMechBankAccount(custMechBankAccountInfo, custInfo.getCustNo());
 
         // 数据存盘,经办人信息
         CustOperatorInfo operator = new CustOperatorInfo();
