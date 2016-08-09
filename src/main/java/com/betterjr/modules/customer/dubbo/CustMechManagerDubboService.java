@@ -35,67 +35,7 @@ public class CustMechManagerDubboService implements ICustMechManagerService {
 
     @Resource
     private CustInsteadService insteadService;
-
-    @Override
-    public String webAddInsteadManagerTmp(Map<String, Object> anMap) {
-        final CustMechManagerTmp custMechManagerTmp = (CustMechManagerTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return AjaxObject.newOk("公司高管-流水信息 代录添加成功", managerTmpService.addCustMechManagerTmp(custMechManagerTmp, CustomerConstants.TMP_TYPE_INSTEAD)).toJson();
-    }
     
-    @Override
-    public String webSaveInsteadManagerTmp(Map<String, Object> anParam, Long anId) {
-        final CustMechManagerTmp custMechManagerTmp = (CustMechManagerTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return AjaxObject.newOk("公司高管-流水信息 代录修改成功", managerTmpService.saveCustMechManagerTmp(custMechManagerTmp)).toJson();
-    }
-    
-    @Override
-    public String webDelInsteadManagerTmp(Map<String, Object> anParam) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-    
-    @Override
-    public String webAddChangeManagerTmp(Map<String, Object> anMap) {
-        final CustMechManagerTmp custMechManagerTmp = (CustMechManagerTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return AjaxObject.newOk("公司高管-流水信息 变更添加成功", managerTmpService.addCustMechManagerTmp(custMechManagerTmp, CustomerConstants.TMP_TYPE_CHANGE)).toJson();
-    }
-    
-    @Override
-    public String webSaveChangeManagerTmp(Map<String, Object> anParam, Long anId) {
-        final CustMechManagerTmp custMechManagerTmp = (CustMechManagerTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return AjaxObject.newOk("公司高管-流水信息 添加成功", managerTmpService.saveCustMechManagerTmp(custMechManagerTmp)).toJson();
-    }
-    
-    @Override
-    public String webDelChangeManagerTmp(Map<String, Object> anParam) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-    
-    @Override
-    public String webAddChangeApply(Map<String, Object> anParam, Long anCustNo) {
-        return AjaxObject.newOk("公司高管-变更申请 成功", managerTmpService.addChangeApply(anParam, anCustNo)).toJson();
-    }
-
-    @Override
-    public String webQueryManagerTmpList(Long anCustNo) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public String webDelManagerTmpList(Long anCustNo) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public String webCheckManagerTmpList(Long anCustNo) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-
     @Override
     public String webQueryManager(Long anCustNo) {
         return AjaxObject.newOk("查询公司高管列表成功", managerService.queryCustMechManager(anCustNo)).toJson();
@@ -105,53 +45,106 @@ public class CustMechManagerDubboService implements ICustMechManagerService {
     public String webFindManager(Long anId) {
         return AjaxObject.newOk("查询公司高管详情成功", managerService.findCustMechManager(anId)).toJson();
     }
-
+    
     @Override
-    public String webFindChangeApply(Long anCustNo, Long anId) {
-        return null;
+    public String webFindManagerTmp(Long anId) {
+        return AjaxObject.newOk("查询公司高管列表成功", managerTmpService.findCustMechManagerTmp(anId)).toJson();
+    }
+    
+    @Override
+    public String webSaveManagerTmp(Map<String, Object> anParam, Long anId) {
+        final CustMechManagerTmp custMechManagerTmp = (CustMechManagerTmp) RuleServiceDubboFilterInvoker.getInputObj();
+        return AjaxObject.newOk("公司高管-流水信息 修改成功", managerTmpService.saveCustMechManagerTmp(custMechManagerTmp, anId)).toJson();
     }
 
     @Override
-    public String webQueryChangeApply(Long anCustNo) {
-        return null;
+    public String webAddChangeManagerTmp(Map<String, Object> anMap) {
+        final CustMechManagerTmp custMechManagerTmp = (CustMechManagerTmp) RuleServiceDubboFilterInvoker.getInputObj();
+        return AjaxObject.newOk("公司高管-流水信息 变更添加成功", managerTmpService.addChangeManagerTmp(custMechManagerTmp)).toJson();
     }
-
+    
     @Override
-    public String webConfirmChangeApply(Long anChangeId, Long anCustNo) {
-        return null;
+    public String webSaveChangeManagerTmp(Map<String, Object> anParam) {
+        final CustMechManagerTmp custMechManagerTmp = (CustMechManagerTmp) RuleServiceDubboFilterInvoker.getInputObj();
+        return AjaxObject.newOk("公司高管-流水信息 变更修改成功", managerTmpService.saveSaveChangeManagerTmp(custMechManagerTmp)).toJson();
     }
-
+    
     @Override
-    public String webCancelChangeApply(Long anChangeId, Long anCustNo) {
-        return null;
+    public String webDelChangeManagerTmp(Long anRefId) {
+        return AjaxObject.newOk("公司高管-流水信息 变更删除成功", managerTmpService.saveDelChangeManagerTmp(anRefId)).toJson();
     }
-
+    
     @Override
-    public String webAddInsteadRecord(Map<String, Object> anParam, Long anCustNo, Long anId, Long anOperType) {
-        return null;
+    public String webCancelChangeManagerTmp(Long anId) {
+        return AjaxObject.newOk("公司高管-流水信息 变更删除成功", managerTmpService.saveCancelChangeManagerTmp(anId)).toJson();
     }
-
+    
     @Override
-    public String webQueryInsteadRecord(Long anInsteadId, Long anCustNo) {
-        return null;
+    public String webQueryNewChangeManagerTmp(Long anCustNo) {
+        return AjaxObject.newOk("公司高管-流水信息 列表查询成功", managerTmpService.queryNewCustMechManagerTmp(anCustNo, CustomerConstants.TMP_TYPE_CHANGE)).toJson();
     }
-
+    
     @Override
-    public String webFindInsteadRecord(Long anCustNo, Long anId) {
-        return null;
+    public String webAddChangeApply(Map<String, Object> anParam, Long anCustNo) {
+        return AjaxObject.newOk("公司高管-变更申请 成功", managerTmpService.addChangeApply(anParam, anCustNo)).toJson();
     }
-
+    
     @Override
-    public String webConfirmInsteadRecord(Long anInsteadId, Long anCustNo) {
-        return null;
+    public String webSaveChangeApply(Map<String, Object> anParam, Long anApplyId) {
+        return AjaxObject.newOk("公司高管-变更申请 成功", managerTmpService.saveChangeApply(anParam, anApplyId)).toJson();
     }
-
+    
     @Override
-    public String webCancelInsteadRecord(Long anInsteadId, Long anCustNo) {
+    public String webQueryChangeApply(Long anCustNo, int anFlag, int anPageNum, int anPageSize) {
         return null;
     }
     
+    @Override
+    public String webFindChangeApply(Long anId) {
+        return null;
+    }
     
+    @Override
+    public String webAddInsteadManagerTmp(Map<String, Object> anMap) {
+        final CustMechManagerTmp custMechManagerTmp = (CustMechManagerTmp) RuleServiceDubboFilterInvoker.getInputObj();
+        return AjaxObject.newOk("公司高管-流水信息 代录添加成功", managerTmpService.addInsteadManagerTmp(custMechManagerTmp)).toJson();
+    }
+    
+    @Override
+    public String webSaveInsteadManagerTmp(Map<String, Object> anParam, Long anId) {
+        final CustMechManagerTmp custMechManagerTmp = (CustMechManagerTmp) RuleServiceDubboFilterInvoker.getInputObj();
+        return AjaxObject.newOk("公司高管-流水信息 代录修改成功", managerTmpService.saveSaveInsteadManagerTmp(custMechManagerTmp, anId)).toJson();
 
+    }
+    
+    @Override
+    public String webDelInsteadManagerTmp(Long anRefId) {
+        return AjaxObject.newOk("公司高管-流水信息 代录删除成功", managerTmpService.saveDelInsteadManagerTmp(anRefId)).toJson();
+    }
+    
+    @Override
+    public String webCancelInsteadManagerTmp(Long anId) {
+        return AjaxObject.newOk("公司高管-流水信息 代录删除成功", managerTmpService.saveCancelInsteadManagerTmp(anId)).toJson();
+    }
+    
+    @Override
+    public String webQueryNewInsteadManagerTmp(Long anCustNo) {
+        return AjaxObject.newOk("公司高管-流水信息 列表查询成功", managerTmpService.queryNewCustMechManagerTmp(anCustNo, CustomerConstants.TMP_TYPE_INSTEAD))
+                .toJson();
+    }
 
+    @Override
+    public String webAddInsteadRecord(Map<String, Object> anParam, Long anInsteadRecordId) {
+        return AjaxObject.newOk("公司高管-添加代录 成功", managerTmpService.addInsteadRecord(anParam, anInsteadRecordId)).toJson();
+    }
+
+    @Override
+    public String webFindInsteadRecord(Long anId) {
+        return null;
+    }
+
+    @Override
+    public String webSaveInsteadRecord(Map<String, Object> anParam, Long anInsteadRecordId) {
+        return AjaxObject.newOk("公司高管-修改代录 成功", managerTmpService.saveInsteadRecord(anParam, anInsteadRecordId)).toJson();
+    }
 }

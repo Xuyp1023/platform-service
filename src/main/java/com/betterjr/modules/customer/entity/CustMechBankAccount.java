@@ -676,11 +676,13 @@ public class CustMechBankAccount implements BetterjrEntity {
         return result;
     }
     
-    public void initAddValue() {
+    public void initAddValue(Long anCustNo, String anCustName, Long anRegOperId, String anRegOperName, String anOperOrg) {
         this.id = SerialGenerator.getLongValue("CustMechBankAccount.id");
         
-        this.regOperId = UserUtils.getOperatorInfo().getId();
-        this.regOperName = UserUtils.getOperatorInfo().getName();
+        this.regOperId = anRegOperId;
+        this.regOperName = anRegOperName;
+        this.operOrg = anOperOrg;
+        
         this.regDate = BetterDateUtils.getNumDate();
         this.regTime = BetterDateUtils.getNumTime();
         
@@ -689,7 +691,9 @@ public class CustMechBankAccount implements BetterjrEntity {
         this.modiDate = BetterDateUtils.getNumDate();
         this.modiTime = BetterDateUtils.getNumTime();
         
-        this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
+        this.custNo = anCustNo;
+        //this.custName = anCustName;
+        
         this.businStatus = "0";
     }
 

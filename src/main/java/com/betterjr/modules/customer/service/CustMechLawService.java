@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.Collections3;
+import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.customer.constant.CustomerConstants;
 import com.betterjr.modules.customer.dao.CustMechLawMapper;
@@ -84,9 +85,10 @@ public class CustMechLawService extends BaseService<CustMechLawMapper, CustMechL
      */
     public CustMechLaw addCustMechLaw(CustMechLaw anCustMechLaw, Long anCustNo) {
         BTAssert.notNull(anCustMechLaw, "法人信息不允许为空！");
+        BTAssert.notNull(anCustNo, "客户编号不允许为空！");
 
-        final String custName = accountService.queryCustName(anCustNo);
-        anCustMechLaw.initAddValue(anCustNo, custName);
+        final CustInfo custInfo = accountService.selectByPrimaryKey(anCustNo);
+        anCustMechLaw.initAddValue(anCustNo, custInfo.getCustName(), custInfo.getRegOperId(), custInfo.getRegOperName(), custInfo.getOperOrg());
         this.insert(anCustMechLaw);
         
         lawTmpService.addCustMechLawTmp(anCustMechLaw);

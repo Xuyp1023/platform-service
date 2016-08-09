@@ -20,6 +20,7 @@ public interface CustomerConstants {
     // 审核结果: 0审核通过 1审核驳回
     String AUDIT_RESULT_PASS = "0";
     String AUDIT_RESULT_REJECT = "1";
+    String AUDIT_RESULT_CANCEL = "2";
 
     // 流水使用状态: 0未使用  1使用中  2已使用
     String TMP_STATUS_NEW = "0";

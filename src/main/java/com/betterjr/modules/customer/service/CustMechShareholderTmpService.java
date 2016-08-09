@@ -87,8 +87,20 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
         return custChangeApply;
     }
 
+    /**
+     * 回写正式表记录
+     */
     @Override
     public void saveFormalData(String... anTmpIds) {
 
+    }
+    
+    /**
+     * 回写作废记录
+     * @param anTmpIds
+     */
+    @Override
+    public void saveCancelData(String... anTmpIds) {
+        
     }
 }

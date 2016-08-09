@@ -83,8 +83,8 @@ public class CustMechBaseService extends BaseService<CustMechBaseMapper, CustMec
         CustMechBase tempCustMechBase = findCustMechBaseByCustNo(anCustNo);
         BTAssert.isNull(tempCustMechBase, "客户基本信息已存在，不允许重复录入！");
 
-        final String custName = accountService.queryCustName(anCustNo);
-        anCustMechBase.initAddValue(anCustNo, custName);
+        final CustInfo custInfo = accountService.selectByPrimaryKey(anCustNo);
+        anCustMechBase.initAddValue(anCustNo, custInfo.getCustName(), custInfo.getRegOperId(), custInfo.getRegOperName(), custInfo.getOperOrg());
         this.insert(anCustMechBase);
         
         // 建立初始流水

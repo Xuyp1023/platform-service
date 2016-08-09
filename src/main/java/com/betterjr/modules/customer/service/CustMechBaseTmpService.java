@@ -231,7 +231,7 @@ public class CustMechBaseTmpService extends BaseService<CustMechBaseTmpMapper, C
      */
     public CustMechBaseTmp saveInsteadRecord(CustMechBaseTmp anCustMechBaseTmp, Long anInsteadRecordId, String anFileList) {
         // 校验参数 并获取代录记录 在驳回的状态下可以修改
-        CustInsteadRecord insteadRecord = checkInsteadRecord(anCustMechBaseTmp, anInsteadRecordId,
+        CustInsteadRecord insteadRecord = checkInsteadRecord(anCustMechBaseTmp, anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN,
                 CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT, CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_REJECT);
 
         Long tmpId = Long.valueOf(insteadRecord.getTmpIds());
@@ -245,32 +245,12 @@ public class CustMechBaseTmpService extends BaseService<CustMechBaseTmpMapper, C
     }
 
     /**
-     * 保存数据至正式表
-     */
-    @Override
-    public void saveFormalData(String... anTmpIds) {
-        BTAssert.notEmpty(anTmpIds, "临时流水编号不允许为空！");
-
-        if (anTmpIds.length != 1) {
-            throw new BytterTradeException(20021, "临时流水编号只能有一位！");
-        }
-
-        Long tmpId = Long.valueOf(anTmpIds[0]);
-
-        // 修改临时表记录为已使用
-        final CustMechBaseTmp custMechBaseTmp = saveCustMechBaseTmpStatus(tmpId, CustomerConstants.TMP_STATUS_USED);
-
-        // 回写正式表记录
-        baseService.saveCustMechBase(custMechBaseTmp);
-    }
-
-    /**
      * 检查并返回变更申请
      * 
      * @param anApplyId
      * @return
      */
-    public CustChangeApply checkChangeApply(Long anApplyId) {
+    public CustChangeApply checkChangeApply(Long anApplyId, String... anBusinStatus) {
         BTAssert.notNull(anApplyId, "变更申请-编号 不能为空");
         // 查询 变更申请
         CustChangeApply changeApply = changeApplyService.findChangeApply(anApplyId);
@@ -337,4 +317,33 @@ public class CustMechBaseTmpService extends BaseService<CustMechBaseTmpMapper, C
         return custMechBaseTmp;
     }
 
+    
+    /**
+     * 保存数据至正式表
+     */
+    @Override
+    public void saveFormalData(String... anTmpIds) {
+        BTAssert.notEmpty(anTmpIds, "临时流水编号不允许为空！");
+
+        if (anTmpIds.length != 1) {
+            throw new BytterTradeException(20021, "临时流水编号只能有一位！");
+        }
+
+        Long tmpId = Long.valueOf(anTmpIds[0]);
+
+        // 修改临时表记录为已使用
+        final CustMechBaseTmp custMechBaseTmp = saveCustMechBaseTmpStatus(tmpId, CustomerConstants.TMP_STATUS_USED);
+
+        // 回写正式表记录
+        baseService.saveCustMechBase(custMechBaseTmp);
+    }
+    
+    /**
+     * 回写作废记录
+     * @param anTmpIds
+     */
+    @Override
+    public void saveCancelData(String... anTmpIds) {
+        
+    }
 }

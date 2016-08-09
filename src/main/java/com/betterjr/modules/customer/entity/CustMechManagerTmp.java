@@ -503,6 +503,19 @@ public class CustMechManagerTmp implements BetterjrEntity {
         this.initAddValue(anBusinStatus, null, null);
     }
     
+    public void initAddValue(CustMechManager anManager, String anBusinStatus) {
+        this.initAddValue(anBusinStatus, null, null);
+        
+        this.name = anManager.getName();
+        this.sex = anManager.getSex();
+        this.identType = anManager.getIdentType();
+        this.identNo = anManager.getIdentNo();
+        this.birthdate = anManager.getBirthdate();
+        this.eduLevel = anManager.getEduLevel();
+        this.position = anManager.getPosition();
+        this.batchNo = anManager.getBatchNo();
+    }
+    
     public void initAddValue(String anBusinStatus, String anTmpType, Long anVersion) {
         this.id = SerialGenerator.getLongValue("CustMechManagerTmp.id");
         
@@ -537,5 +550,12 @@ public class CustMechManagerTmp implements BetterjrEntity {
         this.eduLevel = anCustMechManagerTmp.getEduLevel();
         this.position = anCustMechManagerTmp.getPosition();
         this.batchNo = anCustMechManagerTmp.getBatchNo();
+    }
+
+    public void initModifyValue(CustMechManagerTmp anCustMechManagerTmp, String anTmpStatus, Long anVersion) {
+        this.initModifyValue(anCustMechManagerTmp);
+        
+        this.businStatus = anTmpStatus;
+        this.version = anVersion;
     }
 }

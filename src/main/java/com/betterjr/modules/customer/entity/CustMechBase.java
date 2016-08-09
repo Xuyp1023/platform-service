@@ -1079,18 +1079,18 @@ public class CustMechBase implements BetterjrEntity {
     }
     
     public void initAddValue(Long anCustNo) {
-        this.initAddValue(anCustNo, null);
+        this.initAddValue(anCustNo, null, null, null, null);
     }
     
-    public void initAddValue(Long anCustNo, String anCustName) {
+    public void initAddValue(Long anCustNo, String anCustName, Long anRegOperId, String anRegOperName, String anOperOrg) {
         this.custNo = anCustNo;
         this.custName = anCustName;
         
         this.regDate = BetterDateUtils.getNumDate();
         this.regTime = BetterDateUtils.getNumTime();
-        this.regOperId = UserUtils.getOperatorInfo().getId();
-        this.regOperName = UserUtils.getOperatorInfo().getName();
-        this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
+        this.regOperId = anRegOperId;
+        this.regOperName = anRegOperName;
+        this.operOrg = anOperOrg;
         
         this.modiOperId = UserUtils.getOperatorInfo().getId();
         this.modiOperName = UserUtils.getOperatorInfo().getName();

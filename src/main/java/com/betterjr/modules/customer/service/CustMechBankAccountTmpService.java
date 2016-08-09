@@ -88,9 +88,21 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
         return custChangeApply;
     }
 
+    /**
+     * 回写正式表
+     */
     @Override
     public void saveFormalData(String... anTmpIds) {
         // TODO Auto-generated method stub
 
+    }
+    
+    /**
+     * 回写作废记录
+     * @param anTmpIds
+     */
+    @Override
+    public void saveCancelData(String... anTmpIds) {
+        
     }
 }

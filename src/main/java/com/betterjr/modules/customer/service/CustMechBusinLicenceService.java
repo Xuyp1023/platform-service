@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.Collections3;
+import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.customer.constant.CustomerConstants;
 import com.betterjr.modules.customer.dao.CustMechBusinLicenceMapper;
@@ -92,9 +93,8 @@ public class CustMechBusinLicenceService extends BaseService<CustMechBusinLicenc
     public CustMechBusinLicence addCustMechBusinLicence(CustMechBusinLicence anCustMechBusinLicence, Long anCustNo) {
         BTAssert.notNull(anCustMechBusinLicence, "营业执照信息不允许为空！");
 
-        final String custName = accountService.queryCustName(anCustNo);
-        
-        anCustMechBusinLicence.initAddValue(anCustNo, custName);
+        final CustInfo custInfo = accountService.selectByPrimaryKey(anCustNo);
+        anCustMechBusinLicence.initAddValue(anCustNo, custInfo.getCustName(), custInfo.getRegOperId(), custInfo.getRegOperName(), custInfo.getOperOrg());
         this.insert(anCustMechBusinLicence);
         
         // 建立初始流水记录

@@ -98,8 +98,8 @@ public class CustMechLawDubboService implements ICustMechLawService {
     }
 
     @Override
-    public String webFindInsteadRecord(Long anInsteadRecordId) {
-        return AjaxObject.newOk("法人信息-代录详情 成功", lawTmpService.findCustMechLawTmpByInsteadRecord(anInsteadRecordId)).toJson();
+    public String webFindInsteadRecord(Long anId) {
+        return AjaxObject.newOk("法人信息-代录详情 成功", lawTmpService.findCustMechLawTmpByInsteadRecord(anId)).toJson();
     }
 
 

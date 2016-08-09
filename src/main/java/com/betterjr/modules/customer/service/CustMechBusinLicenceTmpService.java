@@ -206,7 +206,7 @@ public class CustMechBusinLicenceTmpService extends BaseService<CustMechBusinLic
      */
     public Object saveInsteadRecord(CustMechBusinLicenceTmp anBusinLicenceTmp, Long anInsteadRecordId, String anFileList) {
         // 校验参数 并获取代录记录 在驳回的状态下可以修改
-        CustInsteadRecord insteadRecord = checkInsteadRecord(anBusinLicenceTmp, anInsteadRecordId,
+        CustInsteadRecord insteadRecord = checkInsteadRecord(anBusinLicenceTmp, anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN,
                 CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT, CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_REJECT);
 
         Long tmpId = Long.valueOf(insteadRecord.getTmpIds());
@@ -219,25 +219,10 @@ public class CustMechBusinLicenceTmpService extends BaseService<CustMechBusinLic
         return businLicenceTmp;
     }
 
-    @Override
-    public void saveFormalData(String... anTmpIds) {
-        BTAssert.notEmpty(anTmpIds, "临时流水编号不允许为空！");
-
-        if (anTmpIds.length != 1) {
-            throw new BytterTradeException(20021, "临时流水编号只能有一位！");
-        }
-
-        Long tmpId = Long.valueOf(anTmpIds[0]);
-
-        final CustMechBusinLicenceTmp businLicenceTmp = saveBusinLicenceTmpStatus(tmpId, CustomerConstants.TMP_STATUS_USED);
-
-        businLicenceService.saveCustMechBusinLicence(businLicenceTmp);
-    }
-
     /**
      * 检查并返回变更申请
      */
-    public CustChangeApply checkChangeApply(Long anApplyId) {
+    public CustChangeApply checkChangeApply(Long anApplyId, String... anBusinStatus) {
         BTAssert.notNull(anApplyId, "变更申请-编号 不能为空");
         // 查询 变更申请
         CustChangeApply changeApply = changeApplyService.findChangeApply(anApplyId);
@@ -296,5 +281,27 @@ public class CustMechBusinLicenceTmpService extends BaseService<CustMechBusinLic
     }
 
 
+    @Override
+    public void saveFormalData(String... anTmpIds) {
+        BTAssert.notEmpty(anTmpIds, "临时流水编号不允许为空！");
 
+        if (anTmpIds.length != 1) {
+            throw new BytterTradeException(20021, "临时流水编号只能有一位！");
+        }
+
+        Long tmpId = Long.valueOf(anTmpIds[0]);
+
+        final CustMechBusinLicenceTmp businLicenceTmp = saveBusinLicenceTmpStatus(tmpId, CustomerConstants.TMP_STATUS_USED);
+
+        businLicenceService.saveCustMechBusinLicence(businLicenceTmp);
+    }
+
+    /**
+     * 回写作废记录
+     * @param anTmpIds
+     */
+    @Override
+    public void saveCancelData(String... anTmpIds) {
+        
+    }
 }

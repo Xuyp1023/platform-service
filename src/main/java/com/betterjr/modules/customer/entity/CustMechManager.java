@@ -442,7 +442,7 @@ public class CustMechManager implements BetterjrEntity {
         return result;
     }
     
-    public void initAddValue() {
+    public void initAddValue(CustMechManagerTmp anManagerTmp) {
         this.id = SerialGenerator.getLongValue("CustMechManager.id");
         
         this.regOperId = UserUtils.getOperatorInfo().getId();
@@ -455,24 +455,51 @@ public class CustMechManager implements BetterjrEntity {
         this.modiDate = BetterDateUtils.getNumDate();
         this.modiTime = BetterDateUtils.getNumTime();
         
+        this.custNo = anManagerTmp.getCustNo();
+        this.name = anManagerTmp.getName();
+        this.identType = anManagerTmp.getIdentType();
+        this.identNo = anManagerTmp.getIdentNo();
+        this.sex = anManagerTmp.getSex();
+        this.birthdate = anManagerTmp.getBirthdate();
+        this.eduLevel = anManagerTmp.getEduLevel();
+        this.position = anManagerTmp.getPosition();
+        this.batchNo = anManagerTmp.getBatchNo();
+                                                                
         this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
         this.businStatus = "0";
     }
 
     public void initModifyValue(final CustMechManager anCustMechManager) {
-        this.id = anCustMechManager.getId();
-/*
-        this.regOperId = anCustMechBaseTmp.getRegOperId();
-        this.regOperName = anCustMechBaseTmp.getRegOperName();
-        this.regDate = anCustMechBaseTmp.getRegDate();
-        this.regTime = anCustMechBaseTmp.getRegTime();
-*/
+        this.custNo = anCustMechManager.getCustNo();
+        this.name = anCustMechManager.getName();
+        this.identType = anCustMechManager.getIdentType();
+        this.identNo = anCustMechManager.getIdentNo();
+        this.sex = anCustMechManager.getSex();
+        this.birthdate = anCustMechManager.getBirthdate();
+        this.eduLevel = anCustMechManager.getEduLevel();
+        this.position = anCustMechManager.getPosition();
+        this.batchNo = anCustMechManager.getBatchNo();
+        
         this.modiOperId = UserUtils.getOperatorInfo().getId();
         this.modiOperName = UserUtils.getOperatorInfo().getName();
         this.modiDate = BetterDateUtils.getNumDate();
         this.modiTime = BetterDateUtils.getNumTime();
+    }
 
-        this.businStatus = anCustMechManager.getBusinStatus();
-        this.operOrg = anCustMechManager.getOperOrg();
+    public void initModifyValue(CustMechManagerTmp anManagerTmp) {
+        this.custNo = anManagerTmp.getCustNo();
+        this.name = anManagerTmp.getName();
+        this.identType = anManagerTmp.getIdentType();
+        this.identNo = anManagerTmp.getIdentNo();
+        this.sex = anManagerTmp.getSex();
+        this.birthdate = anManagerTmp.getBirthdate();
+        this.eduLevel = anManagerTmp.getEduLevel();
+        this.position = anManagerTmp.getPosition();
+        this.batchNo = anManagerTmp.getBatchNo();
+        
+        this.modiOperId = UserUtils.getOperatorInfo().getId();
+        this.modiOperName = UserUtils.getOperatorInfo().getName();
+        this.modiDate = BetterDateUtils.getNumDate();
+        this.modiTime = BetterDateUtils.getNumTime();
     }
 }

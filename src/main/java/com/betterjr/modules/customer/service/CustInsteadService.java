@@ -9,7 +9,6 @@
 // ============================================================================
 package com.betterjr.modules.customer.service;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -70,7 +69,6 @@ public class CustInsteadService {
         Long custNo = Long.valueOf(tempCustNo);
         final CustInsteadApply custInsteadApply = insteadApplyService.addCustInsteadApply(insteadType, custNo);
 
-        Long applyId = custInsteadApply.getId();
         String insteadItems = (String) anParam.get("insteadItems");
         insteadRecordService.addCustInsteadRecord(custInsteadApply, insteadType, insteadItems);
 
@@ -105,7 +103,7 @@ public class CustInsteadService {
     }
 
     /**
-     * 代录拥有列表 
+     * 代录拥有列表
      * 
      * @param anParam
      * @param anFlag
@@ -119,7 +117,7 @@ public class CustInsteadService {
         anParam.put("operOrg", UserUtils.getOperatorInfo().getOperOrg());
         return insteadApplyService.queryCustInsteadApply(anParam, anFlag, anPageNum, anPageSize);
     }
-    
+
     /**
      * 代录申请列表 待审核 待录入 复核驳回
      * 
@@ -280,6 +278,8 @@ public class CustInsteadService {
      * @return
      */
     public CustInsteadApply saveSubmitConfirmInsteadApply(Long anId) {
+        BTAssert.notNull(anId, "代录申请编号不允许为空!");
+
         // 检查并取得代录申请
         final CustInsteadApply tempInsteadApply = checkInsteadApply(anId, CustomerConstants.INSTEAD_APPLY_STATUS_REVIEW_PASS);
 
@@ -334,6 +334,38 @@ public class CustInsteadService {
     }
 
     /**
+     * 
+     * @param anId
+     * @param anReason
+     * @return
+     */
+    public CustInsteadApply saveCancelInsteadApply(Long anId, String anReason) {
+        BTAssert.notNull(anId, "代录申请编号不允许为空!");
+
+        // 检查并取得代录申请 新发起的申请,复核通过后 均可以作废
+        final CustInsteadApply tempInsteadApply = checkInsteadApply(anId, CustomerConstants.INSTEAD_APPLY_STATUS_REVIEW_PASS,
+                CustomerConstants.INSTEAD_APPLY_STATUS_NEW);
+
+        List<CustInsteadRecord> insteadRecords = insteadRecordService.selectByProperty("applyId", anId);
+
+        // 回写代录记录状态
+        for (CustInsteadRecord insteadRecord : insteadRecords) {
+            IFormalDataService formalDataService = FormalDataHelper.getFormalDataService(insteadRecord);
+            String[] tmpIds = BetterStringUtils.split(insteadRecord.getTmpIds(), ",");
+            formalDataService.saveCancelData(tmpIds);
+        }
+
+        // 修改代录申请状态： 确认通过
+        final CustInsteadApply insteadApply = saveInsteadApplyStatus(anId, CustomerConstants.INSTEAD_APPLY_STATUS_CANCEL);
+
+        // 添加审核日志
+        addCustAuditLog(CustomerConstants.AUDIT_TYPE_INSTEADAPPLY, anId, CustomerConstants.AUDIT_RESULT_CANCEL, "作费申请", null,
+                insteadApply.getCustNo());
+
+        return insteadApply;
+    }
+
+    /**
      * 录入提交
      * 
      * @param anId
@@ -352,8 +384,7 @@ public class CustInsteadService {
         final CustInsteadApply insteadApply = saveInsteadApplyStatus(anId, CustomerConstants.INSTEAD_APPLY_STATUS_TYPE_IN);
 
         // 写入审核记录表
-        addCustAuditLog(CustomerConstants.AUDIT_TYPE_INSTEADAPPLY, anId, CustomerConstants.AUDIT_RESULT_PASS, "录入提交", null,
-                insteadApply.getCustNo());
+        addCustAuditLog(CustomerConstants.AUDIT_TYPE_INSTEADAPPLY, anId, CustomerConstants.AUDIT_RESULT_PASS, "录入提交", null, insteadApply.getCustNo());
 
         return insteadApply;
     }
@@ -426,11 +457,7 @@ public class CustInsteadService {
 
         // 将数据存入正式表
         String insteadType = tempInsteadApply.getInsteadType();
-        if (BetterStringUtils.equals(insteadType, CustomerConstants.INSTEAD_APPLY_TYPE_OPENACCOUNT)) {
-            // 这里处理开户代录，开户流程正式表 调用开户服务，并且修改新增的用户为已审核状态
-            // TODO
-        }
-        else {
+        if (BetterStringUtils.equals(insteadType, CustomerConstants.INSTEAD_APPLY_TYPE_OPENACCOUNT) == false) {
             // 当前申请下所有代录记录 均确认，才可以通过
             List<CustInsteadRecord> insteadRecords = insteadRecordService.selectByProperty("applyId", anId);
             for (CustInsteadRecord insteadRecord : insteadRecords) {
@@ -540,7 +567,8 @@ public class CustInsteadService {
         String insteadType = tempInsteadApply.getInsteadType();
         if (BetterStringUtils.equals(insteadType, CustomerConstants.INSTEAD_APPLY_TYPE_OPENACCOUNT) == true) {
             // 修改代录申请状态： 确认通过
-            final CustInsteadApply insteadApply = saveInsteadApplyStatus(anId, CustomerConstants.INSTEAD_APPLY_STATUS_CONFIRM_PASS);
+            final CustInsteadApply insteadApply = saveInsteadApplyStatus(tempInsteadApply.getId(),
+                    CustomerConstants.INSTEAD_APPLY_STATUS_CONFIRM_PASS);
 
             // 添加审核日志
             addCustAuditLog(CustomerConstants.AUDIT_TYPE_INSTEADAPPLY, anId, CustomerConstants.AUDIT_RESULT_PASS, "确认提交通过", null,
@@ -580,7 +608,8 @@ public class CustInsteadService {
         String insteadType = tempInsteadApply.getInsteadType();
         if (BetterStringUtils.equals(insteadType, CustomerConstants.INSTEAD_APPLY_TYPE_OPENACCOUNT) == true) {
             // 修改代录申请状态： 确认驳回
-            final CustInsteadApply insteadApply = saveInsteadApplyStatus(anId, CustomerConstants.INSTEAD_APPLY_STATUS_CONFIRM_REJECT);
+            final CustInsteadApply insteadApply = saveInsteadApplyStatus(tempInsteadApply.getId(),
+                    CustomerConstants.INSTEAD_APPLY_STATUS_CONFIRM_REJECT);
 
             // 添加审核日志
             addCustAuditLog(CustomerConstants.AUDIT_TYPE_INSTEADAPPLY, anId, CustomerConstants.AUDIT_RESULT_REJECT, "确认提交驳回", null,
