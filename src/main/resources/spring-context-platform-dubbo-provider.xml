@@ -20,6 +20,7 @@
 		com.betterjr.modules.blacklist;
 		com.betterjr.modules.customer;
 		com.betterjr.modules.document;
+		com.betterjr.modules.workflow;
 		com.betterjr.modules.account.service;
         com.betterjr.modules.rule.service;
         com.betterjr.modules.rule.validator;
@@ -161,7 +162,8 @@
 	<aop:aspectj-autoproxy proxy-target-class="true" />
 	<aop:config>
 		<aop:pointcut id="appService"
-			expression="execution(* com.betterjr..service.*Service.*(..))" />
+			expression="execution(* com.betterjr..service.*Service.*(..)) 
+			or execution(* org.snaker.engine.core..*.*(..))" />
 		<aop:advisor advice-ref="txAdvice" pointcut-ref="appService" />
 	</aop:config>
 	<tx:advice id="txAdvice" transaction-manager="transactionManager">
@@ -193,5 +195,6 @@
 		init-method="init" scope="singleton" lazy-init="false" />
 
 	<import resource="platform-dubbo-provider.xml" />
+	<import resource="workflow-snaker.xml"/>
 
 </beans>
