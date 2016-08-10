@@ -32,6 +32,13 @@ public class CustMechBaseTmp implements BetterjrEntity {
     private Long id;
     
     /**
+     * 代录记录/变更申请 编号
+     */
+    @Column(name = "L_PARENTID",  columnDefinition="INTEGER" )
+    @MetaData( value="代录记录/变更申请 编号", comments = "代录记录/变更申请 编号")
+    private Long parentId;
+    
+    /**
      * 客户编号
      */
     @Column(name = "L_CUSTNO",  columnDefinition="INTEGER" )
@@ -943,6 +950,14 @@ public class CustMechBaseTmp implements BetterjrEntity {
         this.tmpOperType = tmpOperType == null ? null : tmpOperType.trim();
     }
 
+    public Long getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Long anParentId) {
+        parentId = anParentId;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -950,6 +965,7 @@ public class CustMechBaseTmp implements BetterjrEntity {
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
         sb.append(", id=").append(id);
+        sb.append(", parentId=").append(parentId);
         sb.append(", custNo=").append(custNo);
         sb.append(", custName=").append(custName);
         sb.append(", version=").append(version);
@@ -1026,6 +1042,7 @@ public class CustMechBaseTmp implements BetterjrEntity {
         }
         CustMechBaseTmp other = (CustMechBaseTmp) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
+                && (this.getParentId() == null ? other.getParentId() == null : this.getParentId().equals(other.getParentId()))
                 && (this.getCustNo() == null ? other.getCustNo() == null : this.getCustNo().equals(other.getCustNo()))
                 && (this.getCustName() == null ? other.getCustName() == null : this.getCustName().equals(other.getCustName()))
                 && (this.getVersion() == null ? other.getVersion() == null : this.getVersion().equals(other.getVersion()))
@@ -1094,6 +1111,7 @@ public class CustMechBaseTmp implements BetterjrEntity {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
+        result = prime * result + ((getParentId() == null) ? 0 : getParentId().hashCode());
         result = prime * result + ((getCustNo() == null) ? 0 : getCustNo().hashCode());
         result = prime * result + ((getCustName() == null) ? 0 : getCustName().hashCode());
         result = prime * result + ((getVersion() == null) ? 0 : getVersion().hashCode());

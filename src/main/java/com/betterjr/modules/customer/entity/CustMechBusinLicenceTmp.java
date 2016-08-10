@@ -29,6 +29,13 @@ public class CustMechBusinLicenceTmp implements BetterjrEntity {
     @MetaData(value = "编号", comments = "编号")
     private Long id;
 
+    /**
+     * 代录记录/变更申请 编号
+     */
+    @Column(name = "L_PARENTID",  columnDefinition="INTEGER" )
+    @MetaData( value="代录记录/变更申请 编号", comments = "代录记录/变更申请 编号")
+    private Long parentId;
+    
     /** 
      * 数据版本号
      */
@@ -545,6 +552,14 @@ public class CustMechBusinLicenceTmp implements BetterjrEntity {
         this.tmpOperType = tmpOperType == null ? null : tmpOperType.trim();
     }
 
+    public Long getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Long anParentId) {
+        parentId = anParentId;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -552,6 +567,7 @@ public class CustMechBusinLicenceTmp implements BetterjrEntity {
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
         sb.append(", id=").append(id);
+        sb.append(", parentId=").append(parentId);
         sb.append(", version=").append(version);
         sb.append(", unifiedCode=").append(unifiedCode);
         sb.append(", regNo=").append(regNo);
@@ -603,6 +619,7 @@ public class CustMechBusinLicenceTmp implements BetterjrEntity {
         }
         CustMechBusinLicenceTmp other = (CustMechBusinLicenceTmp) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
+                && (this.getParentId() == null ? other.getParentId() == null : this.getParentId().equals(other.getParentId()))
                 && (this.getVersion() == null ? other.getVersion() == null : this.getVersion().equals(other.getVersion()))
                 && (this.getUnifiedCode() == null ? other.getUnifiedCode() == null : this.getUnifiedCode().equals(other.getUnifiedCode()))
                 && (this.getRegNo() == null ? other.getRegNo() == null : this.getRegNo().equals(other.getRegNo()))
@@ -643,6 +660,7 @@ public class CustMechBusinLicenceTmp implements BetterjrEntity {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
+        result = prime * result + ((getParentId() == null) ? 0 : getParentId().hashCode());
         result = prime * result + ((getVersion() == null) ? 0 : getVersion().hashCode());
         result = prime * result + ((getUnifiedCode() == null) ? 0 : getUnifiedCode().hashCode());
         result = prime * result + ((getRegNo() == null) ? 0 : getRegNo().hashCode());

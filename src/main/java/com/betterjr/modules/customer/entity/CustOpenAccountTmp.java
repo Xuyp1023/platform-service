@@ -30,6 +30,41 @@ public class CustOpenAccountTmp implements BetterjrEntity {
     private Long id;
 
     /**
+     * 代录记录 编号
+     */
+    @Column(name = "L_PARENTID", columnDefinition = "INTEGER")
+    @MetaData(value = "代录记录 编号", comments = "代录记录 编号")
+    private Long parentId;
+
+    /**
+     * 申请日期
+     */
+    @Column(name = "D_APPLY_DATE", columnDefinition = "VARCHAR")
+    @MetaData(value = "申请日期", comments = "申请日期")
+    private String applyDate;
+
+    /**
+     * 申请时间
+     */
+    @Column(name = "T_APPLY_TIME", columnDefinition = "VARCHAR")
+    @MetaData(value = "申请时间", comments = "申请时间")
+    private String applyTime;
+
+    /**
+     * 审核日期
+     */
+    @Column(name = "D_AUDIT_DATE", columnDefinition = "VARCHAR")
+    @MetaData(value = "审核日期", comments = "审核日期")
+    private String auditDate;
+
+    /**
+     * 审核时间
+     */
+    @Column(name = "T_AUDIT_TIME", columnDefinition = "VARCHAR")
+    @MetaData(value = "审核时间", comments = "审核时间")
+    private String auditTime;
+
+    /**
      * 客户编号
      */
     @Column(name = "L_CUSTNO", columnDefinition = "INTEGER")
@@ -724,6 +759,46 @@ public class CustOpenAccountTmp implements BetterjrEntity {
         this.orgCode = orgCode;
     }
 
+    public Long getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Long anParentId) {
+        parentId = anParentId;
+    }
+
+    public String getApplyDate() {
+        return applyDate;
+    }
+
+    public void setApplyDate(String anApplyDate) {
+        applyDate = anApplyDate;
+    }
+
+    public String getApplyTime() {
+        return applyTime;
+    }
+
+    public void setApplyTime(String anApplyTime) {
+        applyTime = anApplyTime;
+    }
+
+    public String getAuditDate() {
+        return auditDate;
+    }
+
+    public void setAuditDate(String anAuditDate) {
+        auditDate = anAuditDate;
+    }
+
+    public String getAuditTime() {
+        return auditTime;
+    }
+
+    public void setAuditTime(String anAuditTime) {
+        auditTime = anAuditTime;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -731,6 +806,11 @@ public class CustOpenAccountTmp implements BetterjrEntity {
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
         sb.append(", id=").append(id);
+        sb.append(", parentId=").append(parentId);
+        sb.append(", applyDate=").append(applyDate);
+        sb.append(", applyTime=").append(applyTime);
+        sb.append(", auditDate=").append(auditDate);
+        sb.append(", auditTime=").append(auditTime);
         sb.append(", custNo=").append(custNo);
         sb.append(", custName=").append(custName);
         sb.append(", identNo=").append(identNo);
@@ -794,6 +874,11 @@ public class CustOpenAccountTmp implements BetterjrEntity {
         }
         CustOpenAccountTmp other = (CustOpenAccountTmp) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
+                && (this.getParentId() == null ? other.getParentId() == null : this.getParentId().equals(other.getParentId()))
+                && (this.getApplyDate() == null ? other.getApplyDate() == null : this.getApplyDate().equals(other.getApplyDate()))
+                && (this.getApplyTime() == null ? other.getApplyTime() == null : this.getApplyTime().equals(other.getApplyTime()))
+                && (this.getAuditDate() == null ? other.getAuditDate() == null : this.getAuditDate().equals(other.getAuditDate()))
+                && (this.getAuditTime() == null ? other.getAuditTime() == null : this.getAuditTime().equals(other.getAuditTime()))
                 && (this.getCustNo() == null ? other.getCustNo() == null : this.getCustNo().equals(other.getCustNo()))
                 && (this.getCustName() == null ? other.getCustName() == null : this.getCustName().equals(other.getCustName()))
                 && (this.getIdentNo() == null ? other.getIdentNo() == null : this.getIdentNo().equals(other.getIdentNo()))
@@ -848,6 +933,11 @@ public class CustOpenAccountTmp implements BetterjrEntity {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
+        result = prime * result + ((getParentId() == null) ? 0 : getParentId().hashCode());
+        result = prime * result + ((getApplyDate() == null) ? 0 : getApplyDate().hashCode());
+        result = prime * result + ((getApplyTime() == null) ? 0 : getApplyTime().hashCode());
+        result = prime * result + ((getAuditDate() == null) ? 0 : getAuditDate().hashCode());
+        result = prime * result + ((getAuditTime() == null) ? 0 : getAuditTime().hashCode());
         result = prime * result + ((getCustNo() == null) ? 0 : getCustNo().hashCode());
         result = prime * result + ((getCustName() == null) ? 0 : getCustName().hashCode());
         result = prime * result + ((getIdentNo() == null) ? 0 : getIdentNo().hashCode());
