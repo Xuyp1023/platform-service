@@ -30,6 +30,7 @@ import com.betterjr.modules.customer.entity.CustMechBusinLicence;
 import com.betterjr.modules.customer.entity.CustMechLaw;
 import com.betterjr.modules.customer.entity.CustOpenAccountTmp;
 import com.betterjr.modules.customer.helper.IFormalDataService;
+import com.betterjr.modules.document.service.CustFileItemService;
 
 /**
  * 
@@ -50,6 +51,9 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
 
     @Autowired
     private CustOperatorService custOperatorService;
+
+    @Autowired
+    private CustFileItemService custFileItemService;
 
     @Autowired
     private CustInsteadRecordService custInsteadRecordService;
@@ -84,9 +88,10 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
      * 开户资料暂存
      * 
      * @param anOpenAccountInfo
+     * @param anFileList
      * @return
      */
-    public CustOpenAccountTmp saveOpenAccountInfo(CustOpenAccountTmp anOpenAccountInfo) {
+    public CustOpenAccountTmp saveOpenAccountInfo(CustOpenAccountTmp anOpenAccountInfo, String anFileList) {
         logger.info("Begin to Save Open Account Infomation");
         // 检查开户资料合法性
         checkAccountInfoValid(anOpenAccountInfo);
@@ -95,12 +100,16 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         if (null == anExitsOpenAccountInfo) {
             // 初始化参数设置
             initAddValue(anOpenAccountInfo, CustomerConstants.TMP_TYPE_TEMPSTORE, CustomerConstants.TMP_STATUS_NEW);
+            // 处理附件
+            anOpenAccountInfo.setBatchNo(custFileItemService.updateCustFileItemInfo(anFileList, anOpenAccountInfo.getBatchNo()));
             // 数据存盘,开户资料暂存
             this.insert(anOpenAccountInfo);
         }
         else {
             // 初始化参数设置
             initModifyValue(anOpenAccountInfo, anExitsOpenAccountInfo, CustomerConstants.TMP_STATUS_NEW);
+            // 处理附件
+            anOpenAccountInfo.setBatchNo(custFileItemService.updateCustFileItemInfo(anFileList, anOpenAccountInfo.getBatchNo()));
             // 数据存盘,开户资料暂存
             this.updateByPrimaryKeySelective(anOpenAccountInfo);
         }
@@ -115,7 +124,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
      * @param anId
      * @return
      */
-    public CustOpenAccountTmp saveOpenAccountApply(CustOpenAccountTmp anOpenAccountInfo, Long anId) {
+    public CustOpenAccountTmp saveOpenAccountApply(CustOpenAccountTmp anOpenAccountInfo, Long anId, String anFileList) {
         logger.info("Begin to Commit Open Account Apply");
         // 检查开户资料合法性
         checkAccountInfoValid(anOpenAccountInfo);
@@ -123,6 +132,8 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         if (null == anId) {
             // 初始化参数设置
             initAddValue(anOpenAccountInfo, CustomerConstants.TMP_TYPE_TEMPSTORE, CustomerConstants.TMP_STATUS_USEING);
+            // 处理附件
+            anOpenAccountInfo.setBatchNo(custFileItemService.updateCustFileItemInfo(anFileList, anOpenAccountInfo.getBatchNo()));
             // 数据存盘,开户资料暂存
             this.insert(anOpenAccountInfo);
         }
@@ -131,6 +142,8 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
             CustOpenAccountTmp anExitsOpenAccountInfo = this.selectByPrimaryKey(anId);
             // 初始化参数设置
             initModifyValue(anOpenAccountInfo, anExitsOpenAccountInfo, CustomerConstants.TMP_STATUS_USEING);
+            // 处理附件
+            anOpenAccountInfo.setBatchNo(custFileItemService.updateCustFileItemInfo(anFileList, anOpenAccountInfo.getBatchNo()));
             // 数据存盘,开户资料暂存
             this.updateByPrimaryKeySelective(anOpenAccountInfo);
         }
@@ -205,13 +218,14 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
     }
 
     /**
-     * 代录开户资料暂存
+     * 代录开户资料提交
      * 
      * @param anOpenAccountInfo
      * @param anInsteadId
+     * @param anFileList
      * @return
      */
-    public CustOpenAccountTmp saveOpenAccountInfoByInstead(CustOpenAccountTmp anOpenAccountInfo, Long anInsteadId) {
+    public CustOpenAccountTmp saveOpenAccountInfoByInstead(CustOpenAccountTmp anOpenAccountInfo, Long anInsteadId, String anFileList) {
         logger.info("Begin to Save Open Account Infomation Instead");
         // 代录流水号不能为空
         BTAssert.notNull(anInsteadId, "代录流水号不能为空");
@@ -225,6 +239,8 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         if (null == anTempId) {
             // 初始化参数设置
             initAddValue(anOpenAccountInfo, CustomerConstants.TMP_TYPE_INSTEADSTORE, CustomerConstants.TMP_STATUS_NEW);
+            // 处理附件
+            anOpenAccountInfo.setBatchNo(custFileItemService.updateCustFileItemInfo(anFileList, anOpenAccountInfo.getBatchNo()));
             // 数据存盘,开户资料暂存
             this.insert(anOpenAccountInfo);
         }
@@ -233,6 +249,8 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
             CustOpenAccountTmp anExitsOpenAccountInfo = this.selectByPrimaryKey(Long.valueOf(anTempId));
             // 初始化参数设置
             initModifyValue(anOpenAccountInfo, anExitsOpenAccountInfo, CustomerConstants.TMP_STATUS_NEW);
+            // 处理附件
+            anOpenAccountInfo.setBatchNo(custFileItemService.updateCustFileItemInfo(anFileList, anOpenAccountInfo.getBatchNo()));
             // 数据存盘,开户资料暂存
             this.updateByPrimaryKeySelective(anOpenAccountInfo);
         }

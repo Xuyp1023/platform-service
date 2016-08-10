@@ -30,18 +30,18 @@ public class CustOpenAccountDubboService implements ICustOpenAccountService {
     }
 
     @Override
-    public String webSaveOpenAccountInfo(Map<String, Object> anMap) {
+    public String webSaveOpenAccountInfo(Map<String, Object> anMap, String anFileList) {
 
         CustOpenAccountTmp anOpenAccountInfo = (CustOpenAccountTmp) RuleServiceDubboFilterInvoker.getInputObj();
 
-        return AjaxObject.newOk("开户资料暂存成功", custOpenAccountTmpService.saveOpenAccountInfo(anOpenAccountInfo)).toJson();
+        return AjaxObject.newOk("开户资料暂存成功", custOpenAccountTmpService.saveOpenAccountInfo(anOpenAccountInfo, anFileList)).toJson();
     }
 
-    public String webSaveOpenAccountApply(Map<String, Object> anMap, Long anId) {
+    public String webSaveOpenAccountApply(Map<String, Object> anMap, Long anId, String anFileList) {
 
         CustOpenAccountTmp anOpenAccountInfo = (CustOpenAccountTmp) RuleServiceDubboFilterInvoker.getInputObj();
 
-        return AjaxObject.newOk("开户申请提交成功", custOpenAccountTmpService.saveOpenAccountApply(anOpenAccountInfo, anId)).toJson();
+        return AjaxObject.newOk("开户申请提交成功", custOpenAccountTmpService.saveOpenAccountApply(anOpenAccountInfo, anId, anFileList)).toJson();
     }
 
     public String webQueryOpenAccountApply(String anFlag, int anPageNum, int anPageSize) {
@@ -60,11 +60,12 @@ public class CustOpenAccountDubboService implements ICustOpenAccountService {
     }
 
     @Override
-    public String webSaveOpenAccountInfoByInstead(Map<String, Object> anMap, Long anInsteadId) {
+    public String webSaveOpenAccountInfoByInstead(Map<String, Object> anMap, Long anInsteadId, String anFileList) {
 
         CustOpenAccountTmp anOpenAccountInfo = (CustOpenAccountTmp) RuleServiceDubboFilterInvoker.getInputObj();
 
-        return AjaxObject.newOk("代录开户资料提交成功", custOpenAccountTmpService.saveOpenAccountInfoByInstead(anOpenAccountInfo, anInsteadId)).toJson();
+        return AjaxObject.newOk("代录开户资料提交成功", custOpenAccountTmpService.saveOpenAccountInfoByInstead(anOpenAccountInfo, anInsteadId, anFileList))
+                .toJson();
     }
 
     @Override
