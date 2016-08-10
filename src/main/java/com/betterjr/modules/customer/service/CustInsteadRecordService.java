@@ -108,24 +108,6 @@ public class CustInsteadRecordService extends BaseService<CustInsteadRecordMappe
     }
     
     /**
-     * 保存代录项目暂存
-     * 
-     * @return
-     */
-    public CustInsteadRecord saveCustInsteadRecordTmp(Long anId, String anTmpIds) {
-        BTAssert.notNull(anId, "代录项编号不能为空！");
-        BTAssert.notNull(anTmpIds, "代录流水编号不能为空！");
-
-        final CustInsteadRecord tempCustInsteadRecord = this.selectByPrimaryKey(anId);
-        BTAssert.notNull(tempCustInsteadRecord, "没有找到对应的代录项目！");
-
-        tempCustInsteadRecord.initModifyValue(CustomerConstants.INSTEAD_RECORD_STATUS_NEW, anTmpIds);
-
-        this.updateByPrimaryKeySelective(tempCustInsteadRecord);
-        return tempCustInsteadRecord;
-    }
-
-    /**
      * 保存代录项目
      */
     public CustInsteadRecord saveCustInsteadRecord(Long anId, String anTmpIds) {
