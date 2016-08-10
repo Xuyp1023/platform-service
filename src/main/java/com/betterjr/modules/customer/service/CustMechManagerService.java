@@ -21,8 +21,6 @@ import com.betterjr.modules.customer.entity.CustMechManagerTmp;
  */
 @Service
 public class CustMechManagerService extends BaseService<CustMechManagerMapper, CustMechManager> {
-
-    private static Logger logger = LoggerFactory.getLogger(CustMechManagerService.class);
     
     @Resource
     private CustMechManagerTmpService managerTmpService;
@@ -44,13 +42,12 @@ public class CustMechManagerService extends BaseService<CustMechManagerMapper, C
     public CustMechManager findCustMechManager(Long anId) {
         BTAssert.notNull(anId, "高管编号不允许为空！");
         
-        return this.selectByPrimaryKey(anId);
+        CustMechManager manager = this.selectByPrimaryKey(anId);
+        return manager;
     }
     
     /**
      * 添加高管信息
-     * @param anManagerTmp
-     * @return
      */
     public CustMechManager addCustMechManager(CustMechManagerTmp anManagerTmp) {
         BTAssert.notNull(anManagerTmp, "高管流水信息不允许为空！");
@@ -64,9 +61,6 @@ public class CustMechManagerService extends BaseService<CustMechManagerMapper, C
     
     /**
      * 保存高管信息
-     * @param anCustMechManager
-     * @param anId
-     * @return
      */
     public CustMechManager saveCustMechManager(CustMechManager anCustMechManager, Long anId) {
         BTAssert.notNull(anId, "高管编号不允许为空！");
@@ -80,6 +74,9 @@ public class CustMechManagerService extends BaseService<CustMechManagerMapper, C
         return tempCustMechManager;
     }
 
+    /**
+     * 通过高管流水修改高管 
+     */
     public CustMechManager saveCustMechManager(CustMechManagerTmp anManagerTmp) {
         BTAssert.notNull(anManagerTmp, "高管流水编号不允许为空！");
         

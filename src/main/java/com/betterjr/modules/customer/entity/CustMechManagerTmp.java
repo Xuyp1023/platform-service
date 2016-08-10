@@ -12,6 +12,7 @@ import com.betterjr.common.entity.BetterjrEntity;
 import com.betterjr.common.selectkey.SerialGenerator;
 import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.UserUtils;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Access(AccessType.FIELD)
 @Entity
@@ -35,6 +36,7 @@ public class CustMechManagerTmp implements BetterjrEntity {
     /**
      * 数据版本号
      */
+    @JsonIgnore
     @Column(name = "N_VERSION",  columnDefinition="INTEGER" )
     @MetaData( value="数据版本号", comments = "数据版本号")
     private Long version;
@@ -98,6 +100,7 @@ public class CustMechManagerTmp implements BetterjrEntity {
     /**
      * 创建人(操作员)ID号
      */
+    @JsonIgnore
     @Column(name = "L_REG_OPERID",  columnDefinition="INTEGER" )
     @MetaData( value="创建人(操作员)ID号", comments = "创建人(操作员)ID号")
     private Long regOperId;
@@ -105,6 +108,7 @@ public class CustMechManagerTmp implements BetterjrEntity {
     /**
      * 创建人(操作员)姓名
      */
+    @JsonIgnore
     @Column(name = "C_REG_OPERNAME",  columnDefinition="VARCHAR" )
     @MetaData( value="创建人(操作员)姓名", comments = "创建人(操作员)姓名")
     private String regOperName;
@@ -112,6 +116,7 @@ public class CustMechManagerTmp implements BetterjrEntity {
     /**
      * 创建日期
      */
+    @JsonIgnore
     @Column(name = "D_REG_DATE",  columnDefinition="VARCHAR" )
     @MetaData( value="创建日期", comments = "创建日期")
     private String regDate;
@@ -119,6 +124,7 @@ public class CustMechManagerTmp implements BetterjrEntity {
     /**
      * 创建时间
      */
+    @JsonIgnore
     @Column(name = "T_REG_TIME",  columnDefinition="VARCHAR" )
     @MetaData( value="创建时间", comments = "创建时间")
     private String regTime;
@@ -126,6 +132,7 @@ public class CustMechManagerTmp implements BetterjrEntity {
     /**
      * 修改人(操作员)ID号
      */
+    @JsonIgnore
     @Column(name = "L_MODI_OPERID",  columnDefinition="INTEGER" )
     @MetaData( value="修改人(操作员)ID号", comments = "修改人(操作员)ID号")
     private Long modiOperId;
@@ -133,6 +140,7 @@ public class CustMechManagerTmp implements BetterjrEntity {
     /**
      * 修改人(操作员)姓名
      */
+    @JsonIgnore
     @Column(name = "C_MODI_OPERNAME",  columnDefinition="VARCHAR" )
     @MetaData( value="修改人(操作员)姓名", comments = "修改人(操作员)姓名")
     private String modiOperName;
@@ -140,6 +148,7 @@ public class CustMechManagerTmp implements BetterjrEntity {
     /**
      * 修改日期
      */
+    @JsonIgnore
     @Column(name = "D_MODI_DATE",  columnDefinition="VARCHAR" )
     @MetaData( value="修改日期", comments = "修改日期")
     private String modiDate;
@@ -147,6 +156,7 @@ public class CustMechManagerTmp implements BetterjrEntity {
     /**
      * 修改时间
      */
+    @JsonIgnore
     @Column(name = "T_MODI_TIME",  columnDefinition="VARCHAR" )
     @MetaData( value="修改时间", comments = "修改时间")
     private String modiTime;
@@ -569,12 +579,31 @@ public class CustMechManagerTmp implements BetterjrEntity {
         this.eduLevel = anCustMechManagerTmp.getEduLevel();
         this.position = anCustMechManagerTmp.getPosition();
         this.batchNo = anCustMechManagerTmp.getBatchNo();
+        
     }
 
-    public void initModifyValue(CustMechManagerTmp anCustMechManagerTmp, String anTmpStatus, Long anVersion) {
+    public void initModifyValue(CustMechManagerTmp anCustMechManagerTmp, String anBusinStatus, Long anVersion) {
         this.initModifyValue(anCustMechManagerTmp);
         
-        this.businStatus = anTmpStatus;
+        this.businStatus = anBusinStatus;
         this.version = anVersion;
+    }
+
+    public void initModifyValue(CustMechManager anManager, String anBusinStatus) {
+        this.modiOperId = UserUtils.getOperatorInfo().getId();
+        this.modiOperName = UserUtils.getOperatorInfo().getName();
+        this.modiDate = BetterDateUtils.getNumDate();
+        this.modiTime = BetterDateUtils.getNumTime();
+
+        this.name = anManager.getName();
+        this.sex = anManager.getSex();
+        this.identType = anManager.getIdentType();
+        this.identNo = anManager.getIdentNo();
+        this.birthdate = anManager.getBirthdate();
+        this.eduLevel = anManager.getEduLevel();
+        this.position = anManager.getPosition();
+        this.batchNo = anManager.getBatchNo();        
+        
+        this.businStatus = anBusinStatus;
     }
 }
