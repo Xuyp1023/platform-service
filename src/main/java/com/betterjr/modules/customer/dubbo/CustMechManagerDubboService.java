@@ -6,8 +6,10 @@ import javax.annotation.Resource;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import com.betterjr.common.web.AjaxObject;
+import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.customer.ICustMechManagerService;
 import com.betterjr.modules.customer.constant.CustomerConstants;
+import com.betterjr.modules.customer.entity.CustChangeApply;
 import com.betterjr.modules.customer.entity.CustMechManagerTmp;
 import com.betterjr.modules.customer.service.CustChangeService;
 import com.betterjr.modules.customer.service.CustInsteadService;
@@ -54,7 +56,7 @@ public class CustMechManagerDubboService implements ICustMechManagerService {
     @Override
     public String webSaveManagerTmp(Map<String, Object> anParam, Long anId) {
         final CustMechManagerTmp custMechManagerTmp = (CustMechManagerTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return AjaxObject.newOk("公司高管-流水信息 修改成功", managerTmpService.saveCustMechManagerTmp(custMechManagerTmp, anId)).toJson();
+        return AjaxObject.newOk("公司高管-流水信息 修改成功", managerTmpService.saveManagerTmp(custMechManagerTmp, anId)).toJson();
     }
 
     @Override
@@ -96,7 +98,9 @@ public class CustMechManagerDubboService implements ICustMechManagerService {
     
     @Override
     public String webQueryChangeApply(Long anCustNo, int anFlag, int anPageNum, int anPageSize) {
-        return null;
+        final Page<CustChangeApply> changeApplys = changeService.queryChangeApply(anCustNo, CustomerConstants.ITEM_MANAGER, anFlag, anPageNum,
+                anPageSize);
+        return AjaxObject.newOkWithPage("高管信息-变更列表查询 成功", changeApplys).toJson();
     }
     
     @Override

@@ -26,6 +26,13 @@ public class CustMechBankAccountTmp implements BetterjrEntity {
     private Long id;
 
     /**
+     * 代录记录/变更申请 编号
+     */
+    @Column(name = "L_PARENTID",  columnDefinition="INTEGER" )
+    @MetaData( value="代录记录/变更申请 编号", comments = "代录记录/变更申请 编号")
+    private Long parentId;
+    
+    /**
      * 数据版本号
      */
     @Column(name = "N_VERSION",  columnDefinition="INTEGER" )
@@ -586,6 +593,14 @@ public class CustMechBankAccountTmp implements BetterjrEntity {
     public void setTmpOperType(String tmpOperType) {
         this.tmpOperType = tmpOperType == null ? null : tmpOperType.trim();
     }
+    
+    public Long getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Long anParentId) {
+        parentId = anParentId;
+    }
 
     @Override
     public String toString() {
@@ -594,6 +609,7 @@ public class CustMechBankAccountTmp implements BetterjrEntity {
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
         sb.append(", id=").append(id);
+        sb.append(", parentId=").append(parentId);
         sb.append(", version=").append(version);
         sb.append(", isDefault=").append(isDefault);
         sb.append(", tradeAcco=").append(tradeAcco);
@@ -649,6 +665,7 @@ public class CustMechBankAccountTmp implements BetterjrEntity {
         }
         CustMechBankAccountTmp other = (CustMechBankAccountTmp) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
+                && (this.getParentId() == null ? other.getParentId() == null : this.getParentId().equals(other.getParentId()))
             && (this.getVersion() == null ? other.getVersion() == null : this.getVersion().equals(other.getVersion()))
             && (this.getIsDefault() == null ? other.getIsDefault() == null : this.getIsDefault().equals(other.getIsDefault()))
             && (this.getTradeAcco() == null ? other.getTradeAcco() == null : this.getTradeAcco().equals(other.getTradeAcco()))
@@ -693,6 +710,7 @@ public class CustMechBankAccountTmp implements BetterjrEntity {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
+        result = prime * result + ((getParentId() == null) ? 0 : getParentId().hashCode());
         result = prime * result + ((getVersion() == null) ? 0 : getVersion().hashCode());
         result = prime * result + ((getIsDefault() == null) ? 0 : getIsDefault().hashCode());
         result = prime * result + ((getTradeAcco() == null) ? 0 : getTradeAcco().hashCode());
