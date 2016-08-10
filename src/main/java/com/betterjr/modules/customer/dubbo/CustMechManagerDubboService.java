@@ -5,11 +5,13 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.web.AjaxObject;
 import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.customer.ICustMechManagerService;
 import com.betterjr.modules.customer.constant.CustomerConstants;
 import com.betterjr.modules.customer.entity.CustChangeApply;
+import com.betterjr.modules.customer.entity.CustMechManager;
 import com.betterjr.modules.customer.entity.CustMechManagerTmp;
 import com.betterjr.modules.customer.service.CustChangeService;
 import com.betterjr.modules.customer.service.CustInsteadService;
@@ -45,7 +47,9 @@ public class CustMechManagerDubboService implements ICustMechManagerService {
 
     @Override
     public String webFindManager(Long anId) {
-        return AjaxObject.newOk("查询公司高管详情成功", managerService.findCustMechManager(anId)).toJson();
+        CustMechManager manager = managerService.findCustMechManager(anId);
+        BTAssert.notNull(manager, "没有找到高管信息!");
+        return AjaxObject.newOk("查询公司高管详情成功!", manager).toJson();
     }
     
     @Override
@@ -115,26 +119,26 @@ public class CustMechManagerDubboService implements ICustMechManagerService {
     }
     
     @Override
-    public String webAddInsteadManagerTmp(Map<String, Object> anMap) {
+    public String webAddInsteadManagerTmp(Map<String, Object> anMap, Long anInsteadRecordId) {
         final CustMechManagerTmp custMechManagerTmp = (CustMechManagerTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return AjaxObject.newOk("公司高管-流水信息 代录添加成功", managerTmpService.addInsteadManagerTmp(custMechManagerTmp)).toJson();
+        return AjaxObject.newOk("公司高管-流水信息 代录添加成功", managerTmpService.addInsteadManagerTmp(custMechManagerTmp, anInsteadRecordId)).toJson();
     }
     
     @Override
-    public String webSaveInsteadManagerTmp(Map<String, Object> anParam, Long anId) {
+    public String webSaveInsteadManagerTmp(Map<String, Object> anParam, Long anInsteadRecordId) {
         final CustMechManagerTmp custMechManagerTmp = (CustMechManagerTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return AjaxObject.newOk("公司高管-流水信息 代录修改成功", managerTmpService.saveSaveInsteadManagerTmp(custMechManagerTmp, anId)).toJson();
+        return AjaxObject.newOk("公司高管-流水信息 代录修改成功", managerTmpService.saveSaveInsteadManagerTmp(custMechManagerTmp, anInsteadRecordId)).toJson();
 
     }
     
     @Override
-    public String webDelInsteadManagerTmp(Long anRefId) {
-        return AjaxObject.newOk("公司高管-流水信息 代录删除成功", managerTmpService.saveDelInsteadManagerTmp(anRefId)).toJson();
+    public String webDelInsteadManagerTmp(Long anRefId, Long anInsteadRecordId) {
+        return AjaxObject.newOk("公司高管-流水信息 代录删除成功", managerTmpService.saveDelInsteadManagerTmp(anRefId, anInsteadRecordId)).toJson();
     }
     
     @Override
-    public String webCancelInsteadManagerTmp(Long anId) {
-        return AjaxObject.newOk("公司高管-流水信息 代录删除成功", managerTmpService.saveCancelInsteadManagerTmp(anId)).toJson();
+    public String webCancelInsteadManagerTmp(Long anId, Long anInsteadRecordId) {
+        return AjaxObject.newOk("公司高管-流水信息 代录删除成功", managerTmpService.saveCancelInsteadManagerTmp(anId, anInsteadRecordId)).toJson();
     }
     
     @Override

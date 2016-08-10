@@ -134,15 +134,15 @@ public class CustChangeApplyService extends BaseService<CustChangeApplyMapper, C
      * @return
      */
     public Page<CustChangeApply> queryCustChangeApply(Map<String, Object> anParam, int anFlag, int anPageNum, int anPageSize) {
-        final String custName = (String) anParam.get("LIKEcustName");
-        final String businStatus = (String) anParam.get("businStatus");
-        if (BetterStringUtils.isBlank(custName)) {
+        final Object custName = anParam.get("LIKEcustName");
+        final Object businStatus = anParam.get("businStatus");
+        if (custName == null || BetterStringUtils.isBlank((String) custName)) {
             anParam.remove("LIKEcustName");
         }
         else {
             anParam.put("LIKEcustName", "%" + custName + "%");
         }
-        if (BetterStringUtils.isBlank(businStatus)) {
+        if (businStatus == null || BetterStringUtils.isBlank((String) businStatus)) {
             anParam.remove("businStatus");
         }
         
