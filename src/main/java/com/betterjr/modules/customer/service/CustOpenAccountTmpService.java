@@ -237,7 +237,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
             this.updateByPrimaryKeySelective(anOpenAccountInfo);
         }
         // 回写暂存流水号至代录申请表
-        custInsteadRecordService.saveCustInsteadRecordTmp(anInsteadId, String.valueOf(anOpenAccountInfo.getId()));
+        custInsteadRecordService.saveCustInsteadRecord(anInsteadId, String.valueOf(anOpenAccountInfo.getId()));
 
         return anOpenAccountInfo;
     }
@@ -263,14 +263,10 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
      * 客户确认开户
      */
     @Override
-    public void saveFormalData(String... anTmpIds) {
-        BTAssert.notEmpty(anTmpIds, "临时流水编号不允许为空！");
-        if (anTmpIds.length != 1) {
-            logger.warn("临时流水编号只能有一位！");
-            throw new BytterTradeException(40001, "临时流水编号只能有一位！");
-        }
+    public void saveFormalData(Long anParentId) {
+        BTAssert.notNull(anParentId, "代录记录流水号不允许为空！");
         // 获取客户开户资料信息
-        CustOpenAccountTmp anOpenAccountInfo = this.selectByPrimaryKey(Long.valueOf(anTmpIds[0]));
+        CustOpenAccountTmp anOpenAccountInfo = Collections3.getFirst(this.selectByProperty("parentId", anParentId));
         BTAssert.notNull(anOpenAccountInfo, "无法获取客户开户资料信息");
         // 检查开户资料合法性
         checkAccountInfoValid(anOpenAccountInfo);
@@ -280,11 +276,11 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         // 更新数据
         this.updateByPrimaryKeySelective(anOpenAccountInfo);
     }
-    
+
     @Override
-    public void saveCancelData(String... anTmpIds) {
+    public void saveCancelData(Long anParentId) {
         // TODO Auto-generated method stub
-        
+
     }
 
     private void checkPlatformUser() {
