@@ -15,7 +15,9 @@ import com.betterjr.modules.workflow.data.FlowInput;
 import com.betterjr.modules.workflow.data.FlowStatus;
 import com.betterjr.modules.workflow.data.TaskAuditHistory;
 import com.betterjr.modules.workflow.entity.CustFlowBase;
+import com.betterjr.modules.workflow.entity.CustFlowNode;
 import com.betterjr.modules.workflow.service.CustFlowBaseService;
+import com.betterjr.modules.workflow.service.CustFlowNodeService;
 import com.betterjr.modules.workflow.service.FlowService;
 
 @Service(interfaceClass=IFlowService.class)
@@ -24,6 +26,8 @@ public class FlowDubboService implements IFlowService{
     private CustFlowBaseService flowBaseService;
     @Autowired
     private FlowService flowService;
+    @Autowired
+    private CustFlowNodeService flowNodeService;
     
     /**
      * 保存流程配置
@@ -50,11 +54,10 @@ public class FlowDubboService implements IFlowService{
      */
     @Override
     public String webQueryWorkTask(Map<String, Object> anMap, int anFlag, int anPageNum, int anPageSize) {
-        String user=null;
         FlowStatus searchParam = (FlowStatus)RuleServiceDubboFilterInvoker.getInputObj();
+        searchParam.setOperator(null);
         Page<FlowStatus> page=new Page<FlowStatus>(anPageNum, anPageSize, anFlag==1);
-        page.add(searchParam);
-        Page<FlowStatus> list=this.flowService.queryCurrentWorkTask(page, user);
+        Page<FlowStatus> list=this.flowService.queryCurrentWorkTask(page, searchParam);
         return AjaxObject.newOkWithPage("查询当前所有用户需要审批的任务成功",list).toJson();
     }
 
@@ -63,11 +66,10 @@ public class FlowDubboService implements IFlowService{
      */
     @Override
     public String webQueryHistoryWorkTask(Map<String, Object> anMap, int anFlag, int anPageNum, int anPageSize) {
-        String user=null;
         FlowStatus searchParam = (FlowStatus)RuleServiceDubboFilterInvoker.getInputObj();
+        searchParam.setOperator(null);
         Page<FlowStatus> page=new Page<FlowStatus>(anPageNum, anPageSize, anFlag==1);
-        page.add(searchParam);
-        Page<FlowStatus> list=this.flowService.queryHistoryWorkTask(page, user);
+        Page<FlowStatus> list=this.flowService.queryHistoryWorkTask(page, searchParam);
         return AjaxObject.newOkWithPage("查询所有用户审批历史数据成功",list).toJson();
     }
     
@@ -76,32 +78,60 @@ public class FlowDubboService implements IFlowService{
      */
     @Override
     public String webQueryWorkTaskByMonitor(Map<String, Object> anMap, int anFlag, int anPageNum, int anPageSize) {
-        String user=UserUtils.getUserName();
+        String user=UserUtils.getUser().getId().toString();
         FlowStatus searchParam = (FlowStatus)RuleServiceDubboFilterInvoker.getInputObj();
+        searchParam.setOperator(user);
         Page<FlowStatus> page=new Page<FlowStatus>(anPageNum, anPageSize, anFlag==1);
-        page.add(searchParam);
-        Page<FlowStatus> list=this.flowService.queryWorkTaskByMonitor(page, user);
+        Page<FlowStatus> list=this.flowService.queryWorkTaskByMonitor(page, searchParam);
         return AjaxObject.newOkWithPage("查询当前用户所监控的进行时流程成功",list).toJson();
     }
 
-
     /**
-     * 当前流程已经执行的流程节点详情
+     *  新增流程节点
+     * @param anMap
+     * @return
      */
     @Override
-    public List<TaskAuditHistory> getExecutedHistory(Long businessId) {
-        // TODO Auto-generated method stub
-        return this.flowService.getExecutedHistory(businessId);
+    public String webAddFlowNode(Map<String, Object> anMap) {
+        CustFlowNode anNode=(CustFlowNode)RuleServiceDubboFilterInvoker.getInputObj();
+        this.flowNodeService.addFlowNode(anNode);
+        return AjaxObject.newOk("新增流程节点成功").toJson();
     }
 
     /**
-     * 当前流程已经执行的流程节点名称
+     * 修改，删除流程节点
+     * @param anMap
+     * @return
      */
     @Override
-    public List<String> getExecutedNodes(Long businessId) {
-        // TODO Auto-generated method stub
-        return this.flowService.getExecutedNodes(businessId);
+    public String webSaveFlowNode(Map<String, Object> anMap) {
+        CustFlowNode anNode=(CustFlowNode)RuleServiceDubboFilterInvoker.getInputObj();
+        this.flowNodeService.saveFlowNode(anNode);
+        return AjaxObject.newOk("修改/删除流程节点成功").toJson();
     }
+
+    /**
+     * 当前流程已经执行的历史详情
+     * @param businessId
+     * @return
+     */
+    @Override
+    public String webQueryExecutedHistory(Long businessId) {
+        List<TaskAuditHistory> list=this.flowService.getExecutedHistory(businessId);
+        return AjaxObject.newOk(list).toJson();
+    }
+
+    /**
+     * 当前流程当前节点之前的流程节点详情
+     * @param businessId
+     * @return
+     */
+    @Override
+    public String webQueryExecutedNodes(Long businessId) {
+        List<TaskAuditHistory> list=this.flowService.getExecutedNodes(businessId);
+        return AjaxObject.newOk(list).toJson();
+    }
+
 
     /**
      * 执行流程
@@ -125,20 +155,36 @@ public class FlowDubboService implements IFlowService{
      * 当前需要审批的任务(当前用户)
      */
     @Override
-    public Page<FlowStatus> queryCurrentUserWorkTask(Page<FlowStatus> page) {
+    public Page<FlowStatus> queryCurrentUserWorkTask(Page page,FlowStatus search) {
         // TODO Auto-generated method stub
-        return this.flowService.queryCurrentWorkTask(page, UserUtils.getUserName());
+        if(search==null){
+            search=new FlowStatus();
+        }
+        search.setOperator(UserUtils.getUser().getId().toString());
+        return this.flowService.queryCurrentWorkTask(page,search);
     }
 
     /**
      * 审批历史数据 (当前用户)
      */
     @Override
-    public Page<FlowStatus> queryCurrentUserHistoryWorkTask(Page<FlowStatus> page) {
-        // TODO Auto-generated method stub
-        return this.flowService.queryHistoryWorkTask(page, UserUtils.getUserName());
+    public Page<FlowStatus> queryCurrentUserHistoryWorkTask(Page page,FlowStatus search) {
+        if(search==null){
+            search=new FlowStatus();
+        }
+        search.setOperator(UserUtils.getUser().getId().toString());
+        return this.flowService.queryHistoryWorkTask(page, search);
     }
 
-
+    /**
+     * 根据流程类型，得到自定义流程所有节点
+     * @param flowType
+     * @return
+     */
+    @Override
+    public List<CustFlowNode> findFlowNodesByType(String flowType) {
+        // TODO Auto-generated method stub
+        return this.flowNodeService.findFlowNodesByType(flowType);
+    }
 
 }

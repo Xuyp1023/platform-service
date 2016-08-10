@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.snaker.engine.access.QueryFilter;
 import org.snaker.engine.entity.HistoryTask;
 import org.snaker.engine.entity.Order;
+import org.snaker.engine.entity.Task;
 import org.snaker.engine.entity.WorkItem;
 import org.snaker.engine.spring.SpringSnakerEngine;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,12 +20,15 @@ import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
+import com.betterjr.common.utils.UserUtils;
 import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.workflow.data.FlowInput;
 import com.betterjr.modules.workflow.data.FlowStatus;
 import com.betterjr.modules.workflow.data.TaskAuditHistory;
 import com.betterjr.modules.workflow.entity.CustFlowBase;
 import com.betterjr.modules.workflow.entity.CustFlowInstanceBusiness;
+import com.betterjr.modules.workflow.entity.CustFlowNode;
+import com.betterjr.modules.workflow.entity.CustFlowStep;
 import com.betterjr.modules.workflow.utils.SnakerPageUtils;
 
 @Service
@@ -39,6 +43,12 @@ public class FlowService {
     
     @Autowired
     private CustFlowBaseService baseService;
+    
+    @Autowired
+    private CustFlowNodeService nodeService;
+    
+    @Autowired
+    private CustFlowStepService stepService;
 
     /**
      * 启动流程
@@ -78,7 +88,7 @@ public class FlowService {
         QueryFilter filter = new QueryFilter().setOrderId(business.getFlowOrderId()).setOperator(input.getOperator());
         List<WorkItem> workItemList = engine.query().getWorkItems(null, filter);
         if (workItemList != null && workItemList.size() > 0) {
-
+            Collections3.extractToList(workItemList, "");
             for (int index = 0; index < workItemList.size(); index++) {
                 String taskId = workItemList.get(index).getTaskId();
                 engine.executeTask(taskId, input.getOperator(), formParas);
@@ -89,25 +99,43 @@ public class FlowService {
     }
 
     /**
-     * 当前流程已经执行的流程节点名称
+     * 当前流程当前节点之前的流程节点
      * 
      * @param businessId
      * @return
      */
-    public List<String> getExecutedNodes(Long businessId) {
-        List<TaskAuditHistory> historyList = this.getExecutedHistory(businessId);
-        if (Collections3.isEmpty(historyList)) {
+    public List<TaskAuditHistory> getExecutedNodes(Long businessId) {
+        CustFlowInstanceBusiness business = this.businessService.selectByPrimaryKey(businessId);
+        if (business == null) {
+            logger.warn("not found order for business :" + businessId);
             return Collections.emptyList();
         }
-        List<String> list = new ArrayList<String>();
-        for (TaskAuditHistory his : historyList) {
-            list.add(his.getFlowNodeName());
+        QueryFilter filter = new QueryFilter();
+        filter.setOrderId(business.getFlowOrderId());
+        List<Order> orderList=this.engine.query().getActiveOrders(filter);
+        Order order=Collections3.getFirst(orderList);
+        if(order==null){
+            logger.warn("not found order for order id:"+business.getFlowOrderId());
+            return Collections.emptyList();
         }
-        return list;
+        
+        List<CustFlowStep> stepList=this.stepService.selectByProperty("flowBaseId", order.getProcessId());
+
+        List<TaskAuditHistory> historyList = new ArrayList<TaskAuditHistory>();
+        if(!Collections3.isEmpty(stepList)){
+            for(CustFlowStep step:stepList){
+                TaskAuditHistory result=new TaskAuditHistory();
+                result.setFlowNodeId(step.getNodeId());
+                result.setFlowNodeName(step.getNodeName());
+                historyList.add(result);
+            }
+        }
+
+       return historyList;
     }
 
     /**
-     * 当前流程已经执行的流程节点详情
+     * 当前流程已经执行的历史详情
      * 
      * @param flowInstanceId
      * @return
@@ -115,13 +143,17 @@ public class FlowService {
     public List<TaskAuditHistory> getExecutedHistory(Long businessId) {
         CustFlowInstanceBusiness business = this.businessService.selectByPrimaryKey(businessId);
         if (business == null) {
-            logger.error("can not find order for business :" + businessId);
+            logger.warn("not found order for business :" + businessId);
             return Collections.emptyList();
         }
         QueryFilter filter = new QueryFilter();
         filter.setOrderId(business.getFlowOrderId());
         List<HistoryTask> taskHistory = this.engine.query().getHistoryTasks(filter);
-
+        
+        List taskNameList=Collections3.extractToList(taskHistory, "taskName");
+        List<CustFlowNode> nodeList=this.nodeService.selectByListProperty("nodeCustomName", taskNameList);
+        Map<String,Long> nodeNameMap=Collections3.extractToMap(nodeList, "nodeCustomName", "id");
+        
         List<TaskAuditHistory> historyList = new ArrayList<TaskAuditHistory>();
         for (HistoryTask task : taskHistory) {
             TaskAuditHistory flow = new TaskAuditHistory();
@@ -131,6 +163,7 @@ public class FlowService {
             flow.setFlowNodeName(task.getTaskName());
             flow.setOperator(task.getOperator());
             flow.setReason(var.getReason());
+            flow.setFlowNodeId(nodeNameMap.get(task.getTaskName()));
             historyList.add(flow);
         }
         return historyList;
@@ -142,11 +175,8 @@ public class FlowService {
      * @param page
      * @return
      */
-    public Page<FlowStatus> queryCurrentWorkTask(Page<FlowStatus> page, String user) {
-        QueryFilter filter = new QueryFilter();
-        if (!BetterStringUtils.isBlank(user)) {
-            filter.setOperator(user);
-        }
+    public Page<FlowStatus> queryCurrentWorkTask(Page page, FlowStatus search) {
+        QueryFilter filter = convertFlowStatusToQuery(search);
 
         org.snaker.engine.access.Page snakerPage=null;
         if(page!=null){
@@ -155,21 +185,30 @@ public class FlowService {
             page=new Page();
         }
         List<WorkItem> list = this.engine.query().getWorkItems(snakerPage, filter);
-        if (!Collections3.isEmpty(list)) {
-            for (WorkItem it : list) {
-                FlowStatus status = new FlowStatus();
-                status.setCreateOperator(it.getCreator());
-                status.setCreateTime(BetterDateUtils.parseDate(it.getOrderCreateTime()));
-                status.setCurrentTaskName(it.getTaskKey());
-                status.setFlowName(it.getOrderId());
-                status.setFlowType(it.getProcessName());
-                status.setLastUpdateTime(BetterDateUtils.parseDate(it.getTaskEndTime()));
-                status.setOperator(it.getOperator());
-                page.add(status);
-            }
-        }
+        populatePage(page, list);
         return page;
     }
+
+    private QueryFilter convertFlowStatusToQuery(FlowStatus search) {
+        QueryFilter filter = new QueryFilter();
+        if (!BetterStringUtils.isBlank(search.getOperator())) {
+            filter.setOperator(search.getOperator());
+        }
+        if (!BetterStringUtils.isBlank(search.getFlowName())) {
+            filter.setOrderId(search.getFlowName());
+        }
+        if (!BetterStringUtils.isBlank(search.getFlowType())) {
+            filter.setProcessType(search.getFlowType());
+        }
+        if (search.getBusinessId()!=null && search.getBusinessId()>0) {
+            CustFlowInstanceBusiness business = this.businessService.selectByPrimaryKey(search.getBusinessId());
+            if (business != null) {
+               filter.setOrderId(business.getFlowOrderId());
+            }
+        }
+        return filter;
+    }
+
 
     /**
      * 审批历史数据 user=null,表示所有用户
@@ -177,11 +216,8 @@ public class FlowService {
      * @param page
      * @return
      */
-    public Page<FlowStatus> queryHistoryWorkTask(Page<FlowStatus> page, String user) {
-        QueryFilter filter = new QueryFilter();
-        if (!BetterStringUtils.isBlank(user)) {
-            filter.setOperator(user);
-        }
+    public Page<FlowStatus> queryHistoryWorkTask(Page page, FlowStatus search) {
+        QueryFilter filter = convertFlowStatusToQuery(search);
         
         org.snaker.engine.access.Page snakerPage=null;
         if(page!=null){
@@ -191,19 +227,7 @@ public class FlowService {
         }
         List<WorkItem> list = this.engine.query().getHistoryWorkItems(snakerPage, filter);
         
-        if (!Collections3.isEmpty(list)) {
-            for (WorkItem it : list) {
-                FlowStatus status = new FlowStatus();
-                status.setCreateOperator(it.getCreator());
-                status.setCreateTime(BetterDateUtils.parseDate(it.getOrderCreateTime()));
-                status.setCurrentTaskName(it.getTaskKey());
-                status.setFlowName(it.getOrderId());
-                status.setFlowType(it.getProcessName());
-                status.setLastUpdateTime(BetterDateUtils.parseDate(it.getTaskEndTime()));
-                status.setOperator(it.getOperator());
-                page.add(status);
-            }
-        }
+        this.populatePage(page, list);
         return page;
     }
     
@@ -211,14 +235,14 @@ public class FlowService {
     /**
      * 流程监控,user 不能为空
      */
-    public Page<FlowStatus> queryWorkTaskByMonitor(Page<FlowStatus> page, String user) {
+    public Page<FlowStatus> queryWorkTaskByMonitor(Page page,FlowStatus search) {
         
-        List<CustFlowBase> monitoredList=this.baseService.selectByProperty("monitorOperName", user);
+        List<CustFlowBase> monitoredList=this.baseService.selectByProperty("monitorOperName", search.getOperator());
         if(Collections3.isEmpty(monitoredList)){
             return new Page();
         }
         
-        QueryFilter filter = new QueryFilter();
+        QueryFilter filter =convertFlowStatusToQuery(search);
         for(CustFlowBase monitoredItem:monitoredList){
             filter.setProcessId(monitoredItem.getId().toString());
         }
@@ -230,7 +254,16 @@ public class FlowService {
             page=new Page();
         }
         List<WorkItem> list = this.engine.query().getWorkItems(snakerPage, filter);
+        this.populatePage(page, list);
+        return page;
+    }
+    
+    private void populatePage(Page<FlowStatus> page, List<WorkItem> list) {
         if (!Collections3.isEmpty(list)) {
+            List orderList=Collections3.extractToList(list, "orderId");
+            List<CustFlowInstanceBusiness> businessList=this.businessService.selectByListProperty("flowOrderId", orderList);
+            Map businessMap=Collections3.extractToMap(businessList, "flowOrderId", "businessId");
+            
             for (WorkItem it : list) {
                 FlowStatus status = new FlowStatus();
                 status.setCreateOperator(it.getCreator());
@@ -240,10 +273,10 @@ public class FlowService {
                 status.setFlowType(it.getProcessName());
                 status.setLastUpdateTime(BetterDateUtils.parseDate(it.getTaskEndTime()));
                 status.setOperator(it.getOperator());
+                status.setBusinessId((Long)businessMap.get(it.getOrderId()));
                 page.add(status);
             }
         }
-        return page;
     }
 
 }

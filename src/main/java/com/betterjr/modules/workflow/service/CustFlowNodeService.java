@@ -32,18 +32,24 @@ public class CustFlowNodeService extends BaseService<CustFlowNodeMapper, CustFlo
     public List<CustFlowNode> findFlowNodesByType(String flowType) {
         return this.mapper.findFlowNodesByType(flowType);
     }
+    
+    /**
+     * 新增，存在则更新
+     */
+    public void addFlowNode(CustFlowNode anNode){
+        CustFlowNode node = this.selectByPrimaryKey(anNode.getId());
+        if(node==null){
+            this.insert(anNode);
+        }else{
+            this.updateByPrimaryKey(anNode);
+        }
+    }
 
     /**
      * 更新, nodeCustomName为空，表示删除
      */
     public void saveFlowNode(CustFlowNode anNode) {
         
-        if (anNode.getId() == null) {
-            anNode.setId(SerialGenerator.getLongValue(IdKey));
-            this.insert(anNode);
-            return;
-        }
-
         CustFlowNode node = this.selectByPrimaryKey(anNode.getId());
         BTAssert.notNull(node,"数据库不存在记录，更新失败");
 

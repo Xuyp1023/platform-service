@@ -81,7 +81,9 @@ public class FlowServiceTest extends BasicServiceTest<FlowService> {
     @Test
     public void queryCurrentWorkTaskWithNotExistsUser(){
         FlowService service = this.getServiceObject();
-        Page<FlowStatus> page=service.queryCurrentWorkTask(null, "testUser3");
+        FlowStatus search=new FlowStatus();
+        search.setOperator("testUser3");
+        Page<FlowStatus> page=service.queryCurrentWorkTask(null,search );
         List<FlowStatus> list=page.getResult();
         if(!Collections3.isEmpty(list)){
             for(FlowStatus sta:list){
@@ -93,7 +95,9 @@ public class FlowServiceTest extends BasicServiceTest<FlowService> {
     @Test
     public void queryCurrentWorkTaskWithUser(){
         FlowService service = this.getServiceObject();
-        Page<FlowStatus> page=service.queryCurrentWorkTask(null, "testUser8");
+        FlowStatus search=new FlowStatus();
+        search.setOperator("testUser8");
+        Page<FlowStatus> page=service.queryCurrentWorkTask(null, search);
         List<FlowStatus> list=page.getResult();
         if(!Collections3.isEmpty(list)){
             for(FlowStatus sta:list){
@@ -117,7 +121,9 @@ public class FlowServiceTest extends BasicServiceTest<FlowService> {
     @Test
     public void queryWorkTaskByMonitor(){
         FlowService service = this.getServiceObject();
-        Page<FlowStatus> page=service.queryWorkTaskByMonitor(null, "testMonitor");
+        FlowStatus search=new FlowStatus();
+        search.setOperator("testMonitor");
+        Page<FlowStatus> page=service.queryWorkTaskByMonitor(null, search);
         List<FlowStatus> list=page.getResult();
         if(!Collections3.isEmpty(list)){
             for(FlowStatus sta:list){
