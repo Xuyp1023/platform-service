@@ -30,9 +30,6 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
 
     /**
      * 查询联系人流水信息
-     * 
-     * @param anCustNo
-     * @return
      */
     public CustMechContacterTmp findCustMechContacterTmpByCustNo(Long anId) {
         BTAssert.notNull(anId, "联系人流水信息编号不允许为空！");
@@ -42,9 +39,6 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
 
     /**
      * 保存联系人流水信息
-     * 
-     * @param anCustMechContacterTmp
-     * @return
      */
     public int saveCustMechContacterTmp(CustMechContacterTmp anCustMechContacterTmp, Long anId) {
         BTAssert.notNull(anId, "联系人流水编号不允许为空！");
@@ -58,9 +52,6 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
 
     /**
      * 添加联系人流水信息
-     * 
-     * @param anCustMechContacterTmp
-     * @return
      */
     public int addCustMechContacterTmp(CustMechContacterTmp anCustMechContacterTmp) {
         BTAssert.notNull(anCustMechContacterTmp, "联系人流水信息编号不允许为空！");
@@ -71,9 +62,6 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
 
     /**
      * 法人信息变更申请
-     * 
-     * @param anCustMechLawTmp
-     * @return
      */
     public CustChangeApply addCustChangeApply(CustMechContacterTmp anCustMechContacterTmp) {
         BTAssert.notNull(anCustMechContacterTmp, "基本信息变更申请不能为空");
@@ -81,7 +69,6 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
         anCustMechContacterTmp.initAddValue(CustomerConstants.TMP_TYPE_CHANGE);
         this.insert(anCustMechContacterTmp);
 
-        // 发起变更申请
         CustChangeApply custChangeApply = changeApplyService.addChangeApply(anCustMechContacterTmp.getRefId(), CustomerConstants.ITEM_CONTACTER,
                 String.valueOf(anCustMechContacterTmp.getId()));
 
@@ -92,7 +79,7 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
      * 回写正式表记录
      */
     @Override
-    public void saveFormalData(String... anTmpIds) {
+    public void saveFormalData(Long anId) {
 
     }
     
@@ -101,7 +88,7 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
      * @param anTmpIds
      */
     @Override
-    public void saveCancelData(String... anTmpIds) {
+    public void saveCancelData(Long anId) {
         
     }
 }

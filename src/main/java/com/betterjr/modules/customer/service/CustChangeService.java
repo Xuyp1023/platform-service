@@ -43,10 +43,6 @@ public class CustChangeService {
 
     /**
      * 查询变更申请详情
-     * 
-     * @param anCustNo
-     * @param anId
-     * @return
      */
     public CustChangeApply findChangeApply(Long anId, String anChangeItem) {
         BTAssert.notNull(anId, "申请编号不允许为空！");
@@ -64,9 +60,6 @@ public class CustChangeService {
 
     /**
      * 查询变更申请列表 分类查询
-     * 
-     * @param anCustNo
-     * @return
      */
     public Page<CustChangeApply> queryChangeApply(Long anCustNo, String anChangeItem, int anFlag, int anPageNum, int anPageSize) {
         BTAssert.notNull(anCustNo, "客户编号不允许为空!");
@@ -76,14 +69,11 @@ public class CustChangeService {
         conditionMap.put(CustomerConstants.CUST_NO, anCustNo);
         conditionMap.put("changeItem", anChangeItem);
 
-        return changeApplyService.selectPropertyByPage(CustChangeApply.class, conditionMap, anPageNum, anPageSize, anFlag == 1);
+        return changeApplyService.queryCustChangeApply(conditionMap, anFlag, anPageNum, anPageSize);
     }
 
     /**
      * 查询变更申请列表 审核使用
-     * 
-     * @param anCustNo
-     * @return
      */
     public Page<CustChangeApply> queryChangeApplyList(Map<String, Object> anParam, int anFlag, int anPageNum, int anPageSize) {
         BTAssert.notNull(anParam, "查询条件不允许为空!");
@@ -93,9 +83,6 @@ public class CustChangeService {
 
     /**
      * 保存审核通过 将数据转入正式表
-     * 
-     * @param anId
-     * @return
      */
     public CustChangeApply saveAuditPassChangeApply(Long anId, String anReason) {
         BTAssert.notNull(anId, "变更申请编号不允许为空!");
@@ -107,19 +94,15 @@ public class CustChangeService {
             throw new BytterTradeException(20010, "变更申请状态不正确，审核失败！");
         }
 
-        // 修改审核状态为通过
         final CustChangeApply changeApply = changeApplyService.saveChangeApplyStatus(anId, CustomerConstants.CHANGE_APPLY_STATUS_AUDIT_PASS);
         BTAssert.notNull(changeApply, "修改变更申请审核状态失败！");
 
-        // 保存相应数据至正式表
         IFormalDataService formalDataService = FormalDataHelper.getFormalDataService(changeApply);
         BTAssert.notNull(formalDataService, "变更项目不正确！");
 
-        String[] tmpIds = BetterStringUtils.split(changeApply.getTmpIds(), ",");
-        formalDataService.saveFormalData(tmpIds);
+        formalDataService.saveFormalData(changeApply.getId());
 
-        // 添加审核
-        CustAuditLog auditLog = auditLogService.addCustAuditLog(CustomerConstants.AUDIT_TYPE_CHANGEAPPLY, anId, CustomerConstants.AUDIT_RESULT_PASS,
+        CustAuditLog auditLog = auditLogService.addCustAuditLog(CustomerConstants.AUDIT_TYPE_CHANGEAPPLY, CustomerConstants.AUDIT_STEP_AUDIT, anId, CustomerConstants.AUDIT_RESULT_PASS,
                 anReason, changeApply.getChangeItem(), changeApply.getCustNo());
         BTAssert.notNull(auditLog, "审核记录添加失败!");
 
@@ -128,9 +111,6 @@ public class CustChangeService {
 
     /**
      * 保存审核驳回 修改状态
-     * 
-     * @param anId
-     * @return
      */
     public CustChangeApply saveAuditRejectChangeApply(Long anId, String anReason) {
         BTAssert.notNull(anId, "变更申请编号不允许为空!");
@@ -142,11 +122,9 @@ public class CustChangeService {
             throw new BytterTradeException(20010, "变更申请状态不正确，审核失败！");
         }
 
-        // 修改审核状态为 驳回
         final CustChangeApply changeApply = changeApplyService.saveChangeApplyStatus(anId, CustomerConstants.CHANGE_APPLY_STATUS_AUDIT_REJECT);
 
-        // 添加审核记录
-        CustAuditLog auditLog = auditLogService.addCustAuditLog(CustomerConstants.AUDIT_TYPE_CHANGEAPPLY, anId, CustomerConstants.AUDIT_RESULT_REJECT,
+        CustAuditLog auditLog = auditLogService.addCustAuditLog(CustomerConstants.AUDIT_TYPE_CHANGEAPPLY, CustomerConstants.AUDIT_STEP_AUDIT, anId, CustomerConstants.AUDIT_RESULT_REJECT,
                 anReason, changeApply.getChangeItem(), changeApply.getCustNo());
         BTAssert.notNull(auditLog, "审核记录添加失败!");
 
@@ -155,10 +133,6 @@ public class CustChangeService {
 
     /**
      * 作废变更申请
-     * 
-     * @param anId
-     * @param anReason 
-     * @return
      */
     public CustChangeApply saveCancelChangeApply(Long anId, String anReason) {
         BTAssert.notNull(anId, "变更申请编号不允许为空!");
@@ -168,19 +142,15 @@ public class CustChangeService {
 
         // 检查变更申请状态
         
-        // 修改审核状态为作废
         final CustChangeApply changeApply = changeApplyService.saveChangeApplyStatus(anId, CustomerConstants.CHANGE_APPLY_STATUS_CANCEL);
         BTAssert.notNull(changeApply, "修改变更申请审核状态失败！");
         
-        // 回调变更申请方法
         IFormalDataService formalDataService = FormalDataHelper.getFormalDataService(changeApply);
         BTAssert.notNull(formalDataService, "变更项目不正确！");
 
-        String[] tmpIds = BetterStringUtils.split(changeApply.getTmpIds(), ",");
-        formalDataService.saveCancelData(tmpIds);
+        formalDataService.saveCancelData(changeApply.getId());
         
-        // 添加审核记录
-        CustAuditLog auditLog = auditLogService.addCustAuditLog(CustomerConstants.AUDIT_TYPE_CHANGEAPPLY, anId, CustomerConstants.AUDIT_RESULT_CANCEL,
+        CustAuditLog auditLog = auditLogService.addCustAuditLog(CustomerConstants.AUDIT_TYPE_CHANGEAPPLY, null, anId, CustomerConstants.AUDIT_RESULT_CANCEL,
                 anReason, changeApply.getChangeItem(), changeApply.getCustNo());
         BTAssert.notNull(auditLog, "审核记录添加失败!");
         

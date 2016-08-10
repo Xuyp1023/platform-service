@@ -1,5 +1,6 @@
 package com.betterjr.modules.customer.service;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -7,6 +8,7 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
+import com.betterjr.common.data.SimpleDataEntity;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.UserUtils;
@@ -28,13 +30,13 @@ import com.betterjr.modules.customer.entity.CustMechBaseTmp;
 public class CustMechBaseService extends BaseService<CustMechBaseMapper, CustMechBase> {
     @Resource
     private CustAccountService accountService;
-    
+
     @Resource
     private CustMechBaseTmpService baseTmpService;
 
     @Resource
     private CustAndOperatorRelaService custAndOpService;
-    
+
     /**
      * 公司基本信息-查询详情
      * 
@@ -86,20 +88,35 @@ public class CustMechBaseService extends BaseService<CustMechBaseMapper, CustMec
         final CustInfo custInfo = accountService.selectByPrimaryKey(anCustNo);
         anCustMechBase.initAddValue(anCustNo, custInfo.getCustName(), custInfo.getRegOperId(), custInfo.getRegOperName(), custInfo.getOperOrg());
         this.insert(anCustMechBase);
-        
+
         // 建立初始流水
         baseTmpService.addCustMechBaseTmp(anCustMechBase);
-        
+
         return anCustMechBase;
     }
 
     /**
-     * 公司列表 
+     * 公司列表
+     * 
      * @return
      */
     public Collection<CustInfo> queryCustInfo() {
-        final CustOperatorInfo operator= UserUtils.getOperatorInfo();
+        final CustOperatorInfo operator = UserUtils.getOperatorInfo();
         return accountService.findCustInfoByOperator(operator.getId(), operator.getOperOrg());
     }
 
+    /**
+     * 公司列表 供选择框使用
+     * 
+     * @return
+     */
+    public Collection<SimpleDataEntity> queryCustInfoSelect() {
+        final CustOperatorInfo operator = UserUtils.getOperatorInfo();
+        List<CustInfo> custInfos = accountService.findCustInfoByOperator(operator.getId(), operator.getOperOrg());
+        Collection<SimpleDataEntity> custInfoSelects = new ArrayList<>();
+
+        custInfos.forEach(custInfo -> custInfoSelects.add(new SimpleDataEntity(custInfo.getCustName(), String.valueOf(custInfo.getCustNo()))));
+        
+        return custInfoSelects;
+    }
 }

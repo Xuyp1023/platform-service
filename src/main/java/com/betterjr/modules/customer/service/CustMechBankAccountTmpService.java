@@ -92,7 +92,7 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
      * 回写正式表
      */
     @Override
-    public void saveFormalData(String... anTmpIds) {
+    public void saveFormalData(Long anId) {
         // TODO Auto-generated method stub
 
     }
@@ -102,7 +102,7 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
      * @param anTmpIds
      */
     @Override
-    public void saveCancelData(String... anTmpIds) {
+    public void saveCancelData(Long anId) {
         
     }
 }

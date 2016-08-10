@@ -91,7 +91,7 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
      * 回写正式表记录
      */
     @Override
-    public void saveFormalData(String... anTmpIds) {
+    public void saveFormalData(Long anId) {
 
     }
     
@@ -100,7 +100,7 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
      * @param anTmpIds
      */
     @Override
-    public void saveCancelData(String... anTmpIds) {
+    public void saveCancelData(Long anId) {
         
     }
 }

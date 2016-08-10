@@ -45,23 +45,17 @@ public class CustMechManagerTmpService extends BaseService<CustMechManagerTmpMap
 
     /**
      * 查询公司高管流水信息
-     * 
-     * @param anCustNo
-     * @return
      */
     public CustMechManagerTmp findCustMechManagerTmp(Long anId) {
         BTAssert.notNull(anId, "公司高管流水信息编号不允许为空！");
 
         final CustMechManagerTmp managerTmp = this.selectByPrimaryKey(anId);
-        
+
         return managerTmp;
     }
 
     /**
      * 添加新增变更流水记录
-     * 
-     * @param anRefId
-     * @return
      */
     public CustMechManagerTmp addChangeManagerTmp(CustMechManagerTmp anCustMechManagerTmp) {
         BTAssert.notNull(anCustMechManagerTmp, "公司高管流水信息不允许为空！");
@@ -77,9 +71,6 @@ public class CustMechManagerTmpService extends BaseService<CustMechManagerTmpMap
 
     /**
      * 添加修改变更记录
-     * 
-     * @param anRefId
-     * @return
      */
     public CustMechManagerTmp saveSaveChangeManagerTmp(CustMechManagerTmp anCustMechManagerTmp) {
         BTAssert.notNull(anCustMechManagerTmp, "公司高管流水信息不允许为空！");
@@ -87,13 +78,12 @@ public class CustMechManagerTmpService extends BaseService<CustMechManagerTmpMap
         final Long refId = anCustMechManagerTmp.getRefId();
         BTAssert.notNull(refId, "引用编号不允许为空!");
 
-        // 检查变更引用记录是否存在
         CustMechManager manager = managerService.findCustMechManager(refId);
         BTAssert.notNull(manager, "没有找到引用的记录!");
 
         CustMechManagerTmp tempManagerTmp = findManagerTmpByRefId(refId, CustomerConstants.TMP_TYPE_CHANGE);
         if (tempManagerTmp == null) {
-            anCustMechManagerTmp.initAddValue(manager, CustomerConstants.TMP_STATUS_NEW);
+            anCustMechManagerTmp.setBusinStatus(CustomerConstants.TMP_STATUS_NEW);
             anCustMechManagerTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
             return addManagerTmp(anCustMechManagerTmp, CustomerConstants.TMP_TYPE_CHANGE);
         }
@@ -106,18 +96,13 @@ public class CustMechManagerTmpService extends BaseService<CustMechManagerTmpMap
 
     /**
      * 添加删除变更记录
-     * 
-     * @param anCustNo
-     * @return
      */
     public CustMechManagerTmp saveDelChangeManagerTmp(Long anRefId) {
         BTAssert.notNull(anRefId, "公司高管号不允许为空！");
 
-        // 检查变更引用记录是否存在
         CustMechManager manager = managerService.findCustMechManager(anRefId);
         BTAssert.notNull(manager, "没有找到引用的记录!");
 
-        // 创建一个新的流水(如果已经存在变更流水,或者删除流水 则在原有基础上修改)
         CustMechManagerTmp managerTmp = findManagerTmpByRefId(anRefId, CustomerConstants.TMP_TYPE_CHANGE);
         if (managerTmp == null) {
             managerTmp = new CustMechManagerTmp();
@@ -135,12 +120,8 @@ public class CustMechManagerTmpService extends BaseService<CustMechManagerTmpMap
 
     /**
      * 撤销变更记录
-     * 
-     * @param anId
-     * @return
      */
     public int saveCancelChangeManagerTmp(Long anId) {
-        // 检查是否可撤销
         CustMechManagerTmp managerTmp = this.findCustMechManagerTmp(anId);
 
         Long tmpVersion = managerTmp.getVersion();
@@ -163,32 +144,23 @@ public class CustMechManagerTmpService extends BaseService<CustMechManagerTmpMap
 
     /**
      * 加载变更列表中的流水列表
-     * 
-     * @param anCustNo
-     * @return
      */
     public Collection<CustMechManagerTmp> queryCustMechManagerTmpByChangeApply(Long anApplyId) {
         BTAssert.notNull(anApplyId, "公司编号不允许为空！");
         CustChangeApply changeApply = changeApplyService.findChangeApply(anApplyId);
         List<String> strTmpIds = Arrays.asList(BetterStringUtils.split(changeApply.getTmpIds(), ","));
-        
+
         List<Long> tmpIds = new ArrayList<>();
-        strTmpIds.forEach(strTmpId->{
-            tmpIds.add(Long.valueOf(strTmpId));
-        });
+        strTmpIds.forEach(strTmpId -> tmpIds.add(Long.valueOf(strTmpId)));
 
         Map<String, Object> conditionMap = new HashMap<>();
-
-        conditionMap.put(CustomerConstants.ID, tmpIds.toArray());
+        conditionMap.put(CustomerConstants.ID, tmpIds.toArray(new Long[tmpIds.size()]));
 
         return this.selectByProperty(conditionMap);
     }
 
     /**
      * 
-     * @param anRefId
-     * @param anTmpType
-     * @return
      */
     private CustMechManagerTmp findManagerTmpByRefId(Long anRefId, String anTmpType) {
         Map<String, Object> conditionMap = new HashMap<>();
@@ -202,46 +174,73 @@ public class CustMechManagerTmpService extends BaseService<CustMechManagerTmpMap
 
     /**
      * 添加一个变更申请
-     * 
-     * @return
      */
     public CustChangeApply addChangeApply(Map<String, Object> anParam, Long anCustNo) {
         BTAssert.notNull(anCustNo, "公司编号不允许为空！");
         BTAssert.notNull(anParam, "参数不允许为空！");
 
-        String tmpTmpIds = (String) anParam.get("tmpIds");
 
-        // 根据 changeIds 处理状态
-        String[] strTmpIds = BetterStringUtils.split(tmpTmpIds, ",");
+        String tempTmpIds = (String) anParam.get("tmpIds");
 
-        Long[] tmpIds = new Long[strTmpIds.length];
-        for (int i = 0; i < strTmpIds.length; i++) {
-            tmpIds[i] = Long.valueOf(strTmpIds[i]);
-        }
+        List<String> strTmpIds = Arrays.asList(BetterStringUtils.split(tempTmpIds, ","));
 
-        // 检查是否还有不包含在列表里面的未处理项目,如果有,发生错误
-        if (checkMatch(tmpIds, anCustNo, CustomerConstants.TMP_TYPE_CHANGE) == false) {
+        List<Long> tmpIds = new ArrayList<>();
+
+        strTmpIds.forEach(strTmpId -> tmpIds.add(Long.valueOf(strTmpId)));
+
+        if (checkMatchNewChange(tmpIds.toArray(new Long[tmpIds.size()]), anCustNo) == false) {
             throw new BytterTradeException("代录编号列表不正确,请检查.");
         }
+        CustChangeApply changeApply = changeApplyService.addChangeApply(anCustNo, CustomerConstants.ITEM_MANAGER, tempTmpIds);
 
         for (Long id : tmpIds) {
-            saveCustMechManagerTmpStatus(id, CustomerConstants.TMP_STATUS_USEING);
+            saveManagerTmpParentIdAndStatus(id, changeApply.getId(), CustomerConstants.TMP_STATUS_USEING);
         }
 
-        // TODO 要将所有未改变的记录也放入临时表并且标记为 未改变 逐条比较
         Collection<CustMechManager> managers = managerService.queryCustMechManager(anCustNo);
-        
+        Collection<CustMechManagerTmp> managerTmps = this.selectByProperty("parentId", changeApply.getId());
 
-        // 发起变更申请
-        CustChangeApply changeApply = changeApplyService.addChangeApply(anCustNo, CustomerConstants.ITEM_MANAGER, tmpTmpIds);
+        saveNormalManagers(managers, managerTmps, changeApply, CustomerConstants.TMP_TYPE_CHANGE);
 
         return changeApply;
     }
 
     /**
+     * 存储未修改的记录
+     */
+    private void saveNormalManagers(Collection<CustMechManager> anManagers, Collection<CustMechManagerTmp> anManagerTmps,
+            CustChangeApply anChangeApply, String anTmpType) {
+        Long parentId = anChangeApply.getId();
+        for (CustMechManager manager : anManagers) {
+            if (checkIsNormalManager(manager, anManagerTmps) == true) {
+                CustMechManagerTmp managerTmp = new CustMechManagerTmp();
+                managerTmp.initAddValue(manager, CustomerConstants.TMP_STATUS_USEING);
+                managerTmp.setRefId(manager.getId());
+                managerTmp.setParentId(parentId);
+                managerTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_NORMAL);
+                addManagerTmp(managerTmp, anTmpType);
+            }
+        }
+    }
+
+    /**
+     * 检查是否是未改变高管
+     */
+    private boolean checkIsNormalManager(CustMechManager anManager, Collection<CustMechManagerTmp> anManagerTmps) {
+        boolean flag = true;
+        Long id = anManager.getId();
+        for (CustMechManagerTmp managerTmp : anManagerTmps) {
+            Long refId = managerTmp.getRefId();
+            if (refId != null && refId.equals(id)) {
+                flag = false;
+                break;
+            }
+        }
+        return flag;
+    }
+
+    /**
      * 修改一个变更申请
-     * 
-     * @return
      */
     public CustChangeApply saveChangeApply(Map<String, Object> anParam, Long anApplyId) {
         BTAssert.notNull(anApplyId, "变更申请编号不允许为空！");
@@ -251,57 +250,87 @@ public class CustMechManagerTmpService extends BaseService<CustMechManagerTmpMap
 
         Long custNo = changeApply.getCustNo();
 
-        String tmpTmpIds = (String) anParam.get("tmpIds");
+        String tempTmpIds = (String) anParam.get("tmpIds");
 
-        // 根据 changeIds 处理状态
-        String[] strTmpIds = BetterStringUtils.split(tmpTmpIds, ",");
+        List<String> strTmpIds = Arrays.asList(BetterStringUtils.split(tempTmpIds, ","));
 
-        Long[] tmpIds = new Long[strTmpIds.length];
-        for (int i = 0; i < strTmpIds.length; i++) {
-            tmpIds[i] = Long.valueOf(strTmpIds[i]);
-        }
+        List<Long> tmpIds = new ArrayList<>();
 
-        // 检查是否还有不包含在列表里面的未处理项目,如果有,发生错误
-        if (checkMatch(tmpIds, custNo, CustomerConstants.TMP_TYPE_CHANGE) == false) {
-            throw new BytterTradeException("代录编号列表不正确,请检查.");
-        }
+        strTmpIds.forEach(strTmpId -> tmpIds.add(Long.valueOf(strTmpId)));
 
         for (Long id : tmpIds) {
-            saveCustMechManagerTmpStatus(id, CustomerConstants.TMP_STATUS_USEING);
+            saveManagerTmpParentIdAndStatus(id, anApplyId, CustomerConstants.TMP_STATUS_USEING);
         }
 
-        // TODO 要将所有未改变的记录也放入临时表并且标记为 未改变 逐条比较
+        changeApplyService.saveChangeApply(anApplyId, tempTmpIds);
 
-        // 重新发起变更申请
-        changeApplyService.saveChangeApplyStatus(anApplyId, CustomerConstants.CHANGE_APPLY_STATUS_NEW);
+        Collection<CustMechManager> managers = managerService.queryCustMechManager(custNo);
+        Collection<CustMechManagerTmp> managerTmps = this.selectByProperty("parentId", anApplyId);
+        saveNormalManagers(managers, managerTmps, changeApply, CustomerConstants.TMP_TYPE_CHANGE);
 
         return changeApply;
     }
 
     /**
-     * 加载未使用的流水列表
-     * 
-     * @param anCustNo
-     * @return
+     * 加载未提交的变更流水列表
      */
-    public Collection<CustMechManagerTmp> queryNewCustMechManagerTmp(Long anCustNo, String anTmpType) {
+    public Collection<CustMechManagerTmp> queryNewChangeCustMechManagerTmp(Long anCustNo) {
+        BTAssert.notNull(anCustNo, "客户编号不允许为空!");
+
         Map<String, Object> conditionMap = new HashMap<>();
 
         Long version = VersionHelper.generateVersion(this.mapper, anCustNo);
 
         conditionMap.put("custNo", anCustNo);
         conditionMap.put("version", version);
-        conditionMap.put("tmpType", anTmpType);
+        conditionMap.put("tmpType", CustomerConstants.TMP_TYPE_CHANGE);
         conditionMap.put("businStatus", CustomerConstants.TMP_STATUS_NEW);
 
         return this.selectByProperty(conditionMap);
     }
 
     /**
+     * 加载变更流水列表
+     */
+    public Collection<CustMechManagerTmp> queryChangeCustMechManagerTmp(Long anApplyId) {
+        BTAssert.notNull(anApplyId, "变更申请编号不允许为空!");
+
+        CustChangeApply changeApply = checkChangeApply(anApplyId);
+
+        Long custNo = changeApply.getCustNo();
+        Long version = VersionHelper.generateVersion(this.mapper, custNo);
+
+        final Map<String, Object> conditionMap = new HashMap<>();
+        conditionMap.put("custNo", custNo);
+        conditionMap.put("parentId", changeApply.getId());
+        conditionMap.put("version", version);
+        conditionMap.put("tmpType", CustomerConstants.TMP_TYPE_CHANGE);
+
+        return this.selectByProperty(conditionMap);
+    }
+
+    /**
+     * 加载代录流水列表
+     */
+    public Collection<CustMechManagerTmp> queryInsteadManagerTmp(Long anInsteadRecordId) {
+        BTAssert.notNull(anInsteadRecordId, "代录记录编号不允许为空!");
+
+        CustInsteadRecord insteadRecord = checkInsteadRecord(anInsteadRecordId);
+
+        Long custNo = insteadRecord.getCustNo();
+        Long version = VersionHelper.generateVersion(this.mapper, custNo);
+
+        final Map<String, Object> conditionMap = new HashMap<>();
+        conditionMap.put("custNo", custNo);
+        conditionMap.put("parentId", insteadRecord.getId());
+        conditionMap.put("version", version);
+        conditionMap.put("tmpType", CustomerConstants.TMP_TYPE_INSTEAD);
+
+        return this.selectByProperty(conditionMap);
+    }
+
+    /**
      * 添加公司高管流水信息
-     * 
-     * @param anCustMechManagerTmp
-     * @return
      */
     public CustMechManagerTmp addManagerTmp(CustMechManagerTmp anCustMechManagerTmp, String anTmpType) {
         BTAssert.notNull(anCustMechManagerTmp, "公司高管流水信息不允许为空！");
@@ -315,10 +344,6 @@ public class CustMechManagerTmpService extends BaseService<CustMechManagerTmpMap
 
     /**
      * 修改公司高管流水信息
-     * 
-     * @param anCustMechManagerTmp
-     * @param anId
-     * @return
      */
     public CustMechManagerTmp saveManagerTmp(CustMechManagerTmp anCustMechManagerTmp, Long anId) {
         BTAssert.notNull(anCustMechManagerTmp, "公司高管流水信息不允许为空！");
@@ -337,14 +362,14 @@ public class CustMechManagerTmpService extends BaseService<CustMechManagerTmpMap
     }
 
     /**
-     * 保存状态
-     * 
-     * @param anId
-     * @param anBusinStatus
-     * @return
+     * 保存 parentId 和 状态
      */
-    public CustMechManagerTmp saveCustMechManagerTmpStatus(Long anId, String anBusinStatus) {
+    public CustMechManagerTmp saveManagerTmpParentIdAndStatus(Long anId, Long anParentId, String anBusinStatus) {
         CustMechManagerTmp managerTmp = this.selectByPrimaryKey(anId);
+
+        if (anParentId != null) {
+            managerTmp.setParentId(anParentId);
+        }
 
         managerTmp.setBusinStatus(anBusinStatus);
 
@@ -353,10 +378,16 @@ public class CustMechManagerTmpService extends BaseService<CustMechManagerTmpMap
         return managerTmp;
     }
 
+    /**
+     * 添加代录流水
+     */
     public CustMechManagerTmp addInsteadManagerTmp(CustMechManagerTmp anCustMechManagerTmp) {
         BTAssert.notNull(anCustMechManagerTmp, "公司高管流水信息不允许为空！");
 
         final Long refId = anCustMechManagerTmp.getRefId();
+        final Long parentId = anCustMechManagerTmp.getParentId();
+
+        checkInsteadRecord(parentId);
         BTAssert.isNull(refId, "引用编号需要为空!");
 
         anCustMechManagerTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW);
@@ -365,19 +396,21 @@ public class CustMechManagerTmpService extends BaseService<CustMechManagerTmpMap
         return addManagerTmp(anCustMechManagerTmp, CustomerConstants.TMP_TYPE_INSTEAD);
     }
 
+    /**
+     * 添加修改代录流水
+     */
     public CustMechManagerTmp saveSaveInsteadManagerTmp(CustMechManagerTmp anCustMechManagerTmp, Long anId) {
         BTAssert.notNull(anCustMechManagerTmp, "公司高管流水信息不允许为空！");
 
         final Long refId = anCustMechManagerTmp.getRefId();
         BTAssert.notNull(refId, "引用编号不允许为空!");
 
-        // 检查变更引用记录是否存在
         CustMechManager manager = managerService.findCustMechManager(refId);
         BTAssert.notNull(manager, "没有找到引用的记录!");
 
         CustMechManagerTmp tempManagerTmp = findManagerTmpByRefId(refId, CustomerConstants.TMP_TYPE_INSTEAD);
         if (tempManagerTmp == null) {
-            anCustMechManagerTmp.initAddValue(manager, CustomerConstants.TMP_STATUS_NEW);
+            anCustMechManagerTmp.setBusinStatus(CustomerConstants.TMP_STATUS_NEW);
             anCustMechManagerTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
             return addManagerTmp(anCustMechManagerTmp, CustomerConstants.TMP_TYPE_INSTEAD);
         }
@@ -388,14 +421,15 @@ public class CustMechManagerTmpService extends BaseService<CustMechManagerTmpMap
         }
     }
 
+    /**
+     * 添加删除代录流水
+     */
     public CustMechManagerTmp saveDelInsteadManagerTmp(Long anRefId) {
         BTAssert.notNull(anRefId, "公司高管号不允许为空！");
 
-        // 检查变更引用记录是否存在
         CustMechManager manager = managerService.findCustMechManager(anRefId);
         BTAssert.notNull(manager, "没有找到引用的记录!");
 
-        // 创建一个新的流水(如果已经存在变更流水,或者删除流水 则在原有基础上修改)
         CustMechManagerTmp managerTmp = findManagerTmpByRefId(anRefId, CustomerConstants.TMP_TYPE_INSTEAD);
         if (managerTmp == null) {
             managerTmp = new CustMechManagerTmp();
@@ -411,8 +445,10 @@ public class CustMechManagerTmpService extends BaseService<CustMechManagerTmpMap
         }
     }
 
+    /**
+     * 撤销代录流水
+     */
     public int saveCancelInsteadManagerTmp(Long anId) {
-        // 检查是否可撤销
         CustMechManagerTmp managerTmp = this.findCustMechManagerTmp(anId);
 
         Long tmpVersion = managerTmp.getVersion();
@@ -433,72 +469,54 @@ public class CustMechManagerTmpService extends BaseService<CustMechManagerTmpMap
         return this.deleteByPrimaryKey(anId);
     }
 
+    /**
+     * 提交代录项目
+     */
     public CustInsteadRecord addInsteadRecord(Map<String, Object> anParam, Long anInsteadRecordId) {
         BTAssert.notNull(anInsteadRecordId, "代录编号不允许为空！");
         BTAssert.notNull(anParam, "参数不允许为空！");
 
         CustInsteadRecord insteadRecord = checkInsteadRecord(anInsteadRecordId);
 
-        Long custNo = insteadRecord.getCustNo();
+        String tempTmpIds = (String) anParam.get("tmpIds");
 
-        String tmpIds = (String) anParam.get("tmpIds");
+        List<String> strTmpIds = Arrays.asList(BetterStringUtils.split(tempTmpIds, ","));
 
-        // 根据 changeIds 处理状态
-        String[] strTmpIds = BetterStringUtils.split(tmpIds, ",");
+        List<Long> tmpIds = new ArrayList<>();
 
-        Long[] changeIds = new Long[strTmpIds.length];
-        for (int i = 0; i < strTmpIds.length; i++) {
-            changeIds[i] = Long.valueOf(strTmpIds[i]);
+        strTmpIds.forEach(strTmpId -> tmpIds.add(Long.valueOf(strTmpId)));
+
+        for (Long id : tmpIds) {
+            saveManagerTmpParentIdAndStatus(id, insteadRecord.getId(), CustomerConstants.TMP_STATUS_USEING);
         }
 
-        // 检查是否还有不包含在列表里面的未处理项目,如果有,发生错误
-        if (checkMatch(changeIds, custNo, CustomerConstants.TMP_TYPE_CHANGE) == false) {
-            throw new BytterTradeException("代录编号列表不正确,请检查.");
-        }
-
-        for (Long id : changeIds) {
-            saveCustMechManagerTmpStatus(id, CustomerConstants.TMP_STATUS_USEING);
-        }
-
-        // TODO 要将所有未改变的记录也放入临时表并且标记为 未改变 逐条比较
-
-        // 重新发起变更申请
-        insteadRecordService.saveCustInsteadRecordStatus(anInsteadRecordId, CustomerConstants.CHANGE_APPLY_STATUS_NEW);
+        insteadRecordService.saveCustInsteadRecordStatus(anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN);
 
         return insteadRecord;
     }
 
+    /**
+     * 修改代录项目
+     */
     public CustInsteadRecord saveInsteadRecord(Map<String, Object> anParam, Long anInsteadRecordId) {
         BTAssert.notNull(anInsteadRecordId, "代录编号不允许为空！");
         BTAssert.notNull(anParam, "参数不允许为空！");
 
         CustInsteadRecord insteadRecord = checkInsteadRecord(anInsteadRecordId);
 
-        Long custNo = insteadRecord.getCustNo();
+        String tempTmpIds = (String) anParam.get("tmpIds");
 
-        String tmpIds = (String) anParam.get("tmpIds");
+        List<String> strTmpIds = Arrays.asList(BetterStringUtils.split(tempTmpIds, ","));
 
-        // 根据 changeIds 处理状态
-        String[] strTmpIds = BetterStringUtils.split(tmpIds, ",");
+        List<Long> tmpIds = new ArrayList<>();
 
-        Long[] changeIds = new Long[strTmpIds.length];
-        for (int i = 0; i < strTmpIds.length; i++) {
-            changeIds[i] = Long.valueOf(strTmpIds[i]);
+        strTmpIds.forEach(strTmpId -> tmpIds.add(Long.valueOf(strTmpId)));
+        
+        for (Long id : tmpIds) {
+            saveManagerTmpParentIdAndStatus(id, insteadRecord.getId(), CustomerConstants.TMP_STATUS_USEING);
         }
 
-        // 检查是否还有不包含在列表里面的未处理项目,如果有,发生错误
-        if (checkMatch(changeIds, custNo, CustomerConstants.TMP_TYPE_CHANGE) == false) {
-            throw new BytterTradeException("代录编号列表不正确,请检查.");
-        }
-
-        for (Long id : changeIds) {
-            saveCustMechManagerTmpStatus(id, CustomerConstants.TMP_STATUS_USEING);
-        }
-
-        // TODO 要将所有未改变的记录也放入临时表并且标记为 未改变 逐条比较
-
-        // 重新发起变更申请
-        insteadRecordService.saveCustInsteadRecordStatus(anInsteadRecordId, CustomerConstants.CHANGE_APPLY_STATUS_NEW);
+        insteadRecordService.saveCustInsteadRecord(anInsteadRecordId, tempTmpIds);
 
         return insteadRecord;
     }
@@ -507,15 +525,12 @@ public class CustMechManagerTmpService extends BaseService<CustMechManagerTmpMap
      * 回写正式数据
      */
     @Override
-    public void saveFormalData(String... anTmpIds) {
-        for (String tempTmpId : anTmpIds) {
-            Long tmpId = Long.valueOf(tempTmpId);
-
-            CustMechManagerTmp managerTmp = this.findCustMechManagerTmp(tmpId);
-
-            BTAssert.notNull(managerTmp, "没有找到对应的高管临时流水!");
-
-            String tmpOperType = managerTmp.getTmpOperType();
+    public void saveFormalData(Long anId) {
+        
+        Collection<CustMechManagerTmp> managerTmps = this.selectByProperty("parentId", anId);
+        
+        for (CustMechManagerTmp managerTmp: managerTmps) {
+            String tmpOperType = managerTmp.getTmpOperType(); 
             switch (tmpOperType) {
             case CustomerConstants.TMP_OPER_TYPE_ADD:
                 managerService.addCustMechManager(managerTmp);
@@ -531,27 +546,20 @@ public class CustMechManagerTmpService extends BaseService<CustMechManagerTmpMap
                 break;
             }
 
-            saveCustMechManagerTmpStatus(tmpId, CustomerConstants.TMP_STATUS_USED);
+            saveManagerTmpParentIdAndStatus(managerTmp.getId(), null, CustomerConstants.TMP_STATUS_USED);
         }
     }
 
     /**
      * 回写作废记录
-     * 
-     * @param anTmpIds
      */
     @Override
-    public void saveCancelData(String... anTmpIds) {
+    public void saveCancelData(Long anId) {
 
     }
 
     /**
      * 检查并返回代录记录
-     * 
-     * @param anCustMechBaseTmp
-     * @param anInsteadRecordId
-     * @param anBusinStatus
-     * @return
      */
     private CustInsteadRecord checkInsteadRecord(Long anInsteadRecordId, String... anBusinStatus) {
         BTAssert.notNull(anInsteadRecordId, "代录记录编号不允许为空！");
@@ -560,52 +568,50 @@ public class CustMechManagerTmpService extends BaseService<CustMechManagerTmpMap
         BTAssert.notNull(insteadRecord, "没有找到对应的代录记录");
 
         String insteadItem = insteadRecord.getInsteadItem();
-        if (BetterStringUtils.equals(insteadItem, CustomerConstants.ITEM_LAW) == false) {
+        if (BetterStringUtils.equals(insteadItem, CustomerConstants.ITEM_MANAGER) == false) {
             throw new BytterTradeException(20072, "代录项目不匹配！");
         }
 
-        List<String> businStatus = Arrays.asList(anBusinStatus);
-        if (businStatus.contains(insteadRecord.getBusinStatus()) == false) {
-            throw new BytterTradeException(20071, "此代录项目状态不正确！");
+        if (anBusinStatus.length != 0) {
+            List<String> businStatus = Arrays.asList(anBusinStatus);
+            if (businStatus.contains(insteadRecord.getBusinStatus()) == false) {
+                throw new BytterTradeException(20071, "此代录项目状态不正确！");
+            }
         }
-
-        Long applyId = insteadRecord.getApplyId();
 
         return insteadRecord;
     }
 
     /**
      * 检查并返回变更申请
-     * 
-     * @param anApplyId
-     * @return
      */
     public CustChangeApply checkChangeApply(Long anApplyId, String... anBusinStatus) {
         BTAssert.notNull(anApplyId, "变更申请-编号 不能为空");
-        // 查询 变更申请
+
         CustChangeApply changeApply = changeApplyService.findChangeApply(anApplyId);
-        if (BetterStringUtils.equals(changeApply.getChangeItem(), CustomerConstants.ITEM_MANAGER) == false) {
-            throw new BytterTradeException(20074, "");
+        String changeItem = changeApply.getChangeItem();
+        if (BetterStringUtils.equals(changeItem, CustomerConstants.ITEM_MANAGER) == false) {
+            throw new BytterTradeException(20074, "变更项目不匹配!");
         }
+
+        if (anBusinStatus.length != 0) {
+
+        }
+
         return changeApply;
     }
 
     /**
      * 检查是否匹配
-     * 
-     * @param anChangeIds
-     * @param anCustNo
-     * @return
      */
-    private boolean checkMatch(Long[] anChangeIds, Long anCustNo, String anTmpType) {
-        Collection<CustMechManagerTmp> managerTmps = queryNewCustMechManagerTmp(anCustNo, anTmpType);
+    private boolean checkMatchNewChange(Long[] anChangeIds, Long anCustNo) {
+        Collection<CustMechManagerTmp> managerTmps = queryNewChangeCustMechManagerTmp(anCustNo);
         if (anChangeIds.length != managerTmps.size()) {
             return false;
         }
         Set<Long> tempSet = new HashSet<>();
 
         for (CustMechManagerTmp managerTmp : managerTmps) {
-            // 忽略未修改的记录
             if (BetterStringUtils.equals(managerTmp.getTmpOperType(), CustomerConstants.TMP_OPER_TYPE_NORMAL) == true) {
                 continue;
             }

@@ -17,6 +17,13 @@ public interface CustomerConstants {
     String AUDIT_TYPE_CHANGEAPPLY = "3";
     String AUDIT_TYPE_CUSTRELATION = "4";
     
+    // 审核步骤
+    String AUDIT_STEP_AUDIT = "0";
+    String AUDIT_STEP_REVIEW = "1";
+    String AUDIT_STEP_CONFIRM = "2";
+    String AUDIT_STEP_TYPEIN = "3";
+    String AUDIT_STEP_SELF = "4";
+    
     // 审核结果: 0审核通过 1审核驳回
     String AUDIT_RESULT_PASS = "0";
     String AUDIT_RESULT_REJECT = "1";
@@ -51,7 +58,7 @@ public interface CustomerConstants {
     String ITEM_BANKACCOUNT = "6";
     String ITEM_OPENACCOUNT = "7";
 
-    // 变更申请状态：0未审核 1审核通过 2审核驳回
+    // 变更申请状态：0未审核 1审核通过 2审核驳回 3作废
     String CHANGE_APPLY_STATUS_NEW = "0";
     String CHANGE_APPLY_STATUS_AUDIT_PASS = "1";
     String CHANGE_APPLY_STATUS_AUDIT_REJECT = "2";

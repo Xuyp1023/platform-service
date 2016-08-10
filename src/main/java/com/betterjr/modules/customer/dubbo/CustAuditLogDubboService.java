@@ -15,25 +15,32 @@ public class CustAuditLogDubboService implements ICustAuditLogService {
     private CustAuditLogService auditLogService;
 
     @Override
-    public String webQueryAuditLogOpenAccountList(Long anBusinId, int anFlag, int anPageNum, int anPageSize) {
-        return AjaxObject.newOkWithPage("开户 审核日志-列表查询 成功", auditLogService.queryCustAuditLogOpenAccountByBusinId(anBusinId, anFlag, anPageNum, anPageSize)).toJson();
+    public String webQueryAuditLogOpenAccountList(Long anBusinId) {
+        return AjaxObject.newOk("开户 审核日志-列表查询 成功", auditLogService.queryCustAuditLogByAuditType(anBusinId, CustomerConstants.AUDIT_TYPE_OPENACCOUNT))
+                .toJson();
     }
 
     @Override
-    public String webQueryAuditLogInsteadApplyList(Long anBusinId, int anFlag, int anPageNum, int anPageSize) {
-        return AjaxObject.newOkWithPage("代录申请 审核日志-列表查询 成功", auditLogService.queryCustAuditLogInsteadApplyByBusinId(anBusinId, anFlag, anPageNum, anPageSize)).toJson();
+    public String webQueryAuditLogInsteadApplyList(Long anBusinId) {
+        return AjaxObject
+                .newOk("代录申请 审核日志-列表查询 成功", auditLogService.queryCustAuditLogByAuditType(anBusinId, CustomerConstants.AUDIT_TYPE_INSTEADAPPLY))
+                .toJson();
     }
 
     @Override
-    public String webQueryAuditLogInsteadRecordList(Long anBusinId, int anFlag, int anPageNum, int anPageSize) {
-        return AjaxObject.newOkWithPage("代录记录 审核日志-列表查询 成功", auditLogService.queryCustAuditLogInsteadRecordByBusinId(anBusinId, anFlag, anPageNum, anPageSize)).toJson();
+    public String webQueryAuditLogInsteadRecordList(Long anBusinId) {
+        return AjaxObject
+                .newOk("代录记录 审核日志-列表查询 成功", auditLogService.queryCustAuditLogByAuditType(anBusinId, CustomerConstants.AUDIT_TYPE_INSTEADRECORD))
+                .toJson();
     }
 
     @Override
-    public String webQueryAuditLogChangeApplyList(Long anBusinId, int anFlag, int anPageNum, int anPageSize) {
-        return AjaxObject.newOkWithPage("变更申请 审核日志-列表查询 成功", auditLogService.queryCustAuditLogChangeApplyByBusinId(anBusinId, anFlag, anPageNum, anPageSize)).toJson();
+    public String webQueryAuditLogChangeApplyList(Long anBusinId) {
+        return AjaxObject
+                .newOk("变更申请 审核日志-列表查询 成功", auditLogService.queryCustAuditLogByAuditType(anBusinId, CustomerConstants.AUDIT_TYPE_CHANGEAPPLY))
+                .toJson();
     }
-    
+
     @Override
     public String webFindAuditLog(Long anId) {
         return AjaxObject.newOk("审核日志-详情查询 成功", auditLogService.findCustAuditLog(anId)).toJson();
