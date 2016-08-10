@@ -45,48 +45,38 @@ public class CustMechBaseTmpService extends BaseService<CustMechBaseTmpMapper, C
 
     @Resource
     private CustChangeApplyService changeApplyService;
-    
+
     @Resource
     private CustAccountService custAccountService;
 
     /**
      * 公司基本信息-流水信息-详情
-     * 
-     * @param anId
-     * @param anCustNo
-     * @return
      */
     public CustMechBaseTmp findCustMechBaseTmp(Long anId) {
         BTAssert.notNull(anId, "流水编号不允许为空！");
 
         return this.selectByPrimaryKey(anId);
     }
-    
+
     /**
      * 根据当前流水,找上一条有效流水
-     * @param anCustMechBaseTmp
-     * @return
      */
     public CustMechBaseTmp findCustMechBaseTmpPrevVersion(CustMechBaseTmp anCustMechBaseTmp) {
         Long refId = anCustMechBaseTmp.getRefId();
         Long version = anCustMechBaseTmp.getVersion();
-        
+
         Long befVersion = this.mapper.selectPrevVersion(refId, version);
-        
+
         Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("version", befVersion);
         conditionMap.put("refId", refId);
-        
-        List<CustMechBaseTmp> befDatas =  this.selectByProperty(conditionMap);
+
+        List<CustMechBaseTmp> befDatas = this.selectByProperty(conditionMap);
         return Collections3.getFirst(befDatas);
     }
 
     /**
      * 公司基本信息-流水信息-详情
-     * 
-     * @param anId
-     * @param anCustNo
-     * @return
      */
     public CustMechBaseTmp findCustMechBaseTmpByInsteadRecord(Long anInsteadRecordId) {
         BTAssert.notNull(anInsteadRecordId, "代录项目编号不允许为空！");
@@ -108,50 +98,39 @@ public class CustMechBaseTmpService extends BaseService<CustMechBaseTmpMapper, C
 
     /**
      * 公司基本信息-流水信息-添加
-     * 
-     * @param anCustMechBaseTmp
-     * @return
      */
     public CustMechBaseTmp addCustMechBaseTmp(CustMechBaseTmp anCustMechBaseTmp, String anTmpType) {
         BTAssert.notNull(anCustMechBaseTmp, "公司基本信息-流水信息 不能为空！");
         BTAssert.notNull(anTmpType, "流水类型  不能为空！");
 
         final Long custNo = anCustMechBaseTmp.getRefId();
-        
+
         anCustMechBaseTmp.initAddValue(anTmpType, custNo);
         anCustMechBaseTmp.setVersion(VersionHelper.generateVersion(this.mapper, custNo));
         this.insert(anCustMechBaseTmp);
 
         return anCustMechBaseTmp;
     }
-    
+
     /**
-     * 公司基本信息-流水信息-添加  开户时建立
-     * 
-     * @param anCustMechBaseTmp
-     * @return
+     * 公司基本信息-流水信息-添加 开户时建立
      */
     public CustMechBaseTmp addCustMechBaseTmp(CustMechBase anCustMechBase) {
         BTAssert.notNull(anCustMechBase, "公司基本信息 不能为空！");
 
         final CustMechBaseTmp custMechBaseTmp = new CustMechBaseTmp();
-        
-        // 初始数据一开始为 已使用
+
         custMechBaseTmp.initAddValue(anCustMechBase, CustomerConstants.TMP_TYPE_INITDATA, CustomerConstants.TMP_STATUS_USED);
         custMechBaseTmp.setVersion(VersionHelper.generateVersion(this.mapper, anCustMechBase.getCustNo()));
         custMechBaseTmp.setRefId(anCustMechBase.getCustNo());
-        
+
         this.insert(custMechBaseTmp);
 
         return custMechBaseTmp;
     }
 
-
     /**
      * 公司基本信息-流水信息-修改
-     * 
-     * @param anCustMechBaseTmp
-     * @return
      */
     public CustMechBaseTmp saveCustMechBaseTmp(CustMechBaseTmp anCustMechBaseTmp, Long anId) {
         BTAssert.notNull(anId, "公司基本信息-流水信息 编号不允许为空！");
@@ -173,11 +152,12 @@ public class CustMechBaseTmpService extends BaseService<CustMechBaseTmpMapper, C
         BTAssert.notNull(anCustMechBaseTmp, "公司基本信息-变更申请 不能为空");
 
         // TODO 处理上传
-        // 添加变更流水记录
         CustMechBaseTmp custMechBaseTmp = addCustMechBaseTmp(anCustMechBaseTmp, CustomerConstants.TMP_TYPE_CHANGE);
 
-        // 发起变更申请
-        changeApplyService.addChangeApply(custMechBaseTmp.getRefId(), CustomerConstants.ITEM_BASE, String.valueOf(custMechBaseTmp.getId()));
+        CustChangeApply changeApply = changeApplyService.addChangeApply(custMechBaseTmp.getRefId(), CustomerConstants.ITEM_BASE,
+                String.valueOf(custMechBaseTmp.getId()));
+
+        saveCustMechBaseTmpParentId(custMechBaseTmp.getId(), changeApply.getId());
 
         return custMechBaseTmp;
     }
@@ -187,7 +167,6 @@ public class CustMechBaseTmpService extends BaseService<CustMechBaseTmpMapper, C
      * 
      */
     public CustMechBaseTmp saveChangeApply(CustMechBaseTmp anCustMechBaseTmp, Long anApplyId, String anFileList) {
-        // 检查并获取
         CustChangeApply changeApply = checkChangeApply(anApplyId);
 
         Long tmpId = Long.valueOf(changeApply.getTmpIds());
@@ -197,47 +176,38 @@ public class CustMechBaseTmpService extends BaseService<CustMechBaseTmpMapper, C
         // TODO 处理上传
         CustMechBaseTmp custMechBaseTmp = saveCustMechBaseTmp(anCustMechBaseTmp, tmpId);
 
-        // 重新发起变更申请
         changeApplyService.saveChangeApplyStatus(anApplyId, CustomerConstants.CHANGE_APPLY_STATUS_NEW);
 
         return custMechBaseTmp;
     }
-    
+
     /**
      * 公司基本信息-添加代录
-     * 
-     * @param anCustMechBaseTmp
-     * @return
      */
     public CustMechBaseTmp addInsteadRecord(CustMechBaseTmp anCustMechBaseTmp, Long anInsteadRecordId, String anFileList) {
-        // 校验参数
         checkInsteadRecord(anCustMechBaseTmp, anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_NEW);
 
         // TODO 处理上传
-        // 添加代录流水信息
         final CustMechBaseTmp custMechBaseTmp = addCustMechBaseTmp(anCustMechBaseTmp, CustomerConstants.TMP_TYPE_INSTEAD);
 
-        // 回写代录记录
-        insteadRecordService.saveCustInsteadRecord(anInsteadRecordId, String.valueOf(custMechBaseTmp.getId()));
+        CustInsteadRecord insteadRecord = insteadRecordService.saveCustInsteadRecord(anInsteadRecordId, String.valueOf(custMechBaseTmp.getId()));
+
+        saveCustMechBaseTmpParentId(custMechBaseTmp.getId(), insteadRecord.getId());
 
         return custMechBaseTmp;
     }
 
     /**
      * 公司基本信息-修改代录
-     * 
-     * @param anCustMechBaseTmp
-     * @return
      */
     public CustMechBaseTmp saveInsteadRecord(CustMechBaseTmp anCustMechBaseTmp, Long anInsteadRecordId, String anFileList) {
-        // 校验参数 并获取代录记录 在驳回的状态下可以修改
         CustInsteadRecord insteadRecord = checkInsteadRecord(anCustMechBaseTmp, anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN,
                 CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT, CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_REJECT);
 
         Long tmpId = Long.valueOf(insteadRecord.getTmpIds());
 
         // TODO 处理上传
-        // 修改代录流水信息
+
         final CustMechBaseTmp custMechBaseTmp = saveCustMechBaseTmp(anCustMechBaseTmp, tmpId);
         insteadRecordService.saveCustInsteadRecordStatus(anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN);
 
@@ -252,22 +222,17 @@ public class CustMechBaseTmpService extends BaseService<CustMechBaseTmpMapper, C
      */
     public CustChangeApply checkChangeApply(Long anApplyId, String... anBusinStatus) {
         BTAssert.notNull(anApplyId, "变更申请-编号 不能为空");
-        // 查询 变更申请
+
         CustChangeApply changeApply = changeApplyService.findChangeApply(anApplyId);
         if (BetterStringUtils.equals(changeApply.getChangeItem(), CustomerConstants.ITEM_BASE) == false) {
             throw new BytterTradeException(20074, "");
         }
-        changeApply.getBusinStatus();
+        
         return changeApply;
     }
 
     /**
      * 检查并返回代录记录
-     * 
-     * @param anCustMechBaseTmp
-     * @param anInsteadRecordId
-     * @param anBusinStatus
-     * @return
      */
     private CustInsteadRecord checkInsteadRecord(CustMechBaseTmp anCustMechBaseTmp, Long anInsteadRecordId, String... anBusinStatus) {
         BTAssert.notNull(anCustMechBaseTmp, "客户基本信息流水信息不允许为空！");
@@ -300,9 +265,6 @@ public class CustMechBaseTmpService extends BaseService<CustMechBaseTmpMapper, C
 
     /**
      * 保存流水信息状态并返回
-     * 
-     * @param anCustMechBaseTmp
-     * @param anBusinStatus
      */
     private CustMechBaseTmp saveCustMechBaseTmpStatus(Long anId, String anBusinStatus) {
         BTAssert.notNull(anId, "编号不允许为空");
@@ -317,33 +279,31 @@ public class CustMechBaseTmpService extends BaseService<CustMechBaseTmpMapper, C
         return custMechBaseTmp;
     }
 
-    
+    private void saveCustMechBaseTmpParentId(Long anId, Long anParentId) {
+        CustMechBaseTmp custMechBaseTmp = findCustMechBaseTmp(anId);
+        custMechBaseTmp.setParentId(anParentId);
+        this.updateByPrimaryKeySelective(custMechBaseTmp);
+    }
+
     /**
      * 保存数据至正式表
      */
     @Override
-    public void saveFormalData(String... anTmpIds) {
-        BTAssert.notEmpty(anTmpIds, "临时流水编号不允许为空！");
+    public void saveFormalData(Long anId) {
+        BTAssert.notNull(anId, "临时流水编号不允许为空！");
 
-        if (anTmpIds.length != 1) {
-            throw new BytterTradeException(20021, "临时流水编号只能有一位！");
-        }
+        final CustMechBaseTmp custMechBaseTmp = saveCustMechBaseTmpStatus(anId, CustomerConstants.TMP_STATUS_USED);
 
-        Long tmpId = Long.valueOf(anTmpIds[0]);
-
-        // 修改临时表记录为已使用
-        final CustMechBaseTmp custMechBaseTmp = saveCustMechBaseTmpStatus(tmpId, CustomerConstants.TMP_STATUS_USED);
-
-        // 回写正式表记录
         baseService.saveCustMechBase(custMechBaseTmp);
     }
-    
+
     /**
      * 回写作废记录
+     * 
      * @param anTmpIds
      */
     @Override
-    public void saveCancelData(String... anTmpIds) {
-        
+    public void saveCancelData(Long anId) {
+
     }
 }

@@ -91,6 +91,25 @@ public class CustChangeApplyService extends BaseService<CustChangeApplyMapper, C
 
         return !Collections3.isEmpty(custChangeApplys);
     }
+    
+    /**
+     * 保存变更申请-修改状态
+     * 
+     * @param anCustChangeApply
+     * @return
+     */
+    public CustChangeApply saveChangeApply(Long anApplyId, String anTmpIds) {
+        BTAssert.notNull(anApplyId, "编号不允许为空！");
+        BTAssert.notNull(anTmpIds, "流水记录不允许为空！");
+
+        final CustChangeApply tempCustChangeApply = this.selectByPrimaryKey(anApplyId);
+        tempCustChangeApply.setTmpIds(anTmpIds);
+        tempCustChangeApply.setBusinStatus(CustomerConstants.CHANGE_APPLY_STATUS_NEW);
+        
+        this.updateByPrimaryKeySelective(tempCustChangeApply);
+
+        return tempCustChangeApply;
+    }
 
     /**
      * 保存变更申请-修改状态

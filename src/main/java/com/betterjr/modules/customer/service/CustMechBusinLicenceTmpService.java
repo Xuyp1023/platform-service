@@ -50,11 +50,10 @@ public class CustMechBusinLicenceTmpService extends BaseService<CustMechBusinLic
 
     @Resource
     private CustAccountService custAccountService;
-    
-    
+
     public CustMechBusinLicenceTmp findBusinLicenceTmp(Long anId) {
         BTAssert.notNull(anId, "编号不允许为空！");
-        
+
         return this.selectByPrimaryKey(anId);
     }
 
@@ -72,31 +71,29 @@ public class CustMechBusinLicenceTmpService extends BaseService<CustMechBusinLic
         }
 
         final Long id = Long.valueOf(insteadRecord.getTmpIds());
-        
+
         CustMechBusinLicenceTmp businLicenceTmp = findBusinLicenceTmp(id);
-        
+
         return businLicenceTmp;
     }
-    
+
     /**
      * 根据当前流水取上一版可用流水
-     * @param anMechBusinLicenceTmp
-     * @return
      */
     public CustMechBusinLicenceTmp findBusinLicenceTmpPrevVersion(CustMechBusinLicenceTmp anMechBusinLicenceTmp) {
         Long refId = anMechBusinLicenceTmp.getRefId();
         Long version = anMechBusinLicenceTmp.getVersion();
-        
+
         Long befVersion = this.mapper.selectPrevVersion(refId, version);
-        
+
         Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("version", befVersion);
         conditionMap.put("refId", refId);
-        
-        List<CustMechBusinLicenceTmp> befDatas =  this.selectByProperty(conditionMap);
+
+        List<CustMechBusinLicenceTmp> befDatas = this.selectByProperty(conditionMap);
         return Collections3.getFirst(befDatas);
     }
-    
+
     /**
      * 营业执照流水信息-保存
      */
@@ -122,7 +119,7 @@ public class CustMechBusinLicenceTmpService extends BaseService<CustMechBusinLic
 
         final String custName = custAccountService.queryCustName(custNo);
         anCustMechBusinLicenceTmp.initAddValue(anTmpType, custNo, custName);
-        
+
         anCustMechBusinLicenceTmp.setVersion(VersionHelper.generateVersion(this.mapper, custNo));
         this.insert(anCustMechBusinLicenceTmp);
 
@@ -137,11 +134,10 @@ public class CustMechBusinLicenceTmpService extends BaseService<CustMechBusinLic
 
         final CustMechBusinLicenceTmp custMechBusinLicenceTmp = new CustMechBusinLicenceTmp();
 
-        // 初始数据一开始为 已使用
         custMechBusinLicenceTmp.initAddValue(anCustMechBusinLicence, CustomerConstants.TMP_TYPE_INITDATA, CustomerConstants.TMP_STATUS_USED);
         custMechBusinLicenceTmp.setVersion(VersionHelper.generateVersion(this.mapper, anCustMechBusinLicence.getCustNo()));
         custMechBusinLicenceTmp.setRefId(anCustMechBusinLicence.getCustNo());
-        
+
         this.insert(custMechBusinLicenceTmp);
 
         return custMechBusinLicenceTmp;
@@ -155,9 +151,10 @@ public class CustMechBusinLicenceTmpService extends BaseService<CustMechBusinLic
 
         CustMechBusinLicenceTmp businLicenceTmp = addCustMechBusinLicenceTmp(anCustMechBusinLicenceTmp, CustomerConstants.TMP_TYPE_CHANGE);
 
-        // 发起变更申请
-        changeApplyService.addChangeApply(anCustMechBusinLicenceTmp.getRefId(), CustomerConstants.ITEM_BUSINLICENCE,
+        CustChangeApply changeApply = changeApplyService.addChangeApply(anCustMechBusinLicenceTmp.getRefId(), CustomerConstants.ITEM_BUSINLICENCE,
                 String.valueOf(anCustMechBusinLicenceTmp.getId()));
+
+        saveCustMechBusinLicenceTmpParentId(businLicenceTmp.getId(), changeApply.getId());
 
         return businLicenceTmp;
     }
@@ -169,7 +166,6 @@ public class CustMechBusinLicenceTmpService extends BaseService<CustMechBusinLic
      * @return
      */
     public CustMechBusinLicenceTmp saveChangeApply(CustMechBusinLicenceTmp anBusinLicenceTmp, Long anApplyId, String anFileList) {
-        // 检查并获取
         CustChangeApply changeApply = checkChangeApply(anApplyId);
 
         Long tmpId = Long.valueOf(changeApply.getTmpIds());
@@ -178,7 +174,6 @@ public class CustMechBusinLicenceTmpService extends BaseService<CustMechBusinLic
         // TODO 文件上传
         CustMechBusinLicenceTmp businLicenceTmp = saveCustMechBusinLicenceTmp(anBusinLicenceTmp, tmpId);
 
-        // 重新发起变更申请
         changeApplyService.saveChangeApplyStatus(anApplyId, CustomerConstants.CHANGE_APPLY_STATUS_NEW);
 
         return businLicenceTmp;
@@ -188,15 +183,14 @@ public class CustMechBusinLicenceTmpService extends BaseService<CustMechBusinLic
      * 营业执照流水信息-添加代录
      */
     public Object addInsteadRecord(CustMechBusinLicenceTmp anBusinLicenceTmp, Long anInsteadRecordId, String anFileList) {
-        // 校验参数
         checkInsteadRecord(anBusinLicenceTmp, anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_NEW);
 
         // TODO 处理上传
-        // 添加代录流水信息
         final CustMechBusinLicenceTmp businLicenceTmp = addCustMechBusinLicenceTmp(anBusinLicenceTmp, CustomerConstants.TMP_TYPE_INSTEAD);
 
-        // 回写代录记录
-        insteadRecordService.saveCustInsteadRecord(anInsteadRecordId, String.valueOf(businLicenceTmp.getId()));
+        CustInsteadRecord insteadRecord = insteadRecordService.saveCustInsteadRecord(anInsteadRecordId, String.valueOf(businLicenceTmp.getId()));
+
+        saveCustMechBusinLicenceTmpParentId(businLicenceTmp.getId(), insteadRecord.getId());
 
         return businLicenceTmp;
     }
@@ -205,14 +199,12 @@ public class CustMechBusinLicenceTmpService extends BaseService<CustMechBusinLic
      * 营业执照流水信息-修改代录
      */
     public Object saveInsteadRecord(CustMechBusinLicenceTmp anBusinLicenceTmp, Long anInsteadRecordId, String anFileList) {
-        // 校验参数 并获取代录记录 在驳回的状态下可以修改
         CustInsteadRecord insteadRecord = checkInsteadRecord(anBusinLicenceTmp, anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN,
                 CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT, CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_REJECT);
 
         Long tmpId = Long.valueOf(insteadRecord.getTmpIds());
 
         // TODO 处理上传
-        // 修改代录流水信息
         final CustMechBusinLicenceTmp businLicenceTmp = saveCustMechBusinLicenceTmp(anBusinLicenceTmp, tmpId);
         insteadRecordService.saveCustInsteadRecordStatus(anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN);
 
@@ -224,7 +216,6 @@ public class CustMechBusinLicenceTmpService extends BaseService<CustMechBusinLic
      */
     public CustChangeApply checkChangeApply(Long anApplyId, String... anBusinStatus) {
         BTAssert.notNull(anApplyId, "变更申请-编号 不能为空");
-        // 查询 变更申请
         CustChangeApply changeApply = changeApplyService.findChangeApply(anApplyId);
         if (BetterStringUtils.equals(changeApply.getChangeItem(), CustomerConstants.ITEM_BUSINLICENCE) == false) {
             throw new BytterTradeException(20074, "");
@@ -280,28 +271,31 @@ public class CustMechBusinLicenceTmpService extends BaseService<CustMechBusinLic
         return businLicenceTmp;
     }
 
-
     @Override
-    public void saveFormalData(String... anTmpIds) {
-        BTAssert.notEmpty(anTmpIds, "临时流水编号不允许为空！");
+    public void saveFormalData(Long anId) {
+        BTAssert.notNull(anId, "编号不允许为空！");
 
-        if (anTmpIds.length != 1) {
-            throw new BytterTradeException(20021, "临时流水编号只能有一位！");
-        }
-
-        Long tmpId = Long.valueOf(anTmpIds[0]);
-
-        final CustMechBusinLicenceTmp businLicenceTmp = saveBusinLicenceTmpStatus(tmpId, CustomerConstants.TMP_STATUS_USED);
+        final CustMechBusinLicenceTmp businLicenceTmp = saveBusinLicenceTmpStatus(anId, CustomerConstants.TMP_STATUS_USED);
 
         businLicenceService.saveCustMechBusinLicence(businLicenceTmp);
     }
 
+    private void saveCustMechBusinLicenceTmpParentId(Long anId, Long anParentId) {
+        final CustMechBusinLicenceTmp businLicenceTmp = this.selectByPrimaryKey(anId);
+        BTAssert.notNull(businLicenceTmp, "没有找到临时流水信息！");
+
+        businLicenceTmp.setParentId(anParentId);
+
+        this.updateByPrimaryKeySelective(businLicenceTmp);
+    }
+
     /**
      * 回写作废记录
+     * 
      * @param anTmpIds
      */
     @Override
-    public void saveCancelData(String... anTmpIds) {
-        
+    public void saveCancelData(Long anId) {
+
     }
 }

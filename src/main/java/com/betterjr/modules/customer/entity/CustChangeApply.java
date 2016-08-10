@@ -432,7 +432,19 @@ public class CustChangeApply implements BetterjrEntity {
         this.lastStatus = this.businStatus;
         this.businStatus = anBusinStatus;
     }
+    
+    public void initModifyValue(CustChangeApply anChangeApply) {
+        this.modiOperId = UserUtils.getOperatorInfo().getId();
+        this.modiOperName = UserUtils.getOperatorInfo().getName();
+        this.modiDate = BetterDateUtils.getNumDate();
+        this.modiTime = BetterDateUtils.getNumTime();
 
+        this.lastStatus = this.businStatus;
+        this.businStatus = anChangeApply.getBusinStatus();
+        
+        this.tmpIds = anChangeApply.getTmpIds();
+    }
+    
     public String getAuditDate() {
         return auditDate;
     }
@@ -464,4 +476,5 @@ public class CustChangeApply implements BetterjrEntity {
     public void setAuditReason(String anAuditReason) {
         auditReason = anAuditReason;
     }
+
 }

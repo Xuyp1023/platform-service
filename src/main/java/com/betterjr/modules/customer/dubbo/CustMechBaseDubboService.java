@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.betterjr.common.data.SimpleDataEntity;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.common.web.AjaxObject;
 import com.betterjr.mapper.pagehelper.Page;
@@ -47,6 +48,12 @@ public class CustMechBaseDubboService implements ICustMechBaseService {
     @Override
     public String webQueryCustInfo() {
         Collection<CustInfo> custInfos = baseService.queryCustInfo();
+        return AjaxObject.newOk("查询操作员所有的公司列表成功", custInfos).toJson();
+    }
+    
+    @Override
+    public String webQueryCustInfoSelect() {
+        Collection<SimpleDataEntity> custInfos = baseService.queryCustInfoSelect();
         return AjaxObject.newOk("查询操作员所有的公司列表成功", custInfos).toJson();
     }
 

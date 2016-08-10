@@ -11,11 +11,11 @@ public interface IFormalDataService {
      * @param anTmpIds
      * @return
      */
-    public void saveFormalData(String... anTmpIds);
+    public void saveFormalData(Long anId);
     
     /**
      * 作废数据状态回写接口
      * @param anTmpIds
      */
-    public void saveCancelData(String... anTmpIds);
+    public void saveCancelData(Long anId);
 }

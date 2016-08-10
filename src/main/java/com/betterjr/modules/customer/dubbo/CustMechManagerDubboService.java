@@ -83,8 +83,14 @@ public class CustMechManagerDubboService implements ICustMechManagerService {
     
     @Override
     public String webQueryNewChangeManagerTmp(Long anCustNo) {
-        return AjaxObject.newOk("公司高管-流水信息 列表查询成功", managerTmpService.queryNewCustMechManagerTmp(anCustNo, CustomerConstants.TMP_TYPE_CHANGE)).toJson();
+        return AjaxObject.newOk("公司高管-流水信息 列表查询成功", managerTmpService.queryNewChangeCustMechManagerTmp(anCustNo)).toJson();
     }
+    
+    @Override
+    public String webQueryChangeManagerTmp(Long anApplyId) {
+        return AjaxObject.newOk("公司高管-流水信息 列表查询成功", managerTmpService.queryChangeCustMechManagerTmp(anApplyId)).toJson();
+    }
+    
     
     @Override
     public String webAddChangeApply(Map<String, Object> anParam, Long anCustNo) {
@@ -132,8 +138,8 @@ public class CustMechManagerDubboService implements ICustMechManagerService {
     }
     
     @Override
-    public String webQueryNewInsteadManagerTmp(Long anCustNo) {
-        return AjaxObject.newOk("公司高管-流水信息 列表查询成功", managerTmpService.queryNewCustMechManagerTmp(anCustNo, CustomerConstants.TMP_TYPE_INSTEAD))
+    public String webQueryInsteadManagerTmp(Long anInsteadRecordId) {
+        return AjaxObject.newOk("公司高管-流水信息 列表查询成功", managerTmpService.queryInsteadManagerTmp(anInsteadRecordId))
                 .toJson();
     }
 

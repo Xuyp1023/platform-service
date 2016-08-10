@@ -39,11 +39,19 @@ public class CustAuditLog implements BetterjrEntity {
     private Long version;
 
     /**
+     * 审核步骤 0 auditStep  1 reviewStep 2 confirmStep
+     */
+    @Column(name = "C_STEP_NODE", columnDefinition = "CHAR")
+    @MetaData(value = "审核步骤", comments = "审核步骤 0 auditStep  1 reviewStep 2 confirmStep")
+    private String stepNode;
+    
+    /**
      * 审核类型 0开户审核 1代录申请审核 2代录审核 3变更审核 4客户关系审核
      */
     @Column(name = "C_AUDIT_TYPE", columnDefinition = "CHAR")
     @MetaData(value = "审核类型", comments = "审核类型 0开户审核 1代录申请审核 2代录审核 3变更审核 4客户关系审核")
     private String auditType;
+
 
     /**
      * 业务编号
@@ -347,6 +355,14 @@ public class CustAuditLog implements BetterjrEntity {
     public void setCustNo(Long custNo) {
         this.custNo = custNo;
     }
+    
+    public String getStepNode() {
+        return stepNode;
+    }
+
+    public void setStepNode(String anStepNode) {
+        stepNode = anStepNode;
+    }
 
     @Override
     public String toString() {
@@ -375,6 +391,7 @@ public class CustAuditLog implements BetterjrEntity {
         sb.append(", businStatus=").append(businStatus);
         sb.append(", lastStatus=").append(lastStatus);
         sb.append(", custNo=").append(custNo);
+        sb.append(", stepNode=").append(stepNode);
         sb.append(", serialVersionUID=").append(serialVersionUID);
         sb.append("]");
         return sb.toString();
@@ -412,7 +429,8 @@ public class CustAuditLog implements BetterjrEntity {
                 && (this.getOperOrg() == null ? other.getOperOrg() == null : this.getOperOrg().equals(other.getOperOrg()))
                 && (this.getBusinStatus() == null ? other.getBusinStatus() == null : this.getBusinStatus().equals(other.getBusinStatus()))
                 && (this.getLastStatus() == null ? other.getLastStatus() == null : this.getLastStatus().equals(other.getLastStatus()))
-                && (this.getCustNo() == null ? other.getCustNo() == null : this.getCustNo().equals(other.getCustNo()));
+                && (this.getCustNo() == null ? other.getCustNo() == null : this.getCustNo().equals(other.getCustNo()))
+                && (this.getStepNode() == null ? other.getStepNode() == null : this.getStepNode().equals(other.getStepNode()));
     }
 
     @Override
@@ -440,10 +458,11 @@ public class CustAuditLog implements BetterjrEntity {
         result = prime * result + ((getBusinStatus() == null) ? 0 : getBusinStatus().hashCode());
         result = prime * result + ((getLastStatus() == null) ? 0 : getLastStatus().hashCode());
         result = prime * result + ((getCustNo() == null) ? 0 : getCustNo().hashCode());
+        result = prime * result + ((getStepNode() == null) ? 0 : getStepNode().hashCode());
         return result;
     }
 
-    public void initAddValue(String anAuditType, Long anBusinId, String anAuditResult, String anReason, String anAuditItem, Long anCustNo) {
+    public void initAddValue(String anAuditType, String anStepNode, Long anBusinId, String anAuditResult, String anReason, String anAuditItem, Long anCustNo) {
         this.id = SerialGenerator.getLongValue("CustAuditLog.id");
 
         this.regOperId = UserUtils.getOperatorInfo().getId();
@@ -462,6 +481,7 @@ public class CustAuditLog implements BetterjrEntity {
         this.auditItem = anAuditItem;
         
         this.auditType = anAuditType;
+        this.stepNode = anStepNode;
         this.businId = anBusinId;
         this.result = anAuditResult;
         this.reason = anReason;
