@@ -131,6 +131,47 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
     }
 
     /**
+     * 客户与电子合同服务商关系查询
+     * 
+     * @param anCustNo
+     * @return
+     */
+    public List<SimpleDataEntity> queryProviderRelation(Long anCustNo) {
+        List<SimpleDataEntity> result = new ArrayList<SimpleDataEntity>();
+        if (null == anCustNo) {
+            return result;
+        }
+        Map<String, Object> anMap = new HashMap<String, Object>();
+        anMap.put("custNo", anCustNo);
+        anMap.put("relateType", CustomerConstants.RELATE_TYPE_ELEC_CONTRACT);
+        for (CustRelation relation : this.selectByProperty(anMap)) {
+            result.add(new SimpleDataEntity(relation.getRelateCustname(), String.valueOf(relation.getRelateCustno())));
+        }
+        return result;
+    }
+
+    /**
+     * 客户与保理机构关系查询
+     * 
+     * @param anCustNo
+     * @return
+     */
+    public List<SimpleDataEntity> queryFactorRelation(Long anCustNo) {
+        List<SimpleDataEntity> result = new ArrayList<SimpleDataEntity>();
+        if (null == anCustNo) {
+            return result;
+        }
+        Map<String, Object> anMap = new HashMap<String, Object>();
+        anMap.put("custNo", anCustNo);
+        anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR, CustomerConstants.RELATE_TYPE_CORE_FACTOR,
+                CustomerConstants.RELATE_TYPE_SELLER_FACTOR });
+        for (CustRelation relation : this.selectByProperty(anMap)) {
+            result.add(new SimpleDataEntity(relation.getRelateCustname(), String.valueOf(relation.getRelateCustno())));
+        }
+        return result;
+    }
+
+    /**
      * 客户白名单受理列表
      * 
      * @param anBusinStatus
@@ -286,7 +327,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
             CustInfo anCustInfo = custAccountService.selectByPrimaryKey(anCustNo);
             if (anCustInfo.getIdentValid() == false) {
                 logger.warn("客户未进行实名验证,不允许提交");
-                throw new BytterTradeException(40001,"客户未进行实名验证,不允许提交");
+                throw new BytterTradeException(40001, "客户未进行实名验证,不允许提交");
             }
             saveProviderRelation(anCustInfo, anProviderCustList);
             saveFactorRelation(anCustInfo, anFactorCustList, anPostscript);
