@@ -195,10 +195,10 @@ public class SnakerProcessModelGenerator {
                 for (CustFlowStepApprovers app : classList) {
                     TaskModel taskModel = new TaskModel();
                     nodeList.add(taskModel);
-                    String nodeName = step.getNodeName();
-                    taskModel.setName(nodeName + "-" + app.getAuditOperName());
+                    String nodeName = step.getNodeId().toString();
+                    taskModel.setName(nodeName);
                     taskModel.setAssignee(app.getAuditMoneyId().toString());
-                    taskModel.setDisplayName(app.getAuditOperName());
+                    taskModel.setDisplayName(step.getNodeName());
                     // task point to join
                     TransitionModel trans = new TransitionModel();
                     trans.setTarget(join2Model);
@@ -227,12 +227,10 @@ public class SnakerProcessModelGenerator {
                 for (CustFlowStepApprovers app : classList) {
                     TaskModel taskModel = new TaskModel();
                     nodeList.add(taskModel);
-                    // taskModel.setName(app.getAuditOperId().toString());
-                    // taskModel.setDisplayName(app.getAuditOperId().toString());
-                    String nodeName = step.getNodeName();
-                    taskModel.setName(nodeName + "-" + app.getAuditOperName());
+                    String nodeName = step.getNodeId().toString();
+                    taskModel.setName(nodeName);
                     taskModel.setAssignee(app.getAuditOperId().toString());
-                    taskModel.setDisplayName(app.getAuditOperName().toString());
+                    taskModel.setDisplayName(step.getNodeName());
                     // task point to trans
                     TransitionModel trans = new TransitionModel();
                     taskModel.setOutputs(Collections.singletonList(trans));

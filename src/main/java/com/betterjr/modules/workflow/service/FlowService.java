@@ -88,7 +88,6 @@ public class FlowService {
         QueryFilter filter = new QueryFilter().setOrderId(business.getFlowOrderId()).setOperator(input.getOperator());
         List<WorkItem> workItemList = engine.query().getWorkItems(null, filter);
         if (workItemList != null && workItemList.size() > 0) {
-            Collections3.extractToList(workItemList, "");
             for (int index = 0; index < workItemList.size(); index++) {
                 String taskId = workItemList.get(index).getTaskId();
                 engine.executeTask(taskId, input.getOperator(), formParas);
@@ -104,7 +103,7 @@ public class FlowService {
      * @param businessId
      * @return
      */
-    public List<TaskAuditHistory> getExecutedNodes(Long businessId) {
+    public List<CustFlowStep> getExecutedNodes(Long businessId) {
         CustFlowInstanceBusiness business = this.businessService.selectByPrimaryKey(businessId);
         if (business == null) {
             logger.warn("not found order for business :" + businessId);
@@ -112,26 +111,27 @@ public class FlowService {
         }
         QueryFilter filter = new QueryFilter();
         filter.setOrderId(business.getFlowOrderId());
-        List<Order> orderList=this.engine.query().getActiveOrders(filter);
-        Order order=Collections3.getFirst(orderList);
-        if(order==null){
-            logger.warn("not found order for order id:"+business.getFlowOrderId());
+        List<Task> taskList=this.engine.query().getActiveTasks(filter);
+        Task task=Collections3.getFirst(taskList);
+        if(task==null){
+            logger.warn("not found current task for order id:"+business.getFlowOrderId());
             return Collections.emptyList();
         }
+       String nodeId=task.getTaskName();
+       
+
+
+       List<Order> orderList=this.engine.query().getActiveOrders(filter);
+       Order order=Collections3.getFirst(orderList);
+       if(order==null){
+           logger.warn("not found order for order id:"+business.getFlowOrderId());
+           return Collections.emptyList();
+       }
+       String processId=order.getProcessId();
         
-        List<CustFlowStep> stepList=this.stepService.selectByProperty("flowBaseId", order.getProcessId());
+       List<CustFlowStep> stepList=this.stepService.findPrevStepsByNodeId(Long.parseLong(processId), Long.parseLong(nodeId));
 
-        List<TaskAuditHistory> historyList = new ArrayList<TaskAuditHistory>();
-        if(!Collections3.isEmpty(stepList)){
-            for(CustFlowStep step:stepList){
-                TaskAuditHistory result=new TaskAuditHistory();
-                result.setFlowNodeId(step.getNodeId());
-                result.setFlowNodeName(step.getNodeName());
-                historyList.add(result);
-            }
-        }
-
-       return historyList;
+       return stepList;
     }
 
     /**
@@ -150,20 +150,17 @@ public class FlowService {
         filter.setOrderId(business.getFlowOrderId());
         List<HistoryTask> taskHistory = this.engine.query().getHistoryTasks(filter);
         
-        List taskNameList=Collections3.extractToList(taskHistory, "taskName");
-        List<CustFlowNode> nodeList=this.nodeService.selectByListProperty("nodeCustomName", taskNameList);
-        Map<String,Long> nodeNameMap=Collections3.extractToMap(nodeList, "nodeCustomName", "id");
-        
+               
         List<TaskAuditHistory> historyList = new ArrayList<TaskAuditHistory>();
         for (HistoryTask task : taskHistory) {
             TaskAuditHistory flow = new TaskAuditHistory();
             flow.setAuditDate(BetterDateUtils.parseDate(task.getFinishTime()));
             FlowInput var = FlowInput.toObject(task.getVariable());
             flow.setCommand(var.getCommand());
-            flow.setFlowNodeName(task.getTaskName());
+            flow.setFlowNodeName(task.getDisplayName());
             flow.setOperator(task.getOperator());
             flow.setReason(var.getReason());
-            flow.setFlowNodeId(nodeNameMap.get(task.getTaskName()));
+            flow.setFlowNodeId(Long.parseLong(task.getTaskName()));
             historyList.add(flow);
         }
         return historyList;
@@ -191,6 +188,9 @@ public class FlowService {
 
     private QueryFilter convertFlowStatusToQuery(FlowStatus search) {
         QueryFilter filter = new QueryFilter();
+        if(search==null){
+            return filter;
+        }
         if (!BetterStringUtils.isBlank(search.getOperator())) {
             filter.setOperator(search.getOperator());
         }
@@ -268,7 +268,8 @@ public class FlowService {
                 FlowStatus status = new FlowStatus();
                 status.setCreateOperator(it.getCreator());
                 status.setCreateTime(BetterDateUtils.parseDate(it.getOrderCreateTime()));
-                status.setCurrentTaskName(it.getTaskKey());
+                status.setCurrentNodeName(it.getTaskName());
+                status.setCurrentNodeId(Long.parseLong(it.getTaskKey()));
                 status.setFlowName(it.getOrderId());
                 status.setFlowType(it.getProcessName());
                 status.setLastUpdateTime(BetterDateUtils.parseDate(it.getTaskEndTime()));
