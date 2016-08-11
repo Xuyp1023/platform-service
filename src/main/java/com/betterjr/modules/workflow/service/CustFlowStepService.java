@@ -16,4 +16,7 @@ public class CustFlowStepService extends BaseService<CustFlowStepMapper,CustFlow
         return this.mapper.findStepsByProcessAndNodeRole(anProcessId, role);
     }
 
+    public List<CustFlowStep> findPrevStepsByNodeId(Long anProcessId,Long anNodeId){
+        return this.mapper.findPrevStepsByNodeId(anProcessId, anNodeId);
+    }
 }

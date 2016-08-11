@@ -16,6 +16,7 @@ import com.betterjr.modules.workflow.data.FlowStatus;
 import com.betterjr.modules.workflow.data.TaskAuditHistory;
 import com.betterjr.modules.workflow.entity.CustFlowBase;
 import com.betterjr.modules.workflow.entity.CustFlowNode;
+import com.betterjr.modules.workflow.entity.CustFlowStep;
 import com.betterjr.modules.workflow.service.CustFlowBaseService;
 import com.betterjr.modules.workflow.service.CustFlowNodeService;
 import com.betterjr.modules.workflow.service.FlowService;
@@ -128,7 +129,7 @@ public class FlowDubboService implements IFlowService{
      */
     @Override
     public String webQueryExecutedNodes(Long businessId) {
-        List<TaskAuditHistory> list=this.flowService.getExecutedNodes(businessId);
+        List<CustFlowStep> list=this.flowService.getExecutedNodes(businessId);
         return AjaxObject.newOk(list).toJson();
     }
 

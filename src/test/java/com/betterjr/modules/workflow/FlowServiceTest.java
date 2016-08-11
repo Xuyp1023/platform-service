@@ -16,6 +16,7 @@ import com.betterjr.modules.workflow.data.FlowInput;
 import com.betterjr.modules.workflow.data.FlowStatus;
 import com.betterjr.modules.workflow.data.FlowType;
 import com.betterjr.modules.workflow.data.TaskAuditHistory;
+import com.betterjr.modules.workflow.entity.CustFlowStep;
 import com.betterjr.modules.workflow.service.FlowService;
 
 public class FlowServiceTest extends BasicServiceTest<FlowService> {
@@ -38,14 +39,14 @@ public class FlowServiceTest extends BasicServiceTest<FlowService> {
         in.setType(type);
         in.setMoney(money);
         in.setBusinessId(businessId);
-        in.setOperator("hewei-start");
+        in.setOperator("1262");
 
 
         FlowService service = this.getServiceObject();
         service.start(in);
 
 //        String cuOperators[] = new String[] { "testUser3", "testUser4", "testUser7", "testUser8" };
-        String cuOperators[] = new String[] { "testUser3", "testUser4"};
+        String cuOperators[] = new String[] { "1259", "1262","1259","1258","1259"};
         for (String operator : cuOperators) {
             in.setCommand(FlowCommand.GoNext);
             in.setOperator(operator);
@@ -96,7 +97,7 @@ public class FlowServiceTest extends BasicServiceTest<FlowService> {
     public void queryCurrentWorkTaskWithUser(){
         FlowService service = this.getServiceObject();
         FlowStatus search=new FlowStatus();
-        search.setOperator("testUser8");
+        search.setOperator("1259");
         Page<FlowStatus> page=service.queryCurrentWorkTask(null, search);
         List<FlowStatus> list=page.getResult();
         if(!Collections3.isEmpty(list)){
@@ -109,11 +110,23 @@ public class FlowServiceTest extends BasicServiceTest<FlowService> {
     @Test
     public void getExecutedHistory(){
         FlowService service = this.getServiceObject();
-        Long businessId=-6459835009888238627l;
+        Long businessId=6538303027681064631l;
         List<TaskAuditHistory> list=service.getExecutedHistory(businessId);
         if(!Collections3.isEmpty(list)){
             for(TaskAuditHistory sta:list){
                 logger.error("getExecutedHistory:"+sta+","+sta.getCommand().getDisplayName());
+            }
+        }
+    }
+    
+    @Test
+    public void getExecutedNodes(){
+        FlowService service = this.getServiceObject();
+        Long businessId=6538303027681064631l;
+        List<CustFlowStep> list=service.getExecutedNodes(businessId);
+        if(!Collections3.isEmpty(list)){
+            for(CustFlowStep sta:list){
+                logger.error("getExecutedNodes:"+sta);
             }
         }
     }
