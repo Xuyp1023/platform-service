@@ -8,6 +8,7 @@ import com.alibaba.dubbo.config.annotation.Service;
 import com.betterjr.common.web.AjaxObject;
 import com.betterjr.modules.customer.ICustOpenAccountService;
 import com.betterjr.modules.customer.entity.CustOpenAccountTmp;
+import com.betterjr.modules.customer.service.CustOpenAccountAuditService;
 import com.betterjr.modules.customer.service.CustOpenAccountTmpService;
 import com.betterjr.modules.rule.service.RuleServiceDubboFilterInvoker;
 
@@ -23,18 +24,21 @@ public class CustOpenAccountDubboService implements ICustOpenAccountService {
     @Autowired
     private CustOpenAccountTmpService custOpenAccountTmpService;
 
+    @Autowired
+    private CustOpenAccountAuditService custOpenAccountAuditService;
+
     @Override
     public String webFindOpenAccountInfo() {
 
-        return AjaxObject.newOk("开户资料读取成功", custOpenAccountTmpService.findOpenAccountInfoByOperator()).toJson();
+        return AjaxObject.newOk("开户资料读取成功", custOpenAccountTmpService.findOpenAccountInfo()).toJson();
     }
 
     @Override
-    public String webSaveOpenAccountInfo(Map<String, Object> anMap, String anFileList) {
+    public String webSaveOpenAccountInfo(Map<String, Object> anMap, Long anId, String anFileList) {
 
         CustOpenAccountTmp anOpenAccountInfo = (CustOpenAccountTmp) RuleServiceDubboFilterInvoker.getInputObj();
 
-        return AjaxObject.newOk("开户资料暂存成功", custOpenAccountTmpService.saveOpenAccountInfo(anOpenAccountInfo, anFileList)).toJson();
+        return AjaxObject.newOk("开户资料暂存成功", custOpenAccountTmpService.saveOpenAccountInfo(anOpenAccountInfo, anId, anFileList)).toJson();
     }
 
     public String webSaveOpenAccountApply(Map<String, Object> anMap, Long anId, String anFileList) {
@@ -72,6 +76,18 @@ public class CustOpenAccountDubboService implements ICustOpenAccountService {
     public String webFindOpenAccountInfoByInsteadId(Long anInsteadId) {
 
         return AjaxObject.newOk("代录开户资料读取成功", custOpenAccountTmpService.findOpenAccountInfoByInsteadId(anInsteadId)).toJson();
+    }
+
+    @Override
+    public String webQueryAuditWorkflow(Long anCustNo) {
+
+        return AjaxObject.newOk("开户审批流程查询成功", custOpenAccountAuditService.queryAuditWorkflow(anCustNo)).toJson();
+    }
+
+    @Override
+    public String webQueryAuditWorkflowById(Long anOpenAccountId) {
+
+        return AjaxObject.newOk("开户审批流程查询成功", custOpenAccountAuditService.queryAuditWorkflowById(anOpenAccountId)).toJson();
     }
 
 }

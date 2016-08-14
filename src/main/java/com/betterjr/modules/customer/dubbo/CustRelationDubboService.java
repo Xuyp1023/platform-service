@@ -31,10 +31,9 @@ public class CustRelationDubboService implements ICustRelationService {
     }
 
     @Override
-    public String webQueryAuditWorkflow(Long anCustNo, String anFlag, int anPageNum, int anPageSize) {
+    public String webQueryAuditWorkflow(Long anCustNo) {
 
-        return AjaxObject.newOkWithPage("开通保理融资业务审批流程查询成功", custRelationAuditService.queryAuditWorkflow(anCustNo, anFlag, anPageNum, anPageSize))
-                .toJson();
+        return AjaxObject.newOk("开通保理融资业务审批流程查询成功", custRelationAuditService.queryAuditWorkflow(anCustNo)).toJson();
     }
 
     @Override

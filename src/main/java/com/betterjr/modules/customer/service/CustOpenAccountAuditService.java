@@ -1,7 +1,6 @@
 package com.betterjr.modules.customer.service;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,7 +9,6 @@ import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.UserUtils;
-import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.customer.dao.CustOpenAccountAuditMapper;
@@ -27,21 +25,27 @@ public class CustOpenAccountAuditService extends BaseService<CustOpenAccountAudi
     private CustOpenAccountTmpService custOpenAccountTmpService;
 
     /**
-     * 客户开户审批流程
+     * 开户审批流程查询
      * 
      * @param anCustNo
-     * @param anFlag
-     * @param anPageNum
-     * @param anPageSize
      * @return
      */
-    public Page<CustOpenAccountAudit> queryAuditWorkflow(Long anCustNo, String anFlag, int anPageNum, int anPageSize) {
+    public List<CustOpenAccountAudit> queryAuditWorkflow(Long anCustNo) {
         BTAssert.notNull(anCustNo, "请选择机构");
         CustOpenAccountTmp anOpenAccountInfo = Collections3.getFirst(custOpenAccountTmpService.selectByProperty("custNo", anCustNo));
         BTAssert.notNull(anOpenAccountInfo, "无法获取客户开户资料信息");
-        Map<String, Object> anMap = new HashMap<String, Object>();
-        anMap.put("sourceId", anOpenAccountInfo.getId());
-        return this.selectPropertyByPage(anMap, anPageNum, anPageSize, "1".equals(anFlag), "auditDate,auditTime");
+        return queryAuditWorkflow(anOpenAccountInfo.getId());
+    }
+
+    /**
+     * 开户审批流程查询
+     * 
+     * @param anOpenAccountId:开户资料流水号
+     * @return
+     */
+    public List<CustOpenAccountAudit> queryAuditWorkflowById(Long anOpenAccountId) {
+        BTAssert.notNull(anOpenAccountId, "开户资料流水号不能为空");
+        return this.selectByProperty("sourceId", anOpenAccountId, "auditDate,auditTime");
     }
 
     public int addInitOpenAccountApplyLog(Long anSourceId, String anAuditOpinion, String anTaskName) {

@@ -1,12 +1,16 @@
 package com.betterjr.modules.customer.service;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.exception.BytterTradeException;
+import com.betterjr.common.mapper.BeanMapper;
 import com.betterjr.common.selectkey.SerialGenerator;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
@@ -14,6 +18,7 @@ import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.IdcardUtils;
 import com.betterjr.common.utils.UserUtils;
+import com.betterjr.common.utils.reflection.ReflectionUtils;
 import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
@@ -30,7 +35,12 @@ import com.betterjr.modules.customer.entity.CustMechBusinLicence;
 import com.betterjr.modules.customer.entity.CustMechLaw;
 import com.betterjr.modules.customer.entity.CustOpenAccountTmp;
 import com.betterjr.modules.customer.helper.IFormalDataService;
+import com.betterjr.modules.document.entity.CustFileAduit;
+import com.betterjr.modules.document.entity.CustFileItem;
+import com.betterjr.modules.document.service.CustFileAuditService;
 import com.betterjr.modules.document.service.CustFileItemService;
+import com.betterjr.modules.document.utils.CustFileUtils;
+import com.google.common.collect.Multimap;
 
 /**
  * 
@@ -56,6 +66,9 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
     private CustFileItemService custFileItemService;
 
     @Autowired
+    private CustFileAuditService custFileAuditService;
+
+    @Autowired
     private CustInsteadRecordService custInsteadRecordService;
 
     @Autowired
@@ -75,12 +88,29 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
      * 
      * @return
      */
-    public CustOpenAccountTmp findOpenAccountInfoByOperator() {
+    public CustOpenAccountTmp findOpenAccountInfo() {
+        // 读取被驳回的记录
+        CustOpenAccountTmp anOpenAccountInfo = findRefuseAccountInfo();
+        if (anOpenAccountInfo != null) {
+            return anOpenAccountInfo;
+        }
+        // 读取暂存的记录
+        return findTempStoreAccountInfo();
+    }
+
+    private CustOpenAccountTmp findTempStoreAccountInfo() {
         Map<String, Object> anMap = new HashMap<String, Object>();
         anMap.put("operOrg", UserUtils.getOperatorInfo().getOperOrg());
         anMap.put("businStatus", CustomerConstants.TMP_STATUS_NEW);
         anMap.put("tmpType", CustomerConstants.TMP_TYPE_TEMPSTORE);
+        return Collections3.getFirst(this.selectByProperty(anMap));
+    }
 
+    private CustOpenAccountTmp findRefuseAccountInfo() {
+        Map<String, Object> anMap = new HashMap<String, Object>();
+        anMap.put("operOrg", UserUtils.getOperatorInfo().getOperOrg());
+        anMap.put("businStatus", CustomerConstants.TMP_STATUS_REFUSE);
+        anMap.put("tmpType", CustomerConstants.TMP_TYPE_TEMPSTORE);
         return Collections3.getFirst(this.selectByProperty(anMap));
     }
 
@@ -91,13 +121,11 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
      * @param anFileList
      * @return
      */
-    public CustOpenAccountTmp saveOpenAccountInfo(CustOpenAccountTmp anOpenAccountInfo, String anFileList) {
+    public CustOpenAccountTmp saveOpenAccountInfo(CustOpenAccountTmp anOpenAccountInfo, Long anId, String anFileList) {
         logger.info("Begin to Save Open Account Infomation");
         // 检查开户资料合法性
         checkAccountInfoValid(anOpenAccountInfo);
-        // 按当前操作员查找是否存在暂存记录,以此保证每个操作员当前只能有一条未生效的暂存开户记录
-        CustOpenAccountTmp anExitsOpenAccountInfo = findOpenAccountInfoByOperator();
-        if (null == anExitsOpenAccountInfo) {
+        if (null == anId) {
             // 初始化参数设置
             initAddValue(anOpenAccountInfo, CustomerConstants.TMP_TYPE_TEMPSTORE, CustomerConstants.TMP_STATUS_NEW);
             // 处理附件
@@ -106,8 +134,10 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
             this.insert(anOpenAccountInfo);
         }
         else {
+            CustOpenAccountTmp anExitsOpenAccountInfo = this.selectByPrimaryKey(anId);
+            BTAssert.notNull(anExitsOpenAccountInfo, "无法获取客户开户资料信息");
             // 初始化参数设置
-            initModifyValue(anOpenAccountInfo, anExitsOpenAccountInfo, CustomerConstants.TMP_STATUS_NEW);
+            anOpenAccountInfo.initModifyValue(anExitsOpenAccountInfo);
             // 处理附件
             anOpenAccountInfo.setBatchNo(custFileItemService.updateCustFileItemInfo(anFileList, anOpenAccountInfo.getBatchNo()));
             // 数据存盘,开户资料暂存
@@ -140,8 +170,16 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         else {
             // 加载已暂存的开户资料
             CustOpenAccountTmp anExitsOpenAccountInfo = this.selectByPrimaryKey(anId);
+            BTAssert.notNull(anExitsOpenAccountInfo, "无法获取客户开户资料信息");
             // 初始化参数设置
-            initModifyValue(anOpenAccountInfo, anExitsOpenAccountInfo, CustomerConstants.TMP_STATUS_USEING);
+            anOpenAccountInfo.initModifyValue(anExitsOpenAccountInfo);
+            // 设置状态为使用中
+            anOpenAccountInfo.setBusinStatus(CustomerConstants.TMP_STATUS_USEING);
+            anOpenAccountInfo.setLastStatus(CustomerConstants.TMP_STATUS_USEING);
+            // 申请日期
+            anOpenAccountInfo.setApplyDate(BetterDateUtils.getNumDate());
+            // 申请时间
+            anOpenAccountInfo.setApplyTime(BetterDateUtils.getNumTime());
             // 处理附件
             anOpenAccountInfo.setBatchNo(custFileItemService.updateCustFileItemInfo(anFileList, anOpenAccountInfo.getBatchNo()));
             // 数据存盘,开户资料暂存
@@ -184,7 +222,14 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         // 检查开户资料合法性
         checkAccountInfoValid(anOpenAccountInfo);
         // 生成开户数据
-        initValidAccount(anOpenAccountInfo, anOpenAccountInfo.getRegOperId(), anOpenAccountInfo.getRegOperName(), anOpenAccountInfo.getOperOrg());
+        createValidAccount(anOpenAccountInfo, anOpenAccountInfo.getRegOperId(), anOpenAccountInfo.getRegOperName(), anOpenAccountInfo.getOperOrg());
+        // 设置状态为已使用
+        anOpenAccountInfo.setBusinStatus(CustomerConstants.TMP_STATUS_USED);
+        anOpenAccountInfo.setLastStatus(CustomerConstants.TMP_STATUS_USED);
+        // 审核日期
+        anOpenAccountInfo.setAuditDate(BetterDateUtils.getNumDate());
+        // 审核时间
+        anOpenAccountInfo.setAuditTime(BetterDateUtils.getNumTime());
         // 更新数据
         this.updateByPrimaryKeySelective(anOpenAccountInfo);
         // 写入开户日志
@@ -206,9 +251,13 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         // 获取客户开户资料
         CustOpenAccountTmp anOpenAccountInfo = this.selectByPrimaryKey(anId);
         BTAssert.notNull(anOpenAccountInfo, "无法获取客户开户资料信息");
-        // 设置状态为未使用
-        anOpenAccountInfo.setBusinStatus(CustomerConstants.TMP_STATUS_NEW);
-        anOpenAccountInfo.setLastStatus(CustomerConstants.TMP_STATUS_NEW);
+        // 设置状态为驳回
+        anOpenAccountInfo.setBusinStatus(CustomerConstants.TMP_STATUS_REFUSE);
+        anOpenAccountInfo.setLastStatus(CustomerConstants.TMP_STATUS_REFUSE);
+        // 审核日期
+        anOpenAccountInfo.setAuditDate(BetterDateUtils.getNumDate());
+        // 审核时间
+        anOpenAccountInfo.setAuditTime(BetterDateUtils.getNumTime());
         // 更新数据
         this.updateByPrimaryKeySelective(anOpenAccountInfo);
         // 写入开户日志
@@ -248,7 +297,10 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
             // 加载已暂存的开户资料
             CustOpenAccountTmp anExitsOpenAccountInfo = this.selectByPrimaryKey(Long.valueOf(anTempId));
             // 初始化参数设置
-            initModifyValue(anOpenAccountInfo, anExitsOpenAccountInfo, CustomerConstants.TMP_STATUS_NEW);
+            anOpenAccountInfo.initModifyValue(anExitsOpenAccountInfo);
+            // 设置状态为未使用
+            anOpenAccountInfo.setBusinStatus(CustomerConstants.TMP_STATUS_NEW);
+            anOpenAccountInfo.setLastStatus(CustomerConstants.TMP_STATUS_NEW);
             // 处理附件
             anOpenAccountInfo.setBatchNo(custFileItemService.updateCustFileItemInfo(anFileList, anOpenAccountInfo.getBatchNo()));
             // 数据存盘,开户资料暂存
@@ -289,7 +341,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         // 检查开户资料合法性
         checkAccountInfoValid(anOpenAccountInfo);
         // 生成开户数据
-        initValidAccount(anOpenAccountInfo, UserUtils.getOperatorInfo().getId(), UserUtils.getOperatorInfo().getName(),
+        createValidAccount(anOpenAccountInfo, UserUtils.getOperatorInfo().getId(), UserUtils.getOperatorInfo().getName(),
                 UserUtils.getOperatorInfo().getOperOrg());
         // 更新数据
         this.updateByPrimaryKeySelective(anOpenAccountInfo);
@@ -317,73 +369,43 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         anOpenAccountInfo.setLastStatus(anBusinStatus);
     }
 
-    private void initModifyValue(CustOpenAccountTmp anOpenAccountInfo, CustOpenAccountTmp anExitsOpenAccountInfo, String anBusinStatus) {
-        // 初始化参数设置
-        anOpenAccountInfo.initModifyValue(anExitsOpenAccountInfo);
-        // 设置状态为使用中
-        anOpenAccountInfo.setBusinStatus(anBusinStatus);
-        anOpenAccountInfo.setLastStatus(anBusinStatus);
-    }
+    private void createValidAccount(CustOpenAccountTmp anOpenAccountInfo, Long anOperId, String anOperName, String anOperOrg) {
+        // 开户资料附件
+        Long anBatchNo = anOpenAccountInfo.getBatchNo();
 
-    private void initValidAccount(CustOpenAccountTmp anOpenAccountInfo, Long anOperId, String anOperName, String anOperOrg) {
+        // 开户资料附件信息
+        Multimap<String, Object> anCustFileItem = ReflectionUtils.listConvertToMuiltMap(custFileItemService.findCustFiles(anBatchNo), "fileInfoType");
+
         // 数据存盘,客户资料
-        CustInfo custInfo = new CustInfo();
-        initCustInfo(custInfo, anOpenAccountInfo);
-        custInfo.setRegOperId(anOperId);
-        custInfo.setRegOperName(anOperName);
-        custInfo.setOperOrg(anOperOrg);
-        custAccountService.insert(custInfo);
+        CustInfo custInfo = addCustInfo(anOpenAccountInfo, anOperId, anOperName, anOperOrg);
 
         // 数据存盘,基本信息
-        CustMechBase custMechBaseInfo = new CustMechBase();
-        initCustBaseInfo(custMechBaseInfo, anOpenAccountInfo);
-        custMechBaseInfo.setRegOperId(anOperId);
-        custMechBaseInfo.setRegOperName(anOperName);
-        custMechBaseInfo.setOperOrg(anOperOrg);
-        custMechBaseService.addCustMechBase(custMechBaseInfo, custInfo.getCustNo());
+        addCustMechBase(anOpenAccountInfo, custInfo.getCustNo(), anOperId, anOperName, anOperOrg);
 
         // 数据存盘,法人信息
-        CustMechLaw custMechLawInfo = new CustMechLaw();
-        initCustLaw(custMechLawInfo, anOpenAccountInfo, custInfo.getCustNo());
-        custMechLawInfo.setRegOperId(anOperId);
-        custMechLawInfo.setRegOperName(anOperName);
-        custMechLawInfo.setOperOrg(anOperOrg);
-        custMechLawService.addCustMechLaw(custMechLawInfo, custInfo.getCustNo());
+        addCustMechLaw(anOpenAccountInfo, anCustFileItem, custInfo.getCustNo(), anOperId, anOperName, anOperOrg);
 
         // 数据存盘,营业执照
-        CustMechBusinLicence custMechBusinLicenceInfo = new CustMechBusinLicence();
-        initBusinLicence(custMechBusinLicenceInfo, anOpenAccountInfo, custInfo.getCustNo());
-        custMechBusinLicenceInfo.setRegOperId(anOperId);
-        custMechBusinLicenceInfo.setRegOperName(anOperName);
-        custMechBusinLicenceInfo.setOperOrg(anOperOrg);
-        custMechBusinLicenceService.addCustMechBusinLicence(custMechBusinLicenceInfo, custInfo.getCustNo());
+        addCustMechBusinLicence(anOpenAccountInfo, anCustFileItem, custInfo.getCustNo(), anOperId, anOperName, anOperOrg);
 
         // 数据存盘,银行账户
-        CustMechBankAccount custMechBankAccountInfo = new CustMechBankAccount();
-        initCustBankAccount(custMechBankAccountInfo, anOpenAccountInfo, custInfo.getCustNo());
-        custMechBankAccountInfo.setRegOperId(anOperId);
-        custMechBankAccountInfo.setRegOperName(anOperName);
-        custMechBankAccountInfo.setOperOrg(anOperOrg);
-        custMechBankAccountService.addCustMechBankAccount(custMechBankAccountInfo, custInfo.getCustNo());
+        addCustMechBankAccount(anOpenAccountInfo, anCustFileItem, custInfo.getCustNo(), anOperId, anOperName, anOperOrg);
 
         // 数据存盘,经办人信息
-        CustOperatorInfo operator = new CustOperatorInfo();
-        initOperator(operator, anOpenAccountInfo);
-        operator.setOperOrg(anOperOrg);
-        custOperatorService.insert(operator);
+        addCustOperatorInfo(anOpenAccountInfo, anCustFileItem, custInfo.getCustNo(), anOperId, anOperName, anOperOrg);
 
         // 数据存盘,当前操作员关联客户
         custAndOperatorRelaService.insert(new CustOperatorRelation(anOperId, custInfo.getCustNo(), anOperOrg));
 
         // 回写客户编号
         anOpenAccountInfo.setCustNo(custInfo.getCustNo());
-
-        // 设置状态为已使用
-        anOpenAccountInfo.setBusinStatus(CustomerConstants.TMP_STATUS_USED);
-        anOpenAccountInfo.setLastStatus(CustomerConstants.TMP_STATUS_USED);
     }
 
-    private void initCustInfo(CustInfo anCustInfo, CustOpenAccountTmp anOpenAccountInfo) {
+    private CustInfo addCustInfo(CustOpenAccountTmp anOpenAccountInfo, Long anOperId, String anOperName, String anOperOrg) {
+        CustInfo anCustInfo = new CustInfo();
+        anCustInfo.setRegOperId(anOperId);
+        anCustInfo.setRegOperName(anOperName);
+        anCustInfo.setOperOrg(anOperOrg);
         anCustInfo.setCustNo(SerialGenerator.getCustNo());
         anCustInfo.setIdentValid(true);
         anCustInfo.setCustType(CustomerConstants.CUSTOMER_TYPE_ENTERPRISE);// 客户类型:0-机构;1-个人;
@@ -396,9 +418,16 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         anCustInfo.setBusinStatus("0");
         anCustInfo.setLastStatus("0");
         anCustInfo.setVersion(0l);
+        custAccountService.insert(anCustInfo);
+
+        return anCustInfo;
     }
 
-    private void initCustBaseInfo(CustMechBase anCustMechBaseInfo, CustOpenAccountTmp anOpenAccountInfo) {
+    private void addCustMechBase(CustOpenAccountTmp anOpenAccountInfo, Long anCustNo, Long anOperId, String anOperName, String anOperOrg) {
+        CustMechBase anCustMechBaseInfo = new CustMechBase();
+        anCustMechBaseInfo.setRegOperId(anOperId);
+        anCustMechBaseInfo.setRegOperName(anOperName);
+        anCustMechBaseInfo.setOperOrg(anOperOrg);
         anCustMechBaseInfo.setLawName(anOpenAccountInfo.getLawName());
         anCustMechBaseInfo.setLawIdentType(anOpenAccountInfo.getLawIdentType());
         anCustMechBaseInfo.setLawIdentNo(anOpenAccountInfo.getLawIdentNo());
@@ -409,10 +438,16 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         anCustMechBaseInfo.setPhone(anOpenAccountInfo.getPhone());
         anCustMechBaseInfo.setFax(anOpenAccountInfo.getFax());
         anCustMechBaseInfo.setVersion(0l);
+        custMechBaseService.addCustMechBase(anCustMechBaseInfo, anCustNo);
     }
 
-    private void initCustLaw(CustMechLaw anCustMechLawInfo, CustOpenAccountTmp anOpenAccountInfo, Long anCustNo) {
+    private void addCustMechLaw(CustOpenAccountTmp anOpenAccountInfo, Multimap<String, Object> anCustFileItem, Long anCustNo, Long anOperId,
+            String anOperName, String anOperOrg) {
+        CustMechLaw anCustMechLawInfo = new CustMechLaw();
         anCustMechLawInfo.setCustNo(anCustNo);
+        anCustMechLawInfo.setRegOperId(anOperId);
+        anCustMechLawInfo.setRegOperName(anOperName);
+        anCustMechLawInfo.setOperOrg(anOperOrg);
         anCustMechLawInfo.setName(anOpenAccountInfo.getLawName());
         anCustMechLawInfo.setIdentType(anOpenAccountInfo.getLawIdentType());
         anCustMechLawInfo.setIdentNo(anOpenAccountInfo.getLawIdentNo());
@@ -420,18 +455,62 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         anCustMechLawInfo.setSex(IdcardUtils.getGenderByIdCard(anOpenAccountInfo.getLawIdentNo(), anOpenAccountInfo.getLawIdentType()));
         anCustMechLawInfo.setBirthdate(IdcardUtils.getBirthByIdCard(anOpenAccountInfo.getLawIdentNo()));
         anCustMechLawInfo.setVersion(0l);
+        // 附件：法人representIdFile
+        Collection anCollection = anCustFileItem.get("representIdFile");
+        List<CustFileItem> anFileItemList = new ArrayList(anCollection);
+        if (anFileItemList.size() > 0) {
+            Long anNewBatchNo = CustFileUtils.findBatchNo();
+            // 更新文件信息,同时写入文件认证信息
+            saveCustFileItem(anFileItemList, "representIdFile", anCustNo, anNewBatchNo, anOperId);
+            // 更新附件批次号
+            anCustMechLawInfo.setBatchNo(anNewBatchNo);
+        }
+        custMechLawService.addCustMechLaw(anCustMechLawInfo, anCustNo);
     }
 
-    private void initBusinLicence(CustMechBusinLicence anCustMechBusinLicenceInfo, CustOpenAccountTmp anOpenAccountInfo, Long anCustNo) {
+    private void addCustMechBusinLicence(CustOpenAccountTmp anOpenAccountInfo, Multimap<String, Object> anCustFileItem, Long anCustNo, Long anOperId,
+            String anOperName, String anOperOrg) {
+        CustMechBusinLicence anCustMechBusinLicenceInfo = new CustMechBusinLicence();
+        anCustMechBusinLicenceInfo.setCustNo(anCustNo);
+        anCustMechBusinLicenceInfo.setRegOperId(anOperId);
+        anCustMechBusinLicenceInfo.setRegOperName(anOperName);
+        anCustMechBusinLicenceInfo.setOperOrg(anOperOrg);
         anCustMechBusinLicenceInfo.setRegNo(anOpenAccountInfo.getBusinLicence());
         anCustMechBusinLicenceInfo.setCertifiedDate(anOpenAccountInfo.getBusinLicenceRegDate());
         anCustMechBusinLicenceInfo.setOrgCode(anOpenAccountInfo.getOrgCode());
         anCustMechBusinLicenceInfo.setLawName(anOpenAccountInfo.getLawName());
         anCustMechBusinLicenceInfo.setEndDate(anOpenAccountInfo.getBusinLicenceValidDate());
+        // 附件：组织机构代码证orgCodeFile
+        Collection anOrgCodeCollection = anCustFileItem.get("orgCodeFile");
+        List<CustFileItem> anOrgCodeFileItemList = new ArrayList(anOrgCodeCollection);
+        // 附件：税务登记证taxRegistFile
+        Collection anTaxRegistollection = anCustFileItem.get("orgCodeFile");
+        List<CustFileItem> anTaxRegistFileItemList = new ArrayList(anTaxRegistollection);
+        // 附件：营业执照bizLicenseFile
+        Collection anBizLicenseCollection = anCustFileItem.get("orgCodeFile");
+        List<CustFileItem> anBizLicenseFileItemList = new ArrayList(anBizLicenseCollection);
+        // 企业三证附件信息同时处理
+        if (anOrgCodeFileItemList.size() > 0 || anTaxRegistFileItemList.size() > 0 || anBizLicenseFileItemList.size() > 0) {
+            Long anNewBatchNo = CustFileUtils.findBatchNo();
+            // 附件：组织机构代码证orgCodeFile,更新文件信息,同时写入文件认证信息
+            saveCustFileItem(anOrgCodeFileItemList, "orgCodeFile", anCustNo, anNewBatchNo, anOperId);
+            // 附件：税务登记证taxRegistFile,更新文件信息,同时写入文件认证信息
+            saveCustFileItem(anTaxRegistFileItemList, "taxRegistFile", anCustNo, anNewBatchNo, anOperId);
+            // 附件：营业执照bizLicenseFile,更新文件信息,同时写入文件认证信息
+            saveCustFileItem(anTaxRegistFileItemList, "bizLicenseFile", anCustNo, anNewBatchNo, anOperId);
+            // 更新附件批次号
+            anCustMechBusinLicenceInfo.setBatchNo(anNewBatchNo);
+        }
+        custMechBusinLicenceService.addCustMechBusinLicence(anCustMechBusinLicenceInfo, anCustNo);
     }
 
-    private void initCustBankAccount(CustMechBankAccount anCustMechBankAccountInfo, CustOpenAccountTmp anOpenAccountInfo, Long anCustNo) {
+    private void addCustMechBankAccount(CustOpenAccountTmp anOpenAccountInfo, Multimap<String, Object> anCustFileItem, Long anCustNo, Long anOperId,
+            String anOperName, String anOperOrg) {
+        CustMechBankAccount anCustMechBankAccountInfo = new CustMechBankAccount();
         anCustMechBankAccountInfo.setCustNo(anCustNo);
+        anCustMechBankAccountInfo.setRegOperId(anOperId);
+        anCustMechBankAccountInfo.setRegOperName(anOperName);
+        anCustMechBankAccountInfo.setOperOrg(anOperOrg);
         anCustMechBankAccountInfo.setIsDefault(true);
         anCustMechBankAccountInfo.setTradeAcco("");
         anCustMechBankAccountInfo.setBankNo(anOpenAccountInfo.getBankNo());
@@ -452,9 +531,23 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         anCustMechBankAccountInfo.setCityName("");
         anCustMechBankAccountInfo.setAccoStatus("0");
         anCustMechBankAccountInfo.setVersion(0l);
+        // 附件：银行账户bankAcctAckFile
+        Collection anCollection = anCustFileItem.get("bankAcctAckFile");
+        List<CustFileItem> anFileItemList = new ArrayList(anCollection);
+        if (anFileItemList.size() > 0) {
+            Long anNewBatchNo = CustFileUtils.findBatchNo();
+            // 更新文件信息,同时写入文件认证信息
+            saveCustFileItem(anFileItemList, "bankAcctAckFile", anCustNo, anNewBatchNo, anOperId);
+            // 更新附件批次号
+            anCustMechBankAccountInfo.setBatchNo(anNewBatchNo);
+        }
+        custMechBankAccountService.addCustMechBankAccount(anCustMechBankAccountInfo, anCustNo);
     }
 
-    private void initOperator(CustOperatorInfo anCustOperatorInfo, CustOpenAccountTmp anOpenAccountInfo) {
+    private void addCustOperatorInfo(CustOpenAccountTmp anOpenAccountInfo, Multimap<String, Object> anCustFileItem, Long anCustNo, Long anOperId,
+            String anOperName, String anOperOrg) {
+        CustOperatorInfo anCustOperatorInfo = new CustOperatorInfo();
+        anCustOperatorInfo.setOperOrg(anOperOrg);
         anCustOperatorInfo.setId(SerialGenerator.getLongValue(SerialGenerator.OPERATOR_ID));
         anCustOperatorInfo.setName(anOpenAccountInfo.getOperName());
         anCustOperatorInfo.setIdentType(anOpenAccountInfo.getOperIdenttype());
@@ -472,6 +565,68 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         anCustOperatorInfo.setAddress(anOpenAccountInfo.getAddress());
         anCustOperatorInfo.setEmail(anOpenAccountInfo.getOperEmail());
         anCustOperatorInfo.setZipCode(anOpenAccountInfo.getZipCode());
+        custOperatorService.insert(anCustOperatorInfo);
+        // 附件：经办人brokerIdFile
+        Collection anCollection = anCustFileItem.get("brokerIdFile");
+        List<CustFileItem> anFileItemList = new ArrayList(anCollection);
+        if (anFileItemList.size() > 0) {
+            Long anNewBatchNo = CustFileUtils.findBatchNo();
+            // 更新文件信息,同时写入文件认证信息
+            saveCustFileItem(anFileItemList, "brokerIdFile", anCustNo, anNewBatchNo, anOperId);
+        }
+    }
+
+    /**
+     * 更新文件信息
+     * 
+     * @param anCustFileItem
+     * @param anFileInfoType
+     * @param anCustNo
+     * @param anBatchNo
+     * @param anOperId
+     */
+    private void saveCustFileItem(List<CustFileItem> anCustFileItem, String anFileInfoType, Long anCustNo, Long anBatchNo, Long anOperId) {
+        if (anCustFileItem.size() > 0) {
+            // 写入文件信息
+            for (CustFileItem fileItem : anCustFileItem) {
+                addCustFileItem(fileItem, anBatchNo);
+            }
+            // 操作员编码
+            String anOperCode = custOperatorService.selectByPrimaryKey(anOperId).getOperCode();
+            // 写入文件认证信息
+            addCustFileAduit(anCustNo, anBatchNo, anCustFileItem.size(), anFileInfoType, anOperCode);
+        }
+    }
+
+    private void addCustFileItem(CustFileItem anCustFileItem, Long anBatchNo) {
+        CustFileItem fileItem = new CustFileItem();
+        BeanMapper.copy(anCustFileItem, fileItem);
+        fileItem.setBatchNo(anBatchNo);
+        fileItem.setId(SerialGenerator.getLongValue("CustFileItem.id"));
+        custFileItemService.insert(fileItem);
+    }
+
+    /**
+     * 写入文件认证信息
+     * 
+     * @param anCustNo
+     * @param anBatchNo
+     * @param anFileCount
+     * @param anFileInfoType
+     * @param anOperCode
+     */
+    private void addCustFileAduit(Long anCustNo, Long anBatchNo, int anFileCount, String anFileInfoType, String anOperCode) {
+        CustFileAduit anFileAudit = new CustFileAduit();
+        anFileAudit.setId(anBatchNo);
+        anFileAudit.setCustNo(anCustNo);
+        anFileAudit.setFileCount(anFileCount);
+        anFileAudit.setAuditStatus("1");
+        anFileAudit.setWorkType(anFileInfoType);
+        anFileAudit.setDescription("");
+        anFileAudit.setRegDate(BetterDateUtils.getNumDate());
+        anFileAudit.setRegTime(BetterDateUtils.getNumTime());
+        anFileAudit.setOperNo(anOperCode);
+        custFileAuditService.insert(anFileAudit);
     }
 
     private void checkAccountInfoValid(CustOpenAccountTmp anOpenAccountInfo) {

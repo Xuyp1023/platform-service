@@ -209,7 +209,7 @@ public class BlacklistService extends BaseService<BlacklistMapper, Blacklist> {
      * @param anLawName
      * @return
      */
-    public boolean checkBlacklistExists(String anName, String anIdentNo, String anLawName) {
+    public String checkBlacklistExists(String anName, String anIdentNo, String anLawName) {
         // 入参不能同时为空
         if (null == anName && null == anIdentNo && null == anLawName) {
             logger.warn("参数不能为空");
@@ -219,9 +219,9 @@ public class BlacklistService extends BaseService<BlacklistMapper, Blacklist> {
         List<Blacklist> resultByIdentNo = queryBlacklistByIdentNo(anIdentNo);
         List<Blacklist> resultByLawName = queryBlacklistByLawName(anLawName);
         if (resultByName.size() > 0 || resultByIdentNo.size() > 0 || resultByLawName.size() > 0) {
-            return true;
+            return "1";
         }
-        return false;
+        return "0";
     }
 
     private List<Blacklist> queryBlacklistByIdentNo(String anIdentNo) {
