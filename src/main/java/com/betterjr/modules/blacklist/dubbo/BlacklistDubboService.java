@@ -60,9 +60,9 @@ public class BlacklistDubboService implements IBlacklistService {
     }
 
     @Override
-    public boolean checkBlacklistExists(String anName, String anIdentNo, String anLawName) {
+    public String webCheckBlacklistExists(String anName, String anIdentNo, String anLawName) {
 
-        return scfBlacklistService.checkBlacklistExists(anName, anIdentNo, anLawName);
+        return AjaxObject.newOk("检查是否存在黑名单成功", scfBlacklistService.checkBlacklistExists(anName, anIdentNo, anLawName)).toJson();
     }
 
 }

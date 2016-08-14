@@ -1003,5 +1003,7 @@ public class CustOpenAccountTmp implements BetterjrEntity {
         this.modiOperName = UserUtils.getOperatorInfo().getName();
         this.modiDate = BetterDateUtils.getNumDate();
         this.modiTime = BetterDateUtils.getNumTime();
+        this.businStatus = anOpenAccountInfo.getBusinStatus();
+        this.lastStatus = this.businStatus;
     }
 }
