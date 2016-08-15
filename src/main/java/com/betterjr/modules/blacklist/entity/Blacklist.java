@@ -13,6 +13,7 @@ import com.betterjr.common.selectkey.SerialGenerator;
 import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.UserUtils;
+import com.betterjr.modules.blacklist.constant.BlacklistConstants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Access(AccessType.FIELD)
@@ -513,7 +514,7 @@ public class Blacklist implements BetterjrEntity {
         this.regDate = BetterDateUtils.getNumDate();
         this.regTime = BetterDateUtils.getNumTime();
         this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
-        this.businStatus = "0";
+        this.businStatus = BlacklistConstants.BLACKLIST_STATUS_INEFFECTIVE;
     }
 
     public void initModifyValue(Blacklist request) {
@@ -535,7 +536,7 @@ public class Blacklist implements BetterjrEntity {
 
     public void initLawName(String anCustType) {
         // 是否个人黑名单:custType,0-个人,1-机构
-        if (BetterStringUtils.equals(anCustType, "0") == true) {
+        if (BetterStringUtils.equals(anCustType, BlacklistConstants.BLACKLIST_TYPE_PERSONAL) == true) {
             this.lawName = " ";
         }
     }

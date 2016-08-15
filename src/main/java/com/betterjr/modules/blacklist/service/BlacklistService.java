@@ -12,6 +12,7 @@ import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.mapper.pagehelper.Page;
+import com.betterjr.modules.blacklist.constant.BlacklistConstants;
 import com.betterjr.modules.blacklist.dao.BlacklistMapper;
 import com.betterjr.modules.blacklist.entity.Blacklist;
 
@@ -28,14 +29,16 @@ public class BlacklistService extends BaseService<BlacklistMapper, Blacklist> {
      * @return
      */
     public Page<Blacklist> queryBlacklist(Map<String, Object> anMap, String anFlag, int anPageNum, int anPageSize) {
-        // 检查是否为保理操作员,保理操作员必须使用operOrg进行数据过滤,且需要处理入参:custType类型(0:个人;1:机构;)
-        anMap.put("operOrg", UserUtils.getOperatorInfo().getOperOrg());
+        // 检查是否为保理操作员,保理操作员必须使用operOrg进行数据过滤
+        if (UserUtils.factorUser()) {
+            anMap.put("operOrg", UserUtils.getOperatorInfo().getOperOrg());
+        }
+
+        // 处理入参:custType类型(0:个人;1:机构;)
         Object anCreditType = anMap.get("custType");
         if (null == anCreditType || anCreditType.toString().isEmpty()) {
-            anMap.put("custType", new String[] { "0", "1"});
+            anMap.put("custType", new String[] { BlacklistConstants.BLACKLIST_TYPE_PERSONAL, BlacklistConstants.BLACKLIST_TYPE_BRANCHES });
         }
-        
-        // 检查是否为平台用户(待确定...),可查看所有黑名单信息
 
         return this.selectPropertyByPage(Blacklist.class, anMap, anPageNum, anPageSize, "1".equals(anFlag));
     }
@@ -70,7 +73,7 @@ public class BlacklistService extends BaseService<BlacklistMapper, Blacklist> {
         BTAssert.notNull(anBlacklist.getName(), "被执行人姓名/名称不允许为空");
 
         // 检查法人
-        if (BetterStringUtils.equals(anBlacklist.getCustType(), "1") == true) {
+        if (BetterStringUtils.equals(anBlacklist.getCustType(), BlacklistConstants.BLACKLIST_TYPE_BRANCHES) == true) {
             BTAssert.notNull(anBlacklist.getLawName(), "当客户类型为机构时,法人信息不允许为空");
         }
 
@@ -87,7 +90,7 @@ public class BlacklistService extends BaseService<BlacklistMapper, Blacklist> {
         }
 
         // 检查是否已存在黑名单-法人
-        if (queryBlacklistByName(anBlacklist.getLawName()).size() > 0) {
+        if (queryBlacklistByLawName(anBlacklist.getLawName()).size() > 0) {
             logger.warn("该法人在黑名单信息中已存在");
             throw new BytterTradeException(40001, "该法人在黑名单信息中已存在");
         }
@@ -111,7 +114,7 @@ public class BlacklistService extends BaseService<BlacklistMapper, Blacklist> {
         checkOperator(anBlacklist.getOperOrg(), "当前操作员不能修改该黑名单信息");
 
         // 不允许修改已生效(businStatus:1)的黑名单
-        checkStatus(anBlacklist.getBusinStatus(), "1", true, "当前黑名单已生效,不允许修改");
+        checkStatus(anBlacklist.getBusinStatus(), BlacklistConstants.BLACKLIST_TYPE_BRANCHES, true, "当前黑名单已生效,不允许修改");
 
         // 初始化黑名单修改信息
         anModiBlacklist.initModifyValue(anBlacklist);
@@ -140,10 +143,10 @@ public class BlacklistService extends BaseService<BlacklistMapper, Blacklist> {
         checkOperator(anBlacklist.getOperOrg(), "当前操作员不能激活该黑名单");
 
         // 不允许激活已生效(businStatus:1)的黑名单
-        checkStatus(anBlacklist.getBusinStatus(), "1", true, "当前黑名单已激活");
+        checkStatus(anBlacklist.getBusinStatus(), BlacklistConstants.BLACKLIST_TYPE_BRANCHES, true, "当前黑名单已激活");
 
         // 设置黑名单激活状态(businStatus:1)
-        anBlacklist.setBusinStatus("1");
+        anBlacklist.setBusinStatus(BlacklistConstants.BLACKLIST_STATUS_EFFECTIVE);
 
         // 数据存盘
         this.updateByPrimaryKey(anBlacklist);
@@ -168,10 +171,10 @@ public class BlacklistService extends BaseService<BlacklistMapper, Blacklist> {
         checkOperator(anBlacklist.getOperOrg(), "当前操作员不能注销该黑名单");
 
         // 不允许注销未生效(businStatus:0)的黑名单
-        checkStatus(anBlacklist.getBusinStatus(), "0", true, "当前黑名单未生效,不需要注销");
+        checkStatus(anBlacklist.getBusinStatus(), BlacklistConstants.BLACKLIST_STATUS_INEFFECTIVE, true, "当前黑名单未生效,不需要注销");
 
         // 设置黑名单注销状态(businStatus:0)
-        anBlacklist.setBusinStatus("0");
+        anBlacklist.setBusinStatus(BlacklistConstants.BLACKLIST_STATUS_INEFFECTIVE);
 
         // 数据存盘
         this.updateByPrimaryKey(anBlacklist);
@@ -195,7 +198,7 @@ public class BlacklistService extends BaseService<BlacklistMapper, Blacklist> {
         checkOperator(anBlacklist.getOperOrg(), "当前操作员不能删除该黑名单");
 
         // 不允许删除已生效(businStatus:1)的黑名单
-        checkStatus(anBlacklist.getBusinStatus(), "1", true, "当前黑名单已生效,不允许删除");
+        checkStatus(anBlacklist.getBusinStatus(), BlacklistConstants.BLACKLIST_STATUS_EFFECTIVE, true, "当前黑名单已生效,不允许删除");
 
         // 删除黑名单
         return this.deleteByPrimaryKey(anId);
@@ -207,7 +210,7 @@ public class BlacklistService extends BaseService<BlacklistMapper, Blacklist> {
      * @param anName
      * @param anIdentNo
      * @param anLawName
-     * @return
+     * @return String 0-不存在;1-已存在;
      */
     public String checkBlacklistExists(String anName, String anIdentNo, String anLawName) {
         // 入参不能同时为空
@@ -215,19 +218,26 @@ public class BlacklistService extends BaseService<BlacklistMapper, Blacklist> {
             logger.warn("参数不能为空");
             throw new IllegalArgumentException("参数不能为空");
         }
-        List<Blacklist> resultByName = queryBlacklistByName(anName);
-        List<Blacklist> resultByIdentNo = queryBlacklistByIdentNo(anIdentNo);
-        List<Blacklist> resultByLawName = queryBlacklistByLawName(anLawName);
+        List<Blacklist> resultByName = queryEffitiveBlacklistByName(anName);
+        List<Blacklist> resultByIdentNo = queryEffitiveBlacklistByIdentNo(anIdentNo);
+        List<Blacklist> resultByLawName = queryEffitiveBlacklistByLawName(anLawName);
         if (resultByName.size() > 0 || resultByIdentNo.size() > 0 || resultByLawName.size() > 0) {
-            return "1";
+            return BlacklistConstants.BLACKLIST_STATUS_EFFECTIVE;
         }
-        return "0";
+        return BlacklistConstants.BLACKLIST_STATUS_INEFFECTIVE;
     }
 
     private List<Blacklist> queryBlacklistByIdentNo(String anIdentNo) {
         Map<String, Object> anMap = new HashMap<String, Object>();
         anMap.put("identNo", anIdentNo);
 
+        return this.selectByProperty(anMap);
+    }
+
+    private List<Blacklist> queryEffitiveBlacklistByIdentNo(String anIdentNo) {
+        Map<String, Object> anMap = new HashMap<String, Object>();
+        anMap.put("identNo", anIdentNo);
+        anMap.put("businStatus", BlacklistConstants.BLACKLIST_STATUS_EFFECTIVE);
         return this.selectByProperty(anMap);
     }
 
@@ -238,10 +248,24 @@ public class BlacklistService extends BaseService<BlacklistMapper, Blacklist> {
         return this.selectByProperty(anMap);
     }
 
+    private List<Blacklist> queryEffitiveBlacklistByName(String anName) {
+        Map<String, Object> anMap = new HashMap<String, Object>();
+        anMap.put("name", anName);
+        anMap.put("businStatus", BlacklistConstants.BLACKLIST_STATUS_EFFECTIVE);
+        return this.selectByProperty(anMap);
+    }
+
     private List<Blacklist> queryBlacklistByLawName(String anLawName) {
         Map<String, Object> anMap = new HashMap<String, Object>();
         anMap.put("lawName", anLawName);
 
+        return this.selectByProperty(anMap);
+    }
+
+    private List<Blacklist> queryEffitiveBlacklistByLawName(String anLawName) {
+        Map<String, Object> anMap = new HashMap<String, Object>();
+        anMap.put("lawName", anLawName);
+        anMap.put("businStatus", BlacklistConstants.BLACKLIST_STATUS_EFFECTIVE);
         return this.selectByProperty(anMap);
     }
 

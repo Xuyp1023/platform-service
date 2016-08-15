@@ -15,6 +15,7 @@ import com.betterjr.common.selectkey.SerialGenerator;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterDateUtils;
+import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.IdcardUtils;
 import com.betterjr.common.utils.UserUtils;
@@ -26,6 +27,7 @@ import com.betterjr.modules.account.entity.CustOperatorRelation;
 import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.account.service.CustAndOperatorRelaService;
 import com.betterjr.modules.account.service.CustOperatorService;
+import com.betterjr.modules.blacklist.service.BlacklistService;
 import com.betterjr.modules.customer.constant.CustomerConstants;
 import com.betterjr.modules.customer.dao.CustOpenAccountTmpMapper;
 import com.betterjr.modules.customer.entity.CustInsteadRecord;
@@ -49,6 +51,9 @@ import com.google.common.collect.Multimap;
  */
 @Service
 public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMapper, CustOpenAccountTmp> implements IFormalDataService {
+
+    @Autowired
+    private BlacklistService blacklistService;
 
     @Autowired
     private CustMechLawService custMechLawService;
@@ -655,6 +660,13 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         if (checkCustExistsByBankAccount(anOpenAccountInfo.getBankAcco()) == true) {
             logger.warn("银行账号已存在");
             throw new BytterTradeException(40001, "银行账号已存在");
+        }
+        
+        // 检查是否黑名单
+        String anFlag = blacklistService.checkBlacklistExists(anOpenAccountInfo.getCustName(), anOpenAccountInfo.getOrgCode(), anOpenAccountInfo.getLawName());
+        if (BetterStringUtils.equals(anFlag, "1")){
+            logger.warn("从黑名单库中检测到当前客户开户资料信息,请确认!");
+            throw new BytterTradeException(40001, "从黑名单库中检测到当前客户开户资料信息,请确认!");
         }
     }
 
