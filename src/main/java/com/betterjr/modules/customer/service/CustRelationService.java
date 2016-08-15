@@ -109,6 +109,27 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
     }
 
     /**
+     * 保理公司与核心企业关系查询
+     * 
+     * @param anFactorNo
+     * @return
+     */
+    public List<SimpleDataEntity> queryFactorCoreRelation(Long anFactorNo) {
+        List<SimpleDataEntity> result = new ArrayList<SimpleDataEntity>();
+        if (null == anFactorNo) {
+            return result;
+        }
+        Map<String, Object> anMap = new HashMap<String, Object>();
+        anMap.put("relateCustno", anFactorNo);
+        anMap.put("relateType", CustomerConstants.RELATE_TYPE_CORE_FACTOR);
+        anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
+        for (CustRelation relation : this.selectByProperty(anMap)) {
+            result.add(new SimpleDataEntity(relation.getCustName(), String.valueOf(relation.getCustNo())));
+        }
+        return result;
+    }
+
+    /**
      * 保理机构下拉列表查询,适用于供应商/经销商/核心企业相关查询
      * 
      * @param anCustNo
@@ -144,6 +165,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         Map<String, Object> anMap = new HashMap<String, Object>();
         anMap.put("custNo", anCustNo);
         anMap.put("relateType", CustomerConstants.RELATE_TYPE_ELEC_CONTRACT);
+        anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
         for (CustRelation relation : this.selectByProperty(anMap)) {
             result.add(new SimpleDataEntity(relation.getRelateCustname(), String.valueOf(relation.getRelateCustno())));
         }
@@ -151,22 +173,47 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
     }
 
     /**
-     * 客户与保理机构关系查询
+     * 客户关系查询
      * 
      * @param anCustNo
      * @return
      */
-    public List<SimpleDataEntity> queryFactorRelation(Long anCustNo) {
+    public List<SimpleDataEntity> queryCustRelation(Long anCustNo) {
         List<SimpleDataEntity> result = new ArrayList<SimpleDataEntity>();
         if (null == anCustNo) {
             return result;
         }
         Map<String, Object> anMap = new HashMap<String, Object>();
         anMap.put("custNo", anCustNo);
-        anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR, CustomerConstants.RELATE_TYPE_CORE_FACTOR,
-                CustomerConstants.RELATE_TYPE_SELLER_FACTOR });
+        anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
         for (CustRelation relation : this.selectByProperty(anMap)) {
             result.add(new SimpleDataEntity(relation.getRelateCustname(), String.valueOf(relation.getRelateCustno())));
+        }
+        return result;
+    }
+
+    /**
+     * 保理机构关系客户查询
+     * 
+     * @param anFactorNo:保理机构
+     * @param anRelateType:授信对象(1:供应商;2:经销商;3:核心企业;)
+     * @return
+     */
+    public List<SimpleDataEntity> queryFactorCustRelation(Long anFactorNo, String anCreditType) {
+        List<SimpleDataEntity> result = new ArrayList<SimpleDataEntity>();
+        if (null == anFactorNo) {
+            return result;
+        }
+        Map<String, Object> anMap = new HashMap<String, Object>();
+        anMap.put("relateCustno", anFactorNo);
+        String anRelateType = anCreditType;
+        if (BetterStringUtils.equals(anRelateType, "1")) {
+            anRelateType = CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR;
+        }
+        anMap.put("relateType", anRelateType);
+        anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
+        for (CustRelation relation : this.selectByProperty(anMap)) {
+            result.add(new SimpleDataEntity(relation.getCustName(), String.valueOf(relation.getCustNo())));
         }
         return result;
     }

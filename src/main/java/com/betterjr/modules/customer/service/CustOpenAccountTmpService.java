@@ -26,6 +26,7 @@ import com.betterjr.modules.account.entity.CustOperatorRelation;
 import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.account.service.CustAndOperatorRelaService;
 import com.betterjr.modules.account.service.CustOperatorService;
+import com.betterjr.modules.blacklist.service.BlacklistService;
 import com.betterjr.modules.customer.constant.CustomerConstants;
 import com.betterjr.modules.customer.dao.CustOpenAccountTmpMapper;
 import com.betterjr.modules.customer.entity.CustInsteadRecord;
@@ -49,6 +50,9 @@ import com.google.common.collect.Multimap;
  */
 @Service
 public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMapper, CustOpenAccountTmp> implements IFormalDataService {
+
+    @Autowired
+    private BlacklistService blacklistService;
 
     @Autowired
     private CustMechLawService custMechLawService;
@@ -656,6 +660,9 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
             logger.warn("银行账号已存在");
             throw new BytterTradeException(40001, "银行账号已存在");
         }
+        
+        // 检查是否黑名单
+        blacklistService.checkBlacklistExists(anOpenAccountInfo.getCustName(), anOpenAccountInfo.getOrgCode(), anOpenAccountInfo.getLawName());
     }
 
     private boolean checkCustExistsByCustName(String anCustName) {
