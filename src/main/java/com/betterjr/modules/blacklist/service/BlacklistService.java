@@ -90,7 +90,7 @@ public class BlacklistService extends BaseService<BlacklistMapper, Blacklist> {
         }
 
         // 检查是否已存在黑名单-法人
-        if (queryBlacklistByName(anBlacklist.getLawName()).size() > 0) {
+        if (queryBlacklistByLawName(anBlacklist.getLawName()).size() > 0) {
             logger.warn("该法人在黑名单信息中已存在");
             throw new BytterTradeException(40001, "该法人在黑名单信息中已存在");
         }
@@ -210,7 +210,7 @@ public class BlacklistService extends BaseService<BlacklistMapper, Blacklist> {
      * @param anName
      * @param anIdentNo
      * @param anLawName
-     * @return 0-不存在;1-已存在;
+     * @return String 0-不存在;1-已存在;
      */
     public String checkBlacklistExists(String anName, String anIdentNo, String anLawName) {
         // 入参不能同时为空
@@ -233,7 +233,7 @@ public class BlacklistService extends BaseService<BlacklistMapper, Blacklist> {
 
         return this.selectByProperty(anMap);
     }
-    
+
     private List<Blacklist> queryEffitiveBlacklistByIdentNo(String anIdentNo) {
         Map<String, Object> anMap = new HashMap<String, Object>();
         anMap.put("identNo", anIdentNo);
@@ -247,7 +247,7 @@ public class BlacklistService extends BaseService<BlacklistMapper, Blacklist> {
 
         return this.selectByProperty(anMap);
     }
-    
+
     private List<Blacklist> queryEffitiveBlacklistByName(String anName) {
         Map<String, Object> anMap = new HashMap<String, Object>();
         anMap.put("name", anName);
@@ -261,7 +261,7 @@ public class BlacklistService extends BaseService<BlacklistMapper, Blacklist> {
 
         return this.selectByProperty(anMap);
     }
-    
+
     private List<Blacklist> queryEffitiveBlacklistByLawName(String anLawName) {
         Map<String, Object> anMap = new HashMap<String, Object>();
         anMap.put("lawName", anLawName);
