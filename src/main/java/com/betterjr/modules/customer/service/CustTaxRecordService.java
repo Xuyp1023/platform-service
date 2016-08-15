@@ -1,13 +1,14 @@
 package com.betterjr.modules.customer.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
+import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.customer.dao.CustTaxRecordMapper;
 import com.betterjr.modules.customer.entity.CustTaxRecord;
 
@@ -18,14 +19,13 @@ import com.betterjr.modules.customer.entity.CustTaxRecord;
  */
 @Service
 public class CustTaxRecordService extends BaseService<CustTaxRecordMapper, CustTaxRecord> {
-    private static Logger logger = LoggerFactory.getLogger(CustTaxRecordService.class);
     
     /**
      * 纳税记录上传记录列表
      * @param anCustNo
      * @return
      */
-    public List<CustTaxRecord> queryCustTaxRecord(Long anCustNo) {
+    public List<CustTaxRecord> findCustTaxRecordList(Long anCustNo) {
         BTAssert.notNull(anCustNo, "客户编号不允许为空！");
         
         return this.selectByProperty("custNo", anCustNo);
@@ -38,6 +38,16 @@ public class CustTaxRecordService extends BaseService<CustTaxRecordMapper, CustT
         BTAssert.notNull(anId, "纳税记录上传记录编号不允许为空！");
         
         return this.selectByPrimaryKey(anId);
+    }
+    
+    /**
+     * 根据custNo分页查询上传记录列表
+     */
+    public Page<CustTaxRecord> queryCustTaxRecordList(Long anCustNo, String anFlag, int anPageNum, int anPageSize) {
+        BTAssert.notNull(anCustNo, "客户编号不允许为空！");
+        Map<String, Object> anMap = new HashMap<String, Object>();
+        anMap.put("custNo", anCustNo);
+        return this.selectPropertyByPage(anMap, anPageNum, anPageSize, "1".equals(anFlag));
     }
     
     /**
