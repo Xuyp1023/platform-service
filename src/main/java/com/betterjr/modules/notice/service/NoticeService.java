@@ -70,10 +70,12 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
 
         final CustOperatorInfo operator = UserUtils.getOperatorInfo();
 
-        checkNoticeCustomer(anId, operator.getId());
-
         // 校验是否有权限读
         Notice notice = this.selectByPrimaryKey(anId);
+        
+        if (BetterStringUtils.equals(operator.getOperOrg(), notice.getOperOrg()) == false) {
+            throw new BytterTradeException("公告详情查询错误!");
+        }
 
         Set<SimpleDataEntity> targetCust = queryTargetCust(notice);
 
