@@ -111,7 +111,7 @@ public class FlowServiceTest extends BasicServiceTest<FlowService> {
     public void getExecutedHistory(){
         FlowService service = this.getServiceObject();
         Long businessId=6538303027681064631l;
-        List<TaskAuditHistory> list=service.getExecutedHistory(businessId);
+        List<TaskAuditHistory> list=service.findExecutedHistory(businessId);
         if(!Collections3.isEmpty(list)){
             for(TaskAuditHistory sta:list){
                 logger.error("getExecutedHistory:"+sta+","+sta.getCommand().getDisplayName());
@@ -123,7 +123,7 @@ public class FlowServiceTest extends BasicServiceTest<FlowService> {
     public void getExecutedNodes(){
         FlowService service = this.getServiceObject();
         Long businessId=6538303027681064631l;
-        List<CustFlowStep> list=service.getExecutedNodes(businessId);
+        List<CustFlowStep> list=service.findExecutedNodes(businessId);
         if(!Collections3.isEmpty(list)){
             for(CustFlowStep sta:list){
                 logger.error("getExecutedNodes:"+sta);

@@ -9,6 +9,7 @@ import org.snaker.engine.model.ProcessModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.betterjr.common.selectkey.SerialGenerator;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.Collections3;
@@ -100,36 +101,19 @@ public class CustFlowBaseService extends BaseService<CustFlowBaseMapper, CustFlo
      */
     public void saveProcess(CustFlowBase base) {
         // base
-        this.insert(base);
+        Long baseId=SerialGenerator.getLongValue(CustFlowBase.selectKey);
+        this.insertOrUpdateWithPkId(base, baseId);
         // steps --> approvers
         if (!Collections3.isEmpty(base.getStepList())) {
             for (CustFlowStep step : base.getStepList()) {
-                this.stepService.insert(step);
-                // 判断节点角色
-                CustFlowNode node = step.getStepNode();
-                if (FlowNodeRole.Core.name().equalsIgnoreCase(node.getNodeRole())) {
-
-                    if (!Collections3.isEmpty(step.getStepApprovers())) {
-                        for (CustFlowStepApprovers app : step.getStepApprovers()) {
-                            this.addCoreAudit(app.getAuditOperId(), base.getId());
-                        }
-                    }
-                }
-
-                if (FlowNodeRole.Financer.name().equalsIgnoreCase(node.getNodeRole())) {
-
-                    if (!Collections3.isEmpty(step.getStepApprovers())) {
-                        for (CustFlowStepApprovers app : step.getStepApprovers()) {
-                            this.addFinancerAudit(app.getAuditOperId(), base.getId());
-                        }
-                    }
-                }
-
-                if (FlowNodeRole.Factoring.name().equalsIgnoreCase(node.getNodeRole())) {
-                    if (!Collections3.isEmpty(step.getStepApprovers())) {
-                        for (CustFlowStepApprovers app : step.getStepApprovers()) {
-                            this.stepAppService.insert(app);
-                        }
+                Long stepId=SerialGenerator.getLongValue(CustFlowStep.selectKey);
+                step.setFlowBaseId(base.getId());
+                this.stepService.insertOrUpdateWithPkId(step, stepId);
+                
+                if (!Collections3.isEmpty(step.getStepApprovers())) {
+                    for (CustFlowStepApprovers app : step.getStepApprovers()) {
+                        app.setStepId(step.getId());
+                        this.stepAppService.insertOrUpdateWithPkId(app, SerialGenerator.getLongValue(CustFlowStepApprovers.selectKey));
                     }
                 }
             }
@@ -142,7 +126,7 @@ public class CustFlowBaseService extends BaseService<CustFlowBaseMapper, CustFlo
         snakerProcess.setType(base.getFlowType());
         snakerProcess.setName(base.getFlowType());
         snakerProcess.setDisplayName(base.getFlowType());
-        snakerProcess.setId(base.getId().toString());
+        snakerProcess.setId(baseId.toString());
         snakerProcess.setState(1);
         snakerProcess.setVersion(1);
         this.snakerProcessService.saveProcess(snakerProcess);
@@ -175,7 +159,7 @@ public class CustFlowBaseService extends BaseService<CustFlowBaseMapper, CustFlo
                 app.setAuditOperName(oper.getName());
                 app.setAuditMoneyId(CustFlowMoney.DefaultMoney);
                 app.setWeight(CustFlowStepApprovers.MaxWeight);
-                this.stepAppService.insert(app);
+                this.stepAppService.insertOrUpdateWithPkId(app, SerialGenerator.getLongValue(CustFlowStepApprovers.selectKey));
             }
         }
     }
