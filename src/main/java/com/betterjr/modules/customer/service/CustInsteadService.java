@@ -141,7 +141,7 @@ public class CustInsteadService {
     public List<CustInsteadRecord> queryInsteadRecordByApply(Long anApplyId) {
         BTAssert.notNull(anApplyId, "代录申请编号不允许为空");
 
-        return insteadRecordService.findCustInsteadRecordByApplyId(anApplyId);
+        return insteadRecordService.queryCustInsteadRecordByApplyId(anApplyId);
     }
 
     /**
@@ -178,7 +178,7 @@ public class CustInsteadService {
     public CustInsteadApply saveSubmitReviewInsteadApply(Long anId) {
         checkInsteadApply(anId, CustomerConstants.INSTEAD_APPLY_STATUS_TYPE_IN);
 
-        List<CustInsteadRecord> insteadRecords = insteadRecordService.findCustInsteadRecordByApplyId(anId);
+        List<CustInsteadRecord> insteadRecords = insteadRecordService.queryCustInsteadRecordByApplyId(anId);
         List<String> businStatus = Arrays.asList(CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_PASS,
                 CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT, CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_PASS);
         boolean includeReviewRejectFlag = false;
@@ -497,7 +497,7 @@ public class CustInsteadService {
         BTAssert.notEmpty(businStatues, "状态不允许为空！");
 
         List<String> businStatusList = Arrays.asList(businStatues);
-        List<CustInsteadRecord> insteadRecords = insteadRecordService.findCustInsteadRecordByApplyId(anApplyId);
+        List<CustInsteadRecord> insteadRecords = insteadRecordService.queryCustInsteadRecordByApplyId(anApplyId);
         for (CustInsteadRecord insteadRecord : insteadRecords) {
             String businStatus = insteadRecord.getBusinStatus();
             if (businStatusList.contains(businStatus) == false) {

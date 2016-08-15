@@ -1,8 +1,22 @@
 package com.betterjr.modules.notification.entity;
 
-import com.betterjr.common.annotation.*;
+import javax.persistence.Access;
+import javax.persistence.AccessType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import com.betterjr.common.annotation.MetaData;
 import com.betterjr.common.entity.BetterjrEntity;
-import javax.persistence.*;
+import com.betterjr.common.mapper.CustDateJsonSerializer;
+import com.betterjr.common.mapper.CustTimeJsonSerializer;
+import com.betterjr.common.selectkey.SerialGenerator;
+import com.betterjr.common.utils.BetterDateUtils;
+import com.betterjr.modules.account.entity.CustInfo;
+import com.betterjr.modules.account.entity.CustOperatorInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @Access(AccessType.FIELD)
 @Entity
@@ -19,6 +33,7 @@ public class Notification implements BetterjrEntity {
     /**
      * 数据版本号
      */
+    @JsonIgnore
     @Column(name = "N_VERSION",  columnDefinition="INTEGER" )
     @MetaData( value="数据版本号", comments = "数据版本号")
     private Long version;
@@ -68,14 +83,14 @@ public class Notification implements BetterjrEntity {
     /**
      * 内容
      */
-    @Column(name = "C_CONTENT",  columnDefinition="VARCHAR" )
+    @Column(name = "C_CONTENT",  columnDefinition="MEDIUMTEXT" )
     @MetaData( value="内容", comments = "内容")
     private String content;
 
     /**
      * 业务引用
      */
-    @Column(name = "C_REFERENCE",  columnDefinition="VARCHAR" )
+    @Column(name = "C_REFERENCE",  columnDefinition="MEDIUMTEXT" )
     @MetaData( value="业务引用", comments = "业务引用")
     private String reference;
 
@@ -103,6 +118,7 @@ public class Notification implements BetterjrEntity {
     /**
      * 创建日期
      */
+    @JsonSerialize(using = CustDateJsonSerializer.class)
     @Column(name = "D_REG_DATE",  columnDefinition="VARCHAR" )
     @MetaData( value="创建日期", comments = "创建日期")
     private String regDate;
@@ -110,6 +126,7 @@ public class Notification implements BetterjrEntity {
     /**
      * 创建时间
      */
+    @JsonSerialize(using = CustTimeJsonSerializer.class)
     @Column(name = "T_REG_TIME",  columnDefinition="VARCHAR" )
     @MetaData( value="创建时间", comments = "创建时间")
     private String regTime;
@@ -117,6 +134,7 @@ public class Notification implements BetterjrEntity {
     /**
      * 修改人(操作员)ID号
      */
+    @JsonIgnore
     @Column(name = "L_MODI_OPERID",  columnDefinition="INTEGER" )
     @MetaData( value="修改人(操作员)ID号", comments = "修改人(操作员)ID号")
     private Long modiOperId;
@@ -124,6 +142,7 @@ public class Notification implements BetterjrEntity {
     /**
      * 修改人(操作员)姓名
      */
+    @JsonIgnore
     @Column(name = "C_MODI_OPERNAME",  columnDefinition="VARCHAR" )
     @MetaData( value="修改人(操作员)姓名", comments = "修改人(操作员)姓名")
     private String modiOperName;
@@ -131,6 +150,7 @@ public class Notification implements BetterjrEntity {
     /**
      * 修改日期
      */
+    @JsonIgnore
     @Column(name = "D_MODI_DATE",  columnDefinition="VARCHAR" )
     @MetaData( value="修改日期", comments = "修改日期")
     private String modiDate;
@@ -138,6 +158,7 @@ public class Notification implements BetterjrEntity {
     /**
      * 修改时间
      */
+    @JsonIgnore
     @Column(name = "T_MODI_TIME",  columnDefinition="VARCHAR" )
     @MetaData( value="修改时间", comments = "修改时间")
     private String modiTime;
@@ -145,6 +166,7 @@ public class Notification implements BetterjrEntity {
     /**
      * 操作机构
      */
+    @JsonIgnore
     @Column(name = "C_OPERORG",  columnDefinition="VARCHAR" )
     @MetaData( value="操作机构", comments = "操作机构")
     private String operOrg;
@@ -470,5 +492,26 @@ public class Notification implements BetterjrEntity {
         result = prime * result + ((getCustNo() == null) ? 0 : getCustNo().hashCode());
         result = prime * result + ((getCustName() == null) ? 0 : getCustName().hashCode());
         return result;
+    }
+    
+    public void initAddValue(CustOperatorInfo anOperator, CustInfo anCustomer) {
+        this.id = SerialGenerator.getLongValue("Notification.id");
+
+        this.regOperId = anOperator.getId();
+        this.regOperName = anOperator.getName();
+        this.operOrg = anOperator.getOperOrg();
+
+        this.regDate = BetterDateUtils.getNumDate();
+        this.regTime = BetterDateUtils.getNumTime();
+
+        this.modiOperId = anOperator.getId();
+        this.modiOperName = anOperator.getName();
+        this.modiDate = BetterDateUtils.getNumDate();
+        this.modiTime = BetterDateUtils.getNumTime();
+
+        this.custNo = anCustomer.getCustNo();
+        this.custName = anCustomer.getCustName();
+
+        this.businStatus = "0";
     }
 }

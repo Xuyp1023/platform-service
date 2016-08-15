@@ -7,6 +7,7 @@ import javax.annotation.Resource;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.betterjr.common.web.AjaxObject;
 import com.betterjr.modules.customer.ICustInsteadService;
+import com.betterjr.modules.customer.service.CustInsteadApplyService;
 import com.betterjr.modules.customer.service.CustInsteadService;
 import com.betterjr.modules.rule.service.RuleServiceDubboFilterInvoker;
 
@@ -14,6 +15,9 @@ import com.betterjr.modules.rule.service.RuleServiceDubboFilterInvoker;
 public class CustInsteadDubboService implements ICustInsteadService {
     @Resource
     private CustInsteadService insteadService;
+    
+    @Resource
+    private CustInsteadApplyService insteadApplyService;
 
     @Override
     public String webAddInsteadApply(Map<String, Object> anParam, String anFileList) {
@@ -25,6 +29,11 @@ public class CustInsteadDubboService implements ICustInsteadService {
     public String webSaveInsteadApply(Map<String, Object> anParam, Long anApplyId, String anFileList) {
         Map<String, Object> param = (Map<String, Object>) RuleServiceDubboFilterInvoker.getInputObj();
         return AjaxObject.newOk("代录申请 修改申请 成功", insteadService.saveInsteadApply(param, anApplyId, anFileList)).toJson();
+    }
+    
+    @Override
+    public String webFindInsteadApply(Long anApplyId) {
+        return AjaxObject.newOk("代录申请 查询详情 成功", insteadApplyService.findCustInsteadApply(anApplyId)).toJson();
     }
     
     @Override

@@ -2,6 +2,12 @@ package com.betterjr.modules.notification.entity;
 
 import com.betterjr.common.annotation.*;
 import com.betterjr.common.entity.BetterjrEntity;
+import com.betterjr.common.notification.NotificationConstants;
+import com.betterjr.common.selectkey.SerialGenerator;
+import com.betterjr.common.utils.BetterDateUtils;
+import com.betterjr.modules.account.entity.CustInfo;
+import com.betterjr.modules.account.entity.CustOperatorInfo;
+
 import javax.persistence.*;
 
 @Access(AccessType.FIELD)
@@ -57,7 +63,7 @@ public class NotificationCustomer implements BetterjrEntity {
     @Column(name = "C_SEND_NO",  columnDefinition="VARCHAR" )
     @MetaData( value="发送号码", comments = "发送号码")
     private String sendNo;
-
+    
     /**
      * 接收企业经办人ID
      */
@@ -337,7 +343,7 @@ public class NotificationCustomer implements BetterjrEntity {
     public void setLastStatus(String lastStatus) {
         this.lastStatus = lastStatus == null ? null : lastStatus.trim();
     }
-
+    
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -434,5 +440,43 @@ public class NotificationCustomer implements BetterjrEntity {
         result = prime * result + ((getBusinStatus() == null) ? 0 : getBusinStatus().hashCode());
         result = prime * result + ((getLastStatus() == null) ? 0 : getLastStatus().hashCode());
         return result;
+    }
+    
+    public void initAddValue(CustOperatorInfo anOperator, CustInfo anCustomer) {
+        this.id = SerialGenerator.getLongValue("NotificationCustomer.id");
+
+        this.regOperId = anOperator.getId();
+        this.regOperName = anOperator.getName();
+        this.operOrg = anOperator.getOperOrg();
+
+        this.regDate = BetterDateUtils.getNumDate();
+        this.regTime = BetterDateUtils.getNumTime();
+
+        this.modiOperId = anOperator.getId();
+        this.modiOperName = anOperator.getName();
+        this.modiDate = BetterDateUtils.getNumDate();
+        this.modiTime = BetterDateUtils.getNumTime();
+
+        this.custNo = anCustomer.getCustNo();
+        this.custName = anCustomer.getCustName();
+
+        this.isDeleted = NotificationConstants.IS_DELETED_FALSE;
+        this.isRead = NotificationConstants.IS_READ_FALSE;
+        
+        this.businStatus = NotificationConstants.SEND_STATUS_NORMAL;
+    }
+
+    public void initModifyValue(Boolean anReadStatus) {
+        this.modiDate = BetterDateUtils.getNumDate();
+        this.modiTime = BetterDateUtils.getNumTime();
+        
+        this.isRead = anReadStatus;
+    }
+    
+    public void initModifyValue(String anBusinStatus) {
+        this.modiDate = BetterDateUtils.getNumDate();
+        this.modiTime = BetterDateUtils.getNumTime();
+        
+        this.businStatus = anBusinStatus;
     }
 }
