@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.betterjr.modules.operator.dao.SysOperatorRoleRelationMapper" >
+  <resultMap id="BaseResultMap" type="com.betterjr.modules.operator.entity.SysOperatorRoleRelation" >
+    <!--
+      WARNING - @mbggenerated
+    -->
+    <id column="ID" property="id" jdbcType="INTEGER" />
+    <result column="L_ROLE_ID" property="roleId" jdbcType="INTEGER" />
+    <result column="L_OPERID" property="operId" jdbcType="INTEGER" />
+    <result column="C_BUSIN_STATUS" property="businStatus" jdbcType="VARCHAR" />
+    <result column="D_DATE" property="regDate" jdbcType="VARCHAR" />
+    <result column="C_ROLE_NAME" property="roleName" jdbcType="VARCHAR" />
+  </resultMap>
+</mapper>

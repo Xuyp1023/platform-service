@@ -14,6 +14,8 @@
 		com.betterjr.modules.customer,
 		com.betterjr.modules.document,
 		com.betterjr.modules.workflow,
+        com.betterjr.modules.operator,
+        com.betterjr.modules.role,
 		com.betterjr.modules.sys.dubbo,
         com.betterjr.modules.account.dubbo,
         com.betterjr.dubbo.extend.filter" />

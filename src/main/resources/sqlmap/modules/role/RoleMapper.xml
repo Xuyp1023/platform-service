@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.betterjr.modules.role.dao.RoleMapper">
+  <resultMap id="BaseResultMap" type="com.betterjr.modules.role.entity.Role">
+    <!--
+      WARNING - @mbggenerated
+    -->
+    <id column="ID" jdbcType="INTEGER" property="id" />
+    <result column="C_ROLE_NAME" jdbcType="VARCHAR" property="roleName" />
+    <result column="C_ROLE_TYPE" jdbcType="VARCHAR" property="roleType" />
+    <result column="C_BUSIN_STATUS" jdbcType="VARCHAR" property="businStatus" />
+    <result column="C_OPERORG" jdbcType="VARCHAR" property="operOrg" />
+  </resultMap>
+</mapper>
