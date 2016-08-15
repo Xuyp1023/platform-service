@@ -2,6 +2,9 @@ package com.betterjr.modules.notification.entity;
 
 import com.betterjr.common.annotation.*;
 import com.betterjr.common.entity.BetterjrEntity;
+import com.betterjr.common.utils.BetterDateUtils;
+import com.betterjr.common.utils.UserUtils;
+
 import javax.persistence.*;
 
 @Access(AccessType.FIELD)
@@ -54,14 +57,14 @@ public class NotificationChannelProfile implements BetterjrEntity {
     /**
      * 内容
      */
-    @Column(name = "C_CONTENT",  columnDefinition="VARCHAR" )
+    @Column(name = "C_CONTENT",  columnDefinition="MEDIUMTEXT" )
     @MetaData( value="内容", comments = "内容")
     private String content;
 
     /**
      * 业务引用模板
      */
-    @Column(name = "C_REFERENCE",  columnDefinition="VARCHAR" )
+    @Column(name = "C_REFERENCE",  columnDefinition="MEDIUMTEXT" )
     @MetaData( value="业务引用模板", comments = "业务引用模板")
     private String reference;
 
@@ -398,5 +401,19 @@ public class NotificationChannelProfile implements BetterjrEntity {
         result = prime * result + ((getLastStatus() == null) ? 0 : getLastStatus().hashCode());
         result = prime * result + ((getCustNo() == null) ? 0 : getCustNo().hashCode());
         return result;
+    }
+
+    public void initModifyValue(NotificationChannelProfile anChannelProfile) {
+        this.modiOperId = UserUtils.getOperatorInfo().getId();
+        this.modiOperName = UserUtils.getOperatorInfo().getName();
+        this.modiDate = BetterDateUtils.getNumDate();
+        this.modiTime = BetterDateUtils.getNumTime();
+        
+        //
+        this.lastStatus = this.businStatus;
+        this.businStatus = anChannelProfile.getBusinStatus();
+        this.subject = anChannelProfile.getSubject();
+        this.content = anChannelProfile.getContent();
+        this.reference = anChannelProfile.getReference();
     }
 }

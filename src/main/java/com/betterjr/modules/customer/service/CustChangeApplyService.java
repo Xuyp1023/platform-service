@@ -142,7 +142,7 @@ public class CustChangeApplyService extends BaseService<CustChangeApplyMapper, C
         else {
             anParam.put("LIKEcustName", "%" + custName + "%");
         }
-        if (businStatus == null || BetterStringUtils.isBlank((String) businStatus)) {
+        if (businStatus == null || (businStatus instanceof String && BetterStringUtils.isBlank((String) businStatus))) {
             anParam.remove("businStatus");
         }
         

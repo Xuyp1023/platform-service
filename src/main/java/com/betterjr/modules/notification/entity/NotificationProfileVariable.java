@@ -1,27 +1,13 @@
-package com.betterjr.modules.customer.entity;
+package com.betterjr.modules.notification.entity;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-
-import com.betterjr.common.annotation.MetaData;
+import com.betterjr.common.annotation.*;
 import com.betterjr.common.entity.BetterjrEntity;
-import com.betterjr.common.mapper.CustDateJsonSerializer;
-import com.betterjr.common.selectkey.SerialGenerator;
-import com.betterjr.common.utils.BetterDateUtils;
-import com.betterjr.common.utils.UserUtils;
-import com.betterjr.modules.customer.constant.CustomerConstants;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import javax.persistence.*;
 
 @Access(AccessType.FIELD)
 @Entity
-@Table(name = "t_cust_instead_apply")
-public class CustInsteadApply implements BetterjrEntity {
+@Table(name = "t_sys_notifi_profile_var")
+public class NotificationProfileVariable implements BetterjrEntity {
     /**
      * 编号
      */
@@ -33,24 +19,37 @@ public class CustInsteadApply implements BetterjrEntity {
     /**
      * 数据版本号
      */
-    @JsonIgnore
     @Column(name = "N_VERSION",  columnDefinition="INTEGER" )
     @MetaData( value="数据版本号", comments = "数据版本号")
     private Long version;
+    
+    /**
+     * 模板编号
+     */
+    @Column(name = "L_CHANNEL_PROFILE_ID",  columnDefinition="INTEGER" )
+    @MetaData( value="模板编号", comments = "模板编号")
+    private Long channelProfileId;
 
     /**
-     * 申请类型：0开户代录，1变更代录
+     * 变量名称
      */
-    @Column(name = "C_INSTEAD_TYPE",  columnDefinition="CHAR" )
-    @MetaData( value="申请类型：0开户代录", comments = "申请类型：0开户代录，1变更代录")
-    private String insteadType;
+    @Column(name = "C_VAR_NAME",  columnDefinition="VARCHAR" )
+    @MetaData( value="变量名称", comments = "变量名称")
+    private String variableName;
 
     /**
-     * 附件
+     * 变量值 eg.: ${entity.custName}  - #公司名称# - 公司名称      ->    variableValue - variableName - variableMark
      */
-    @Column(name = "N_BATCHNO",  columnDefinition="INTEGER" )
-    @MetaData( value="附件", comments = "附件")
-    private Long batchNo;
+    @Column(name = "C_VAR_VALUE",  columnDefinition="VARCHAR" )
+    @MetaData( value="变量值", comments = "变量值")
+    private String variableValue;
+
+    /**
+     * 变量描述
+     */
+    @Column(name = "C_VAR_MARK",  columnDefinition="VARCHAR" )
+    @MetaData( value="变量描述", comments = "变量描述")
+    private String variableMark;
 
     /**
      * 创建人(操作员)ID号
@@ -69,7 +68,6 @@ public class CustInsteadApply implements BetterjrEntity {
     /**
      * 创建日期
      */
-    @JsonSerialize(using = CustDateJsonSerializer.class)
     @Column(name = "D_REG_DATE",  columnDefinition="VARCHAR" )
     @MetaData( value="创建日期", comments = "创建日期")
     private String regDate;
@@ -77,7 +75,6 @@ public class CustInsteadApply implements BetterjrEntity {
     /**
      * 创建时间
      */
-    @JsonIgnore
     @Column(name = "T_REG_TIME",  columnDefinition="VARCHAR" )
     @MetaData( value="创建时间", comments = "创建时间")
     private String regTime;
@@ -85,7 +82,6 @@ public class CustInsteadApply implements BetterjrEntity {
     /**
      * 修改人(操作员)ID号
      */
-    @JsonIgnore
     @Column(name = "L_MODI_OPERID",  columnDefinition="INTEGER" )
     @MetaData( value="修改人(操作员)ID号", comments = "修改人(操作员)ID号")
     private Long modiOperId;
@@ -93,7 +89,6 @@ public class CustInsteadApply implements BetterjrEntity {
     /**
      * 修改人(操作员)姓名
      */
-    @JsonIgnore
     @Column(name = "C_MODI_OPERNAME",  columnDefinition="VARCHAR" )
     @MetaData( value="修改人(操作员)姓名", comments = "修改人(操作员)姓名")
     private String modiOperName;
@@ -101,7 +96,6 @@ public class CustInsteadApply implements BetterjrEntity {
     /**
      * 修改日期
      */
-    @JsonSerialize(using = CustDateJsonSerializer.class)
     @Column(name = "D_MODI_DATE",  columnDefinition="VARCHAR" )
     @MetaData( value="修改日期", comments = "修改日期")
     private String modiDate;
@@ -109,7 +103,6 @@ public class CustInsteadApply implements BetterjrEntity {
     /**
      * 修改时间
      */
-    @JsonIgnore
     @Column(name = "T_MODI_TIME",  columnDefinition="VARCHAR" )
     @MetaData( value="修改时间", comments = "修改时间")
     private String modiTime;
@@ -117,16 +110,12 @@ public class CustInsteadApply implements BetterjrEntity {
     /**
      * 操作机构
      */
-    @JsonIgnore
     @Column(name = "C_OPERORG",  columnDefinition="VARCHAR" )
     @MetaData( value="操作机构", comments = "操作机构")
     private String operOrg;
 
-    /**
-     * 状态：0未受理  1已审核待录入 2审核驳回 3已录入待复核 4已复核待确认 5复核驳回 6 确认通过 7 确认驳回 8 资料作废
-     */
     @Column(name = "C_BUSIN_STATUS",  columnDefinition="CHAR" )
-    @MetaData( value="状态", comments = "状态：0未受理  1已审核待录入 2审核驳回 3已录入待复核 4已复核待确认 5复核驳回 6 确认通过 7 确认驳回 8 资料作废")
+    @MetaData( value="", comments = "")
     private String businStatus;
 
     @Column(name = "C_LAST_STATUS",  columnDefinition="CHAR" )
@@ -134,23 +123,20 @@ public class CustInsteadApply implements BetterjrEntity {
     private String lastStatus;
 
     /**
-     * 客户编号
+     * 模板所属客户编号
      */
     @Column(name = "L_CUSTNO",  columnDefinition="INTEGER" )
-    @MetaData( value="客户编号", comments = "客户编号")
+    @MetaData( value="模板所属客户编号", comments = "模板所属客户编号")
     private Long custNo;
 
     /**
-     * 客户名称
+     * 模板所属客户名称
      */
     @Column(name = "C_CUSTNAME",  columnDefinition="VARCHAR" )
-    @MetaData( value="客户名称", comments = "客户名称")
+    @MetaData( value="模板所属客户名称", comments = "模板所属客户名称")
     private String custName;
 
-    @Transient
-    private String insteadItems;
-    
-    private static final long serialVersionUID = 1468812783845L;
+    private static final long serialVersionUID = 1468812783881L;
 
     public Long getId() {
         return id;
@@ -168,20 +154,36 @@ public class CustInsteadApply implements BetterjrEntity {
         this.version = version;
     }
 
-    public String getInsteadType() {
-        return insteadType;
+    public Long getChannelProfileId() {
+        return channelProfileId;
     }
 
-    public void setInsteadType(String insteadType) {
-        this.insteadType = insteadType == null ? null : insteadType.trim();
+    public void setChannelProfileId(Long anChannelProfileId) {
+        channelProfileId = anChannelProfileId;
     }
 
-    public Long getBatchNo() {
-        return batchNo;
+    public String getVariableName() {
+        return variableName;
     }
 
-    public void setBatchNo(Long batchNo) {
-        this.batchNo = batchNo;
+    public void setVariableName(String anVariableName) {
+        variableName = anVariableName;
+    }
+
+    public String getVariableValue() {
+        return variableValue;
+    }
+
+    public void setVariableValue(String anVariableValue) {
+        variableValue = anVariableValue;
+    }
+
+    public String getVariableMark() {
+        return variableMark;
+    }
+
+    public void setVariableMark(String anVariableMark) {
+        variableMark = anVariableMark;
     }
 
     public Long getRegOperId() {
@@ -287,14 +289,6 @@ public class CustInsteadApply implements BetterjrEntity {
     public void setCustName(String custName) {
         this.custName = custName == null ? null : custName.trim();
     }
-    
-    public String getInsteadItems() {
-        return insteadItems;
-    }
-
-    public void setInsteadItems(String anInsteadItems) {
-        insteadItems = anInsteadItems;
-    }
 
     @Override
     public String toString() {
@@ -304,8 +298,10 @@ public class CustInsteadApply implements BetterjrEntity {
         sb.append("Hash = ").append(hashCode());
         sb.append(", id=").append(id);
         sb.append(", version=").append(version);
-        sb.append(", insteadType=").append(insteadType);
-        sb.append(", batchNo=").append(batchNo);
+        sb.append(", channelProfileId=").append(channelProfileId);
+        sb.append(", variableName=").append(variableName);
+        sb.append(", variableValue=").append(variableValue);
+        sb.append(", variableMark=").append(variableMark);
         sb.append(", regOperId=").append(regOperId);
         sb.append(", regOperName=").append(regOperName);
         sb.append(", regDate=").append(regDate);
@@ -335,11 +331,13 @@ public class CustInsteadApply implements BetterjrEntity {
         if (getClass() != that.getClass()) {
             return false;
         }
-        CustInsteadApply other = (CustInsteadApply) that;
+        NotificationProfileVariable other = (NotificationProfileVariable) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
             && (this.getVersion() == null ? other.getVersion() == null : this.getVersion().equals(other.getVersion()))
-            && (this.getInsteadType() == null ? other.getInsteadType() == null : this.getInsteadType().equals(other.getInsteadType()))
-            && (this.getBatchNo() == null ? other.getBatchNo() == null : this.getBatchNo().equals(other.getBatchNo()))
+            && (this.getChannelProfileId() == null ? other.getChannelProfileId() == null : this.getChannelProfileId().equals(other.getChannelProfileId()))
+            && (this.getVariableName() == null ? other.getVariableName() == null : this.getVariableName().equals(other.getVariableName()))
+            && (this.getVariableValue() == null ? other.getVariableValue() == null : this.getVariableValue().equals(other.getVariableValue()))
+            && (this.getVariableMark() == null ? other.getVariableMark() == null : this.getVariableMark().equals(other.getVariableMark()))
             && (this.getRegOperId() == null ? other.getRegOperId() == null : this.getRegOperId().equals(other.getRegOperId()))
             && (this.getRegOperName() == null ? other.getRegOperName() == null : this.getRegOperName().equals(other.getRegOperName()))
             && (this.getRegDate() == null ? other.getRegDate() == null : this.getRegDate().equals(other.getRegDate()))
@@ -361,8 +359,10 @@ public class CustInsteadApply implements BetterjrEntity {
         int result = 1;
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
         result = prime * result + ((getVersion() == null) ? 0 : getVersion().hashCode());
-        result = prime * result + ((getInsteadType() == null) ? 0 : getInsteadType().hashCode());
-        result = prime * result + ((getBatchNo() == null) ? 0 : getBatchNo().hashCode());
+        result = prime * result + ((getChannelProfileId() == null) ? 0 : getChannelProfileId().hashCode());
+        result = prime * result + ((getVariableName() == null) ? 0 : getVariableName().hashCode());
+        result = prime * result + ((getVariableValue() == null) ? 0 : getVariableValue().hashCode());
+        result = prime * result + ((getVariableMark() == null) ? 0 : getVariableMark().hashCode());
         result = prime * result + ((getRegOperId() == null) ? 0 : getRegOperId().hashCode());
         result = prime * result + ((getRegOperName() == null) ? 0 : getRegOperName().hashCode());
         result = prime * result + ((getRegDate() == null) ? 0 : getRegDate().hashCode());
@@ -377,36 +377,5 @@ public class CustInsteadApply implements BetterjrEntity {
         result = prime * result + ((getCustNo() == null) ? 0 : getCustNo().hashCode());
         result = prime * result + ((getCustName() == null) ? 0 : getCustName().hashCode());
         return result;
-    }
-    
-    public void initAddValue(String anInsteadType, Long anCustNo, String anCustName) {
-        this.id = SerialGenerator.getLongValue("CustInsteadApply.id");
-        
-        this.regOperId = UserUtils.getOperatorInfo().getId();
-        this.regOperName = UserUtils.getOperatorInfo().getName();
-        this.regDate = BetterDateUtils.getNumDate();
-        this.regTime = BetterDateUtils.getNumTime();
-        
-        this.modiOperId = UserUtils.getOperatorInfo().getId();
-        this.modiOperName = UserUtils.getOperatorInfo().getName();
-        this.modiDate = BetterDateUtils.getNumDate();
-        this.modiTime = BetterDateUtils.getNumTime();
-        
-        this.insteadType = anInsteadType;
-        this.custNo = anCustNo;
-        this.custName = anCustName;
-        
-        this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
-        this.businStatus = CustomerConstants.INSTEAD_APPLY_STATUS_NEW;
-    }
-
-    public void initModifyValue(String anBusinStatus) {
-        this.modiOperId = UserUtils.getOperatorInfo().getId();
-        this.modiOperName = UserUtils.getOperatorInfo().getName();
-        this.modiDate = BetterDateUtils.getNumDate();
-        this.modiTime = BetterDateUtils.getNumTime();
-
-        this.lastStatus = this.businStatus;
-        this.businStatus = anBusinStatus;
     }
 }

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
+	default-lazy-init="true">
+
+	<description>MessageQueue配置 </description>
+
+	<bean id="notificationProducer" class="com.betterjr.common.mq.core.RocketMQProducer">
+		<constructor-arg index="0" value="${rocketmq.namesrvAddr}" />
+		<constructor-arg index="1"
+			value="${rocketmq.producerGroupName1}" />
+	</bean>
+	<bean id="notificationConsumer" class="com.betterjr.common.mq.core.RocketMQConsumer">
+		<constructor-arg index="0" value="${rocketmq.namesrvAddr}" />
+		<constructor-arg index="1"
+			value="${rocketmq.consumerGroupName1}" />
+	</bean>
+
+	<bean class="com.betterjr.common.service.NotificationService">
+		<constructor-arg index="0" ref="notificationProducer" />
+	</bean>
+</beans>

@@ -1,7 +1,12 @@
 package com.betterjr.modules.notice.entity;
 
 import com.betterjr.common.annotation.*;
+import com.betterjr.common.data.SimpleDataEntity;
 import com.betterjr.common.entity.BetterjrEntity;
+import com.betterjr.common.selectkey.SerialGenerator;
+
+import java.util.List;
+
 import javax.persistence.*;
 
 @Access(AccessType.FIELD)
@@ -145,6 +150,8 @@ public class Notice implements BetterjrEntity {
     @Column(name = "C_CUSTNAME",  columnDefinition="VARCHAR" )
     @MetaData( value="发布客户名称", comments = "发布客户名称")
     private String custName;
+    
+    private List<SimpleDataEntity> targetCust;
 
     private static final long serialVersionUID = 1468812783876L;
 
@@ -307,6 +314,14 @@ public class Notice implements BetterjrEntity {
     public void setCustName(String custName) {
         this.custName = custName == null ? null : custName.trim();
     }
+    
+    public List<SimpleDataEntity> getTargetCust() {
+        return targetCust;
+    }
+
+    public void setTargetCust(List<SimpleDataEntity> anTargetCust) {
+        targetCust = anTargetCust;
+    }
 
     @Override
     public String toString() {
@@ -398,5 +413,19 @@ public class Notice implements BetterjrEntity {
         result = prime * result + ((getCustNo() == null) ? 0 : getCustNo().hashCode());
         result = prime * result + ((getCustName() == null) ? 0 : getCustName().hashCode());
         return result;
+    }
+    
+    public void initAddValue() {
+        this.id = SerialGenerator.getLongValue("Notice.id");
+    }
+
+    public void initModifyValue(Notice anNotice) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void initModifyValue(String anBusinStatus) {
+        // TODO Auto-generated method stub
+        
     }
 }
