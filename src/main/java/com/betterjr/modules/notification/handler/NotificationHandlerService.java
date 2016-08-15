@@ -74,7 +74,7 @@ public class NotificationHandlerService {
     private CustAccountService accountService;
 
     @Resource
-    private CustOperatorService operatorService;
+    private CustOperatorService custOperatorService;
 
     @Resource(name = "notificationProducer")
     private RocketMQProducer producer;
@@ -111,7 +111,7 @@ public class NotificationHandlerService {
         Long operId = anNotificationModel.getSendOperator();
 
         CustInfo customer = accountService.findCustInfo(custNo);
-        CustOperatorInfo operator = operatorService.findCustOperatorInfo(operId);
+        CustOperatorInfo operator = custOperatorService.findCustOperatorInfo(operId);
 
         Map<String, Object> param = anNotificationModel.getParam();
         BetterjrEntity entity = anNotificationModel.getEntity();
@@ -317,11 +317,11 @@ public class NotificationHandlerService {
     }
 
     private Collection<CustOperatorInfo> queryOperatorByCustNo(Long anCustNo) {
-        return operatorService.queryOperatorInfoByCustNo(anCustNo);
+        return custOperatorService.queryOperatorInfoByCustNo(anCustNo);
     }
 
     private CustOperatorInfo findOperatorById(Long anOperId) {
-        return operatorService.findCustOperatorInfo(anOperId);
+        return custOperatorService.findCustOperatorInfo(anOperId);
     }
 
 }
