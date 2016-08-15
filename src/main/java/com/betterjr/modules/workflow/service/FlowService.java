@@ -103,7 +103,7 @@ public class FlowService {
      * @param businessId
      * @return
      */
-    public List<CustFlowStep> getExecutedNodes(Long businessId) {
+    public List<CustFlowStep> findExecutedNodes(Long businessId) {
         CustFlowInstanceBusiness business = this.businessService.selectByPrimaryKey(businessId);
         if (business == null) {
             logger.warn("not found order for business :" + businessId);
@@ -140,7 +140,7 @@ public class FlowService {
      * @param flowInstanceId
      * @return
      */
-    public List<TaskAuditHistory> getExecutedHistory(Long businessId) {
+    public List<TaskAuditHistory> findExecutedHistory(Long businessId) {
         CustFlowInstanceBusiness business = this.businessService.selectByPrimaryKey(businessId);
         if (business == null) {
             logger.warn("not found order for business :" + businessId);

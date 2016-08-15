@@ -3,10 +3,12 @@ package com.betterjr.modules.workflow.utils;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.snaker.engine.SnakerEngine;
 import org.snaker.engine.model.DecisionModel;
 import org.snaker.engine.model.EndModel;
 import org.snaker.engine.model.ForkModel;
@@ -18,7 +20,12 @@ import org.snaker.engine.model.TaskModel;
 import org.snaker.engine.model.TransitionModel;
 
 import com.alibaba.dubbo.common.utils.CollectionUtils;
+import com.betterjr.common.mapper.BeanMapper;
+import com.betterjr.common.mapper.JsonMapper;
 import com.betterjr.common.utils.Collections3;
+import com.betterjr.common.utils.UserUtils;
+import com.betterjr.modules.workflow.data.AuditType;
+import com.betterjr.modules.workflow.data.FlowNodeRole;
 import com.betterjr.modules.workflow.entity.CustFlowBase;
 import com.betterjr.modules.workflow.entity.CustFlowMoney;
 import com.betterjr.modules.workflow.entity.CustFlowStep;
@@ -35,18 +42,7 @@ public class SnakerProcessModelGenerator {
         long processId = 100l;
         Long step1Id = 200l;
         Long step2Id = 300l;
-        base = new CustFlowBase();
-        base.setId(processId);
 
-        stepList = new ArrayList<CustFlowStep>();
-        CustFlowStep step1 = new CustFlowStep();
-        step1.setId(step1Id);
-        step1.setOrderNum(1);
-        CustFlowStep step2 = new CustFlowStep();
-        step2.setId(step2Id);
-        step2.setOrderNum(2);
-        stepList.add(step1);
-        stepList.add(step2);
 
         stepApproversMap = new HashMap<Long, List<CustFlowStepApprovers>>();
 
@@ -65,21 +61,25 @@ public class SnakerProcessModelGenerator {
         CustFlowStepApprovers app1 = new CustFlowStepApprovers();
         app1.setStepId(step1Id);
         app1.setAuditOperId(4001l);
+        app1.setAuditOperName("hewei");
         app1.setAuditMoneyId(moneyClassId);
         app1.setWeight(50);
         CustFlowStepApprovers app2 = new CustFlowStepApprovers();
         app2.setStepId(step1Id);
         app2.setAuditOperId(4002l);
+        app2.setAuditOperName("hewei");
         app2.setAuditMoneyId(moneyClassId);
         app2.setWeight(50);
         CustFlowStepApprovers app3 = new CustFlowStepApprovers();
         app3.setStepId(step1Id);
         app3.setAuditOperId(4003l);
+        app3.setAuditOperName("hewei");
         app3.setAuditMoneyId(moneyClassId2);
         app3.setWeight(50);
         CustFlowStepApprovers app4 = new CustFlowStepApprovers();
         app4.setStepId(step1Id);
         app4.setAuditOperId(4004l);
+        app4.setAuditOperName("hewei");
         app4.setAuditMoneyId(moneyClassId2);
         app4.setWeight(50);
         List<CustFlowStepApprovers> stepAppsList = new ArrayList<CustFlowStepApprovers>();
@@ -93,20 +93,24 @@ public class SnakerProcessModelGenerator {
         app1Step2.setStepId(step2Id);
         app1Step2.setAuditOperId(4005l);
         app1Step2.setAuditMoneyId(moneyClassId);
+        app1Step2.setAuditOperName("hewei");
         app1Step2.setWeight(50);
         CustFlowStepApprovers app2Step2 = new CustFlowStepApprovers();
         app2Step2.setStepId(step2Id);
         app2Step2.setAuditOperId(4006l);
+        app2Step2.setAuditOperName("dafd");
         app2Step2.setAuditMoneyId(moneyClassId);
         app2Step2.setWeight(50);
         CustFlowStepApprovers app3Step2 = new CustFlowStepApprovers();
         app3Step2.setStepId(step2Id);
         app3Step2.setAuditOperId(4007l);
+        app3Step2.setAuditOperName("fdafdd");
         app3Step2.setAuditMoneyId(moneyClassId2);
         app3Step2.setWeight(50);
         CustFlowStepApprovers app4Step2 = new CustFlowStepApprovers();
         app4Step2.setStepId(step2Id);
         app4Step2.setAuditOperId(4008l);
+        app4Step2.setAuditOperName("f45d454");
         app4Step2.setAuditMoneyId(moneyClassId2);
         app4Step2.setWeight(50);
         List<CustFlowStepApprovers> stepAppsListStep2 = new ArrayList<CustFlowStepApprovers>();
@@ -115,6 +119,34 @@ public class SnakerProcessModelGenerator {
         stepAppsListStep2.add(app3Step2);
         stepAppsListStep2.add(app4Step2);
         stepApproversMap.put(step2Id, stepAppsListStep2);
+        
+        base = new CustFlowBase();
+        base.setId(processId);
+        base.setFlowType("Trade");
+        base.setMonitorOperId(111l);
+        base.setMonitorOperName("hewei");
+        
+
+        stepList = new ArrayList<CustFlowStep>();
+        CustFlowStep step1 = new CustFlowStep();
+        step1.setId(step1Id);
+        step1.setFlowBaseId(processId);
+        step1.setNodeId(11l);
+        step1.setNodeName("出具保理方案");
+        step1.setAuditType("serial");
+        step1.setOrderNum(1);
+        step1.setStepApprovers(stepApproversMap.get(step1Id));
+        CustFlowStep step2 = new CustFlowStep();
+        step2.setId(step2Id);
+        step1.setFlowBaseId(processId);
+        step2.setNodeId(12l);
+        step2.setNodeName("融资方确认方案");
+        step2.setAuditType("serial");
+        step2.setOrderNum(2);
+        step2.setStepApprovers(stepApproversMap.get(step2Id));
+        stepList.add(step1);
+        stepList.add(step2);
+        base.setStepList(stepList);
     }
 
     /**
@@ -161,7 +193,15 @@ public class SnakerProcessModelGenerator {
 
         List<CustFlowStepApprovers> stepApprovers = stepApproversMap.get(step.getId());
         if (Collections3.isEmpty(stepApprovers)) {
-            return tranFromPrevStep;
+            if(FlowNodeRole.Factoring.equals(step.getNodeRole())){
+                return tranFromPrevStep;
+            }else{
+                CustFlowStepApprovers newapp=new CustFlowStepApprovers();
+                newapp.setAuditMoneyId(CustFlowMoney.DefaultMoney);
+                newapp.setStepId(step.getId());
+                newapp.setWeight(CustFlowStepApprovers.MaxWeight);
+                this.stepApproversMap.put(step.getId(), Collections.singletonList(newapp));
+            }
         }
 
         Map<Long, List<CustFlowStepApprovers>> moneyClassMap = new HashMap<Long, List<CustFlowStepApprovers>>();
@@ -195,10 +235,7 @@ public class SnakerProcessModelGenerator {
                 for (CustFlowStepApprovers app : classList) {
                     TaskModel taskModel = new TaskModel();
                     nodeList.add(taskModel);
-                    String nodeName = step.getNodeId().toString();
-                    taskModel.setName(nodeName);
-                    taskModel.setAssignee(app.getAuditMoneyId().toString());
-                    taskModel.setDisplayName(step.getNodeName());
+                    populateTaskModel(step, app, taskModel);
                     // task point to join
                     TransitionModel trans = new TransitionModel();
                     trans.setTarget(join2Model);
@@ -227,10 +264,7 @@ public class SnakerProcessModelGenerator {
                 for (CustFlowStepApprovers app : classList) {
                     TaskModel taskModel = new TaskModel();
                     nodeList.add(taskModel);
-                    String nodeName = step.getNodeId().toString();
-                    taskModel.setName(nodeName);
-                    taskModel.setAssignee(app.getAuditOperId().toString());
-                    taskModel.setDisplayName(step.getNodeName());
+                    populateTaskModel(step, app, taskModel);
                     // task point to trans
                     TransitionModel trans = new TransitionModel();
                     taskModel.setOutputs(Collections.singletonList(trans));
@@ -284,6 +318,17 @@ public class SnakerProcessModelGenerator {
 
     }
 
+    private void populateTaskModel(CustFlowStep step, CustFlowStepApprovers app, TaskModel taskModel) {
+        String nodeName = step.getNodeId().toString();
+        taskModel.setName(nodeName);
+        if(FlowNodeRole.Factoring.equals(step.getNodeRole())){
+            taskModel.setAssignee(app.getAuditOperId().toString());
+        }else{
+            taskModel.setAssignee(SnakerEngine.AUTO);
+        }
+        taskModel.setDisplayName(step.getNodeName());
+    }
+
     public CustFlowBase getBase() {
         return base;
     }
@@ -316,4 +361,17 @@ public class SnakerProcessModelGenerator {
         this.moneyMap = moneyMap;
     }
 
+    public static void main(String[] args){
+        SnakerProcessModelGenerator process=new SnakerProcessModelGenerator();
+        JsonMapper jMapper = JsonMapper.buildNonEmptyMapper();
+        String json=jMapper.toJson(process.base);
+        System.out.println(json);
+        Object base= JsonMapper.parserJson(json);
+        
+        CustFlowBase testObj=BeanMapper.map(base, CustFlowBase.class);
+        System.out.println(base);
+        System.out.println(base.getClass());
+        System.out.println(testObj);
+        System.out.println(testObj.getClass());
+    }
 }
