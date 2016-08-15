@@ -1,6 +1,7 @@
 package com.betterjr.modules.customer.service;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,8 +9,8 @@ import org.springframework.stereotype.Service;
 
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
+import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.customer.dao.CustMechFinanceRecordMapper;
-import com.betterjr.modules.customer.entity.CustMechFinanceRecord;
 import com.betterjr.modules.customer.entity.CustMechFinanceRecord;
 
 /**
@@ -26,10 +27,11 @@ public class CustMechFinanceRecordService extends BaseService<CustMechFinanceRec
      * @param anCustNo
      * @return
      */
-    public List<CustMechFinanceRecord> queryCustMechFinanceRecord(Long anCustNo) {
+    public Page<CustMechFinanceRecord> queryCustMechFinanceRecord(Long anCustNo, String anFlag, int anPageNum, int anPageSize) {
         BTAssert.notNull(anCustNo, "客户编号不允许为空！");
-        
-        return this.selectByProperty("custNo", anCustNo);
+        Map<String, Object> anMap = new HashMap<String, Object>();
+        anMap.put("custNo", anCustNo);
+        return this.selectPropertyByPage(anMap, anPageNum, anPageSize, "1".equals(anFlag));
     }
     
     /**
