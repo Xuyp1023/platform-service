@@ -21,6 +21,8 @@
 		com.betterjr.modules.customer;
 		com.betterjr.modules.document;
 		com.betterjr.modules.workflow;
+        com.betterjr.modules.operator;
+        com.betterjr.modules.role;
 		com.betterjr.modules.account.service;
         com.betterjr.modules.rule.service;
         com.betterjr.modules.rule.validator;
