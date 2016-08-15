@@ -1,6 +1,7 @@
 package com.betterjr.modules.notice.service;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -73,18 +74,21 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
 
         // 校验是否有权限读
         Notice notice = this.selectByPrimaryKey(anId);
-        
+
         Set<SimpleDataEntity> targetCust = queryTargetCust(notice);
-        
+
         notice.setTargetCust(targetCust);
         return notice;
     }
 
     private Set<SimpleDataEntity> queryTargetCust(Notice anNotice) {
-        List<NoticeCustomer> noticeCustomers = noticeCustomerService.queryNoticeCustomer(anNotice.getId());
-        
-        
-        return null;
+        final List<NoticeCustomer> noticeCustomers = noticeCustomerService.querySimpleNoticeCustomer(anNotice.getId());
+        final Set<SimpleDataEntity> targetCusts = new HashSet<>();
+
+        noticeCustomers.forEach(
+                noticeCustomer -> targetCusts.add(new SimpleDataEntity(String.valueOf(noticeCustomer.getCustNo()), noticeCustomer.getCustName())));
+
+        return targetCusts;
     }
 
     /**

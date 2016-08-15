@@ -28,7 +28,7 @@ public class NoticeCustomerService extends BaseService<NoticeCustomerMapper, Not
     private CustAccountService accountService;
 
     @Resource
-    private CustOperatorService operatorService;
+    private CustOperatorService custOperatorService;
 
     /**
      *  
@@ -77,6 +77,12 @@ public class NoticeCustomerService extends BaseService<NoticeCustomerMapper, Not
         return this.selectByProperty("noticeId", anNoticeId);
     }
 
+    public List<NoticeCustomer> querySimpleNoticeCustomer(Long anNoticeId) {
+        BTAssert.notNull(anNoticeId, "公告编号不允许为空!");
+
+        return this.mapper.selectNoticeCustomerByNoticeId(anNoticeId);
+    }
+    
     /**
      * 发布新公告添加公告与客户操作员关系
      */
@@ -122,7 +128,7 @@ public class NoticeCustomerService extends BaseService<NoticeCustomerMapper, Not
      */
     private void saveNoticeCustomer(Long anNoticeId, Long anCustNo, List<Pair<Long, Long>> anSaveNoticeCustomers) {
         final CustInfo custInfo = accountService.findCustInfo(anCustNo);
-        final List<CustOperatorInfo> operatorInfos = operatorService.queryOperatorInfoByCustNo(anCustNo);
+        final List<CustOperatorInfo> operatorInfos = custOperatorService.queryOperatorInfoByCustNo(anCustNo);
         operatorInfos.forEach(operator -> {
             final NoticeCustomer tempNoticeCustomer = this.findNoticeCustomerByNoticeIdAndOperId(anNoticeId, operator.getId());
             if (tempNoticeCustomer == null) {
