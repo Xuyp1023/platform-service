@@ -224,6 +224,18 @@ public class FlowDubboService implements IFlowService {
         search.setOperator(UserUtils.getUser().getId().toString());
         return this.flowService.queryCurrentWorkTask(page, search);
     }
+    
+    /**
+     * 当前需要审批的任务(当前流程,前端自定义用户)
+     */
+    @Override
+    public Page<FlowStatus> queryCurrentWorkTask(Page page, FlowStatus search) {
+        // TODO Auto-generated method stub
+        if (search == null) {
+            search = new FlowStatus();
+        }
+        return this.flowService.queryCurrentWorkTask(page, search);
+    }
 
     /**
      * 审批历史数据 (当前用户)
