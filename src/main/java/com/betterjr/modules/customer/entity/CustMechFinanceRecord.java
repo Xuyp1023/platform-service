@@ -409,19 +409,17 @@ public class CustMechFinanceRecord implements BetterjrEntity {
     }
 
     public void initModifyValue(final CustMechFinanceRecord anCustMechFinanceRecord) {
-        this.id = anCustMechFinanceRecord.getId();
-/*
-        this.regOperId = anCustMechBaseTmp.getRegOperId();
-        this.regOperName = anCustMechBaseTmp.getRegOperName();
-        this.regDate = anCustMechBaseTmp.getRegDate();
-        this.regTime = anCustMechBaseTmp.getRegTime();
-*/
+        
+        this.reportName = anCustMechFinanceRecord.getReportName();
+        this.reportType = anCustMechFinanceRecord.getReportType();
+        this.startDate = anCustMechFinanceRecord.getStartDate();
+        this.endDate = anCustMechFinanceRecord.getEndDate();
+        
         this.modiOperId = UserUtils.getOperatorInfo().getId();
         this.modiOperName = UserUtils.getOperatorInfo().getName();
         this.modiDate = BetterDateUtils.getNumDate();
         this.modiTime = BetterDateUtils.getNumTime();
-
-        this.businStatus = anCustMechFinanceRecord.getBusinStatus();
+        
         this.operOrg = anCustMechFinanceRecord.getOperOrg();
     }
 }
