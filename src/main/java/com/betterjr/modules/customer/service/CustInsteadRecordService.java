@@ -98,9 +98,16 @@ public class CustInsteadRecordService extends BaseService<CustInsteadRecordMappe
     }
     
     /**
+     * 根据代录申请编号找到代录记录 不检查代录申请
+     */
+    public List<CustInsteadRecord> queryCustInsteadRecord(Long anApplyId) {
+        return this.selectByProperty("applyId", anApplyId);
+    }
+    
+    /**
      * 根据代录申请编号找到代录记录
      */
-    public List<CustInsteadRecord> findCustInsteadRecordByApplyId(Long anApplyId) {
+    public List<CustInsteadRecord> queryCustInsteadRecordByApplyId(Long anApplyId) {
         // 检查代录申请是否正确
         checkInsteadApply(anApplyId);
         

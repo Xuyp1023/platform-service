@@ -87,7 +87,7 @@ public interface CustomerConstants {
     String INSTEAD_RECORD_STATUS_REVIEW_REJECT = "3";
     String INSTEAD_RECORD_STATUS_CONFIRM_PASS = "4";
     String INSTEAD_RECORD_STATUS_CONFIRM_REJECT = "5";
-    String INSTEAD_RECORD_STATUS_CANCEL = "5";
+    String INSTEAD_RECORD_STATUS_CANCEL = "6";
 
     // 字段
     String ID = "id";

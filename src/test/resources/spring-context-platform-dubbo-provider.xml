@@ -21,6 +21,7 @@
 		com.betterjr.modules.customer;
 		com.betterjr.modules.document;
 		com.betterjr.modules.workflow;
+		com.betterjr.modules.notification;
 		com.betterjr.modules.account.service;
         com.betterjr.modules.rule.service;
         com.betterjr.modules.rule.validator;
@@ -163,13 +164,15 @@
 	<aop:config>
 		<aop:pointcut id="appService"
 			expression="execution(* com.betterjr..service.*Service.*(..)) 
-			or execution(* org.snaker.engine.core..*.*(..))" />
+			or execution(* org.snaker.engine.core..*.*(..))
+            or execution(* com.betterjr..handler.*HandlerService.*(..))" />
 		<aop:advisor advice-ref="txAdvice" pointcut-ref="appService" />
 	</aop:config>
 	<tx:advice id="txAdvice" transaction-manager="transactionManager">
 		<tx:attributes>
 			<tx:method name="save*" propagation="REQUIRED" />
 			<tx:method name="add*" propagation="REQUIRED" />
+			<tx:method name="process*" propagation="REQUIRED" />
 			<tx:method name="query*" read-only="true" />
 			<tx:method name="find*" read-only="true" />
 			<tx:method name="*" propagation="REQUIRED" />
@@ -193,8 +196,17 @@
 
 	<bean id="serialGenerator" class="com.betterjr.common.selectkey.SerialGenerator"
 		init-method="init" scope="singleton" lazy-init="false" />
+		
+    <bean  class="com.betterjr.common.utils.MailUtils" >
+        <property name="protocol" value="${mail.transport.protocol}" />
+        <property name="host" value="${mail.smtp.host}" />
+        <property name="port" value="${mail.smtp.port}" />
+        <property name="from" value="${mail.from}" />
+        <property name="username" value="${mail.username}" />
+        <property name="password" value="${mail.password}" />
+    </bean>		
 
 <!-- 	<import resource="platform-dubbo-provider.xml" /> -->
 	<import resource="workflow-snaker.xml"/>
-
+    <import resource="mq-config.xml"/>
 </beans>

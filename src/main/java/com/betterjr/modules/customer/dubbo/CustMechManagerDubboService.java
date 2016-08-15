@@ -58,19 +58,19 @@ public class CustMechManagerDubboService implements ICustMechManagerService {
     }
     
     @Override
-    public String webSaveManagerTmp(Map<String, Object> anParam, Long anId) {
+    public String webSaveManagerTmp(Map<String, Object> anParam, Long anId, String anFileList) {
         final CustMechManagerTmp custMechManagerTmp = (CustMechManagerTmp) RuleServiceDubboFilterInvoker.getInputObj();
         return AjaxObject.newOk("公司高管-流水信息 修改成功", managerTmpService.saveManagerTmp(custMechManagerTmp, anId)).toJson();
     }
 
     @Override
-    public String webAddChangeManagerTmp(Map<String, Object> anMap) {
+    public String webAddChangeManagerTmp(Map<String, Object> anMap, String anFileList) {
         final CustMechManagerTmp custMechManagerTmp = (CustMechManagerTmp) RuleServiceDubboFilterInvoker.getInputObj();
         return AjaxObject.newOk("公司高管-流水信息 变更添加成功", managerTmpService.addChangeManagerTmp(custMechManagerTmp)).toJson();
     }
     
     @Override
-    public String webSaveChangeManagerTmp(Map<String, Object> anParam) {
+    public String webSaveChangeManagerTmp(Map<String, Object> anParam, String anFileList) {
         final CustMechManagerTmp custMechManagerTmp = (CustMechManagerTmp) RuleServiceDubboFilterInvoker.getInputObj();
         return AjaxObject.newOk("公司高管-流水信息 变更修改成功", managerTmpService.saveSaveChangeManagerTmp(custMechManagerTmp)).toJson();
     }
@@ -119,13 +119,13 @@ public class CustMechManagerDubboService implements ICustMechManagerService {
     }
     
     @Override
-    public String webAddInsteadManagerTmp(Map<String, Object> anMap, Long anInsteadRecordId) {
+    public String webAddInsteadManagerTmp(Map<String, Object> anMap, Long anInsteadRecordId, String anFileList) {
         final CustMechManagerTmp custMechManagerTmp = (CustMechManagerTmp) RuleServiceDubboFilterInvoker.getInputObj();
         return AjaxObject.newOk("公司高管-流水信息 代录添加成功", managerTmpService.addInsteadManagerTmp(custMechManagerTmp, anInsteadRecordId)).toJson();
     }
     
     @Override
-    public String webSaveInsteadManagerTmp(Map<String, Object> anParam, Long anInsteadRecordId) {
+    public String webSaveInsteadManagerTmp(Map<String, Object> anParam, Long anInsteadRecordId, String anFileList) {
         final CustMechManagerTmp custMechManagerTmp = (CustMechManagerTmp) RuleServiceDubboFilterInvoker.getInputObj();
         return AjaxObject.newOk("公司高管-流水信息 代录修改成功", managerTmpService.saveSaveInsteadManagerTmp(custMechManagerTmp, anInsteadRecordId)).toJson();
 

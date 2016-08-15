@@ -12,6 +12,8 @@
 	<dubbo:annotation package="com.betterjr.modules.test,
 		com.betterjr.modules.blacklist,
 		com.betterjr.modules.customer,
+		com.betterjr.modules.notification,
+		com.betterjr.modules.notice,
 		com.betterjr.modules.document,
 		com.betterjr.modules.workflow,
 		com.betterjr.modules.sys.dubbo,

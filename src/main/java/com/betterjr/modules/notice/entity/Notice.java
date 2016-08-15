@@ -1,8 +1,26 @@
 package com.betterjr.modules.notice.entity;
 
-import com.betterjr.common.annotation.*;
+import java.util.List;
+import java.util.Set;
+
+import javax.persistence.Access;
+import javax.persistence.AccessType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import com.betterjr.common.annotation.MetaData;
+import com.betterjr.common.data.SimpleDataEntity;
 import com.betterjr.common.entity.BetterjrEntity;
-import javax.persistence.*;
+import com.betterjr.common.mapper.CustDateJsonSerializer;
+import com.betterjr.common.mapper.CustTimeJsonSerializer;
+import com.betterjr.common.selectkey.SerialGenerator;
+import com.betterjr.common.utils.BetterDateUtils;
+import com.betterjr.common.utils.UserUtils;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @Access(AccessType.FIELD)
 @Entity
@@ -19,6 +37,7 @@ public class Notice implements BetterjrEntity {
     /**
      * 数据版本号
      */
+    @JsonIgnore
     @Column(name = "N_VERSION",  columnDefinition="INTEGER" )
     @MetaData( value="数据版本号", comments = "数据版本号")
     private Long version;
@@ -40,6 +59,7 @@ public class Notice implements BetterjrEntity {
     /**
      * 发布日期
      */
+    @JsonSerialize(using = CustDateJsonSerializer.class)
     @Column(name = "D_PUBLISH_DATE",  columnDefinition="VARCHAR" )
     @MetaData( value="发布日期", comments = "发布日期")
     private String publishDate;
@@ -47,6 +67,7 @@ public class Notice implements BetterjrEntity {
     /**
      * 发布时间
      */
+    @JsonSerialize(using = CustTimeJsonSerializer.class)
     @Column(name = "T_PUBLISH_TIME",  columnDefinition="VARCHAR" )
     @MetaData( value="发布时间", comments = "发布时间")
     private String publishTime;
@@ -61,6 +82,7 @@ public class Notice implements BetterjrEntity {
     /**
      * 创建人(操作员)ID号
      */
+    @JsonIgnore
     @Column(name = "L_REG_OPERID",  columnDefinition="INTEGER" )
     @MetaData( value="创建人(操作员)ID号", comments = "创建人(操作员)ID号")
     private Long regOperId;
@@ -68,6 +90,7 @@ public class Notice implements BetterjrEntity {
     /**
      * 创建人(操作员)姓名
      */
+    @JsonIgnore
     @Column(name = "C_REG_OPERNAME",  columnDefinition="VARCHAR" )
     @MetaData( value="创建人(操作员)姓名", comments = "创建人(操作员)姓名")
     private String regOperName;
@@ -75,6 +98,7 @@ public class Notice implements BetterjrEntity {
     /**
      * 创建日期
      */
+    @JsonIgnore
     @Column(name = "D_REG_DATE",  columnDefinition="VARCHAR" )
     @MetaData( value="创建日期", comments = "创建日期")
     private String regDate;
@@ -82,6 +106,7 @@ public class Notice implements BetterjrEntity {
     /**
      * 创建时间
      */
+    @JsonIgnore
     @Column(name = "T_REG_TIME",  columnDefinition="VARCHAR" )
     @MetaData( value="创建时间", comments = "创建时间")
     private String regTime;
@@ -89,6 +114,7 @@ public class Notice implements BetterjrEntity {
     /**
      * 修改人(操作员)ID号
      */
+    @JsonIgnore
     @Column(name = "L_MODI_OPERID",  columnDefinition="INTEGER" )
     @MetaData( value="修改人(操作员)ID号", comments = "修改人(操作员)ID号")
     private Long modiOperId;
@@ -96,6 +122,7 @@ public class Notice implements BetterjrEntity {
     /**
      * 修改人(操作员)姓名
      */
+    @JsonIgnore
     @Column(name = "C_MODI_OPERNAME",  columnDefinition="VARCHAR" )
     @MetaData( value="修改人(操作员)姓名", comments = "修改人(操作员)姓名")
     private String modiOperName;
@@ -103,6 +130,7 @@ public class Notice implements BetterjrEntity {
     /**
      * 修改日期
      */
+    @JsonIgnore
     @Column(name = "D_MODI_DATE",  columnDefinition="VARCHAR" )
     @MetaData( value="修改日期", comments = "修改日期")
     private String modiDate;
@@ -110,6 +138,7 @@ public class Notice implements BetterjrEntity {
     /**
      * 修改时间
      */
+    @JsonIgnore
     @Column(name = "T_MODI_TIME",  columnDefinition="VARCHAR" )
     @MetaData( value="修改时间", comments = "修改时间")
     private String modiTime;
@@ -145,6 +174,9 @@ public class Notice implements BetterjrEntity {
     @Column(name = "C_CUSTNAME",  columnDefinition="VARCHAR" )
     @MetaData( value="发布客户名称", comments = "发布客户名称")
     private String custName;
+    
+    @Transient
+    private Set<SimpleDataEntity> targetCust;
 
     private static final long serialVersionUID = 1468812783876L;
 
@@ -307,6 +339,14 @@ public class Notice implements BetterjrEntity {
     public void setCustName(String custName) {
         this.custName = custName == null ? null : custName.trim();
     }
+    
+    public Set<SimpleDataEntity> getTargetCust() {
+        return targetCust;
+    }
+
+    public void setTargetCust(Set<SimpleDataEntity> anTargetCust) {
+        targetCust = anTargetCust;
+    }
 
     @Override
     public String toString() {
@@ -398,5 +438,42 @@ public class Notice implements BetterjrEntity {
         result = prime * result + ((getCustNo() == null) ? 0 : getCustNo().hashCode());
         result = prime * result + ((getCustName() == null) ? 0 : getCustName().hashCode());
         return result;
+    }
+    
+    public void initAddValue(String anCustName, String anBusinStatus) {
+        this.id = SerialGenerator.getLongValue("Notice.id");
+        
+        this.modiOperId = UserUtils.getOperatorInfo().getId();
+        this.modiOperName = UserUtils.getOperatorInfo().getName();
+        this.modiDate = BetterDateUtils.getNumDate();
+        this.modiTime = BetterDateUtils.getNumTime();
+
+        this.regOperId = UserUtils.getOperatorInfo().getId();
+        this.regOperName = UserUtils.getOperatorInfo().getName();
+        this.regDate = BetterDateUtils.getNumDate();
+        this.regTime = BetterDateUtils.getNumTime();
+        
+        this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
+        
+        this.custName = anCustName;
+        this.businStatus = anBusinStatus;
+    }
+
+    public void initModifyValue(Notice anNotice, String anBusinStatus) {
+        this.modiOperId = UserUtils.getOperatorInfo().getId();
+        this.modiOperName = UserUtils.getOperatorInfo().getName();
+        this.modiDate = BetterDateUtils.getNumDate();
+        this.modiTime = BetterDateUtils.getNumTime();     
+        
+        this.businStatus = anBusinStatus;
+    }
+
+    public void initModifyValue(String anBusinStatus) {
+        this.modiOperId = UserUtils.getOperatorInfo().getId();
+        this.modiOperName = UserUtils.getOperatorInfo().getName();
+        this.modiDate = BetterDateUtils.getNumDate();
+        this.modiTime = BetterDateUtils.getNumTime();
+        
+        this.businStatus = anBusinStatus;
     }
 }
