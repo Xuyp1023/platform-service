@@ -158,7 +158,7 @@ public class CustMechManagerTmpService extends BaseService<CustMechManagerTmpMap
         strTmpIds.forEach(strTmpId -> tmpIds.add(Long.valueOf(strTmpId)));
 
         Map<String, Object> conditionMap = new HashMap<>();
-        conditionMap.put(CustomerConstants.ID, tmpIds.toArray(new Long[tmpIds.size()]));
+        conditionMap.put(CustomerConstants.ID, tmpIds);
 
         return this.selectByProperty(conditionMap);
     }
@@ -440,7 +440,7 @@ public class CustMechManagerTmpService extends BaseService<CustMechManagerTmpMap
      * 
      * @param anInsteadRecordId
      */
-    public CustMechManagerTmp saveDelInsteadManagerTmp(Long anRefId, Long anInsteadRecordId) {
+    public CustMechManagerTmp saveDeleteInsteadManagerTmp(Long anRefId, Long anInsteadRecordId) {
         BTAssert.notNull(anRefId, "公司高管号不允许为空！");
 
         CustInsteadRecord insteadRecord = checkInsteadRecord(anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_NEW,

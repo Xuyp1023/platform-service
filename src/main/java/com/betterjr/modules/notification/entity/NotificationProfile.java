@@ -125,6 +125,7 @@ public class NotificationProfile implements BetterjrEntity {
     @MetaData( value="", comments = "")
     private String businStatus;
 
+    @JsonIgnore
     @Column(name = "C_LAST_STATUS",  columnDefinition="CHAR" )
     @MetaData( value="", comments = "")
     private String lastStatus;

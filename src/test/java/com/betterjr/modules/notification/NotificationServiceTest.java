@@ -39,10 +39,11 @@ public class NotificationServiceTest extends BasicServiceTest<NotificationServic
         baseInfo.setCustName("亿起融金融服务有限责任公司");
         
         NotificationBuilder builder = new NotificationModel.NotificationBuilder("开户成功通知", platformCustNo, 1260L);
-        builder.addReceiveOperator(1118L);
-        builder.addReceiveOperator(11848L);
-        builder.addReceiveOperator(11850L);
-        builder.addReceiveOperator(12573L);
+        builder.addReceiveOperator(1258L);
+        builder.addReceiveOperator(1259L);
+        builder.addReceiveOperator(1260L);
+        builder.addReceiveOperator(1261L);
+        builder.addReceiveOperator(1262L);
         builder.setEntity(baseInfo);
         NotificationModel notificationModel = builder.build();
         

@@ -38,13 +38,13 @@ public class NoticeDubboService implements INoticeService {
     }
 
     @Override
-    public String webSetDeletedNotice(Long anId) {
-        return AjaxObject.newOk("设置公告已删除状态-成功", noticeService.saveSetDeletedNotice(anId)).toJson();
+    public String webSetDeletedNotice(Long anId, Long anCustNo) {
+        return AjaxObject.newOk("设置公告已删除状态-成功", noticeService.saveSetDeletedNotice(anId, anCustNo)).toJson();
     }
     
     @Override
-    public String webSetReadNotice(Long anId) {
-        return AjaxObject.newOk("设置公告已读状态-成功", noticeService.saveSetReadNotice(anId)).toJson();
+    public String webSetReadNotice(Long anId, Long anCustNo) {
+        return AjaxObject.newOk("设置公告已读状态-成功", noticeService.saveSetReadNotice(anId, anCustNo)).toJson();
     }
 
     @Override

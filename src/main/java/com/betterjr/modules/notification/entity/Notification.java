@@ -62,6 +62,7 @@ public class Notification implements BetterjrEntity {
     /**
      * 发送日期
      */
+    @JsonSerialize(using = CustDateJsonSerializer.class)
     @Column(name = "D_SENT_DATE",  columnDefinition="VARCHAR" )
     @MetaData( value="发送日期", comments = "发送日期")
     private String sentDate;
@@ -69,6 +70,7 @@ public class Notification implements BetterjrEntity {
     /**
      * 发送时间
      */
+    @JsonSerialize(using = CustTimeJsonSerializer.class)
     @Column(name = "T_SENT_TIME",  columnDefinition="VARCHAR" )
     @MetaData( value="发送时间", comments = "发送时间")
     private String sentTime;

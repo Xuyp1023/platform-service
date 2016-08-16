@@ -132,8 +132,8 @@ public class CustMechManagerDubboService implements ICustMechManagerService {
     }
     
     @Override
-    public String webDelInsteadManagerTmp(Long anRefId, Long anInsteadRecordId) {
-        return AjaxObject.newOk("公司高管-流水信息 代录删除成功", managerTmpService.saveDelInsteadManagerTmp(anRefId, anInsteadRecordId)).toJson();
+    public String webDeleteInsteadManagerTmp(Long anRefId, Long anInsteadRecordId) {
+        return AjaxObject.newOk("公司高管-流水信息 代录删除成功", managerTmpService.saveDeleteInsteadManagerTmp(anRefId, anInsteadRecordId)).toJson();
     }
     
     @Override
