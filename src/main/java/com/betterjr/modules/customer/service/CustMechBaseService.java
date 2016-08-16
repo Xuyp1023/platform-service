@@ -67,6 +67,11 @@ public class CustMechBaseService extends BaseService<CustMechBaseMapper, CustMec
 
         tempCustMechBase.initModifyValue(anCustMechBaseTmp);
         this.updateByPrimaryKey(tempCustMechBase);
+        
+        CustInfo custInfo = accountService.findCustInfo(custNo);
+        custInfo.setCustName(tempCustMechBase.getCustName());
+        
+        accountService.updateByPrimaryKeySelective(custInfo);
 
         return tempCustMechBase;
     }
