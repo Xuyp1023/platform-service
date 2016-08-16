@@ -1,5 +1,7 @@
 package com.betterjr.modules.notification.handler;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -25,6 +27,7 @@ import com.betterjr.common.notification.NotificationConstants;
 import com.betterjr.common.notification.NotificationModel;
 import com.betterjr.common.service.FreemarkerService;
 import com.betterjr.common.utils.BTAssert;
+import com.betterjr.common.utils.Base64Coder;
 import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.modules.account.entity.CustInfo;
@@ -90,12 +93,20 @@ public class NotificationHandlerService {
 
         NotificationProfile profile = profileService.findProfileByProfileNameAndCustNo(profileName, custNo);
 
-        BTAssert.notNull(profile);
-
+        if (profile == null) {
+            logger.error("CustNo:" + custNo + " ProfileName:" + profileName + " 消息模板没有找到!");
+            return;
+        }
+        
         if (BetterStringUtils.equals(NotificationConstants.PROFILE_STATUS_ENABLED, profile.getBusinStatus()) == true) {
             List<NotificationChannelProfile> channelProfiles = channelProfileService.queryChannelProfileByParentProfileId(profile.getId());
 
-            processNotification(profile, channelProfiles, notificationModel);
+            try {
+                processNotification(profile, channelProfiles, notificationModel);
+            }
+            catch (UnsupportedEncodingException e) {
+                logger.error("发送消息失败!", e);
+            }
         }
         else {
             logger.info(profileName + " 消息模板已经禁用!");
@@ -104,9 +115,10 @@ public class NotificationHandlerService {
 
     /**
      * 处理消息
+     * @throws UnsupportedEncodingException 
      */
     private void processNotification(NotificationProfile anProfile, List<NotificationChannelProfile> anChannelProfiles,
-            NotificationModel anNotificationModel) {
+            NotificationModel anNotificationModel) throws UnsupportedEncodingException {
         Long custNo = anNotificationModel.getSendCustomer();
         Long operId = anNotificationModel.getSendOperator();
 
@@ -253,7 +265,7 @@ public class NotificationHandlerService {
     }
 
     private Notification addNotification(NotificationProfile anProfile, NotificationChannelProfile anChannelProfile, Map<String, Object> anParam,
-            CustOperatorInfo anOperator, CustInfo anCustomer) {
+            CustOperatorInfo anOperator, CustInfo anCustomer) throws UnsupportedEncodingException {
         final Notification tempNotification = new Notification();
         final List<NotificationProfileVariable> profileVariables = profileVariableService.queryVariableByProfileId(anChannelProfile.getId());
 
@@ -296,8 +308,11 @@ public class NotificationHandlerService {
     }
 
     private String resolveTemplateContent(String anTemplateContent, List<NotificationProfileVariable> anProfileVariables,
-            Map<String, Object> anParam) {
-        final String templateContent = preproccessTemplateContent(anTemplateContent, anProfileVariables);
+            Map<String, Object> anParam) throws UnsupportedEncodingException {
+        
+        String decodeStr = Base64Coder.decodeString(anTemplateContent);
+        String originStr = URLDecoder.decode(decodeStr,"UTF-8");
+        final String templateContent = preproccessTemplateContent(originStr, anProfileVariables);
 
         StringBuffer sb = freemarkerService.processTemplateByContents(templateContent, anParam);
         return sb.toString();

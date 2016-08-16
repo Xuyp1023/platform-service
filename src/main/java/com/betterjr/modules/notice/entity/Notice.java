@@ -146,6 +146,7 @@ public class Notice implements BetterjrEntity {
     /**
      * 操作机构
      */
+    @JsonIgnore
     @Column(name = "C_OPERORG",  columnDefinition="VARCHAR" )
     @MetaData( value="操作机构", comments = "操作机构")
     private String operOrg;
@@ -157,6 +158,7 @@ public class Notice implements BetterjrEntity {
     @MetaData( value="状态：0暂存", comments = "状态：0暂存，1已发布，2已撤回，3已删除")
     private String businStatus;
 
+    @JsonIgnore
     @Column(name = "C_LAST_STATUS",  columnDefinition="CHAR" )
     @MetaData( value="", comments = "")
     private String lastStatus;
@@ -174,6 +176,18 @@ public class Notice implements BetterjrEntity {
     @Column(name = "C_CUSTNAME",  columnDefinition="VARCHAR" )
     @MetaData( value="发布客户名称", comments = "发布客户名称")
     private String custName;
+    
+    @Transient
+    private Long receiveOperId;
+    
+    @Transient
+    private String receiveOperName;
+    
+    @Transient
+    private Long receiveCustNo;
+    
+    @Transient
+    private String receiveCustName;
     
     @Transient
     private Set<SimpleDataEntity> targetCust;
@@ -346,6 +360,38 @@ public class Notice implements BetterjrEntity {
 
     public void setTargetCust(Set<SimpleDataEntity> anTargetCust) {
         targetCust = anTargetCust;
+    }
+    
+    public Long getReceiveCustNo() {
+        return receiveCustNo;
+    }
+
+    public void setReceiveCustNo(Long anReceiveCustNo) {
+        receiveCustNo = anReceiveCustNo;
+    }
+
+    public String getReceiveCustName() {
+        return receiveCustName;
+    }
+
+    public void setReceiveCustName(String anReceiveCustName) {
+        receiveCustName = anReceiveCustName;
+    }
+    
+    public Long getReceiveOperId() {
+        return receiveOperId;
+    }
+
+    public void setReceiveOperId(Long anReceiveOperId) {
+        receiveOperId = anReceiveOperId;
+    }
+
+    public String getReceiveOperName() {
+        return receiveOperName;
+    }
+
+    public void setReceiveOperName(String anReceiveOperName) {
+        receiveOperName = anReceiveOperName;
     }
 
     @Override

@@ -107,7 +107,9 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
             anParam.put("LIKEsubject", "%" + subject + "%");
         }
 
-        anParam.put("businStatus", new String[] { NoticeConstants.NOTICE_STATUS_CANCELED, NoticeConstants.NOTICE_STATUS_PUBLISHED,
+        anParam.put("businStatus", new String[] { 
+                NoticeConstants.NOTICE_STATUS_CANCELED, 
+                NoticeConstants.NOTICE_STATUS_PUBLISHED,
                 NoticeConstants.NOTICE_STATUS_STORED });
         anParam.put("operOrg", operator.getOperOrg());
 
@@ -155,7 +157,9 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
         final String[] targetCusts = BetterStringUtils.split(anTargetCust, ",");
         BTAssert.notEmpty(targetCusts, "公告客户列表不允许为空!");
 
-        Notice tempNotice = checkNoticeStatus(anId, NoticeConstants.NOTICE_STATUS_STORED);
+        Notice tempNotice = checkNoticeStatus(anId, 
+                NoticeConstants.NOTICE_STATUS_STORED, 
+                NoticeConstants.NOTICE_STATUS_CANCELED);
 
         String tempBusinStatus = tempNotice.getBusinStatus();
         if (BetterStringUtils.equals(tempBusinStatus, NoticeConstants.NOTICE_STATUS_PUBLISHED) == true) {
@@ -203,7 +207,9 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
      * 删除
      */
     public Notice saveDeleteNotice(Long anId) {
-        Notice tempNotice = checkNoticeStatus(anId, NoticeConstants.NOTICE_STATUS_CANCELED, NoticeConstants.NOTICE_STATUS_STORED);
+        Notice tempNotice = checkNoticeStatus(anId, 
+                NoticeConstants.NOTICE_STATUS_CANCELED, 
+                NoticeConstants.NOTICE_STATUS_STORED);
 
         tempNotice.initModifyValue(NoticeConstants.NOTICE_STATUS_DELETED);
 
@@ -214,36 +220,36 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
     /**
      * 公告置只删除
      */
-    public NoticeCustomer saveSetDeletedNotice(Long anId) {
+    public NoticeCustomer saveSetDeletedNotice(Long anId, Long anCustNo) {
         BTAssert.notNull(anId, "公告编号不允许为空!");
 
         CustOperatorInfo operator = UserUtils.getOperatorInfo();
 
         // 检查此消息有没被此人接收
-        checkNoticeCustomer(anId, operator.getId());
+        checkNoticeCustomer(anId, anCustNo, operator.getId());
 
-        return noticeCustomerService.saveSetDeletedNotice(anId, operator.getId());
+        return noticeCustomerService.saveSetDeletedNotice(anId, anCustNo, operator.getId());
     }
 
     /**
      * 公告置已读
      */
-    public NoticeCustomer saveSetReadNotice(Long anId) {
+    public NoticeCustomer saveSetReadNotice(Long anId, Long anCustNo) {
         BTAssert.notNull(anId, "公告编号不允许为空!");
 
         CustOperatorInfo operator = UserUtils.getOperatorInfo();
 
         // 检查此消息有没被此人接收
-        checkNoticeCustomer(anId, operator.getId());
+        checkNoticeCustomer(anId, anCustNo, operator.getId());
 
-        return noticeCustomerService.saveSetReadNotice(anId, operator.getId());
+        return noticeCustomerService.saveSetReadNotice(anId, anCustNo, operator.getId());
     }
 
     /**
      * 
      */
-    private NoticeCustomer checkNoticeCustomer(Long anId, Long anOperId) {
-        final NoticeCustomer noticeCustomer = noticeCustomerService.findNoticeCustomerByNoticeIdAndOperId(anId, anOperId);
+    private NoticeCustomer checkNoticeCustomer(Long anId, Long anCustNo, Long anOperId) {
+        final NoticeCustomer noticeCustomer = noticeCustomerService.findNoticeCustomerByNoticeIdAndCustNoAndOperId(anId, anCustNo, anOperId);
         BTAssert.notNull(noticeCustomer, "没有找到相应的公告接收记录!");
         return noticeCustomer;
     }
