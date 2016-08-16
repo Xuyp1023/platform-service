@@ -199,7 +199,9 @@ public class FlowService {
             page=new Page();
         }
         List<WorkItem> list = this.engine.query().getWorkItems(snakerPage, filter);
-        page.setTotal(snakerPage.getTotalCount());
+        if(snakerPage!=null){
+            page.setTotal(snakerPage.getTotalCount());
+        }
         populatePage(page, list);
         return page;
     }
@@ -244,7 +246,9 @@ public class FlowService {
             page=new Page();
         }
         List<WorkItem> list = this.engine.query().getHistoryWorkItems(snakerPage, filter);
-        page.setTotal(snakerPage.getTotalCount());
+        if(snakerPage!=null){
+            page.setTotal(snakerPage.getTotalCount());
+        }
         this.populatePage(page, list);
         return page;
     }
@@ -272,7 +276,9 @@ public class FlowService {
             page=new Page();
         }
         List<WorkItem> list = this.engine.query().getWorkItems(snakerPage, filter);
-        page.setTotal(snakerPage.getTotalCount());
+        if(snakerPage!=null){
+            page.setTotal(snakerPage.getTotalCount());
+        }
         this.populatePage(page, list);
         return page;
     }

@@ -64,7 +64,7 @@ public class CustFlowNodeService extends BaseService<CustFlowNodeMapper, CustFlo
             anNode.setId(SerialGenerator.getLongValue(CustFlowNode.selectKey));
             this.insert(anNode);
         }else{
-            int newIndex=nodeList.size()-1;
+            int newIndex=nodeList.size();
             long newId=anNode.getSysNodeId()+newIndex;
             anNode.setId(newId);
             this.insert(anNode);
