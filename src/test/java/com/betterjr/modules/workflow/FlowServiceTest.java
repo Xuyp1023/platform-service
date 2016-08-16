@@ -7,6 +7,7 @@ import java.util.Random;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.snaker.engine.SnakerEngine;
 
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.mapper.pagehelper.Page;
@@ -46,7 +47,7 @@ public class FlowServiceTest extends BasicServiceTest<FlowService> {
         service.start(in);
 
 //        String cuOperators[] = new String[] { "testUser3", "testUser4", "testUser7", "testUser8" };
-        String cuOperators[] = new String[] { "1259", "1262","1259","1258","1259"};
+        String cuOperators[] = new String[] { "1259", SnakerEngine.AUTO,"1259",SnakerEngine.AUTO,"1259"};
         for (String operator : cuOperators) {
             in.setCommand(FlowCommand.GoNext);
             in.setOperator(operator);

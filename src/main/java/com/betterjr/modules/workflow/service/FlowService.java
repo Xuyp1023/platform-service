@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.snaker.engine.SnakerEngine;
 import org.snaker.engine.access.QueryFilter;
 import org.snaker.engine.entity.HistoryTask;
 import org.snaker.engine.entity.Order;
@@ -23,6 +24,7 @@ import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.workflow.data.FlowInput;
+import com.betterjr.modules.workflow.data.FlowNodeRole;
 import com.betterjr.modules.workflow.data.FlowStatus;
 import com.betterjr.modules.workflow.data.TaskAuditHistory;
 import com.betterjr.modules.workflow.entity.CustFlowBase;
@@ -84,6 +86,21 @@ public class FlowService {
             logger.error("can not find order for business :" + input.getBusinessId());
             return;
         }
+        //查询当前节点角色，非保理，设置操作员为 SnakerEngine.AUTO
+        FlowStatus search=new FlowStatus();
+        search.setBusinessId(input.getBusinessId());
+        Page<FlowStatus> currentTask=this.queryCurrentWorkTask(null, search);
+        if(Collections3.isEmpty(currentTask)){
+            logger.error("can not find current Task for business :" + input.getBusinessId());
+            return;
+        }else{
+            FlowStatus sta=Collections3.getFirst(currentTask);
+            String role=this.nodeService.findNodeRoleById(sta.getCurrentNodeId());
+            if(!FlowNodeRole.Factoring.name().equalsIgnoreCase(role)){
+                input.setOperator(SnakerEngine.AUTO);
+            }
+        }
+        //执行task
         Map<String, Object> formParas = input.toExecMap();
         QueryFilter filter = new QueryFilter().setOrderId(business.getFlowOrderId()).setOperator(input.getOperator());
         List<WorkItem> workItemList = engine.query().getWorkItems(null, filter);
@@ -182,6 +199,7 @@ public class FlowService {
             page=new Page();
         }
         List<WorkItem> list = this.engine.query().getWorkItems(snakerPage, filter);
+        page.setTotal(snakerPage.getTotalCount());
         populatePage(page, list);
         return page;
     }
@@ -226,7 +244,7 @@ public class FlowService {
             page=new Page();
         }
         List<WorkItem> list = this.engine.query().getHistoryWorkItems(snakerPage, filter);
-        
+        page.setTotal(snakerPage.getTotalCount());
         this.populatePage(page, list);
         return page;
     }
@@ -237,7 +255,7 @@ public class FlowService {
      */
     public Page<FlowStatus> queryWorkTaskByMonitor(Page page,FlowStatus search) {
         
-        List<CustFlowBase> monitoredList=this.baseService.selectByProperty("monitorOperName", search.getOperator());
+        List<CustFlowBase> monitoredList=this.baseService.selectByProperty("monitorOperId", search.getOperator());
         if(Collections3.isEmpty(monitoredList)){
             return new Page();
         }
@@ -254,6 +272,7 @@ public class FlowService {
             page=new Page();
         }
         List<WorkItem> list = this.engine.query().getWorkItems(snakerPage, filter);
+        page.setTotal(snakerPage.getTotalCount());
         this.populatePage(page, list);
         return page;
     }

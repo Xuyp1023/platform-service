@@ -201,6 +201,7 @@ public class SnakerProcessModelGenerator {
                 newapp.setStepId(step.getId());
                 newapp.setWeight(CustFlowStepApprovers.MaxWeight);
                 this.stepApproversMap.put(step.getId(), Collections.singletonList(newapp));
+                stepApprovers= stepApproversMap.get(step.getId());
             }
         }
 
@@ -321,7 +322,7 @@ public class SnakerProcessModelGenerator {
     private void populateTaskModel(CustFlowStep step, CustFlowStepApprovers app, TaskModel taskModel) {
         String nodeName = step.getNodeId().toString();
         taskModel.setName(nodeName);
-        if(FlowNodeRole.Factoring.equals(step.getNodeRole())){
+        if(FlowNodeRole.Factoring.name().equalsIgnoreCase(step.getNodeRole())){
             taskModel.setAssignee(app.getAuditOperId().toString());
         }else{
             taskModel.setAssignee(SnakerEngine.AUTO);
