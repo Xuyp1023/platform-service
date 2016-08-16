@@ -52,7 +52,7 @@ public class CustFlowNodeService extends BaseService<CustFlowNodeMapper, CustFlo
     }
     
     /**
-     * 新增，存在则更新,系统节点id是两位（10-99）,自定义节点是在系统节点id的后面加一位0-9，（第一个自定义节点默认是系统节点Id）
+     * 新增，存在则更新,系统节点id是两位（110-990）,自定义节点是在系统节点id的后面加一,范围0-9：111-119,121-129.... （第一个自定义节点默认是系统节点Id）
      */
     public void addFlowNode(CustFlowNode anNode){
         List<CustFlowNode> nodeListByName =this.selectByProperty("nodeCustomName", anNode.getNodeCustomName());
@@ -65,8 +65,8 @@ public class CustFlowNodeService extends BaseService<CustFlowNodeMapper, CustFlo
             this.insert(anNode);
         }else{
             int newIndex=nodeList.size()-1;
-            String newId=anNode.getSysNodeId().toString()+newIndex;
-            anNode.setId(Long.parseLong(newId));
+            long newId=anNode.getSysNodeId()+newIndex;
+            anNode.setId(newId);
             this.insert(anNode);
         }
     }
@@ -83,6 +83,10 @@ public class CustFlowNodeService extends BaseService<CustFlowNodeMapper, CustFlo
             this.delete(anNode);
         }
         else {
+            List<CustFlowNode> nodeListByName =this.selectByProperty("nodeCustomName", anNode.getNodeCustomName());
+            if(!Collections3.isEmpty(nodeListByName)){
+                throw new BytterTradeException(FlowErrorCode.ExistsNodeName.getCode(),"节点名称已存在!!");
+            }
             this.updateByPrimaryKey(anNode);
         }
 

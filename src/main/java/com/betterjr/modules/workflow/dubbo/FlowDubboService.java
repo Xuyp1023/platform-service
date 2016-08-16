@@ -84,6 +84,30 @@ public class FlowDubboService implements IFlowService {
         Page<FlowStatus> list = this.flowService.queryHistoryWorkTask(page, searchParam);
         return AjaxObject.newOkWithPage("查询所有用户审批历史数据成功", list).toJson();
     }
+    
+    /**
+     * 当前需要审批的任务(当前用户)
+     */
+    @Override
+    public String webQueryCurrentUserWorkTask(Map<String, Object> anMap, int anFlag, int anPageNum, int anPageSize) {
+        FlowStatus searchParam = (FlowStatus) RuleServiceDubboFilterInvoker.getInputObj();
+        searchParam.setOperator(UserUtils.getUser().getId().toString());
+        Page<FlowStatus> page = new Page<FlowStatus>(anPageNum, anPageSize, anFlag == 1);
+        Page<FlowStatus> list = this.flowService.queryCurrentWorkTask(page, searchParam);
+        return AjaxObject.newOkWithPage("查询当前用户需要审批的任务成功", list).toJson();
+    }
+
+    /**
+     * 审批历史数据 (当前用户)
+     */
+    @Override
+    public String webQueryCurrentUserHistoryWorkTask(Map<String, Object> anMap, int anFlag, int anPageNum, int anPageSize) {
+        FlowStatus searchParam = (FlowStatus) RuleServiceDubboFilterInvoker.getInputObj();
+        searchParam.setOperator(UserUtils.getUser().getId().toString());
+        Page<FlowStatus> page = new Page<FlowStatus>(anPageNum, anPageSize, anFlag == 1);
+        Page<FlowStatus> list = this.flowService.queryHistoryWorkTask(page, searchParam);
+        return AjaxObject.newOkWithPage("查询当前用户审批历史数据成功", list).toJson();
+    }
 
     /**
      * 流程监控,查询当前用户所监控的进行时流程
