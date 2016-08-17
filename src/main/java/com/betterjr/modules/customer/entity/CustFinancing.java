@@ -416,29 +416,22 @@ public class CustFinancing implements BetterjrEntity {
         this.regDate = BetterDateUtils.getNumDate();
         this.regTime = BetterDateUtils.getNumTime();
         
-        this.modiOperId = UserUtils.getOperatorInfo().getId();
-        this.modiOperName = UserUtils.getOperatorInfo().getName();
-        this.modiDate = BetterDateUtils.getNumDate();
-        this.modiTime = BetterDateUtils.getNumTime();
-        
         this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
         this.businStatus = "0";
     }
 
     public void initModifyValue(final CustFinancing anCustFinancing) {
-        this.id = anCustFinancing.getId();
-/*
-        this.regOperId = anCustMechBaseTmp.getRegOperId();
-        this.regOperName = anCustMechBaseTmp.getRegOperName();
-        this.regDate = anCustMechBaseTmp.getRegDate();
-        this.regTime = anCustMechBaseTmp.getRegTime();
-*/
+        this.creditLimit = anCustFinancing.getCreditLimit();
+        this.balance = anCustFinancing.getBalance();
+        this.guaranteeType = anCustFinancing.getGuaranteeType();
+        this.businType = anCustFinancing.getBusinType();
+        this.financingOrg = anCustFinancing.getFinancingOrg();
+        this.expireDate = anCustFinancing.getExpireDate();
+        
         this.modiOperId = UserUtils.getOperatorInfo().getId();
         this.modiOperName = UserUtils.getOperatorInfo().getName();
         this.modiDate = BetterDateUtils.getNumDate();
         this.modiTime = BetterDateUtils.getNumTime();
 
-        this.businStatus = anCustFinancing.getBusinStatus();
-        this.operOrg = anCustFinancing.getOperOrg();
     }
 }

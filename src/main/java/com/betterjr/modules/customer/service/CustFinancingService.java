@@ -2,8 +2,6 @@ package com.betterjr.modules.customer.service;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.service.BaseService;
@@ -19,17 +17,16 @@ import com.betterjr.modules.customer.entity.CustFinancing;
 @Service
 public class CustFinancingService extends BaseService<CustFinancingMapper, CustFinancing> {
 
-    private static Logger logger = LoggerFactory.getLogger(CustFinancingService.class);
 
     /**
      * 查询融资情况列表
      * @param anCustNo
      * @return
      */
-    public List<CustFinancing> queryCustFinancingByCustNo(Long anCustNo) {
+    public List<CustFinancing> queryCustFinancingByCustNo(Long anCustNo, String anFlag, int anPageNum, int anPageSize) {
         BTAssert.notNull(anCustNo, "客户编号不允许为空！");
         
-        return this.selectByProperty("custNo", anCustNo);
+        return this.selectPropertyByPage("custNo", anCustNo, anPageNum, anPageSize, "1".equals(anFlag));
     }
     
     /**
@@ -69,6 +66,15 @@ public class CustFinancingService extends BaseService<CustFinancingMapper, CustF
         tempCustFinancing.initModifyValue(anCustFinancing);
         this.updateByPrimaryKeySelective(tempCustFinancing);
         return tempCustFinancing;
+    }
+    
+    /**
+     * 删除融资情况信息
+     */
+    public int saveDeleteCustFinancing(Long anId) {
+        BTAssert.notNull(anId, "融资情况编号不允许为空！");
+        BTAssert.notNull(this.selectByPrimaryKey(anId), "不存在对应融资情况");
+        return this.deleteByPrimaryKey(anId);
     }
 
 }
