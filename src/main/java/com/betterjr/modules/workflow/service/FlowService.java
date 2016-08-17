@@ -23,6 +23,7 @@ import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.mapper.pagehelper.Page;
+import com.betterjr.modules.workflow.data.FlowCommand;
 import com.betterjr.modules.workflow.data.FlowInput;
 import com.betterjr.modules.workflow.data.FlowNodeRole;
 import com.betterjr.modules.workflow.data.FlowStatus;
@@ -104,6 +105,45 @@ public class FlowService {
         Map<String, Object> formParas = input.toExecMap();
         QueryFilter filter = new QueryFilter().setOrderId(business.getFlowOrderId()).setOperator(input.getOperator());
         List<WorkItem> workItemList = engine.query().getWorkItems(null, filter);
+        switch(input.getCommand()){
+            case GoNext:
+                execTask(input, formParas, workItemList);
+                break;
+            case Rollback:
+                rollBackTask(input, formParas, workItemList);
+                break;
+            case Exit:
+                exitTask(input, formParas, workItemList);
+                break;
+            default:
+                break;
+        }
+            
+
+
+    }
+    
+    private void exitTask(FlowInput input, Map<String, Object> formParas, List<WorkItem> workItemList) {
+        if (workItemList != null && workItemList.size() > 0) {
+            for (int index = 0; index < workItemList.size(); index++) {
+                String taskId = workItemList.get(index).getTaskId();
+                engine.executeAndJumpTask(taskId, input.getOperator(), formParas, "end");
+                logger.info("exit task:" + workItemList.get(index));
+            }
+        }
+    }
+    
+    private void rollBackTask(FlowInput input, Map<String, Object> formParas, List<WorkItem> workItemList) {
+        if (workItemList != null && workItemList.size() > 0) {
+            for (int index = 0; index < workItemList.size(); index++) {
+                String taskId = workItemList.get(index).getTaskId();
+                engine.executeAndJumpTask(taskId, input.getOperator(), formParas, input.getRollbackNodeId());
+                logger.info("rollback task:" + workItemList.get(index).getTaskKey());
+            }
+        }
+    }
+
+    private void execTask(FlowInput input, Map<String, Object> formParas, List<WorkItem> workItemList) {
         if (workItemList != null && workItemList.size() > 0) {
             for (int index = 0; index < workItemList.size(); index++) {
                 String taskId = workItemList.get(index).getTaskId();
@@ -111,7 +151,6 @@ public class FlowService {
                 logger.info("finished task:" + workItemList.get(index));
             }
         }
-
     }
 
     /**

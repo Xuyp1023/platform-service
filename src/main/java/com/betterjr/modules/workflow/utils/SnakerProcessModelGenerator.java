@@ -313,7 +313,9 @@ public class SnakerProcessModelGenerator {
             return trans;
         }
         else {
-            tranFromPrevStep.setTarget(Collections3.getFirst(headList.values()));
+            NodeModel node=Collections3.getFirst(headList.values());
+            tranFromPrevStep.setTarget(node);
+            node.setInputs(Collections.singletonList(tranFromPrevStep));
             return tailList.get(0);
         }
 

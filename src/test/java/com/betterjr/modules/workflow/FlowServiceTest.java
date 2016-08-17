@@ -57,6 +57,55 @@ public class FlowServiceTest extends BasicServiceTest<FlowService> {
     }
     
     @Test
+    public void rollBack() {
+        FlowType type = FlowType.Trade;
+        Long businessId = -7570516586381383190l;
+        BigDecimal money = new BigDecimal(10001l);
+
+        FlowService service = this.getServiceObject();
+        FlowInput in = new FlowInput();
+        in.setMoney(money);
+        in.setBusinessId(businessId);
+        in.setCommand(FlowCommand.Rollback);
+        in.setRollbackNodeId("14");
+        in.setOperator( "1259");
+        in.setReason("rollback to 核心企业确认背景");
+        service.exec(in);
+    }
+    
+    @Test
+    public void exec() {
+        FlowType type = FlowType.Trade;
+        Long businessId = -7570516586381383190l;
+        BigDecimal money = new BigDecimal(10001l);
+
+        FlowService service = this.getServiceObject();
+        FlowInput in = new FlowInput();
+        in.setMoney(money);
+        in.setBusinessId(businessId);
+        in.setCommand(FlowCommand.GoNext);
+        in.setOperator( SnakerEngine.AUTO);
+        in.setReason("ok,pass");
+        service.exec(in);
+    }
+    
+    @Test
+    public void exit() {
+        FlowType type = FlowType.Trade;
+        Long businessId = -7570516586381383190l;
+        BigDecimal money = new BigDecimal(10001l);
+
+        FlowService service = this.getServiceObject();
+        FlowInput in = new FlowInput();
+        in.setMoney(money);
+        in.setBusinessId(businessId);
+        in.setCommand(FlowCommand.Exit);
+        in.setOperator("1259");
+        in.setReason("ok,pass");
+        service.exec(in);
+    }
+    
+    @Test
     public void queryHistoryWorkTask(){
         FlowService service = this.getServiceObject();
         Page<FlowStatus> page=service.queryHistoryWorkTask(null, null);
