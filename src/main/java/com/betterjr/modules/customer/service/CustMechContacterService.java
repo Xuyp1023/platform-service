@@ -17,6 +17,8 @@ import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.customer.dao.CustMechContacterMapper;
 import com.betterjr.modules.customer.entity.CustMechContacter;
 import com.betterjr.modules.customer.entity.CustMechContacter;
+import com.betterjr.modules.customer.entity.CustMechContacterTmp;
+import com.betterjr.modules.customer.entity.CustMechContacter;
 
 /**
  * 
@@ -25,60 +27,71 @@ import com.betterjr.modules.customer.entity.CustMechContacter;
  */
 @Service
 public class CustMechContacterService extends BaseService<CustMechContacterMapper, CustMechContacter> {
-    private static final String CUST_NO = "custNo";
-
+    
     @Resource
     private CustMechContacterTmpService contacterTmpService;
 
-    @Resource
-    private CustAccountService accountService;
-
     /**
-     * 查询联系人信息
-     * 
+     * 查询联系人列表
      * @param anCustNo
      * @return
      */
-    public CustMechContacter findCustMechContacterByCustNo(Long anCustNo) {
+    public List<CustMechContacter> queryCustMechContacter(Long anCustNo) {
         BTAssert.notNull(anCustNo, "客户编号不允许为空！");
-
-        final List<CustMechContacter> Contacters = this.selectByProperty(CUST_NO, anCustNo);
-        return Collections3.getFirst(Contacters);
+        
+        return this.selectByProperty("custNo", anCustNo);
     }
-
+    
     /**
-     * 修改联系人信息
-     * 
-     * @param anCustMechContacter
-     * @return
+     * 查询联系人信息
+     */
+    public CustMechContacter findCustMechContacter(Long anId) {
+        BTAssert.notNull(anId, "联系人编号不允许为空！");
+        
+        CustMechContacter contacter = this.selectByPrimaryKey(anId);
+        return contacter;
+    }
+    
+    /**
+     * 添加联系人信息
+     */
+    public CustMechContacter addCustMechContacter(CustMechContacterTmp anContacterTmp) {
+        BTAssert.notNull(anContacterTmp, "联系人流水信息不允许为空！");
+        
+        CustMechContacter contacter = new CustMechContacter();
+        contacter.initAddValue(anContacterTmp);
+        
+        this.insert(contacter);
+        return contacter;
+    }
+    
+    /**
+     * 保存联系人信息
      */
     public CustMechContacter saveCustMechContacter(CustMechContacter anCustMechContacter, Long anId) {
-        BTAssert.notNull(anId, "联系人编号不允许为空");
-
+        BTAssert.notNull(anId, "联系人编号不允许为空！");
+        BTAssert.notNull(anCustMechContacter, "联系人信息不允许为空！");
+        
         final CustMechContacter tempCustMechContacter = this.selectByPrimaryKey(anId);
-        BTAssert.notNull(tempCustMechContacter, "对应的公司联系人信息没有找到！");
-
+        BTAssert.notNull(tempCustMechContacter, "对应的联系人信息没有找到！");
+        
         tempCustMechContacter.initModifyValue(anCustMechContacter);
         this.updateByPrimaryKeySelective(tempCustMechContacter);
         return tempCustMechContacter;
     }
 
     /**
-     * 添加联系人信息
-     * 
-     * @param anCustMechContacter
-     * @return
+     * 通过联系人流水修改联系人 
      */
-    public CustMechContacter addCustMechContacter(CustMechContacter anCustMechContacter, Long anCustNo) {
-        BTAssert.notNull(anCustMechContacter, "联系人信息不允许为空！");
-        BTAssert.notNull(anCustNo, "客户编号不允许为空！");
+    public CustMechContacter saveCustMechContacter(CustMechContacterTmp anContacterTmp) {
+        BTAssert.notNull(anContacterTmp, "联系人流水编号不允许为空！");
         
-        final CustInfo custInfo = accountService.selectByPrimaryKey(anCustNo);
-        anCustMechContacter.initAddValue(anCustNo, custInfo.getCustName(), custInfo.getRegOperId(), custInfo.getRegOperName(), custInfo.getOperOrg());
+        final CustMechContacter tempCustMechContacter = this.selectByPrimaryKey(anContacterTmp.getRefId());
+        BTAssert.notNull(tempCustMechContacter, "对应的联系人信息没有找到！");
         
-        this.insert(anCustMechContacter);
-        
-        return anCustMechContacter;
+        tempCustMechContacter.initModifyValue(anContacterTmp);
+        this.updateByPrimaryKeySelective(tempCustMechContacter);
+        return tempCustMechContacter;
     }
 
 }

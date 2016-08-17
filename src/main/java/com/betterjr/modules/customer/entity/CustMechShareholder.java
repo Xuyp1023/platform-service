@@ -461,38 +461,68 @@ public class CustMechShareholder implements BetterjrEntity {
         result = prime * result + ((getCustNo() == null) ? 0 : getCustNo().hashCode());
         return result;
     }
-    
-    public void initAddValue() {
+
+    public void initAddValue(CustMechShareholderTmp anShareholderTmp) {
         this.id = SerialGenerator.getLongValue("CustMechShareholder.id");
-        
+
         this.regOperId = UserUtils.getOperatorInfo().getId();
         this.regOperName = UserUtils.getOperatorInfo().getName();
         this.regDate = BetterDateUtils.getNumDate();
         this.regTime = BetterDateUtils.getNumTime();
-        
+
         this.modiOperId = UserUtils.getOperatorInfo().getId();
         this.modiOperName = UserUtils.getOperatorInfo().getName();
         this.modiDate = BetterDateUtils.getNumDate();
         this.modiTime = BetterDateUtils.getNumTime();
-        
+
+        this.custNo = anShareholderTmp.getCustNo();
+        this.name = anShareholderTmp.getName();
+        this.identType = anShareholderTmp.getIdentType();
+        this.identNo = anShareholderTmp.getIdentNo();
+        this.sex = anShareholderTmp.getSex();
+        this.birthdate = anShareholderTmp.getBirthdate();
+        this.eduLevel = anShareholderTmp.getEduLevel();
+        this.batchNo = anShareholderTmp.getBatchNo();
+        this.investmentRate = anShareholderTmp.getInvestmentRate();
+        this.investmentType = anShareholderTmp.getInvestmentType();
+
         this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
         this.businStatus = "0";
     }
 
-    public void initModifyValue(final CustMechShareholder anCustMechShareholder) {
-        this.id = anCustMechShareholder.getId();
-/*
-        this.regOperId = anCustMechBaseTmp.getRegOperId();
-        this.regOperName = anCustMechBaseTmp.getRegOperName();
-        this.regDate = anCustMechBaseTmp.getRegDate();
-        this.regTime = anCustMechBaseTmp.getRegTime();
-*/
+    public void initModifyValue(final CustMechShareholder anShareholder) {
+        this.custNo = anShareholder.getCustNo();
+        this.name = anShareholder.getName();
+        this.identType = anShareholder.getIdentType();
+        this.identNo = anShareholder.getIdentNo();
+        this.sex = anShareholder.getSex();
+        this.birthdate = anShareholder.getBirthdate();
+        this.eduLevel = anShareholder.getEduLevel();
+        this.batchNo = anShareholder.getBatchNo();
+        this.investmentRate = anShareholder.getInvestmentRate();
+        this.investmentType = anShareholder.getInvestmentType();
+
         this.modiOperId = UserUtils.getOperatorInfo().getId();
         this.modiOperName = UserUtils.getOperatorInfo().getName();
         this.modiDate = BetterDateUtils.getNumDate();
         this.modiTime = BetterDateUtils.getNumTime();
+    }
 
-        this.businStatus = anCustMechShareholder.getBusinStatus();
-        this.operOrg = anCustMechShareholder.getOperOrg();
+    public void initModifyValue(CustMechShareholderTmp anShareholderTmp) {
+        this.custNo = anShareholderTmp.getCustNo();
+        this.name = anShareholderTmp.getName();
+        this.identType = anShareholderTmp.getIdentType();
+        this.identNo = anShareholderTmp.getIdentNo();
+        this.sex = anShareholderTmp.getSex();
+        this.birthdate = anShareholderTmp.getBirthdate();
+        this.eduLevel = anShareholderTmp.getEduLevel();
+        this.batchNo = anShareholderTmp.getBatchNo();
+        this.investmentRate = anShareholderTmp.getInvestmentRate();
+        this.investmentType = anShareholderTmp.getInvestmentType();
+
+        this.modiOperId = UserUtils.getOperatorInfo().getId();
+        this.modiOperName = UserUtils.getOperatorInfo().getName();
+        this.modiDate = BetterDateUtils.getNumDate();
+        this.modiTime = BetterDateUtils.getNumTime();
     }
 }

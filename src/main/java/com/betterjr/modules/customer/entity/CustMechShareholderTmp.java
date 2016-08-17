@@ -538,6 +538,25 @@ public class CustMechShareholderTmp implements BetterjrEntity {
     }
 
     public void initAddValue(String anBusinStatus) {
+        this.initAddValue(anBusinStatus, null, null);
+    }
+
+    public void initAddValue(CustMechShareholder anShareholder, String anBusinStatus) {
+        this.initAddValue(anBusinStatus, null, null);
+
+        this.custNo = anShareholder.getCustNo();
+        this.name = anShareholder.getName();
+        this.sex = anShareholder.getSex();
+        this.identType = anShareholder.getIdentType();
+        this.identNo = anShareholder.getIdentNo();
+        this.birthdate = anShareholder.getBirthdate();
+        this.eduLevel = anShareholder.getEduLevel();
+        this.batchNo = anShareholder.getBatchNo();
+        this.investmentType = anShareholder.getInvestmentType();
+        this.investmentRate = anShareholder.getInvestmentRate();
+    }
+
+    public void initAddValue(String anBusinStatus, String anTmpType, Long anVersion) {
         this.id = SerialGenerator.getLongValue("CustMechShareholderTmp.id");
 
         this.regOperId = UserUtils.getOperatorInfo().getId();
@@ -552,17 +571,51 @@ public class CustMechShareholderTmp implements BetterjrEntity {
 
         this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
         this.businStatus = anBusinStatus;
+        this.version = anVersion;
+
+        this.tmpType = anTmpType;
     }
 
-    public void initModifyValue(final CustMechShareholderTmp anCustMechShareholderTmp) {
-        this.id = anCustMechShareholderTmp.getId();
-
+    public void initModifyValue(final CustMechShareholderTmp anShareholderTmp) {
         this.modiOperId = UserUtils.getOperatorInfo().getId();
         this.modiOperName = UserUtils.getOperatorInfo().getName();
         this.modiDate = BetterDateUtils.getNumDate();
         this.modiTime = BetterDateUtils.getNumTime();
 
-        this.businStatus = anCustMechShareholderTmp.getBusinStatus();
-        this.operOrg = anCustMechShareholderTmp.getOperOrg();
+        this.name = anShareholderTmp.getName();
+        this.sex = anShareholderTmp.getSex();
+        this.identType = anShareholderTmp.getIdentType();
+        this.identNo = anShareholderTmp.getIdentNo();
+        this.birthdate = anShareholderTmp.getBirthdate();
+        this.eduLevel = anShareholderTmp.getEduLevel();
+        this.batchNo = anShareholderTmp.getBatchNo();
+        this.investmentType = anShareholderTmp.getInvestmentType();
+        this.investmentRate = anShareholderTmp.getInvestmentRate();
+    }
+
+    public void initModifyValue(CustMechShareholderTmp anShareholderTmp, String anBusinStatus, Long anVersion) {
+        this.initModifyValue(anShareholderTmp);
+
+        this.businStatus = anBusinStatus;
+        this.version = anVersion;
+    }
+
+    public void initModifyValue(CustMechShareholder anShareholder, String anBusinStatus) {
+        this.modiOperId = UserUtils.getOperatorInfo().getId();
+        this.modiOperName = UserUtils.getOperatorInfo().getName();
+        this.modiDate = BetterDateUtils.getNumDate();
+        this.modiTime = BetterDateUtils.getNumTime();
+
+        this.name = anShareholder.getName();
+        this.sex = anShareholder.getSex();
+        this.identType = anShareholder.getIdentType();
+        this.identNo = anShareholder.getIdentNo();
+        this.birthdate = anShareholder.getBirthdate();
+        this.eduLevel = anShareholder.getEduLevel();
+        this.batchNo = anShareholder.getBatchNo();
+        this.investmentType = anShareholder.getInvestmentType();
+        this.investmentRate = anShareholder.getInvestmentRate();
+
+        this.businStatus = anBusinStatus;
     }
 }

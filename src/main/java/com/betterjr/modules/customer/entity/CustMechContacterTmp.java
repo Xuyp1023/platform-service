@@ -21,166 +21,166 @@ public class CustMechContacterTmp implements BetterjrEntity {
      * 编号
      */
     @Id
-    @Column(name = "ID",  columnDefinition="INTEGER" )
-    @MetaData( value="编号", comments = "编号")
+    @Column(name = "ID", columnDefinition = "INTEGER")
+    @MetaData(value = "编号", comments = "编号")
     private Long id;
 
     /**
      * 代录记录/变更申请 编号
      */
-    @Column(name = "L_PARENTID",  columnDefinition="INTEGER" )
-    @MetaData( value="代录记录/变更申请 编号", comments = "代录记录/变更申请 编号")
+    @Column(name = "L_PARENTID", columnDefinition = "INTEGER")
+    @MetaData(value = "代录记录/变更申请 编号", comments = "代录记录/变更申请 编号")
     private Long parentId;
-    
+
     /**
      * 数据版本号
      */
-    @Column(name = "N_VERSION",  columnDefinition="INTEGER" )
-    @MetaData( value="数据版本号", comments = "数据版本号")
+    @Column(name = "N_VERSION", columnDefinition = "INTEGER")
+    @MetaData(value = "数据版本号", comments = "数据版本号")
     private Long version;
 
     /**
      * 姓名
      */
-    @Column(name = "C_NAME",  columnDefinition="VARCHAR" )
-    @MetaData( value="姓名", comments = "姓名")
+    @Column(name = "C_NAME", columnDefinition = "VARCHAR")
+    @MetaData(value = "姓名", comments = "姓名")
     private String name;
 
     /**
      * 性别 0女 1男
      */
-    @Column(name = "C_SEX",  columnDefinition="CHAR" )
-    @MetaData( value="性别 0女 1男", comments = "性别 0女 1男")
+    @Column(name = "C_SEX", columnDefinition = "CHAR")
+    @MetaData(value = "性别 0女 1男", comments = "性别 0女 1男")
     private String sex;
 
     /**
      * 移动电话
      */
-    @Column(name = "C_MOBILE",  columnDefinition="VARCHAR" )
-    @MetaData( value="移动电话", comments = "移动电话")
+    @Column(name = "C_MOBILE", columnDefinition = "VARCHAR")
+    @MetaData(value = "移动电话", comments = "移动电话")
     private String mobile;
 
     /**
      * 电话
      */
-    @Column(name = "C_PHONE",  columnDefinition="VARCHAR" )
-    @MetaData( value="电话", comments = "电话")
+    @Column(name = "C_PHONE", columnDefinition = "VARCHAR")
+    @MetaData(value = "电话", comments = "电话")
     private String phone;
 
     /**
      * 电子邮件
      */
-    @Column(name = "C_EMAIL",  columnDefinition="VARCHAR" )
-    @MetaData( value="电子邮件", comments = "电子邮件")
+    @Column(name = "C_EMAIL", columnDefinition = "VARCHAR")
+    @MetaData(value = "电子邮件", comments = "电子邮件")
     private String email;
 
     /**
      * 地址
      */
-    @Column(name = "C_ADDRESS",  columnDefinition="VARCHAR" )
-    @MetaData( value="地址", comments = "地址")
+    @Column(name = "C_ADDRESS", columnDefinition = "VARCHAR")
+    @MetaData(value = "地址", comments = "地址")
     private String address;
 
     /**
      * 创建人(操作员)ID号
      */
-    @Column(name = "L_REG_OPERID",  columnDefinition="INTEGER" )
-    @MetaData( value="创建人(操作员)ID号", comments = "创建人(操作员)ID号")
+    @Column(name = "L_REG_OPERID", columnDefinition = "INTEGER")
+    @MetaData(value = "创建人(操作员)ID号", comments = "创建人(操作员)ID号")
     private Long regOperId;
 
     /**
      * 创建人(操作员)姓名
      */
-    @Column(name = "C_REG_OPERNAME",  columnDefinition="VARCHAR" )
-    @MetaData( value="创建人(操作员)姓名", comments = "创建人(操作员)姓名")
+    @Column(name = "C_REG_OPERNAME", columnDefinition = "VARCHAR")
+    @MetaData(value = "创建人(操作员)姓名", comments = "创建人(操作员)姓名")
     private String regOperName;
 
     /**
      * 创建日期
      */
-    @Column(name = "D_REG_DATE",  columnDefinition="VARCHAR" )
-    @MetaData( value="创建日期", comments = "创建日期")
+    @Column(name = "D_REG_DATE", columnDefinition = "VARCHAR")
+    @MetaData(value = "创建日期", comments = "创建日期")
     private String regDate;
 
     /**
      * 创建时间
      */
-    @Column(name = "T_REG_TIME",  columnDefinition="VARCHAR" )
-    @MetaData( value="创建时间", comments = "创建时间")
+    @Column(name = "T_REG_TIME", columnDefinition = "VARCHAR")
+    @MetaData(value = "创建时间", comments = "创建时间")
     private String regTime;
 
     /**
      * 修改人(操作员)ID号
      */
-    @Column(name = "L_MODI_OPERID",  columnDefinition="INTEGER" )
-    @MetaData( value="修改人(操作员)ID号", comments = "修改人(操作员)ID号")
+    @Column(name = "L_MODI_OPERID", columnDefinition = "INTEGER")
+    @MetaData(value = "修改人(操作员)ID号", comments = "修改人(操作员)ID号")
     private Long modiOperId;
 
     /**
      * 修改人(操作员)姓名
      */
-    @Column(name = "C_MODI_OPERNAME",  columnDefinition="VARCHAR" )
-    @MetaData( value="修改人(操作员)姓名", comments = "修改人(操作员)姓名")
+    @Column(name = "C_MODI_OPERNAME", columnDefinition = "VARCHAR")
+    @MetaData(value = "修改人(操作员)姓名", comments = "修改人(操作员)姓名")
     private String modiOperName;
 
     /**
      * 修改日期
      */
-    @Column(name = "D_MODI_DATE",  columnDefinition="VARCHAR" )
-    @MetaData( value="修改日期", comments = "修改日期")
+    @Column(name = "D_MODI_DATE", columnDefinition = "VARCHAR")
+    @MetaData(value = "修改日期", comments = "修改日期")
     private String modiDate;
 
     /**
      * 修改时间
      */
-    @Column(name = "T_MODI_TIME",  columnDefinition="VARCHAR" )
-    @MetaData( value="修改时间", comments = "修改时间")
+    @Column(name = "T_MODI_TIME", columnDefinition = "VARCHAR")
+    @MetaData(value = "修改时间", comments = "修改时间")
     private String modiTime;
 
     /**
      * 操作机构
      */
-    @Column(name = "C_OPERORG",  columnDefinition="VARCHAR" )
-    @MetaData( value="操作机构", comments = "操作机构")
+    @Column(name = "C_OPERORG", columnDefinition = "VARCHAR")
+    @MetaData(value = "操作机构", comments = "操作机构")
     private String operOrg;
 
     /**
-     * 使用状态:0未使用  1使用中  2已使用
+     * 使用状态:0未使用 1使用中 2已使用
      */
-    @Column(name = "C_BUSIN_STATUS",  columnDefinition="CHAR" )
-    @MetaData( value="使用状态:0未使用  1使用中  2已使用", comments = "使用状态:0未使用  1使用中  2已使用")
+    @Column(name = "C_BUSIN_STATUS", columnDefinition = "CHAR")
+    @MetaData(value = "使用状态:0未使用  1使用中  2已使用", comments = "使用状态:0未使用  1使用中  2已使用")
     private String businStatus;
 
-    @Column(name = "C_LAST_STATUS",  columnDefinition="CHAR" )
-    @MetaData( value="", comments = "")
+    @Column(name = "C_LAST_STATUS", columnDefinition = "CHAR")
+    @MetaData(value = "", comments = "")
     private String lastStatus;
 
     /**
      * 客户编号
      */
-    @Column(name = "L_CUSTNO",  columnDefinition="INTEGER" )
-    @MetaData( value="客户编号", comments = "客户编号")
+    @Column(name = "L_CUSTNO", columnDefinition = "INTEGER")
+    @MetaData(value = "客户编号", comments = "客户编号")
     private Long custNo;
 
     /**
      * 引用编号
      */
-    @Column(name = "L_REF_ID",  columnDefinition="INTEGER" )
-    @MetaData( value="引用编号", comments = "引用编号")
+    @Column(name = "L_REF_ID", columnDefinition = "INTEGER")
+    @MetaData(value = "引用编号", comments = "引用编号")
     private Long refId;
 
     /**
-     * 流水类型:0 代录  1 变更  2 暂存
+     * 流水类型:0 代录 1 变更 2 暂存
      */
-    @Column(name = "C_TMP_TYPE",  columnDefinition="CHAR" )
-    @MetaData( value="流水类型:0 代录  1 变更  2 暂存", comments = "流水类型:0 代录  1 变更  2 暂存")
+    @Column(name = "C_TMP_TYPE", columnDefinition = "CHAR")
+    @MetaData(value = "流水类型:0 代录  1 变更  2 暂存", comments = "流水类型:0 代录  1 变更  2 暂存")
     private String tmpType;
 
     /**
-     * 流水操作类型:0 新增  1 修改  2 删除
+     * 流水操作类型:0 新增 1 修改 2 删除
      */
-    @Column(name = "C_TMP_OPER_TYPE",  columnDefinition="CHAR" )
-    @MetaData( value="流水操作类型:0 新增  1 修改  2 删除", comments = "流水操作类型:0 新增  1 修改  2 删除")
+    @Column(name = "C_TMP_OPER_TYPE", columnDefinition = "CHAR")
+    @MetaData(value = "流水操作类型:0 新增  1 修改  2 删除", comments = "流水操作类型:0 新增  1 修改  2 删除")
     private String tmpOperType;
 
     private static final long serialVersionUID = 1468812783862L;
@@ -426,28 +426,28 @@ public class CustMechContacterTmp implements BetterjrEntity {
         CustMechContacterTmp other = (CustMechContacterTmp) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
                 && (this.getParentId() == null ? other.getParentId() == null : this.getParentId().equals(other.getParentId()))
-            && (this.getVersion() == null ? other.getVersion() == null : this.getVersion().equals(other.getVersion()))
-            && (this.getName() == null ? other.getName() == null : this.getName().equals(other.getName()))
-            && (this.getSex() == null ? other.getSex() == null : this.getSex().equals(other.getSex()))
-            && (this.getMobile() == null ? other.getMobile() == null : this.getMobile().equals(other.getMobile()))
-            && (this.getPhone() == null ? other.getPhone() == null : this.getPhone().equals(other.getPhone()))
-            && (this.getEmail() == null ? other.getEmail() == null : this.getEmail().equals(other.getEmail()))
-            && (this.getAddress() == null ? other.getAddress() == null : this.getAddress().equals(other.getAddress()))
-            && (this.getRegOperId() == null ? other.getRegOperId() == null : this.getRegOperId().equals(other.getRegOperId()))
-            && (this.getRegOperName() == null ? other.getRegOperName() == null : this.getRegOperName().equals(other.getRegOperName()))
-            && (this.getRegDate() == null ? other.getRegDate() == null : this.getRegDate().equals(other.getRegDate()))
-            && (this.getRegTime() == null ? other.getRegTime() == null : this.getRegTime().equals(other.getRegTime()))
-            && (this.getModiOperId() == null ? other.getModiOperId() == null : this.getModiOperId().equals(other.getModiOperId()))
-            && (this.getModiOperName() == null ? other.getModiOperName() == null : this.getModiOperName().equals(other.getModiOperName()))
-            && (this.getModiDate() == null ? other.getModiDate() == null : this.getModiDate().equals(other.getModiDate()))
-            && (this.getModiTime() == null ? other.getModiTime() == null : this.getModiTime().equals(other.getModiTime()))
-            && (this.getOperOrg() == null ? other.getOperOrg() == null : this.getOperOrg().equals(other.getOperOrg()))
-            && (this.getBusinStatus() == null ? other.getBusinStatus() == null : this.getBusinStatus().equals(other.getBusinStatus()))
-            && (this.getLastStatus() == null ? other.getLastStatus() == null : this.getLastStatus().equals(other.getLastStatus()))
-            && (this.getCustNo() == null ? other.getCustNo() == null : this.getCustNo().equals(other.getCustNo()))
-            && (this.getRefId() == null ? other.getRefId() == null : this.getRefId().equals(other.getRefId()))
-            && (this.getTmpType() == null ? other.getTmpType() == null : this.getTmpType().equals(other.getTmpType()))
-            && (this.getTmpOperType() == null ? other.getTmpOperType() == null : this.getTmpOperType().equals(other.getTmpOperType()));
+                && (this.getVersion() == null ? other.getVersion() == null : this.getVersion().equals(other.getVersion()))
+                && (this.getName() == null ? other.getName() == null : this.getName().equals(other.getName()))
+                && (this.getSex() == null ? other.getSex() == null : this.getSex().equals(other.getSex()))
+                && (this.getMobile() == null ? other.getMobile() == null : this.getMobile().equals(other.getMobile()))
+                && (this.getPhone() == null ? other.getPhone() == null : this.getPhone().equals(other.getPhone()))
+                && (this.getEmail() == null ? other.getEmail() == null : this.getEmail().equals(other.getEmail()))
+                && (this.getAddress() == null ? other.getAddress() == null : this.getAddress().equals(other.getAddress()))
+                && (this.getRegOperId() == null ? other.getRegOperId() == null : this.getRegOperId().equals(other.getRegOperId()))
+                && (this.getRegOperName() == null ? other.getRegOperName() == null : this.getRegOperName().equals(other.getRegOperName()))
+                && (this.getRegDate() == null ? other.getRegDate() == null : this.getRegDate().equals(other.getRegDate()))
+                && (this.getRegTime() == null ? other.getRegTime() == null : this.getRegTime().equals(other.getRegTime()))
+                && (this.getModiOperId() == null ? other.getModiOperId() == null : this.getModiOperId().equals(other.getModiOperId()))
+                && (this.getModiOperName() == null ? other.getModiOperName() == null : this.getModiOperName().equals(other.getModiOperName()))
+                && (this.getModiDate() == null ? other.getModiDate() == null : this.getModiDate().equals(other.getModiDate()))
+                && (this.getModiTime() == null ? other.getModiTime() == null : this.getModiTime().equals(other.getModiTime()))
+                && (this.getOperOrg() == null ? other.getOperOrg() == null : this.getOperOrg().equals(other.getOperOrg()))
+                && (this.getBusinStatus() == null ? other.getBusinStatus() == null : this.getBusinStatus().equals(other.getBusinStatus()))
+                && (this.getLastStatus() == null ? other.getLastStatus() == null : this.getLastStatus().equals(other.getLastStatus()))
+                && (this.getCustNo() == null ? other.getCustNo() == null : this.getCustNo().equals(other.getCustNo()))
+                && (this.getRefId() == null ? other.getRefId() == null : this.getRefId().equals(other.getRefId()))
+                && (this.getTmpType() == null ? other.getTmpType() == null : this.getTmpType().equals(other.getTmpType()))
+                && (this.getTmpOperType() == null ? other.getTmpOperType() == null : this.getTmpOperType().equals(other.getTmpOperType()));
     }
 
     @Override
@@ -480,31 +480,65 @@ public class CustMechContacterTmp implements BetterjrEntity {
         result = prime * result + ((getTmpOperType() == null) ? 0 : getTmpOperType().hashCode());
         return result;
     }
-    
+
     public void initAddValue(String anBusinStatus) {
+        this.initAddValue(anBusinStatus, null, null);
+    }
+
+    public void initAddValue(CustMechContacter anContacter, String anBusinStatus) {
+        this.initAddValue(anBusinStatus, null, null);
+
+        this.custNo = anContacter.getCustNo();
+        this.name = anContacter.getName();
+        this.sex = anContacter.getSex();
+    }
+
+    public void initAddValue(String anBusinStatus, String anTmpType, Long anVersion) {
         this.id = SerialGenerator.getLongValue("CustMechContacterTmp.id");
-        
+
         this.regOperId = UserUtils.getOperatorInfo().getId();
         this.regOperName = UserUtils.getOperatorInfo().getName();
         this.regDate = BetterDateUtils.getNumDate();
         this.regTime = BetterDateUtils.getNumTime();
-        
+
         this.modiOperId = UserUtils.getOperatorInfo().getId();
         this.modiOperName = UserUtils.getOperatorInfo().getName();
         this.modiDate = BetterDateUtils.getNumDate();
         this.modiTime = BetterDateUtils.getNumTime();
-        
+
         this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
         this.businStatus = anBusinStatus;
+        this.version = anVersion;
+
+        this.tmpType = anTmpType;
     }
 
-    public void initModifyValue(final CustMechContacterTmp anCustMechContacterTmp) {
+    public void initModifyValue(final CustMechContacterTmp anContacterTmp) {
         this.modiOperId = UserUtils.getOperatorInfo().getId();
         this.modiOperName = UserUtils.getOperatorInfo().getName();
         this.modiDate = BetterDateUtils.getNumDate();
         this.modiTime = BetterDateUtils.getNumTime();
 
-        this.businStatus = anCustMechContacterTmp.getBusinStatus();
-        this.operOrg = anCustMechContacterTmp.getOperOrg();
+        this.name = anContacterTmp.getName();
+        this.sex = anContacterTmp.getSex();
+    }
+
+    public void initModifyValue(CustMechContacterTmp anContacterTmp, String anBusinStatus, Long anVersion) {
+        this.initModifyValue(anContacterTmp);
+
+        this.businStatus = anBusinStatus;
+        this.version = anVersion;
+    }
+
+    public void initModifyValue(CustMechContacter anContacter, String anBusinStatus) {
+        this.modiOperId = UserUtils.getOperatorInfo().getId();
+        this.modiOperName = UserUtils.getOperatorInfo().getName();
+        this.modiDate = BetterDateUtils.getNumDate();
+        this.modiTime = BetterDateUtils.getNumTime();
+
+        this.name = anContacter.getName();
+        this.sex = anContacter.getSex();
+
+        this.businStatus = anBusinStatus;
     }
 }

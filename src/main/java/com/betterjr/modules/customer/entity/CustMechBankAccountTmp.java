@@ -768,33 +768,69 @@ public class CustMechBankAccountTmp implements BetterjrEntity {
         result = prime * result + ((getBatchNo() == null) ? 0 : getBatchNo().hashCode());
         return result;
     }
-
+    
     public void initAddValue(String anBusinStatus) {
+        this.initAddValue(anBusinStatus, null, null);
+    }
+    
+    public void initAddValue(CustMechBankAccount anBankAccount, String anBusinStatus) {
+        this.initAddValue(anBusinStatus, null, null);
+        
+        this.custNo = anBankAccount.getCustNo();
+        this.identType = anBankAccount.getIdentType();
+        this.identNo = anBankAccount.getIdentNo();
+        this.batchNo = anBankAccount.getBatchNo();
+    }
+    
+    public void initAddValue(String anBusinStatus, String anTmpType, Long anVersion) {
         this.id = SerialGenerator.getLongValue("CustMechBankAccountTmp.id");
-
+        
         this.regOperId = UserUtils.getOperatorInfo().getId();
         this.regOperName = UserUtils.getOperatorInfo().getName();
         this.regDate = BetterDateUtils.getNumDate();
         this.regTime = BetterDateUtils.getNumTime();
-
+        
         this.modiOperId = UserUtils.getOperatorInfo().getId();
         this.modiOperName = UserUtils.getOperatorInfo().getName();
         this.modiDate = BetterDateUtils.getNumDate();
         this.modiTime = BetterDateUtils.getNumTime();
-
+        
         this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
         this.businStatus = anBusinStatus;
+        this.version = anVersion;
+        
+        this.tmpType = anTmpType;
     }
-
+    
     public void initModifyValue(final CustMechBankAccountTmp anCustMechBankAccountTmp) {
-        this.id = anCustMechBankAccountTmp.getId();
-
         this.modiOperId = UserUtils.getOperatorInfo().getId();
         this.modiOperName = UserUtils.getOperatorInfo().getName();
         this.modiDate = BetterDateUtils.getNumDate();
         this.modiTime = BetterDateUtils.getNumTime();
 
-        this.businStatus = anCustMechBankAccountTmp.getBusinStatus();
-        this.operOrg = anCustMechBankAccountTmp.getOperOrg();
+        this.identType = anCustMechBankAccountTmp.getIdentType();
+        this.identNo = anCustMechBankAccountTmp.getIdentNo();
+        this.batchNo = anCustMechBankAccountTmp.getBatchNo();
+        
+    }
+
+    public void initModifyValue(CustMechBankAccountTmp anCustMechBankAccountTmp, String anBusinStatus, Long anVersion) {
+        this.initModifyValue(anCustMechBankAccountTmp);
+        
+        this.businStatus = anBusinStatus;
+        this.version = anVersion;
+    }
+
+    public void initModifyValue(CustMechBankAccount anBankAccount, String anBusinStatus) {
+        this.modiOperId = UserUtils.getOperatorInfo().getId();
+        this.modiOperName = UserUtils.getOperatorInfo().getName();
+        this.modiDate = BetterDateUtils.getNumDate();
+        this.modiTime = BetterDateUtils.getNumTime();
+
+        this.identType = anBankAccount.getIdentType();
+        this.identNo = anBankAccount.getIdentNo();
+        this.batchNo = anBankAccount.getBatchNo();        
+        
+        this.businStatus = anBusinStatus;
     }
 }
