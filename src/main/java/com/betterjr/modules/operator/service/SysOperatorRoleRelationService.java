@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.betterjr.common.exception.BytterException;
+import com.betterjr.common.exception.BytterTradeException;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.modules.operator.dao.SysOperatorRoleRelationMapper;
 import com.betterjr.modules.operator.entity.SysOperatorRoleRelation;
@@ -68,7 +68,7 @@ public class SysOperatorRoleRelationService extends BaseService<SysOperatorRoleR
            String roleName=ruleArr[i];
            Role role=roleService.findRoleByName(roleName);
            if(role==null){
-               throw new BytterException("角色信息未找到");
+               throw new BytterTradeException("角色信息未找到");
            }
            SysOperatorRoleRelation roleRelation=new SysOperatorRoleRelation(role.getId(), anOperatorId, roleName);
            this.insert(roleRelation);
