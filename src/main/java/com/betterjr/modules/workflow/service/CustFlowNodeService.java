@@ -12,6 +12,7 @@ import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.mapper.entity.ReferClass;
 import com.betterjr.modules.workflow.dao.CustFlowNodeMapper;
+import com.betterjr.modules.workflow.data.CustFlowNodeData;
 import com.betterjr.modules.workflow.data.FlowErrorCode;
 import com.betterjr.modules.workflow.data.FlowType;
 import com.betterjr.modules.workflow.entity.CustFlowNode;
@@ -40,16 +41,10 @@ public class CustFlowNodeService extends BaseService<CustFlowNodeMapper, CustFlo
     /**
      * 根据流程类型，得到自定义流程所有节点
      */
-    public List<CustFlowNode> findFlowNodesByType(String flowType) {
+    public List<CustFlowNodeData> findFlowNodesByType(String flowType) {
         return this.mapper.findFlowNodesByType(flowType);
     }
     
-    /**
-     * 根据流程类型，得到系统节点
-     */
-    public List<CustFlowNode> findFlowSysNodesByType(String flowType) {
-        return this.mapper.findFlowSysNodesByType(flowType);
-    }
     
     /**
      * 新增，存在则更新,系统节点id是两位（110-990）,自定义节点是在系统节点id的后面加一,范围0-9：111-119,121-129.... （第一个自定义节点默认是系统节点Id）

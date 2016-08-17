@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.betterjr.modules.BasicServiceTest;
+import com.betterjr.modules.workflow.data.CustFlowNodeData;
 import com.betterjr.modules.workflow.data.FlowType;
 import com.betterjr.modules.workflow.entity.CustFlowNode;
 import com.betterjr.modules.workflow.service.CustFlowNodeService;
@@ -24,8 +25,8 @@ public class CustFlowNodeServiceTest extends BasicServiceTest<CustFlowNodeServic
     @Test
     public void findFlowNodesByType(){
         CustFlowNodeService service=this.getServiceObject();
-        List<CustFlowNode> list=service.findFlowNodesByType(FlowType.Trade.name());
-        for(CustFlowNode node:list){
+        List<CustFlowNodeData> list=service.findFlowNodesByType(FlowType.Trade.name());
+        for(CustFlowNodeData node:list){
             logger.error(node.toString());
         }
     }
