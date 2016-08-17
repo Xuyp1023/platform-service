@@ -10,15 +10,15 @@ import com.betterjr.modules.customer.entity.CustMechManagerTmp;
 import com.betterjr.modules.customer.helper.IVersionMapper;
 
 @BetterjrMapper
-public interface CustMechManagerTmpMapper extends Mapper<CustMechManagerTmp>,IVersionMapper {
+public interface CustMechManagerTmpMapper extends Mapper<CustMechManagerTmp>, IVersionMapper {
     // 列表类型需要使用 L_CUSTNO
     @Select("SELECT MAX(n_version) FROM t_cust_mech_manager_tmp WHERE L_CUSTNO=#{refId} AND C_BUSIN_STATUS='2'")
     @ResultType(Long.class)
     @Override
     public Long selectMaxVersion(@Param("refId") Long refId);
-    
+
     // 列表类型需要使用 L_CUSTNO
-    @Select("SELECT MAX(n_version) FROM t_cust_mech_manager_tmp WHERE L_CUSTNO=#{refId} AND C_BUSIN_STATUS='2'")
+    @Select("SELECT MAX(n_version) FROM t_cust_mech_manager_tmp WHERE L_CUSTNO=#{refId} AND N_VERSION < #{version} AND  C_BUSIN_STATUS='2'")
     @ResultType(Long.class)
     @Override
     public Long selectPrevVersion(@Param("refId") Long refId, @Param("version") Long version);

@@ -406,39 +406,47 @@ public class CustMechContacter implements BetterjrEntity {
         return result;
     }
     
-    public void initAddValue(Long anCustNo, String anCustName, Long anRegOperId, String anRegOperName, String anOperOrg) {
+
+    public void initAddValue(CustMechContacterTmp anContacterTmp) {
         this.id = SerialGenerator.getLongValue("CustMechContacter.id");
-        
+
+        this.regOperId = UserUtils.getOperatorInfo().getId();
+        this.regOperName = UserUtils.getOperatorInfo().getName();
         this.regDate = BetterDateUtils.getNumDate();
         this.regTime = BetterDateUtils.getNumTime();
-        
+
         this.modiOperId = UserUtils.getOperatorInfo().getId();
         this.modiOperName = UserUtils.getOperatorInfo().getName();
         this.modiDate = BetterDateUtils.getNumDate();
         this.modiTime = BetterDateUtils.getNumTime();
-        
-        this.regOperId = anRegOperId;
-        this.regOperName = anRegOperName;
-        this.operOrg = anOperOrg;
-        this.custNo = anCustNo;
-        
+
+        this.custNo = anContacterTmp.getCustNo();
+        this.name = anContacterTmp.getName();
+        this.sex = anContacterTmp.getSex();
+
+        this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
         this.businStatus = "0";
     }
 
-    public void initModifyValue(final CustMechContacter anCustMechContacter) {
-        this.id = anCustMechContacter.getId();
-/*
-        this.regOperId = anCustMechBaseTmp.getRegOperId();
-        this.regOperName = anCustMechBaseTmp.getRegOperName();
-        this.regDate = anCustMechBaseTmp.getRegDate();
-        this.regTime = anCustMechBaseTmp.getRegTime();
-*/
+    public void initModifyValue(final CustMechContacter anContacter) {
+        this.custNo = anContacter.getCustNo();
+        this.name = anContacter.getName();
+        this.sex = anContacter.getSex();
+
         this.modiOperId = UserUtils.getOperatorInfo().getId();
         this.modiOperName = UserUtils.getOperatorInfo().getName();
         this.modiDate = BetterDateUtils.getNumDate();
         this.modiTime = BetterDateUtils.getNumTime();
+    }
 
-        this.businStatus = anCustMechContacter.getBusinStatus();
-        this.operOrg = anCustMechContacter.getOperOrg();
+    public void initModifyValue(CustMechContacterTmp anContacterTmp) {
+        this.custNo = anContacterTmp.getCustNo();
+        this.name = anContacterTmp.getName();
+        this.sex = anContacterTmp.getSex();
+
+        this.modiOperId = UserUtils.getOperatorInfo().getId();
+        this.modiOperName = UserUtils.getOperatorInfo().getName();
+        this.modiDate = BetterDateUtils.getNumDate();
+        this.modiTime = BetterDateUtils.getNumTime();
     }
 }
