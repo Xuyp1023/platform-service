@@ -343,5 +343,27 @@ public class FlowService {
             }
         }
     }
+    
+    
+    /**
+     * 改变当前节点流程审批人
+     */
+    public void changeProcessAudit(String[] actorIds,String flowOrderId) {
+        QueryFilter filter = new QueryFilter().setOrderId(flowOrderId);
+        List<WorkItem> workItemList = engine.query().getWorkItems(null, filter);
+        for(WorkItem item:workItemList){
+            String taskId=item.getTaskId();
+            List<Task> taskList=this.engine.query().getActiveTasks(new QueryFilter().setTaskId(taskId));
+            if(!Collections3.isEmpty(taskList)){
+                Task task=Collections3.getFirst(taskList);
+                String[] oriActorIds=task.getActorIds();
+                this.engine.task().removeTaskActor(taskId, oriActorIds);
+                this.engine.task().addTaskActor(taskId, actorIds);
+                logger.info("deleted actorids:"+Collections3.arrayToList(oriActorIds));
+                logger.info("added actorids:"+Collections3.arrayToList(actorIds));
+            }
+        }
+        
+    }
 
 }

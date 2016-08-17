@@ -13,6 +13,7 @@ import com.betterjr.common.selectkey.SerialGenerator;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.Collections3;
+import com.betterjr.common.utils.UserUtils;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.betterjr.modules.account.service.CustAndOperatorRelaService;
 import com.betterjr.modules.account.service.CustOperatorService;
@@ -83,6 +84,7 @@ public class CustFlowBaseService extends BaseService<CustFlowBaseMapper, CustFlo
 
             step.setStepApprovers(appList);
         }
+        base.setStepList(stepList);
 
         SnakerProcessModelGenerator generator = new SnakerProcessModelGenerator();
         generator.setBase(base);
@@ -92,6 +94,29 @@ public class CustFlowBaseService extends BaseService<CustFlowBaseMapper, CustFlo
 
         return generator.buildProcessModel();
 
+    }
+    
+    /**
+     * 读取流程配置，更加流程类型
+     * 
+     * @param id
+     * @return
+     */
+    public CustFlowBase findProcessByFlowType(String flowType) {
+        List<CustFlowBase> baseList = this.selectByProperty("flowType", flowType);
+        if (Collections3.isEmpty(baseList)) {
+            return null;
+        }
+        
+        CustFlowBase base=Collections3.getFirst(baseList);
+        List<CustFlowStep> stepList = this.stepService.selectByProperty("flowBaseId", base.getId());
+
+        for (CustFlowStep step : stepList) {
+            List<CustFlowStepApprovers> appList = this.stepAppService.selectByProperty("stepId", step.getId());
+            step.setStepApprovers(appList);
+        }
+        base.setStepList(stepList);
+        return base;
     }
 
     /**
@@ -164,10 +189,5 @@ public class CustFlowBaseService extends BaseService<CustFlowBaseMapper, CustFlo
         }
     }
 
-    /**
-     * 当前节点流程审批人
-     */
-    public void saveProcessAudit(String[] operators) {
 
-    }
 }

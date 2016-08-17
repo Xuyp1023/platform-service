@@ -13,6 +13,7 @@ import org.snaker.engine.model.ProcessModel;
 import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.modules.BasicServiceTest;
+import com.betterjr.modules.workflow.data.CustFlowNodeData;
 import com.betterjr.modules.workflow.data.FlowNodeRole;
 import com.betterjr.modules.workflow.data.FlowType;
 import com.betterjr.modules.workflow.entity.CustFlowBase;
@@ -57,7 +58,7 @@ public class CustFlowBaseServiceTest extends BasicServiceTest<CustFlowBaseServic
         base.setOperOrg("亿起融");
         base.setRegDate(BetterDateUtils.getNow());
         
-        CustFlowNode node=null;
+        CustFlowNodeData node=null;
         
         stepList=new ArrayList<CustFlowStep>();
         CustFlowStep step1=new CustFlowStep();
@@ -66,7 +67,7 @@ public class CustFlowBaseServiceTest extends BasicServiceTest<CustFlowBaseServic
         step1.setOrderNum(1);
         step1.setNodeName("复核");
         step1.setNodeId(2l);
-        node=new CustFlowNode();
+        node=new CustFlowNodeData();
         node.setNodeRole(FlowNodeRole.Factoring.name());
         step1.setStepNode(node);
         CustFlowStep step2=new CustFlowStep();
@@ -75,7 +76,7 @@ public class CustFlowBaseServiceTest extends BasicServiceTest<CustFlowBaseServic
         step2.setOrderNum(2);
         step2.setNodeName("融资确认");
         step2.setNodeId(9l);
-        node=new CustFlowNode();
+        node=new CustFlowNodeData();
         node.setNodeRole(FlowNodeRole.Financer.name());
         step2.setStepNode(node);
         CustFlowStep step3=new CustFlowStep();
@@ -84,7 +85,7 @@ public class CustFlowBaseServiceTest extends BasicServiceTest<CustFlowBaseServic
         step3.setOrderNum(3);
         step3.setNodeName("核心企业确认");
         step3.setNodeId(10l);
-        node=new CustFlowNode();
+        node=new CustFlowNodeData();
         node.setNodeRole(FlowNodeRole.Core.name());
         step3.setStepNode(node);
         CustFlowStep step4=new CustFlowStep();
@@ -93,7 +94,7 @@ public class CustFlowBaseServiceTest extends BasicServiceTest<CustFlowBaseServic
         step4.setOrderNum(4);
         step4.setNodeName("审批");
         step4.setNodeId(6l);
-        node=new CustFlowNode();
+        node=new CustFlowNodeData();
         node.setNodeRole(FlowNodeRole.Factoring.name());
         step4.setStepNode(node);
         stepList.add(step1);

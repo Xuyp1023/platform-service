@@ -118,6 +118,14 @@ public class FlowServiceTest extends BasicServiceTest<FlowService> {
     }
     
     @Test
+    public void changeProcessAudit() {
+        String flowOrderId="92f1ce6054104446be19981124feb875";
+        String[] actorIds=new String[]{"1259","changeAudit1","changeAudit2","changeAudit3"};
+        FlowService service = this.getServiceObject();
+        service.changeProcessAudit(actorIds, flowOrderId);
+    }
+    
+    @Test
     public void queryCurrentWorkTask(){
         FlowService service = this.getServiceObject();
         Page<FlowStatus> page=service.queryCurrentWorkTask(null, null);

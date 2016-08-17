@@ -14,6 +14,7 @@ import com.betterjr.common.web.AjaxObject;
 import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.rule.service.RuleServiceDubboFilterInvoker;
 import com.betterjr.modules.workflow.IFlowService;
+import com.betterjr.modules.workflow.data.CustFlowNodeData;
 import com.betterjr.modules.workflow.data.FlowInput;
 import com.betterjr.modules.workflow.data.FlowStatus;
 import com.betterjr.modules.workflow.data.TaskAuditHistory;
@@ -21,9 +22,11 @@ import com.betterjr.modules.workflow.entity.CustFlowBase;
 import com.betterjr.modules.workflow.entity.CustFlowMoney;
 import com.betterjr.modules.workflow.entity.CustFlowNode;
 import com.betterjr.modules.workflow.entity.CustFlowStep;
+import com.betterjr.modules.workflow.entity.CustFlowSysNode;
 import com.betterjr.modules.workflow.service.CustFlowBaseService;
 import com.betterjr.modules.workflow.service.CustFlowMoneyService;
 import com.betterjr.modules.workflow.service.CustFlowNodeService;
+import com.betterjr.modules.workflow.service.CustFlowSysNodeService;
 import com.betterjr.modules.workflow.service.FlowService;
 
 @Service(interfaceClass = IFlowService.class)
@@ -34,6 +37,8 @@ public class FlowDubboService implements IFlowService {
     private FlowService flowService;
     @Autowired
     private CustFlowNodeService flowNodeService;
+    @Autowired
+    private CustFlowSysNodeService flowSysNodeService;
     @Autowired
     private CustFlowMoneyService moneyService;
 
@@ -50,15 +55,24 @@ public class FlowDubboService implements IFlowService {
         this.flowBaseService.saveProcess(flowObj);
         return AjaxObject.newOk("保存流程配置成功").toJson();
     }
-
+    
     /**
-     * 修改当前流程节点的操作人
+     * 读取流程配置，根据流程类型
      */
     @Override
-    public String webSaveProcessAudit(String[] operators) {
+    public String webFindProcessByType(String flowType) {
+        CustFlowBase base=this.flowBaseService.findProcessByFlowType(flowType);
+        return AjaxObject.newOk(base).toJson();
+    }
+
+    /**
+     * 流程监控-修改流程审批人
+     */
+    @Override
+    public String webChangeProcessAudit(String[] actorIds,String flowOrderId) {
         // TODO Auto-generated method stub
-        this.flowBaseService.saveProcessAudit(operators);
-        return AjaxObject.newOk("修改流程节点的操作人成功").toJson();
+        this.flowService.changeProcessAudit(actorIds,flowOrderId);
+        return AjaxObject.newOk("流程监控-修改流程审批人成功").toJson();
     }
 
     /**
@@ -201,7 +215,7 @@ public class FlowDubboService implements IFlowService {
     @Override
     public String webFindSysNode(String flowType) {
         // TODO Auto-generated method stub
-        List<CustFlowNode> list= this.flowNodeService.findFlowSysNodesByType(flowType);
+        List<CustFlowSysNode> list= this.flowSysNodeService.findFlowSysNodesByType(flowType);
         return AjaxObject.newOk(list).toJson();
     }
     
@@ -214,7 +228,7 @@ public class FlowDubboService implements IFlowService {
     @Override
     public String webFindFlowNodesByType(String flowType) {
         // TODO Auto-generated method stub
-        List<CustFlowNode> list= this.flowNodeService.findFlowNodesByType(flowType);
+        List<CustFlowNodeData> list= this.flowNodeService.findFlowNodesByType(flowType);
         return AjaxObject.newOk(list).toJson();
     }
 
@@ -280,7 +294,7 @@ public class FlowDubboService implements IFlowService {
      * @return
      */
     @Override
-    public List<CustFlowNode> findFlowNodesByType(String flowType) {
+    public List<CustFlowNodeData> findFlowNodesByType(String flowType) {
         // TODO Auto-generated method stub
         return this.flowNodeService.findFlowNodesByType(flowType);
     }

@@ -23,7 +23,7 @@
 	<bean id="snakerOrderService" class="org.snaker.engine.core.OrderService">
 		<property name="access" ref="dbAccess"/>
 	</bean>
-	<bean id="snakerTaskService" class="org.snaker.engine.core.TaskService">
+	<bean id="snakerTaskService" class="com.betterjr.modules.workflow.service.BetterTaskService">
 		<property name="access" ref="dbAccess"/>
 	</bean>
 	<bean id="snakerManagerService" class="org.snaker.engine.core.ManagerService">
