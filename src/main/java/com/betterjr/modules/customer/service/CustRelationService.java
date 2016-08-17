@@ -109,6 +109,48 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
     }
 
     /**
+     * 供应商下拉列表查询,使用于核心企业查询
+     * 
+     * @param anCoreCustNo
+     * @return
+     */
+    public List<SimpleDataEntity> querySupplierByCore(Long anCoreCustNo) {
+        List<SimpleDataEntity> result = new ArrayList<SimpleDataEntity>();
+        if (null == anCoreCustNo) {
+            return result;
+        }
+        Map<String, Object> anMap = new HashMap<String, Object>();
+        anMap.put("relateCustno", anCoreCustNo);
+        anMap.put("relateType", CustomerConstants.RELATE_TYPE_SUPPLIER_CORE);
+        anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
+        for (CustRelation relation : this.selectByProperty(anMap)) {
+            result.add(new SimpleDataEntity(relation.getCustName(), String.valueOf(relation.getCustNo())));
+        }
+        return result;
+    }
+
+    /**
+     * 经销商下拉列表查询,使用于核心企业查询
+     * 
+     * @param anCoreCustNo
+     * @return
+     */
+    public List<SimpleDataEntity> querySellerByCore(Long anCoreCustNo) {
+        List<SimpleDataEntity> result = new ArrayList<SimpleDataEntity>();
+        if (null == anCoreCustNo) {
+            return result;
+        }
+        Map<String, Object> anMap = new HashMap<String, Object>();
+        anMap.put("relateCustno", anCoreCustNo);
+        anMap.put("relateType", CustomerConstants.RELATE_TYPE_SELLER_CORE);
+        anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
+        for (CustRelation relation : this.selectByProperty(anMap)) {
+            result.add(new SimpleDataEntity(relation.getCustName(), String.valueOf(relation.getCustNo())));
+        }
+        return result;
+    }
+
+    /**
      * 保理公司与核心企业关系查询
      * 
      * @param anFactorNo
@@ -188,7 +230,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
         for (CustRelation relation : this.selectByProperty(anMap)) {
             SimpleDataEntity entity = new SimpleDataEntity(relation.getRelateCustname(), String.valueOf(relation.getRelateCustno()));
-            if (!result.contains(entity)){
+            if (!result.contains(entity)) {
                 result.add(entity);
             }
         }
@@ -197,7 +239,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
         for (CustRelation relation : this.selectByProperty(anMap)) {
             SimpleDataEntity entity = new SimpleDataEntity(relation.getCustName(), String.valueOf(relation.getCustNo()));
-            if (!result.contains(entity)){
+            if (!result.contains(entity)) {
                 result.add(entity);
             }
         }
