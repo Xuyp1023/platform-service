@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.betterjr.common.exception.BytterException;
+import com.betterjr.common.exception.BytterTradeException;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
@@ -94,7 +94,7 @@ public class SysMenuManagerService {
                 String menuId=menuArr[i];
                 SysMenuInfo menuInfo=sysMenuService.findMenuById(Integer.parseInt(menuId));
                 if(menuInfo==null){
-                    throw new BytterException("菜单信息未找到");
+                    throw new BytterTradeException("菜单信息未找到");
                 }
                 sysMenuRuleService.addMenuRole(anRoleId, anRoleName, menuId, menuInfo.getMenuName()); 
             }

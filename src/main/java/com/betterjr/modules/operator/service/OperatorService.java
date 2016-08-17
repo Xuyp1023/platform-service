@@ -75,7 +75,6 @@ public class OperatorService extends BaseService<CustOperatorInfoMapper, CustOpe
         map.put("identNo", anUserIdentNo);
         map.put("identType", anIndentType);
         map.put("status", "1");
-        // return operatorMapper.findCustOperatorByIndentInfo(anIndentType, anUserIdentNo);
         List<CustOperatorInfo> list = this.selectByProperty(map);
         if (list.size() > 0) {
 
