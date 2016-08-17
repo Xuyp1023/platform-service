@@ -47,7 +47,7 @@ public class RoleDubboService implements IRoleService {
     }
 
     @Override
-    public String delRole(String anRoleId) {
+    public String webDelRole(String anRoleId) {
         if(roleService.delRole(anRoleId)){
             return AjaxObject.newOk("删除成功").toJson();
         }else{
@@ -65,7 +65,7 @@ public class RoleDubboService implements IRoleService {
      * @return
      */
     @Override
-    public String findRole(){
+    public String webFindRole(){
         return AjaxObject.newOk("查询所有角色信息",roleService.findRole()).toJson();
     }
 
