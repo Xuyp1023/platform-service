@@ -363,29 +363,18 @@ public class CustMechTradeRecord implements BetterjrEntity {
         this.regDate = BetterDateUtils.getNumDate();
         this.regTime = BetterDateUtils.getNumTime();
         
-        this.modiOperId = UserUtils.getOperatorInfo().getId();
-        this.modiOperName = UserUtils.getOperatorInfo().getName();
-        this.modiDate = BetterDateUtils.getNumDate();
-        this.modiTime = BetterDateUtils.getNumTime();
-        
         this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
         this.businStatus = "0";
     }
 
     public void initModifyValue(final CustMechTradeRecord anCustMechTradeRecord) {
-        this.id = anCustMechTradeRecord.getId();
-/*
-        this.regOperId = anCustMechBaseTmp.getRegOperId();
-        this.regOperName = anCustMechBaseTmp.getRegOperName();
-        this.regDate = anCustMechBaseTmp.getRegDate();
-        this.regTime = anCustMechBaseTmp.getRegTime();
-*/
+
         this.modiOperId = UserUtils.getOperatorInfo().getId();
         this.modiOperName = UserUtils.getOperatorInfo().getName();
         this.modiDate = BetterDateUtils.getNumDate();
         this.modiTime = BetterDateUtils.getNumTime();
-
-        this.businStatus = anCustMechTradeRecord.getBusinStatus();
-        this.operOrg = anCustMechTradeRecord.getOperOrg();
+        
+        this.startDate = anCustMechTradeRecord.getStartDate();
+        this.endDate = anCustMechTradeRecord.getEndDate();
     }
 }

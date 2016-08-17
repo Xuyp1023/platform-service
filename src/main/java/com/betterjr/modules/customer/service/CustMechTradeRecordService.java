@@ -1,16 +1,13 @@
 package com.betterjr.modules.customer.service;
 
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
+import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.customer.dao.CustMechTradeRecordMapper;
 import com.betterjr.modules.customer.entity.CustMechTradeRecord;
-import com.betterjr.modules.customer.entity.CustMechTradeRecord;
+import com.betterjr.modules.document.service.CustFileItemService;
 
 /**
  * 贸易记录上传记录
@@ -19,17 +16,18 @@ import com.betterjr.modules.customer.entity.CustMechTradeRecord;
  */
 @Service
 public class CustMechTradeRecordService extends BaseService<CustMechTradeRecordMapper, CustMechTradeRecord> {
-    private static Logger logger = LoggerFactory.getLogger(CustMechTradeRecordService.class);
 
+    private CustFileItemService custFileItemService;
+    
     /**
-     * 贸易记录上传记录列表
+     * 查询贸易记录上传记录列表
      * @param anCustNo
      * @return
      */
-    public List<CustMechTradeRecord> queryCustMechTradeRecord(Long anCustNo) {
+    public Page<CustMechTradeRecord> queryCustMechTradeRecord(Long anCustNo, String anFlag, int anPageNum, int anPageSize) {
         BTAssert.notNull(anCustNo, "客户编号不允许为空！");
         
-        return this.selectByProperty("custNo", anCustNo);
+        return this.selectPropertyByPage("custNo", anCustNo, anPageNum, anPageSize, "1".equals(anFlag));
     }
     
     /**
@@ -46,10 +44,11 @@ public class CustMechTradeRecordService extends BaseService<CustMechTradeRecordM
      * @param anCustMechTradeRecord
      * @return
      */
-    public CustMechTradeRecord addCustMechTradeRecord(CustMechTradeRecord anCustMechTradeRecord) {
+    public CustMechTradeRecord addCustMechTradeRecord(CustMechTradeRecord anCustMechTradeRecord, String anFileList) {
         BTAssert.notNull(anCustMechTradeRecord, "贸易记录上传记录信息不允许为空！");
         
         anCustMechTradeRecord.initAddValue();
+        anCustMechTradeRecord.setBatchNo(custFileItemService.updateCustFileItemInfo(anFileList, anCustMechTradeRecord.getBatchNo()));
         this.insert(anCustMechTradeRecord);
         return anCustMechTradeRecord;
     }
@@ -70,5 +69,13 @@ public class CustMechTradeRecordService extends BaseService<CustMechTradeRecordM
         tempCustMechTradeRecord.initModifyValue(anCustMechTradeRecord);
         this.updateByPrimaryKeySelective(tempCustMechTradeRecord);
         return tempCustMechTradeRecord;
+    }
+    
+    /**
+     * 删除贸易记录上传信息
+     */
+    public int saveDeleteCustMechTradeRecord(Long anId) {
+        BTAssert.notNull(anId, "贸易记录上传记录编号不允许为空！");
+        return this.deleteByPrimaryKey(anId);
     }
 }
