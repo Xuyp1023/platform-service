@@ -1,13 +1,10 @@
 package com.betterjr.modules.customer.service;
 
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
+import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.customer.dao.CustMechCooperationMapper;
 import com.betterjr.modules.customer.entity.CustMechCooperation;
 
@@ -19,17 +16,16 @@ import com.betterjr.modules.customer.entity.CustMechCooperation;
 @Service
 public class CustMechCooperationService extends BaseService<CustMechCooperationMapper, CustMechCooperation> {
 
-    private static Logger logger = LoggerFactory.getLogger(CustMechCooperationService.class);
 
     /**
      * 查询合作企业列表
      * @param anCustNo
      * @return
      */
-    public List<CustMechCooperation> queryCustMechCooperationByCustNo(Long anCustNo) {
+    public Page<CustMechCooperation> queryCustMechCooperationByCustNo(Long anCustNo, String anFlag, int anPageNum, int anPageSize) {
         BTAssert.notNull(anCustNo, "客户编号不允许为空！");
         
-        return this.selectByProperty("custNo", anCustNo);
+        return this.selectPropertyByPage("custNo", anCustNo, anPageNum, anPageSize, "1".equals(anFlag));
     }
     
     /**
@@ -70,6 +66,14 @@ public class CustMechCooperationService extends BaseService<CustMechCooperationM
         tempCustMechCooperation.initModifyValue(anCustMechCooperation);
         this.updateByPrimaryKeySelective(tempCustMechCooperation);
         return tempCustMechCooperation;
+    }
+    
+    /**
+     * 删除合作企业信息
+     */
+    public int saveDeleteCustMechCooperation(Long anId) {
+        BTAssert.notNull(anId, "合作企业编号不允许为空！");
+        return this.deleteByPrimaryKey(anId);
     }
 
 }
