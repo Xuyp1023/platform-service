@@ -1,5 +1,6 @@
 package com.betterjr.modules.customer.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.service.BaseService;
@@ -17,6 +18,7 @@ import com.betterjr.modules.document.service.CustFileItemService;
 @Service
 public class CustMechTradeRecordService extends BaseService<CustMechTradeRecordMapper, CustMechTradeRecord> {
 
+    @Autowired
     private CustFileItemService custFileItemService;
     
     /**
