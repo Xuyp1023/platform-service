@@ -80,4 +80,12 @@ public class CustTaxRecordService extends BaseService<CustTaxRecordMapper, CustT
         this.updateByPrimaryKeySelective(tempCustTaxRecord);
         return tempCustTaxRecord;
     } 
+    
+    /**
+     * 删除纳税信息
+     */
+    public int saveDeleteCustTaxRecorde (Long anId){
+        BTAssert.notNull(anId, "纳税记录上传记录编号不允许为空！");
+        return this.deleteByPrimaryKey(anId);
+    }
 }

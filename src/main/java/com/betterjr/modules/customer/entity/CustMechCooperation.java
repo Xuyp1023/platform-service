@@ -11,9 +11,11 @@ import javax.persistence.Table;
 
 import com.betterjr.common.annotation.MetaData;
 import com.betterjr.common.entity.BetterjrEntity;
+import com.betterjr.common.mapper.CustDateJsonSerializer;
 import com.betterjr.common.selectkey.SerialGenerator;
 import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.UserUtils;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @Access(AccessType.FIELD)
 @Entity
@@ -95,6 +97,7 @@ public class CustMechCooperation implements BetterjrEntity {
      */
     @Column(name = "D_REG_DATE",  columnDefinition="VARCHAR" )
     @MetaData( value="创建日期", comments = "创建日期")
+    @JsonSerialize(using = CustDateJsonSerializer.class)
     private String regDate;
 
     /**
@@ -123,6 +126,7 @@ public class CustMechCooperation implements BetterjrEntity {
      */
     @Column(name = "D_MODI_DATE",  columnDefinition="VARCHAR" )
     @MetaData( value="修改日期", comments = "修改日期")
+    @JsonSerialize(using = CustDateJsonSerializer.class)
     private String modiDate;
 
     /**

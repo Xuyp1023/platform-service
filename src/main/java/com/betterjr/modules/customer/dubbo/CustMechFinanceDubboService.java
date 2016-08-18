@@ -50,5 +50,10 @@ public class CustMechFinanceDubboService implements ICustMechFinanceService {
         anCustMechFinanceRecord.setBatchNo(custFileItemService.updateCustFileItemInfo(anFileList, anCustMechFinanceRecord.getBatchNo()));
         return AjaxObject.newOk("财务上传记录保存成功", custMechFinanceRecordService.saveCustMechFinanceRecord(anCustMechFinanceRecord, anId)).toJson();
     }
+    
+    @Override
+    public String webSaveDeleteFinanceInfo(Long anId) {
+        return AjaxObject.newOk("财务上传记录删除成功", custMechFinanceRecordService.saveDeleteCustMechFinanceRecord(anId)).toJson();
+    }
 
 }
