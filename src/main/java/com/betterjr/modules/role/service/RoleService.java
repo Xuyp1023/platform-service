@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.exception.BytterDeclareException;
@@ -11,8 +12,10 @@ import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.mapper.pagehelper.Page;
+import com.betterjr.modules.operator.service.SysOperatorRoleRelationService;
 import com.betterjr.modules.role.dao.RoleMapper;
 import com.betterjr.modules.role.entity.Role;
+import com.betterjr.modules.sys.service.SysMenuRuleService;
 
 /****
  * 角色管理
@@ -22,6 +25,10 @@ import com.betterjr.modules.role.entity.Role;
 @Service
 public class RoleService extends BaseService<RoleMapper, Role> {
 
+    @Autowired
+    private SysOperatorRoleRelationService sysOperatorRoleService; 
+    @Autowired
+    private SysMenuRuleService sysMenuRuleService;
     /***
      * 添加角色信息
      * @param role
@@ -66,8 +73,11 @@ public class RoleService extends BaseService<RoleMapper, Role> {
      * @param anRoleId
      * @return
      */
-    public boolean delRole(String anRoleId){
+    public boolean delRole(Long anRoleId){
         Role role=this.selectByPrimaryKey(anRoleId);
+        // 绑定的操作员，菜单关系表都相应的删除
+        sysOperatorRoleService.delSysOperatorRole(role.getId());
+        sysMenuRuleService.delMenuRole(role.getId());
         return this.delete(role)==1;
     }
     

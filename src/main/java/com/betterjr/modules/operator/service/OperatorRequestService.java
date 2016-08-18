@@ -120,5 +120,19 @@ public class OperatorRequestService extends BaseService<CustOperatorInfoMapper, 
             result.add(custOperatorInfo);
         }
         return Page.listToPage(result);
-    }    
+    }
+    
+    /***
+     * 查询操作员信息
+     * @param operatorId
+     * @return
+     */
+    public CustOperatorInfo findOperatorById(Long operatorId){
+        CustOperatorInfo custOperatorInfo=this.selectByPrimaryKey(operatorId);
+        String ruleList = operatorRoleRelationService.findSysRoleByOperatorId(custOperatorInfo.getId());
+        if (BetterStringUtils.isNotBlank(ruleList)) {
+            custOperatorInfo.setRuleList(ruleList);
+        }
+        return custOperatorInfo;
+    }
 }
