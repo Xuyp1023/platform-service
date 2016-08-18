@@ -12,6 +12,7 @@ import com.betterjr.common.entity.BetterjrEntity;
 import com.betterjr.common.selectkey.SerialGenerator;
 import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.UserUtils;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Access(AccessType.FIELD)
 @Entity
@@ -35,6 +36,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
     /**
      * 数据版本号
      */
+    @JsonIgnore
     @Column(name = "N_VERSION", columnDefinition = "INTEGER")
     @MetaData(value = "数据版本号", comments = "数据版本号")
     private Long version;
@@ -84,6 +86,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
     /**
      * 创建人(操作员)ID号
      */
+    @JsonIgnore
     @Column(name = "L_REG_OPERID", columnDefinition = "INTEGER")
     @MetaData(value = "创建人(操作员)ID号", comments = "创建人(操作员)ID号")
     private Long regOperId;
@@ -91,6 +94,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
     /**
      * 创建人(操作员)姓名
      */
+    @JsonIgnore
     @Column(name = "C_REG_OPERNAME", columnDefinition = "VARCHAR")
     @MetaData(value = "创建人(操作员)姓名", comments = "创建人(操作员)姓名")
     private String regOperName;
@@ -98,6 +102,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
     /**
      * 创建日期
      */
+    @JsonIgnore
     @Column(name = "D_REG_DATE", columnDefinition = "VARCHAR")
     @MetaData(value = "创建日期", comments = "创建日期")
     private String regDate;
@@ -105,6 +110,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
     /**
      * 创建时间
      */
+    @JsonIgnore
     @Column(name = "T_REG_TIME", columnDefinition = "VARCHAR")
     @MetaData(value = "创建时间", comments = "创建时间")
     private String regTime;
@@ -112,6 +118,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
     /**
      * 修改人(操作员)ID号
      */
+    @JsonIgnore
     @Column(name = "L_MODI_OPERID", columnDefinition = "INTEGER")
     @MetaData(value = "修改人(操作员)ID号", comments = "修改人(操作员)ID号")
     private Long modiOperId;
@@ -119,6 +126,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
     /**
      * 修改人(操作员)姓名
      */
+    @JsonIgnore
     @Column(name = "C_MODI_OPERNAME", columnDefinition = "VARCHAR")
     @MetaData(value = "修改人(操作员)姓名", comments = "修改人(操作员)姓名")
     private String modiOperName;
@@ -126,6 +134,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
     /**
      * 修改日期
      */
+    @JsonIgnore
     @Column(name = "D_MODI_DATE", columnDefinition = "VARCHAR")
     @MetaData(value = "修改日期", comments = "修改日期")
     private String modiDate;
@@ -133,6 +142,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
     /**
      * 修改时间
      */
+    @JsonIgnore
     @Column(name = "T_MODI_TIME", columnDefinition = "VARCHAR")
     @MetaData(value = "修改时间", comments = "修改时间")
     private String modiTime;
@@ -140,6 +150,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
     /**
      * 操作机构
      */
+    @JsonIgnore
     @Column(name = "C_OPERORG", columnDefinition = "VARCHAR")
     @MetaData(value = "操作机构", comments = "操作机构")
     private String operOrg;
@@ -151,6 +162,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
     @MetaData(value = "使用状态:0未使用  1使用中  2已使用", comments = "使用状态:0未使用  1使用中  2已使用")
     private String businStatus;
 
+    @JsonIgnore
     @Column(name = "C_LAST_STATUS", columnDefinition = "CHAR")
     @MetaData(value = "", comments = "")
     private String lastStatus;
@@ -161,6 +173,13 @@ public class CustMechContacterTmp implements BetterjrEntity {
     @Column(name = "L_CUSTNO", columnDefinition = "INTEGER")
     @MetaData(value = "客户编号", comments = "客户编号")
     private Long custNo;
+
+    /**
+     * 附件
+     */
+    @Column(name = "N_BATCHNO", columnDefinition = "INTEGER")
+    @MetaData(value = "附件", comments = "附件")
+    private Long batchNo;
 
     /**
      * 引用编号
@@ -345,6 +364,14 @@ public class CustMechContacterTmp implements BetterjrEntity {
         this.custNo = custNo;
     }
 
+    public Long getBatchNo() {
+        return batchNo;
+    }
+
+    public void setBatchNo(Long anBatchNo) {
+        batchNo = anBatchNo;
+    }
+
     public Long getRefId() {
         return refId;
     }
@@ -404,6 +431,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
         sb.append(", businStatus=").append(businStatus);
         sb.append(", lastStatus=").append(lastStatus);
         sb.append(", custNo=").append(custNo);
+        sb.append(", batchNo=").append(batchNo);
         sb.append(", refId=").append(refId);
         sb.append(", tmpType=").append(tmpType);
         sb.append(", tmpOperType=").append(tmpOperType);
@@ -445,6 +473,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
                 && (this.getBusinStatus() == null ? other.getBusinStatus() == null : this.getBusinStatus().equals(other.getBusinStatus()))
                 && (this.getLastStatus() == null ? other.getLastStatus() == null : this.getLastStatus().equals(other.getLastStatus()))
                 && (this.getCustNo() == null ? other.getCustNo() == null : this.getCustNo().equals(other.getCustNo()))
+                && (this.getBatchNo() == null ? other.getBatchNo() == null : this.getBatchNo().equals(other.getBatchNo()))
                 && (this.getRefId() == null ? other.getRefId() == null : this.getRefId().equals(other.getRefId()))
                 && (this.getTmpType() == null ? other.getTmpType() == null : this.getTmpType().equals(other.getTmpType()))
                 && (this.getTmpOperType() == null ? other.getTmpOperType() == null : this.getTmpOperType().equals(other.getTmpOperType()));
@@ -475,6 +504,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
         result = prime * result + ((getBusinStatus() == null) ? 0 : getBusinStatus().hashCode());
         result = prime * result + ((getLastStatus() == null) ? 0 : getLastStatus().hashCode());
         result = prime * result + ((getCustNo() == null) ? 0 : getCustNo().hashCode());
+        result = prime * result + ((getBatchNo() == null) ? 0 : getBatchNo().hashCode());
         result = prime * result + ((getRefId() == null) ? 0 : getRefId().hashCode());
         result = prime * result + ((getTmpType() == null) ? 0 : getTmpType().hashCode());
         result = prime * result + ((getTmpOperType() == null) ? 0 : getTmpOperType().hashCode());
@@ -491,6 +521,10 @@ public class CustMechContacterTmp implements BetterjrEntity {
         this.custNo = anContacter.getCustNo();
         this.name = anContacter.getName();
         this.sex = anContacter.getSex();
+        this.mobile = anContacter.getMobile();
+        this.phone = anContacter.getPhone();
+        this.address = anContacter.getAddress();
+        this.email = anContacter.getEmail();
     }
 
     public void initAddValue(String anBusinStatus, String anTmpType, Long anVersion) {
@@ -521,6 +555,10 @@ public class CustMechContacterTmp implements BetterjrEntity {
 
         this.name = anContacterTmp.getName();
         this.sex = anContacterTmp.getSex();
+        this.mobile = anContacterTmp.getMobile();
+        this.phone = anContacterTmp.getPhone();
+        this.address = anContacterTmp.getAddress();
+        this.email = anContacterTmp.getEmail();
     }
 
     public void initModifyValue(CustMechContacterTmp anContacterTmp, String anBusinStatus, Long anVersion) {
@@ -538,6 +576,10 @@ public class CustMechContacterTmp implements BetterjrEntity {
 
         this.name = anContacter.getName();
         this.sex = anContacter.getSex();
+        this.mobile = anContacter.getMobile();
+        this.phone = anContacter.getPhone();
+        this.address = anContacter.getAddress();
+        this.email = anContacter.getEmail();
 
         this.businStatus = anBusinStatus;
     }

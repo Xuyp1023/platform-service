@@ -80,7 +80,7 @@ public class CustMechShareholderDubboService implements ICustMechShareholderServ
 
     @Override
     public String webDeleteChangeShareholderTmp(Long anRefId) {
-        return newOk("公司股东-流水信息 变更删除成功", shareholderTmpService.saveDelChangeShareholderTmp(anRefId)).toJson();
+        return newOk("公司股东-流水信息 变更删除成功", shareholderTmpService.saveDeleteChangeShareholderTmp(anRefId)).toJson();
     }
 
     @Override

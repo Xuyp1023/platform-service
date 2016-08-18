@@ -123,7 +123,7 @@ public class CustMechManagerTmpService extends BaseService<CustMechManagerTmpMap
     /**
      * 添加删除变更记录
      */
-    public CustMechManagerTmp saveDelChangeManagerTmp(Long anRefId) {
+    public CustMechManagerTmp saveDeleteChangeManagerTmp(Long anRefId) {
         BTAssert.notNull(anRefId, "公司高管号不允许为空！");
 
         CustMechManager manager = managerService.findCustMechManager(anRefId);
@@ -473,7 +473,7 @@ public class CustMechManagerTmpService extends BaseService<CustMechManagerTmpMap
             return addManagerTmp(managerTmp, CustomerConstants.TMP_TYPE_INSTEAD);
         }
         else {
-            managerTmp.initAddValue(manager, CustomerConstants.TMP_STATUS_NEW);
+            managerTmp.initModifyValue(manager, CustomerConstants.TMP_STATUS_NEW);
             managerTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_DELETE);
             return saveManagerTmp(managerTmp, managerTmp.getId());
         }

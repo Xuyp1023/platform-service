@@ -78,7 +78,7 @@ public class CustMechBankAccountDubboService implements ICustMechBankAccountServ
     
     @Override
     public String webDeleteChangeBankAccountTmp(Long anRefId) {
-        return AjaxObject.newOk("公司高管-流水信息 变更删除成功", bankAccountTmpService.saveDelChangeBankAccountTmp(anRefId)).toJson();
+        return AjaxObject.newOk("公司高管-流水信息 变更删除成功", bankAccountTmpService.saveDeleteChangeBankAccountTmp(anRefId)).toJson();
     }
     
     @Override

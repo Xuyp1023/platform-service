@@ -120,7 +120,7 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
     /**
      * 添加删除变更记录
      */
-    public CustMechContacterTmp saveDelChangeContacterTmp(Long anRefId) {
+    public CustMechContacterTmp saveDeleteChangeContacterTmp(Long anRefId) {
         BTAssert.notNull(anRefId, "公司联系人号不允许为空！");
 
         CustMechContacter contacter = contacterService.findCustMechContacter(anRefId);
@@ -207,7 +207,7 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
         if (checkMatchNewChange(tmpIds, anCustNo) == false) {
             throw new BytterTradeException("代录编号列表不正确,请检查.");
         }
-        CustChangeApply changeApply = changeApplyService.addChangeApply(anCustNo, CustomerConstants.ITEM_MANAGER, tempTmpIds);
+        CustChangeApply changeApply = changeApplyService.addChangeApply(anCustNo, CustomerConstants.ITEM_CONTACTER, tempTmpIds);
 
         for (Long id : tmpIds) {
             saveContacterTmpParentIdAndStatus(id, changeApply.getId(), CustomerConstants.TMP_STATUS_USEING);
@@ -470,7 +470,7 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
             return addContacterTmp(contacterTmp, CustomerConstants.TMP_TYPE_INSTEAD);
         }
         else {
-            contacterTmp.initAddValue(contacter, CustomerConstants.TMP_STATUS_NEW);
+            contacterTmp.initModifyValue(contacter, CustomerConstants.TMP_STATUS_NEW);
             contacterTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_DELETE);
             return saveContacterTmp(contacterTmp, contacterTmp.getId());
         }
@@ -592,7 +592,7 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
         BTAssert.notNull(insteadRecord, "没有找到对应的代录记录");
 
         String insteadItem = insteadRecord.getInsteadItem();
-        if (BetterStringUtils.equals(insteadItem, CustomerConstants.ITEM_MANAGER) == false) {
+        if (BetterStringUtils.equals(insteadItem, CustomerConstants.ITEM_CONTACTER) == false) {
             throw new BytterTradeException(20072, "代录项目不匹配！");
         }
 
@@ -614,7 +614,7 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
 
         CustChangeApply changeApply = changeApplyService.findChangeApply(anApplyId);
         String changeItem = changeApply.getChangeItem();
-        if (BetterStringUtils.equals(changeItem, CustomerConstants.ITEM_MANAGER) == false) {
+        if (BetterStringUtils.equals(changeItem, CustomerConstants.ITEM_CONTACTER) == false) {
             throw new BytterTradeException(20074, "变更项目不匹配!");
         }
 

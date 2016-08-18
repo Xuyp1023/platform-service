@@ -78,7 +78,7 @@ public class CustMechContacterDubboService implements ICustMechContacterService 
 
     @Override
     public String webDeleteChangeContacterTmp(Long anRefId) {
-        return newOk("公司联系人-流水信息 变更删除成功", contacterTmpService.saveDelChangeContacterTmp(anRefId)).toJson();
+        return newOk("公司联系人-流水信息 变更删除成功", contacterTmpService.saveDeleteChangeContacterTmp(anRefId)).toJson();
     }
 
     @Override
@@ -108,14 +108,14 @@ public class CustMechContacterDubboService implements ICustMechContacterService 
 
     @Override
     public String webQueryChangeApply(Long anCustNo, int anFlag, int anPageNum, int anPageSize) {
-        final Page<CustChangeApply> changeApplys = changeService.queryChangeApply(anCustNo, CustomerConstants.ITEM_MANAGER, anFlag, anPageNum,
+        final Page<CustChangeApply> changeApplys = changeService.queryChangeApply(anCustNo, CustomerConstants.ITEM_CONTACTER, anFlag, anPageNum,
                 anPageSize);
         return newOkWithPage("联系人信息-变更列表查询 成功", changeApplys).toJson();
     }
 
     @Override
     public String webFindChangeApply(Long anApplyId, Long anTmpId) {
-        final CustChangeApply changeApply = changeService.findChangeApply(anApplyId, CustomerConstants.ITEM_MANAGER);
+        final CustChangeApply changeApply = changeService.findChangeApply(anApplyId, CustomerConstants.ITEM_CONTACTER);
 
         final CustMechContacterTmp nowData = contacterTmpService.findCustMechContacterTmp(anTmpId);
         final CustMechContacterTmp befData = contacterTmpService.findCustMechContacterTmpPrevVersion(nowData);
