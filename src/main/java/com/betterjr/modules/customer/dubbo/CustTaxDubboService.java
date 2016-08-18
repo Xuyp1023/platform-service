@@ -52,5 +52,10 @@ public class CustTaxDubboService implements ICustTaxService {
         anCustTaxRecord.setBatchNo(custFileItemService.updateCustFileItemInfo(anFileList, anCustTaxRecord.getBatchNo()));
         return AjaxObject.newOk(custTaxRecordService.saveCustTaxRecord(anCustTaxRecord, anId)).toJson();
     }
+    
+    @Override
+    public String webSaveDeleteCustTaxRecord(Long anId) {
+        return  AjaxObject.newOk("纳税信息删除成功", custTaxRecordService.saveDeleteCustTaxRecorde(anId)).toJson();
+    }
 
 }

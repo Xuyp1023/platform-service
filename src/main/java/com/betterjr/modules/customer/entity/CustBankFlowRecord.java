@@ -9,9 +9,11 @@ import javax.persistence.Table;
 
 import com.betterjr.common.annotation.MetaData;
 import com.betterjr.common.entity.BetterjrEntity;
+import com.betterjr.common.mapper.CustDateJsonSerializer;
 import com.betterjr.common.selectkey.SerialGenerator;
 import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.UserUtils;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @Access(AccessType.FIELD)
 @Entity
@@ -37,6 +39,7 @@ public class CustBankFlowRecord implements BetterjrEntity {
      */
     @Column(name = "D_START_DATE",  columnDefinition="VARCHAR" )
     @MetaData( value="数据开始时间", comments = "数据开始时间")
+    @JsonSerialize(using = CustDateJsonSerializer.class)
     private String startDate;
 
     /**
@@ -44,6 +47,7 @@ public class CustBankFlowRecord implements BetterjrEntity {
      */
     @Column(name = "D_END_DATE",  columnDefinition="VARCHAR" )
     @MetaData( value="数据结束时间", comments = "数据结束时间")
+    @JsonSerialize(using = CustDateJsonSerializer.class)
     private String endDate;
 
     /**
@@ -72,6 +76,7 @@ public class CustBankFlowRecord implements BetterjrEntity {
      */
     @Column(name = "D_REG_DATE",  columnDefinition="VARCHAR" )
     @MetaData( value="创建日期", comments = "创建日期")
+    @JsonSerialize(using = CustDateJsonSerializer.class)
     private String regDate;
 
     /**
@@ -100,6 +105,7 @@ public class CustBankFlowRecord implements BetterjrEntity {
      */
     @Column(name = "D_MODI_DATE",  columnDefinition="VARCHAR" )
     @MetaData( value="修改日期", comments = "修改日期")
+    @JsonSerialize(using = CustDateJsonSerializer.class)
     private String modiDate;
 
     /**

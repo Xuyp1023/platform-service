@@ -73,4 +73,12 @@ public class CustMechFinanceRecordService extends BaseService<CustMechFinanceRec
         this.updateByPrimaryKeySelective(tempCustMechFinanceRecord);
         return tempCustMechFinanceRecord;
     }
+    
+    /**
+     * 删除财务上传信息
+     */
+    public int saveDeleteCustMechFinanceRecord(Long anId) {
+        BTAssert.notNull(anId, "财务上传记录编号不允许为空！");
+        return this.deleteByPrimaryKey(anId);
+    }
 }
