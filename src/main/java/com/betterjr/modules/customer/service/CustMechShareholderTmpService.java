@@ -123,7 +123,7 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
     /**
      * 添加删除变更记录
      */
-    public CustMechShareholderTmp saveDelChangeShareholderTmp(Long anRefId) {
+    public CustMechShareholderTmp saveDeleteChangeShareholderTmp(Long anRefId) {
         BTAssert.notNull(anRefId, "公司股东号不允许为空！");
 
         CustMechShareholder shareholder = shareholderService.findCustMechShareholder(anRefId);
@@ -476,7 +476,7 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
             return addShareholderTmp(shareholderTmp, CustomerConstants.TMP_TYPE_INSTEAD);
         }
         else {
-            shareholderTmp.initAddValue(shareholder, CustomerConstants.TMP_STATUS_NEW);
+            shareholderTmp.initModifyValue(shareholder, CustomerConstants.TMP_STATUS_NEW);
             shareholderTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_DELETE);
             return saveShareholderTmp(shareholderTmp, shareholderTmp.getId());
         }

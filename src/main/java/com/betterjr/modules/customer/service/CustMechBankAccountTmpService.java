@@ -120,7 +120,7 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
     /**
      * 添加删除变更记录
      */
-    public CustMechBankAccountTmp saveDelChangeBankAccountTmp(Long anRefId) {
+    public CustMechBankAccountTmp saveDeleteChangeBankAccountTmp(Long anRefId) {
         BTAssert.notNull(anRefId, "公司银行账户号不允许为空！");
 
         CustMechBankAccount bankAccount = bankAccountService.findCustMechBankAccount(anRefId);
@@ -470,7 +470,7 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
             return addBankAccountTmp(bankAccountTmp, CustomerConstants.TMP_TYPE_INSTEAD);
         }
         else {
-            bankAccountTmp.initAddValue(bankAccount, CustomerConstants.TMP_STATUS_NEW);
+            bankAccountTmp.initModifyValue(bankAccount, CustomerConstants.TMP_STATUS_NEW);
             bankAccountTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_DELETE);
             return saveBankAccountTmp(bankAccountTmp, bankAccountTmp.getId());
         }

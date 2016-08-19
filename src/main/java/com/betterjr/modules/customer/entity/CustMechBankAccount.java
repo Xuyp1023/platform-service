@@ -12,6 +12,7 @@ import com.betterjr.common.entity.BetterjrEntity;
 import com.betterjr.common.selectkey.SerialGenerator;
 import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.UserUtils;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Access(AccessType.FIELD)
 @Entity
@@ -28,6 +29,7 @@ public class CustMechBankAccount implements BetterjrEntity {
     /**
      * 数据版本号
      */
+    @JsonIgnore
     @Column(name = "N_VERSION", columnDefinition = "INTEGER")
     @MetaData(value = "数据版本号", comments = "数据版本号")
     private Long version;
@@ -42,6 +44,7 @@ public class CustMechBankAccount implements BetterjrEntity {
     /**
      * 交易账户
      */
+    @JsonIgnore
     @Column(name = "C_TRADE_ACCO", columnDefinition = "VARCHAR")
     @MetaData(value = "交易账户", comments = "交易账户")
     private String tradeAcco;
@@ -77,6 +80,7 @@ public class CustMechBankAccount implements BetterjrEntity {
     /**
      * 联行号
      */
+    @JsonIgnore
     @Column(name = "C_BANK_BRANCH", columnDefinition = "VARCHAR")
     @MetaData(value = "联行号", comments = "联行号")
     private String bankBranch;
@@ -84,6 +88,7 @@ public class CustMechBankAccount implements BetterjrEntity {
     /**
      * 网点编码
      */
+    @JsonIgnore
     @Column(name = "C_NET_NO", columnDefinition = "VARCHAR")
     @MetaData(value = "网点编码", comments = "网点编码")
     private String netNo;
@@ -91,6 +96,7 @@ public class CustMechBankAccount implements BetterjrEntity {
     /**
      * 分中心
      */
+    @JsonIgnore
     @Column(name = "C_PAY_CENTER", columnDefinition = "VARCHAR")
     @MetaData(value = "分中心", comments = "分中心")
     private String payCenter;
@@ -98,6 +104,7 @@ public class CustMechBankAccount implements BetterjrEntity {
     /**
      * 冻结截止日期
      */
+    @JsonIgnore
     @Column(name = "D_END_FROZEN_DATE", columnDefinition = "VARCHAR")
     @MetaData(value = "冻结截止日期", comments = "冻结截止日期")
     private String endFrozenDate;
@@ -105,6 +112,7 @@ public class CustMechBankAccount implements BetterjrEntity {
     /**
      * 签约协议号
      */
+    @JsonIgnore
     @Column(name = "C_CONTRACT_NO", columnDefinition = "VARCHAR")
     @MetaData(value = "签约协议号", comments = "签约协议号")
     private String contractNo;
@@ -112,6 +120,7 @@ public class CustMechBankAccount implements BetterjrEntity {
     /**
      * 鉴权标志(0 未鉴权，1 已鉴权)
      */
+    @JsonIgnore
     @Column(name = "C_AUTH_STATUS", columnDefinition = "CHAR")
     @MetaData(value = "鉴权标志(0 未鉴权", comments = "鉴权标志(0 未鉴权，1 已鉴权)")
     private String authStatus;
@@ -119,6 +128,7 @@ public class CustMechBankAccount implements BetterjrEntity {
     /**
      * 签约状态
      */
+    @JsonIgnore
     @Column(name = "C_SIGN_STATUS", columnDefinition = "CHAR")
     @MetaData(value = "签约状态", comments = "签约状态")
     private String signStatus;
@@ -126,6 +136,7 @@ public class CustMechBankAccount implements BetterjrEntity {
     /**
      * 客户在银行证件类型
      */
+    @JsonIgnore
     @Column(name = "C_IDENTTYPE", columnDefinition = "CHAR")
     @MetaData(value = "客户在银行证件类型", comments = "客户在银行证件类型")
     private String identType;
@@ -133,6 +144,7 @@ public class CustMechBankAccount implements BetterjrEntity {
     /**
      * 客户在银行的证件号码，主要解决15位18位身份证的问题
      */
+    @JsonIgnore
     @Column(name = "C_IDENTNO", columnDefinition = "VARCHAR")
     @MetaData(value = "客户在银行的证件号码", comments = "客户在银行的证件号码，主要解决15位18位身份证的问题")
     private String identNo;
@@ -140,6 +152,7 @@ public class CustMechBankAccount implements BetterjrEntity {
     /**
      * 特殊控制标志
      */
+    @JsonIgnore
     @Column(name = "C_FLAG", columnDefinition = "VARCHAR")
     @MetaData(value = "特殊控制标志", comments = "特殊控制标志")
     private String flag;
@@ -147,6 +160,7 @@ public class CustMechBankAccount implements BetterjrEntity {
     /**
      * 旧卡信息
      */
+    @JsonIgnore
     @Column(name = "C_BAKUP_ACCO", columnDefinition = "VARCHAR")
     @MetaData(value = "旧卡信息", comments = "旧卡信息")
     private String bakupAcco;
@@ -154,6 +168,7 @@ public class CustMechBankAccount implements BetterjrEntity {
     /**
      * 区/县名称
      */
+    @JsonIgnore    
     @Column(name = "C_COUNTY_NAME", columnDefinition = "VARCHAR")
     @MetaData(value = "区/县名称", comments = "区/县名称")
     private String countyName;
@@ -161,6 +176,7 @@ public class CustMechBankAccount implements BetterjrEntity {
     /**
      * 城市地区名称
      */
+    @JsonIgnore
     @Column(name = "C_CITY_NAME", columnDefinition = "VARCHAR")
     @MetaData(value = "城市地区名称", comments = "城市地区名称")
     private String cityName;
@@ -175,6 +191,7 @@ public class CustMechBankAccount implements BetterjrEntity {
     /**
      * 创建人(操作员)ID号
      */
+    @JsonIgnore
     @Column(name = "L_REG_OPERID", columnDefinition = "INTEGER")
     @MetaData(value = "创建人(操作员)ID号", comments = "创建人(操作员)ID号")
     private Long regOperId;
@@ -182,6 +199,7 @@ public class CustMechBankAccount implements BetterjrEntity {
     /**
      * 创建人(操作员)姓名
      */
+    @JsonIgnore
     @Column(name = "C_REG_OPERNAME", columnDefinition = "VARCHAR")
     @MetaData(value = "创建人(操作员)姓名", comments = "创建人(操作员)姓名")
     private String regOperName;
@@ -189,6 +207,7 @@ public class CustMechBankAccount implements BetterjrEntity {
     /**
      * 创建日期
      */
+    @JsonIgnore
     @Column(name = "D_REG_DATE", columnDefinition = "VARCHAR")
     @MetaData(value = "创建日期", comments = "创建日期")
     private String regDate;
@@ -196,6 +215,7 @@ public class CustMechBankAccount implements BetterjrEntity {
     /**
      * 创建时间
      */
+    @JsonIgnore
     @Column(name = "T_REG_TIME", columnDefinition = "VARCHAR")
     @MetaData(value = "创建时间", comments = "创建时间")
     private String regTime;
@@ -203,6 +223,7 @@ public class CustMechBankAccount implements BetterjrEntity {
     /**
      * 修改人(操作员)ID号
      */
+    @JsonIgnore
     @Column(name = "L_MODI_OPERID", columnDefinition = "INTEGER")
     @MetaData(value = "修改人(操作员)ID号", comments = "修改人(操作员)ID号")
     private Long modiOperId;
@@ -210,6 +231,7 @@ public class CustMechBankAccount implements BetterjrEntity {
     /**
      * 修改人(操作员)姓名
      */
+    @JsonIgnore
     @Column(name = "C_MODI_OPERNAME", columnDefinition = "VARCHAR")
     @MetaData(value = "修改人(操作员)姓名", comments = "修改人(操作员)姓名")
     private String modiOperName;
@@ -217,6 +239,7 @@ public class CustMechBankAccount implements BetterjrEntity {
     /**
      * 修改日期
      */
+    @JsonIgnore
     @Column(name = "D_MODI_DATE", columnDefinition = "VARCHAR")
     @MetaData(value = "修改日期", comments = "修改日期")
     private String modiDate;
@@ -224,6 +247,7 @@ public class CustMechBankAccount implements BetterjrEntity {
     /**
      * 修改时间
      */
+    @JsonIgnore
     @Column(name = "T_MODI_TIME", columnDefinition = "VARCHAR")
     @MetaData(value = "修改时间", comments = "修改时间")
     private String modiTime;
@@ -231,6 +255,7 @@ public class CustMechBankAccount implements BetterjrEntity {
     /**
      * 操作机构
      */
+    @JsonIgnore
     @Column(name = "C_OPERORG", columnDefinition = "VARCHAR")
     @MetaData(value = "操作机构", comments = "操作机构")
     private String operOrg;
@@ -242,10 +267,12 @@ public class CustMechBankAccount implements BetterjrEntity {
     @MetaData(value = "账户状态（0 正常  1 销户中  2 销户", comments = "账户状态（0 正常  1 销户中  2 销户，3冻结，4待复核）")
     private String accoStatus;
 
+    
     @Column(name = "C_BUSIN_STATUS", columnDefinition = "CHAR")
     @MetaData(value = "", comments = "")
     private String businStatus;
 
+    @JsonIgnore
     @Column(name = "C_LAST_STATUS", columnDefinition = "CHAR")
     @MetaData(value = "", comments = "")
     private String lastStatus;
@@ -731,16 +758,30 @@ public class CustMechBankAccount implements BetterjrEntity {
         this.identType = anBankAccountTmp.getIdentType();
         this.identNo = anBankAccountTmp.getIdentNo();
         this.batchNo = anBankAccountTmp.getBatchNo();
+        this.bankAcco = anBankAccountTmp.getBankAcco();
+        this.bankAccoName = anBankAccountTmp.getBankAccoName();
+        this.bankNo = anBankAccountTmp.getBankNo();
+        this.bankName = anBankAccountTmp.getBankName();
+        this.isDefault = anBankAccountTmp.getIsDefault();
+        this.cityNo = anBankAccountTmp.getCityNo();
                                                                 
         this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
         this.businStatus = "0";
     }
 
-    public void initModifyValue(final CustMechBankAccount anCustMechBankAccount) {
-        this.custNo = anCustMechBankAccount.getCustNo();
-        this.identType = anCustMechBankAccount.getIdentType();
-        this.identNo = anCustMechBankAccount.getIdentNo();
-        this.batchNo = anCustMechBankAccount.getBatchNo();
+    public void initModifyValue(final CustMechBankAccount anBankAccount) {
+        this.custNo = anBankAccount.getCustNo();
+        this.identType = anBankAccount.getIdentType();
+        this.identNo = anBankAccount.getIdentNo();
+        this.batchNo = anBankAccount.getBatchNo();
+        
+        this.batchNo = anBankAccount.getBatchNo();
+        this.bankAcco = anBankAccount.getBankAcco();
+        this.bankAccoName = anBankAccount.getBankAccoName();
+        this.bankNo = anBankAccount.getBankNo();
+        this.bankName = anBankAccount.getBankName();
+        this.isDefault = anBankAccount.getIsDefault();
+        this.cityNo = anBankAccount.getCityNo();
         
         this.modiOperId = UserUtils.getOperatorInfo().getId();
         this.modiOperName = UserUtils.getOperatorInfo().getName();
@@ -753,6 +794,12 @@ public class CustMechBankAccount implements BetterjrEntity {
         this.identType = anBankAccountTmp.getIdentType();
         this.identNo = anBankAccountTmp.getIdentNo();
         this.batchNo = anBankAccountTmp.getBatchNo();
+        this.bankAcco = anBankAccountTmp.getBankAcco();
+        this.bankAccoName = anBankAccountTmp.getBankAccoName();
+        this.bankNo = anBankAccountTmp.getBankNo();
+        this.bankName = anBankAccountTmp.getBankName();
+        this.isDefault = anBankAccountTmp.getIsDefault();
+        this.cityNo = anBankAccountTmp.getCityNo();
         
         this.modiOperId = UserUtils.getOperatorInfo().getId();
         this.modiOperName = UserUtils.getOperatorInfo().getName();

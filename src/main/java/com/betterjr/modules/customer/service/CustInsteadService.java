@@ -267,8 +267,7 @@ public class CustInsteadService {
     public CustInsteadApply saveCancelInsteadApply(Long anId, String anReason) {
         BTAssert.notNull(anId, "代录申请编号不允许为空!");
 
-        checkInsteadApply(anId, CustomerConstants.INSTEAD_APPLY_STATUS_REVIEW_PASS,
-                CustomerConstants.INSTEAD_APPLY_STATUS_NEW);
+        checkInsteadApply(anId);
 
         List<CustInsteadRecord> insteadRecords = insteadRecordService.selectByProperty("applyId", anId);
 

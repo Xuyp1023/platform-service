@@ -80,7 +80,7 @@ public class CustMechManagerDubboService implements ICustMechManagerService {
 
     @Override
     public String webDeleteChangeManagerTmp(Long anRefId) {
-        return newOk("公司高管-流水信息 变更删除成功", managerTmpService.saveDelChangeManagerTmp(anRefId)).toJson();
+        return newOk("公司高管-流水信息 变更删除成功", managerTmpService.saveDeleteChangeManagerTmp(anRefId)).toJson();
     }
 
     @Override

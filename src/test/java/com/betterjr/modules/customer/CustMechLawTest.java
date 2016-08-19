@@ -1,9 +1,10 @@
-package com.betterjr.modules;
+package com.betterjr.modules.customer;
 
 import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 
+import com.betterjr.modules.BasicServiceTest;
 import com.betterjr.modules.customer.entity.CustMechLawTmp;
 import com.betterjr.modules.customer.service.CustMechLawTmpService;
 
