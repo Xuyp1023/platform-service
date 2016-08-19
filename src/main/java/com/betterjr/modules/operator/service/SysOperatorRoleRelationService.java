@@ -75,4 +75,14 @@ public class SysOperatorRoleRelationService extends BaseService<SysOperatorRoleR
        }
     }
     
+    /***
+     * 根据角色删除关系表
+     * @param anRoleId
+     * @param anRoleName
+     * @return
+     */
+    public boolean delSysOperatorRole(Long anRoleId){
+        return this.deleteByProperty("roleId", anRoleId)>0;
+    }
+    
 }

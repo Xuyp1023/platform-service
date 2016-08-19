@@ -50,13 +50,23 @@ public class OperatorDubboService implements IOperatorService {
         return AjaxObject.newOkWithPage("操作员分页查询", operatorRequestService.queryCustOperator(anMap, anPageNum, anPageSize)).toJson();
     }
     
+
     /****
-     * 获取菜单信息
+     * 获取左侧菜单信息
      * @param menuId
      * @return
      */
-    public String webFindSysMenuByMenuId(Integer anMenuId,String anRoleName){
-        return AjaxObject.newOk("获取菜单信息",manuManagerService.findSysMenuByMenuId(anMenuId,anRoleName)).toJson();
+    public String webFindSysMenuByMenuId(Integer anMenuId){
+        return AjaxObject.newOk("获取菜单信息",manuManagerService.findSysMenuByMenuId(anMenuId)).toJson();
+    }
+    
+    /****
+     * 根据角色获取菜单信息
+     * @param menuId
+     * @return
+     */
+    public String webFindSysMenuByMenuRole(String anRoleName){
+        return AjaxObject.newOk("获取菜单信息",manuManagerService.findSysMenuByRoleMenu(anRoleName)).toJson();
     }
 
     /****
@@ -77,5 +87,15 @@ public class OperatorDubboService implements IOperatorService {
     public String webAddMenuRole(String anRoleId,String anRoleName,String anMenuIdArr){
         manuManagerService.addMenuRole(anRoleId,anRoleName,anMenuIdArr);
         return AjaxObject.newOk("成功绑定菜单角色信息").toJson();
+    }
+    
+    /***
+     * 查询操作员
+     * @param operatorId
+     * @return
+     */
+    public String webFindOperatorById(Long operatorId){
+        
+        return AjaxObject.newOk("查询操作员",operatorRequestService.findOperatorById(operatorId)).toJson();
     }
 }

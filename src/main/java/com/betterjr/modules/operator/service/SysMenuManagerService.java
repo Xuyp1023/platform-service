@@ -41,9 +41,21 @@ public class SysMenuManagerService {
      *            父菜单编号
      * @return
      */
-    public List findSysMenuByMenuId(Integer anMenuId,String anRoleName) {
-        List<String> menuIds = sysMenuRuleService.findAllByRuleAndMenu(findRoleByOperator(anRoleName), anMenuId);
+    public List findSysMenuByMenuId(Integer anMenuId) {
+        List<String> menuIds = sysMenuRuleService.findAllByRuleAndMenu(findRoleByOperator(""), anMenuId);
         return sysMenuService.findMenuList(menuIds);
+    }
+    
+    /**
+     * 根据选择的角色获取菜单信息
+     * 
+     * @param anMenuId
+     *            父菜单编号
+     * @return
+     */
+    public List findSysMenuByRoleMenu(String anRoleName) {
+        List<String> menuIds = sysMenuRuleService.findAllByRuleAndMenu(findRoleByOperator(anRoleName), 0);
+        return sysMenuService.findAllMenuList(menuIds);
     }
     
     /****
@@ -55,15 +67,9 @@ public class SysMenuManagerService {
         if(BetterStringUtils.isNotBlank(anRoleName)){
             tmpList.add(anRoleName);
         }else{
-            if (UserUtils.isBytterUser()){
-                tmpList.add("BYTTER_USER");
-            }
-            else {
-                CustOperatorInfo operator=UserUtils.getOperatorInfo();
-                String[] arrRule = BetterStringUtils.split(operatorRoleRelationService.findSysRoleByOperatorId(operator.getId()), ";|,");
-                tmpList=Arrays.asList(arrRule);
-                
-            } 
+            CustOperatorInfo operator=UserUtils.getOperatorInfo();
+            String[] arrRule = BetterStringUtils.split(operatorRoleRelationService.findSysRoleByOperatorId(operator.getId()), ";|,");
+            tmpList=Arrays.asList(arrRule);
         }
         logger.info("this worker Rule is :" + tmpList);
         return tmpList;
