@@ -806,6 +806,12 @@ public class CustMechBankAccountTmp implements BetterjrEntity {
         this.identType = anBankAccount.getIdentType();
         this.identNo = anBankAccount.getIdentNo();
         this.batchNo = anBankAccount.getBatchNo();
+        this.bankAcco = anBankAccount.getBankAcco();
+        this.bankAccoName = anBankAccount.getBankAccoName();
+        this.bankNo = anBankAccount.getBankNo();
+        this.bankName = anBankAccount.getBankName();
+        this.isDefault = anBankAccount.getIsDefault();
+        this.cityNo = anBankAccount.getCityNo();
     }
     
     public void initAddValue(String anBusinStatus, String anTmpType, Long anVersion) {
@@ -828,16 +834,24 @@ public class CustMechBankAccountTmp implements BetterjrEntity {
         this.tmpType = anTmpType;
     }
     
-    public void initModifyValue(final CustMechBankAccountTmp anCustMechBankAccountTmp) {
+    public void initModifyValue(final CustMechBankAccountTmp anBankAccountTmp) {
         this.modiOperId = UserUtils.getOperatorInfo().getId();
         this.modiOperName = UserUtils.getOperatorInfo().getName();
         this.modiDate = BetterDateUtils.getNumDate();
         this.modiTime = BetterDateUtils.getNumTime();
 
-        this.identType = anCustMechBankAccountTmp.getIdentType();
-        this.identNo = anCustMechBankAccountTmp.getIdentNo();
-        this.batchNo = anCustMechBankAccountTmp.getBatchNo();
+        this.identType = anBankAccountTmp.getIdentType();
+        this.identNo = anBankAccountTmp.getIdentNo();
+        this.batchNo = anBankAccountTmp.getBatchNo();
+        this.bankAcco = anBankAccountTmp.getBankAcco();
+        this.bankAccoName = anBankAccountTmp.getBankAccoName();
+        this.bankNo = anBankAccountTmp.getBankNo();
+        this.bankName = anBankAccountTmp.getBankName();
+        this.isDefault = anBankAccountTmp.getIsDefault();
+        this.cityNo = anBankAccountTmp.getCityNo();
         
+        this.tmpOperType = anBankAccountTmp.getTmpOperType();
+        this.tmpType = anBankAccountTmp.getTmpType();
     }
 
     public void initModifyValue(CustMechBankAccountTmp anCustMechBankAccountTmp, String anBusinStatus, Long anVersion) {
@@ -856,6 +870,12 @@ public class CustMechBankAccountTmp implements BetterjrEntity {
         this.identType = anBankAccount.getIdentType();
         this.identNo = anBankAccount.getIdentNo();
         this.batchNo = anBankAccount.getBatchNo();        
+        this.bankAcco = anBankAccount.getBankAcco();
+        this.bankAccoName = anBankAccount.getBankAccoName();
+        this.bankNo = anBankAccount.getBankNo();
+        this.bankName = anBankAccount.getBankName();
+        this.isDefault = anBankAccount.getIsDefault();
+        this.cityNo = anBankAccount.getCityNo();
         
         this.businStatus = anBusinStatus;
     }

@@ -758,16 +758,30 @@ public class CustMechBankAccount implements BetterjrEntity {
         this.identType = anBankAccountTmp.getIdentType();
         this.identNo = anBankAccountTmp.getIdentNo();
         this.batchNo = anBankAccountTmp.getBatchNo();
+        this.bankAcco = anBankAccountTmp.getBankAcco();
+        this.bankAccoName = anBankAccountTmp.getBankAccoName();
+        this.bankNo = anBankAccountTmp.getBankNo();
+        this.bankName = anBankAccountTmp.getBankName();
+        this.isDefault = anBankAccountTmp.getIsDefault();
+        this.cityNo = anBankAccountTmp.getCityNo();
                                                                 
         this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
         this.businStatus = "0";
     }
 
-    public void initModifyValue(final CustMechBankAccount anCustMechBankAccount) {
-        this.custNo = anCustMechBankAccount.getCustNo();
-        this.identType = anCustMechBankAccount.getIdentType();
-        this.identNo = anCustMechBankAccount.getIdentNo();
-        this.batchNo = anCustMechBankAccount.getBatchNo();
+    public void initModifyValue(final CustMechBankAccount anBankAccount) {
+        this.custNo = anBankAccount.getCustNo();
+        this.identType = anBankAccount.getIdentType();
+        this.identNo = anBankAccount.getIdentNo();
+        this.batchNo = anBankAccount.getBatchNo();
+        
+        this.batchNo = anBankAccount.getBatchNo();
+        this.bankAcco = anBankAccount.getBankAcco();
+        this.bankAccoName = anBankAccount.getBankAccoName();
+        this.bankNo = anBankAccount.getBankNo();
+        this.bankName = anBankAccount.getBankName();
+        this.isDefault = anBankAccount.getIsDefault();
+        this.cityNo = anBankAccount.getCityNo();
         
         this.modiOperId = UserUtils.getOperatorInfo().getId();
         this.modiOperName = UserUtils.getOperatorInfo().getName();
@@ -780,6 +794,12 @@ public class CustMechBankAccount implements BetterjrEntity {
         this.identType = anBankAccountTmp.getIdentType();
         this.identNo = anBankAccountTmp.getIdentNo();
         this.batchNo = anBankAccountTmp.getBatchNo();
+        this.bankAcco = anBankAccountTmp.getBankAcco();
+        this.bankAccoName = anBankAccountTmp.getBankAccoName();
+        this.bankNo = anBankAccountTmp.getBankNo();
+        this.bankName = anBankAccountTmp.getBankName();
+        this.isDefault = anBankAccountTmp.getIsDefault();
+        this.cityNo = anBankAccountTmp.getCityNo();
         
         this.modiOperId = UserUtils.getOperatorInfo().getId();
         this.modiOperName = UserUtils.getOperatorInfo().getName();
