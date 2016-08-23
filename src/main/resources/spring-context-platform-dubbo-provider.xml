@@ -38,13 +38,12 @@
 		p:value-serializer-ref="stringRedisSerializer" p:hash-value-serializer-ref="stringRedisSerializer" 
 		p:connection-factory-ref="jedisConnectionFactory"/> -->
 
-	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	<bean class="com.betterjr.common.config.BetterPropertyPlaceholderConfigurer">
 		<property name="fileEncoding" value="UTF-8" />
-		<property name="locations">
+		<property name="betterLocations">
 			<list>
-				<value>classpath:config-dev.properties</value>
+				<value>platform-service-config.properties</value>
 			</list>
-			<!-- 请保持配置文件顺序 -->
 		</property>
 	</bean>
 
