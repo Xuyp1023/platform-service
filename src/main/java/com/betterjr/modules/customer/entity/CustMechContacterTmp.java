@@ -525,6 +525,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
         this.phone = anContacter.getPhone();
         this.address = anContacter.getAddress();
         this.email = anContacter.getEmail();
+        this.batchNo = anContacter.getBatchNo();
     }
 
     public void initAddValue(String anBusinStatus, String anTmpType, Long anVersion) {

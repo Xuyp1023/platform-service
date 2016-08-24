@@ -20,7 +20,7 @@ import com.betterjr.modules.document.service.CustFileItemService;
 public class CustBankFlowRecordService extends BaseService<CustBankFlowRecordMapper, CustBankFlowRecord> {
 
     @Autowired
-    private CustFileItemService custFileItemService;
+    private CustFileItemService fileItemService;
     
     /**
      * 查询银行流水上传记录列表
@@ -46,16 +46,16 @@ public class CustBankFlowRecordService extends BaseService<CustBankFlowRecordMap
     /**
      * 添加银行流水上传记录信息
      * 
-     * @param anCustBankFlowRecord
+     * @param anBankFlowRecord
      * @return
      */
-    public CustBankFlowRecord addCustBankFlowRecord(CustBankFlowRecord anCustBankFlowRecord, String anFileList) {
-        BTAssert.notNull(anCustBankFlowRecord, "银行流水上传记录信息不允许为空！");
+    public CustBankFlowRecord addCustBankFlowRecord(CustBankFlowRecord anBankFlowRecord, String anFileList) {
+        BTAssert.notNull(anBankFlowRecord, "银行流水上传记录信息不允许为空！");
         BTAssert.notNull(anFileList, "银行流水上传文件不允许为空！");
-        anCustBankFlowRecord.initAddValue();
-        anCustBankFlowRecord.setBatchNo(custFileItemService.updateCustFileItemInfo(anFileList, anCustBankFlowRecord.getBatchNo()));
-        this.insert(anCustBankFlowRecord);
-        return anCustBankFlowRecord;
+        anBankFlowRecord.initAddValue();
+        anBankFlowRecord.setBatchNo(fileItemService.updateCustFileItemInfo(anFileList, anBankFlowRecord.getBatchNo()));
+        this.insert(anBankFlowRecord);
+        return anBankFlowRecord;
     }
     
     /**

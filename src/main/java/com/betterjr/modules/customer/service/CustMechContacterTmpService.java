@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.exception.BytterTradeException;
@@ -27,6 +28,7 @@ import com.betterjr.modules.customer.entity.CustMechContacter;
 import com.betterjr.modules.customer.entity.CustMechContacterTmp;
 import com.betterjr.modules.customer.helper.IFormalDataService;
 import com.betterjr.modules.customer.helper.VersionHelper;
+import com.betterjr.modules.document.service.CustFileItemService;
 
 /**
  * 
@@ -35,6 +37,8 @@ import com.betterjr.modules.customer.helper.VersionHelper;
  */
 @Service
 public class CustMechContacterTmpService extends BaseService<CustMechContacterTmpMapper, CustMechContacterTmp> implements IFormalDataService {
+    private static final Pattern COMMA_PATTERN = Pattern.compile(",");
+    
     @Resource
     private CustMechContacterService contacterService;
 
@@ -44,10 +48,13 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
     @Resource
     private CustChangeApplyService changeApplyService;
 
+    @Autowired
+    private CustFileItemService fileItemService;
+
     /**
      * 查询公司联系人流水信息
      */
-    public CustMechContacterTmp findCustMechContacterTmp(Long anId) {
+    public CustMechContacterTmp findContacterTmp(Long anId) {
         BTAssert.notNull(anId, "公司联系人流水信息编号不允许为空！");
 
         final CustMechContacterTmp contacterTmp = this.selectByPrimaryKey(anId);
@@ -58,7 +65,7 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
     /**
      * 取上一版
      */
-    public CustMechContacterTmp findCustMechContacterTmpPrevVersion(CustMechContacterTmp anContacterTmp) {
+    public CustMechContacterTmp findContacterTmpPrevVersion(CustMechContacterTmp anContacterTmp) {
         Long custNo = anContacterTmp.getCustNo();
         Long refId = anContacterTmp.getRefId();
         Long version = anContacterTmp.getVersion();
@@ -76,44 +83,47 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
     /**
      * 添加新增变更流水记录
      */
-    public CustMechContacterTmp addChangeContacterTmp(CustMechContacterTmp anCustMechContacterTmp) {
-        BTAssert.notNull(anCustMechContacterTmp, "公司联系人流水信息不允许为空！");
+    public CustMechContacterTmp addChangeContacterTmp(CustMechContacterTmp anContacterTmp, String anFileList) {
+        BTAssert.notNull(anContacterTmp, "公司联系人流水信息不允许为空！");
 
-        final Long refId = anCustMechContacterTmp.getRefId();
+        final Long refId = anContacterTmp.getRefId();
         BTAssert.isNull(refId, "引用编号不能有值!");
 
-        anCustMechContacterTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW);
-        anCustMechContacterTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_ADD);
+        anContacterTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW);
+        anContacterTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_ADD);
+        anContacterTmp.setBatchNo(fileItemService.updateCustFileItemInfo(anFileList, anContacterTmp.getBatchNo()));
 
-        return addContacterTmp(anCustMechContacterTmp, CustomerConstants.TMP_TYPE_CHANGE);
+        return addContacterTmp(anContacterTmp, CustomerConstants.TMP_TYPE_CHANGE);
     }
 
     /**
      * 添加修改变更记录
      */
-    public CustMechContacterTmp saveSaveChangeContacterTmp(CustMechContacterTmp anCustMechContacterTmp) {
-        BTAssert.notNull(anCustMechContacterTmp, "公司联系人流水信息不允许为空！");
+    public CustMechContacterTmp saveSaveChangeContacterTmp(CustMechContacterTmp anContacterTmp, String anFileList) {
+        BTAssert.notNull(anContacterTmp, "公司联系人流水信息不允许为空！");
 
-        final Long refId = anCustMechContacterTmp.getRefId();
+        final Long refId = anContacterTmp.getRefId();
         BTAssert.notNull(refId, "引用编号不允许为空!");
 
-        CustMechContacter contacter = contacterService.findCustMechContacter(refId);
+        CustMechContacter contacter = contacterService.findContacter(refId);
         BTAssert.notNull(contacter, "没有找到引用的记录!");
 
-        if (contacter.getCustNo().equals(anCustMechContacterTmp.getCustNo()) == false) {
+        if (contacter.getCustNo().equals(anContacterTmp.getCustNo()) == false) {
             throw new BytterTradeException("客户编号不匹配!");
         }
 
         CustMechContacterTmp tempContacterTmp = findContacterTmpByRefId(refId, CustomerConstants.TMP_TYPE_CHANGE);
         if (tempContacterTmp == null) {
-            anCustMechContacterTmp.setBusinStatus(CustomerConstants.TMP_STATUS_NEW);
-            anCustMechContacterTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
-            return addContacterTmp(anCustMechContacterTmp, CustomerConstants.TMP_TYPE_CHANGE);
+            anContacterTmp.setBusinStatus(CustomerConstants.TMP_STATUS_NEW);
+            anContacterTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
+            // TODO @@@@@@@@@ 需要处理
+            anContacterTmp.setBatchNo(fileItemService.updateCustFileItemInfo(anFileList, anContacterTmp.getBatchNo()));
+            return addContacterTmp(anContacterTmp, CustomerConstants.TMP_TYPE_CHANGE);
         }
         else {
-            tempContacterTmp.initModifyValue(anCustMechContacterTmp);
+            tempContacterTmp.initModifyValue(anContacterTmp);
             tempContacterTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
-            return saveContacterTmp(tempContacterTmp, tempContacterTmp.getId());
+            return saveContacterTmp(tempContacterTmp, tempContacterTmp.getId(), anFileList);
         }
     }
 
@@ -123,7 +133,7 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
     public CustMechContacterTmp saveDeleteChangeContacterTmp(Long anRefId) {
         BTAssert.notNull(anRefId, "公司联系人号不允许为空！");
 
-        CustMechContacter contacter = contacterService.findCustMechContacter(anRefId);
+        CustMechContacter contacter = contacterService.findContacter(anRefId);
         BTAssert.notNull(contacter, "没有找到引用的记录!");
 
         CustMechContacterTmp contacterTmp = findContacterTmpByRefId(anRefId, CustomerConstants.TMP_TYPE_CHANGE);
@@ -137,7 +147,7 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
         else {
             contacterTmp.initModifyValue(contacter, CustomerConstants.TMP_STATUS_NEW);
             contacterTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_DELETE);
-            return saveContacterTmp(contacterTmp, contacterTmp.getId());
+            return saveContacterTmp(contacterTmp, contacterTmp.getId(), null);
         }
     }
 
@@ -145,7 +155,7 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
      * 撤销变更记录
      */
     public int saveCancelChangeContacterTmp(Long anId) {
-        CustMechContacterTmp contacterTmp = this.findCustMechContacterTmp(anId);
+        CustMechContacterTmp contacterTmp = this.findContacterTmp(anId);
 
         Long tmpVersion = contacterTmp.getVersion();
         Long maxVersion = VersionHelper.generateVersion(this.mapper, contacterTmp.getCustNo());
@@ -168,11 +178,11 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
     /**
      * 加载变更列表中的流水列表
      */
-    public Collection<CustMechContacterTmp> queryCustMechContacterTmpByChangeApply(Long anApplyId) {
+    public Collection<CustMechContacterTmp> queryContacterTmpByChangeApply(Long anApplyId) {
         BTAssert.notNull(anApplyId, "公司编号不允许为空！");
         CustChangeApply changeApply = changeApplyService.findChangeApply(anApplyId);
 
-        long[] tmpIds = Pattern.compile(",").splitAsStream(changeApply.getTmpIds()).mapToLong(Long::valueOf).toArray();
+        long[] tmpIds = COMMA_PATTERN.splitAsStream(changeApply.getTmpIds()).mapToLong(Long::valueOf).toArray();
 
         Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put(CustomerConstants.ID, tmpIds);
@@ -202,7 +212,7 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
 
         String tempTmpIds = (String) anParam.get("tmpIds");
 
-        List<Long> tmpIds = Pattern.compile(",").splitAsStream(tempTmpIds).map(Long::valueOf).collect(Collectors.toList());
+        List<Long> tmpIds = COMMA_PATTERN.splitAsStream(tempTmpIds).map(Long::valueOf).collect(Collectors.toList());
 
         if (checkMatchNewChange(tmpIds, anCustNo) == false) {
             throw new BytterTradeException("代录编号列表不正确,请检查.");
@@ -268,7 +278,7 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
 
         String tempTmpIds = (String) anParam.get("tmpIds");
 
-        Pattern.compile(",").splitAsStream(tempTmpIds).map(Long::valueOf)
+        COMMA_PATTERN.splitAsStream(tempTmpIds).map(Long::valueOf)
                 .forEach(tmpId -> saveContacterTmpParentIdAndStatus(tmpId, anApplyId, CustomerConstants.TMP_STATUS_USEING));
 
         changeApplyService.saveChangeApply(anApplyId, tempTmpIds);
@@ -337,30 +347,35 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
     /**
      * 添加公司联系人流水信息
      */
-    public CustMechContacterTmp addContacterTmp(CustMechContacterTmp anCustMechContacterTmp, String anTmpType) {
-        BTAssert.notNull(anCustMechContacterTmp, "公司联系人流水信息不允许为空！");
-        Long custNo = anCustMechContacterTmp.getCustNo();
+    public CustMechContacterTmp addContacterTmp(CustMechContacterTmp anContacterTmp, String anTmpType) {
+        BTAssert.notNull(anContacterTmp, "公司联系人流水信息不允许为空！");
+        Long custNo = anContacterTmp.getCustNo();
         Long version = VersionHelper.generateVersion(this.mapper, custNo);
 
-        anCustMechContacterTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW, anTmpType, version);
-        this.insert(anCustMechContacterTmp);
-        return anCustMechContacterTmp;
+        anContacterTmp.setVersion(version);
+        anContacterTmp.setTmpType(anTmpType);
+        anContacterTmp.setBusinStatus(CustomerConstants.TMP_STATUS_NEW);
+        //anContacterTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW, anTmpType, version);
+        this.insert(anContacterTmp);
+        return anContacterTmp;
     }
 
     /**
      * 修改公司联系人流水信息
      */
-    public CustMechContacterTmp saveContacterTmp(CustMechContacterTmp anCustMechContacterTmp, Long anId) {
-        BTAssert.notNull(anCustMechContacterTmp, "公司联系人流水信息不允许为空！");
+    public CustMechContacterTmp saveContacterTmp(CustMechContacterTmp anContacterTmp, Long anId, String anFileList) {
+        BTAssert.notNull(anContacterTmp, "公司联系人流水信息不允许为空！");
         BTAssert.notNull(anId, "公司联系人流水编号不允许为空！");
 
-        CustMechContacterTmp tempCustMechContacterTmp = this.selectByPrimaryKey(anId);
+        CustMechContacterTmp tempContacterTmp = this.selectByPrimaryKey(anId);
+        BTAssert.notNull(tempContacterTmp, "没有找到相应联系人记录！");
+        tempContacterTmp.initModifyValue(anContacterTmp);
+        if (anFileList != null) {
+            tempContacterTmp.setBatchNo(fileItemService.updateCustFileItemInfo(anFileList, tempContacterTmp.getBatchNo()));
+        }
+        this.updateByPrimaryKeySelective(tempContacterTmp);
 
-        tempCustMechContacterTmp.initModifyValue(anCustMechContacterTmp);
-
-        this.updateByPrimaryKeySelective(tempCustMechContacterTmp);
-
-        return tempCustMechContacterTmp;
+        return tempContacterTmp;
     }
 
     /**
@@ -374,7 +389,6 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
         }
 
         contacterTmp.setBusinStatus(anBusinStatus);
-
         this.updateByPrimaryKeySelective(contacterTmp);
 
         return contacterTmp;
@@ -385,59 +399,67 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
      * 
      * @param anInsteadRecordId
      */
-    public CustMechContacterTmp addInsteadContacterTmp(CustMechContacterTmp anCustMechContacterTmp, Long anInsteadRecordId) {
-        BTAssert.notNull(anCustMechContacterTmp, "公司联系人流水信息不允许为空！");
+    public CustMechContacterTmp addInsteadContacterTmp(CustMechContacterTmp anContacterTmp, Long anInsteadRecordId, String anFileList) {
+        BTAssert.notNull(anContacterTmp, "公司联系人流水信息不允许为空！");
 
-        checkInsteadRecord(anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_NEW, CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN,
-                CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT, CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_REJECT);
+        checkInsteadRecord(anInsteadRecordId, 
+                CustomerConstants.INSTEAD_RECORD_STATUS_NEW, 
+                CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN,
+                CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT, 
+                CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_REJECT);
 
-        final Long refId = anCustMechContacterTmp.getRefId();
+        final Long refId = anContacterTmp.getRefId();
 
         CustInsteadRecord insteadRecord = checkInsteadRecord(anInsteadRecordId);
         BTAssert.isNull(refId, "引用编号需要为空!");
 
-        if (insteadRecord.getCustNo().equals(anCustMechContacterTmp.getCustNo()) == false) {
+        if (insteadRecord.getCustNo().equals(anContacterTmp.getCustNo()) == false) {
             throw new BytterTradeException("客户编号不匹配!");
         }
 
-        anCustMechContacterTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW);
-        anCustMechContacterTmp.setParentId(anInsteadRecordId);
-        anCustMechContacterTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_ADD);
-
-        return addContacterTmp(anCustMechContacterTmp, CustomerConstants.TMP_TYPE_INSTEAD);
+        anContacterTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW);
+        anContacterTmp.setParentId(anInsteadRecordId);
+        anContacterTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_ADD);
+        anContacterTmp.setBatchNo(fileItemService.updateCustFileItemInfo(anFileList, anContacterTmp.getBatchNo()));
+        return addContacterTmp(anContacterTmp, CustomerConstants.TMP_TYPE_INSTEAD);
     }
 
     /**
      * 添加修改代录流水
      */
-    public CustMechContacterTmp saveSaveInsteadContacterTmp(CustMechContacterTmp anCustMechContacterTmp, Long anInsteadRecordId) {
-        BTAssert.notNull(anCustMechContacterTmp, "公司联系人流水信息不允许为空！");
+    public CustMechContacterTmp saveSaveInsteadContacterTmp(CustMechContacterTmp anContacterTmp, Long anInsteadRecordId, String anFileList) {
+        BTAssert.notNull(anContacterTmp, "公司联系人流水信息不允许为空！");
 
-        CustInsteadRecord insteadRecord = checkInsteadRecord(anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_NEW,
-                CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN, CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT,
+        CustInsteadRecord insteadRecord = checkInsteadRecord(anInsteadRecordId, 
+                CustomerConstants.INSTEAD_RECORD_STATUS_NEW,
+                CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN, 
+                CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT,
                 CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_REJECT);
 
-        final Long refId = anCustMechContacterTmp.getRefId();
+        final Long refId = anContacterTmp.getRefId();
         BTAssert.notNull(refId, "引用编号不允许为空!");
 
-        CustMechContacter contacter = contacterService.findCustMechContacter(refId);
+        CustMechContacter contacter = contacterService.findContacter(refId);
         BTAssert.notNull(contacter, "没有找到引用的记录!");
 
-        if (insteadRecord.getCustNo().equals(anCustMechContacterTmp.getCustNo()) == false) {
+        if (insteadRecord.getCustNo().equals(anContacterTmp.getCustNo()) == false) {
             throw new BytterTradeException("客户编号不匹配!");
         }
 
         CustMechContacterTmp tempContacterTmp = findContacterTmpByRefId(refId, CustomerConstants.TMP_TYPE_INSTEAD);
         if (tempContacterTmp == null) {
-            anCustMechContacterTmp.setParentId(anInsteadRecordId);
-            anCustMechContacterTmp.setBusinStatus(CustomerConstants.TMP_STATUS_NEW);
-            anCustMechContacterTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
-            return addContacterTmp(anCustMechContacterTmp, CustomerConstants.TMP_TYPE_INSTEAD);
+            anContacterTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW);
+            anContacterTmp.setParentId(anInsteadRecordId);
+            anContacterTmp.setBusinStatus(CustomerConstants.TMP_STATUS_NEW);
+            anContacterTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
+            // TODO @@@@@@@@@@@@ 需要处理
+            anContacterTmp.setBatchNo(fileItemService.updateCustFileItemInfo(anFileList, anContacterTmp.getBatchNo()));
+            return addContacterTmp(anContacterTmp, CustomerConstants.TMP_TYPE_INSTEAD);
         }
         else {
-            tempContacterTmp.initModifyValue(anCustMechContacterTmp);
+            tempContacterTmp.initModifyValue(anContacterTmp);
             tempContacterTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
-            return saveContacterTmp(tempContacterTmp, tempContacterTmp.getId());
+            return saveContacterTmp(tempContacterTmp, tempContacterTmp.getId(), anFileList);
         }
     }
 
@@ -449,11 +471,13 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
     public CustMechContacterTmp saveDeleteInsteadContacterTmp(Long anRefId, Long anInsteadRecordId) {
         BTAssert.notNull(anRefId, "公司联系人号不允许为空！");
 
-        CustInsteadRecord insteadRecord = checkInsteadRecord(anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_NEW,
-                CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN, CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT,
+        CustInsteadRecord insteadRecord = checkInsteadRecord(anInsteadRecordId, 
+                CustomerConstants.INSTEAD_RECORD_STATUS_NEW,
+                CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN, 
+                CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT,
                 CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_REJECT);
 
-        CustMechContacter contacter = contacterService.findCustMechContacter(anRefId);
+        CustMechContacter contacter = contacterService.findContacter(anRefId);
         BTAssert.notNull(contacter, "没有找到引用的记录!");
 
         if (insteadRecord.getCustNo().equals(contacter.getCustNo()) == false) {
@@ -472,7 +496,7 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
         else {
             contacterTmp.initModifyValue(contacter, CustomerConstants.TMP_STATUS_NEW);
             contacterTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_DELETE);
-            return saveContacterTmp(contacterTmp, contacterTmp.getId());
+            return saveContacterTmp(contacterTmp, contacterTmp.getId(), null);
         }
     }
 
@@ -482,10 +506,13 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
      * @param anInsteadRecordId
      */
     public int saveCancelInsteadContacterTmp(Long anId, Long anInsteadRecordId) {
-        CustMechContacterTmp contacterTmp = this.findCustMechContacterTmp(anId);
+        CustMechContacterTmp contacterTmp = this.findContacterTmp(anId);
 
-        checkInsteadRecord(anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_NEW, CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN,
-                CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT, CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_REJECT);
+        checkInsteadRecord(anInsteadRecordId, 
+                CustomerConstants.INSTEAD_RECORD_STATUS_NEW, 
+                CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN,
+                CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT, 
+                CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_REJECT);
 
         Long tmpVersion = contacterTmp.getVersion();
         Long maxVersion = VersionHelper.generateVersion(this.mapper, contacterTmp.getCustNo());
@@ -516,10 +543,10 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
 
         String tempTmpIds = (String) anParam.get("tmpIds");
 
-        Pattern.compile(",").splitAsStream(tempTmpIds).map(Long::valueOf)
+        COMMA_PATTERN.splitAsStream(tempTmpIds).map(Long::valueOf)
                 .forEach(tmpId -> saveContacterTmpParentIdAndStatus(tmpId, insteadRecord.getId(), CustomerConstants.TMP_STATUS_USEING));
 
-        insteadRecordService.saveCustInsteadRecordStatus(anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN);
+        insteadRecordService.saveInsteadRecordStatus(anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN);
 
         return insteadRecord;
     }
@@ -535,10 +562,10 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
 
         String tempTmpIds = (String) anParam.get("tmpIds");
 
-        Pattern.compile(",").splitAsStream(tempTmpIds).map(Long::valueOf)
+        COMMA_PATTERN.splitAsStream(tempTmpIds).map(Long::valueOf)
                 .forEach(tmpId -> saveContacterTmpParentIdAndStatus(tmpId, insteadRecord.getId(), CustomerConstants.TMP_STATUS_USEING));
 
-        insteadRecordService.saveCustInsteadRecord(anInsteadRecordId, tempTmpIds);
+        insteadRecordService.saveInsteadRecord(anInsteadRecordId, tempTmpIds);
 
         return insteadRecord;
     }
@@ -588,7 +615,7 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
     private CustInsteadRecord checkInsteadRecord(Long anInsteadRecordId, String... anBusinStatus) {
         BTAssert.notNull(anInsteadRecordId, "代录记录编号不允许为空！");
 
-        CustInsteadRecord insteadRecord = insteadRecordService.findCustInsteadRecord(anInsteadRecordId);
+        CustInsteadRecord insteadRecord = insteadRecordService.findInsteadRecord(anInsteadRecordId);
         BTAssert.notNull(insteadRecord, "没有找到对应的代录记录");
 
         String insteadItem = insteadRecord.getInsteadItem();
@@ -646,19 +673,16 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
             if (BetterStringUtils.equals(contacterTmp.getTmpOperType(), CustomerConstants.TMP_OPER_TYPE_NORMAL) == true) {
                 continue;
             }
-            Long id = contacterTmp.getId();
-            for (Long changeId : anChangeIds) {
-                if (id.equals(changeId) == true) {
-                    tempSet.add(changeId);
+            else {
+                Long id = contacterTmp.getId();
+                for (Long changeId : anChangeIds) {
+                    if (id.equals(changeId) == true) {
+                        tempSet.add(changeId);
+                    }
                 }
             }
         }
 
-        if (tempSet.size() == anChangeIds.size()) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return (tempSet.size() == anChangeIds.size());
     }
 }

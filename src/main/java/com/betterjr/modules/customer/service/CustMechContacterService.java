@@ -45,7 +45,7 @@ public class CustMechContacterService extends BaseService<CustMechContacterMappe
     /**
      * 查询联系人信息
      */
-    public CustMechContacter findCustMechContacter(Long anId) {
+    public CustMechContacter findContacter(Long anId) {
         BTAssert.notNull(anId, "联系人编号不允许为空！");
         
         CustMechContacter contacter = this.selectByPrimaryKey(anId);
@@ -68,14 +68,14 @@ public class CustMechContacterService extends BaseService<CustMechContacterMappe
     /**
      * 保存联系人信息
      */
-    public CustMechContacter saveCustMechContacter(CustMechContacter anCustMechContacter, Long anId) {
+    public CustMechContacter saveCustMechContacter(CustMechContacter anContacter, Long anId) {
         BTAssert.notNull(anId, "联系人编号不允许为空！");
-        BTAssert.notNull(anCustMechContacter, "联系人信息不允许为空！");
+        BTAssert.notNull(anContacter, "联系人信息不允许为空！");
         
         final CustMechContacter tempCustMechContacter = this.selectByPrimaryKey(anId);
         BTAssert.notNull(tempCustMechContacter, "对应的联系人信息没有找到！");
         
-        tempCustMechContacter.initModifyValue(anCustMechContacter);
+        tempCustMechContacter.initModifyValue(anContacter);
         this.updateByPrimaryKeySelective(tempCustMechContacter);
         return tempCustMechContacter;
     }

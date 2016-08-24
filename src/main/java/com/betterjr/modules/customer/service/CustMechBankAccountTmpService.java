@@ -27,6 +27,7 @@ import com.betterjr.modules.customer.entity.CustMechBankAccount;
 import com.betterjr.modules.customer.entity.CustMechBankAccountTmp;
 import com.betterjr.modules.customer.helper.IFormalDataService;
 import com.betterjr.modules.customer.helper.VersionHelper;
+import com.betterjr.modules.document.service.CustFileItemService;
 
 /**
  * 
@@ -35,6 +36,9 @@ import com.betterjr.modules.customer.helper.VersionHelper;
  */
 @Service
 public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccountTmpMapper, CustMechBankAccountTmp> implements IFormalDataService {
+    
+    private static final Pattern COMMA_PATTERN = Pattern.compile(",");
+    
     @Resource
     private CustMechBankAccountService bankAccountService;
 
@@ -44,10 +48,13 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
     @Resource
     private CustChangeApplyService changeApplyService;
 
+    @Resource
+    private CustFileItemService fileItemService;
+
     /**
      * 查询公司银行账户流水信息
      */
-    public CustMechBankAccountTmp findCustMechBankAccountTmp(Long anId) {
+    public CustMechBankAccountTmp findBankAccountTmp(Long anId) {
         BTAssert.notNull(anId, "公司银行账户流水信息编号不允许为空！");
 
         final CustMechBankAccountTmp bankAccountTmp = this.selectByPrimaryKey(anId);
@@ -58,7 +65,7 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
     /**
      * 取上一版
      */
-    public CustMechBankAccountTmp findCustMechBankAccountTmpPrevVersion(CustMechBankAccountTmp anBankAccountTmp) {
+    public CustMechBankAccountTmp findBankAccountTmpPrevVersion(CustMechBankAccountTmp anBankAccountTmp) {
         Long custNo = anBankAccountTmp.getCustNo();
         Long refId = anBankAccountTmp.getRefId();
         Long version = anBankAccountTmp.getVersion();
@@ -76,44 +83,47 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
     /**
      * 添加新增变更流水记录
      */
-    public CustMechBankAccountTmp addChangeBankAccountTmp(CustMechBankAccountTmp anCustMechBankAccountTmp) {
-        BTAssert.notNull(anCustMechBankAccountTmp, "公司银行账户流水信息不允许为空！");
+    public CustMechBankAccountTmp addChangeBankAccountTmp(CustMechBankAccountTmp anBankAccountTmp, String anFileList) {
+        BTAssert.notNull(anBankAccountTmp, "公司银行账户流水信息不允许为空！");
 
-        final Long refId = anCustMechBankAccountTmp.getRefId();
+        final Long refId = anBankAccountTmp.getRefId();
         BTAssert.isNull(refId, "引用编号不能有值!");
 
-        anCustMechBankAccountTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW);
-        anCustMechBankAccountTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_ADD);
+        anBankAccountTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW);
+        anBankAccountTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_ADD);
+        anBankAccountTmp.setBatchNo(fileItemService.updateCustFileItemInfo(anFileList, anBankAccountTmp.getBatchNo()));
 
-        return addBankAccountTmp(anCustMechBankAccountTmp, CustomerConstants.TMP_TYPE_CHANGE);
+        return addBankAccountTmp(anBankAccountTmp, CustomerConstants.TMP_TYPE_CHANGE);
     }
 
     /**
      * 添加修改变更记录
      */
-    public CustMechBankAccountTmp saveSaveChangeBankAccountTmp(CustMechBankAccountTmp anCustMechBankAccountTmp) {
-        BTAssert.notNull(anCustMechBankAccountTmp, "公司银行账户流水信息不允许为空！");
+    public CustMechBankAccountTmp saveSaveChangeBankAccountTmp(CustMechBankAccountTmp anBankAccountTmp, String anFileList) {
+        BTAssert.notNull(anBankAccountTmp, "公司银行账户流水信息不允许为空！");
 
-        final Long refId = anCustMechBankAccountTmp.getRefId();
+        final Long refId = anBankAccountTmp.getRefId();
         BTAssert.notNull(refId, "引用编号不允许为空!");
 
         CustMechBankAccount bankAccount = bankAccountService.findCustMechBankAccount(refId);
         BTAssert.notNull(bankAccount, "没有找到引用的记录!");
 
-        if (bankAccount.getCustNo().equals(anCustMechBankAccountTmp.getCustNo()) == false) {
+        if (bankAccount.getCustNo().equals(anBankAccountTmp.getCustNo()) == false) {
             throw new BytterTradeException("客户编号不匹配!");
         }
 
         CustMechBankAccountTmp tempBankAccountTmp = findBankAccountTmpByRefId(refId, CustomerConstants.TMP_TYPE_CHANGE);
         if (tempBankAccountTmp == null) {
-            anCustMechBankAccountTmp.setBusinStatus(CustomerConstants.TMP_STATUS_NEW);
-            anCustMechBankAccountTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
-            return addBankAccountTmp(anCustMechBankAccountTmp, CustomerConstants.TMP_TYPE_CHANGE);
+            anBankAccountTmp.setBusinStatus(CustomerConstants.TMP_STATUS_NEW);
+            anBankAccountTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
+            // TODO @@@@@@@@@@@@@@@@@@ 需要处理
+            anBankAccountTmp.setBatchNo(fileItemService.updateCustFileItemInfo(anFileList, anBankAccountTmp.getBatchNo()));
+            return addBankAccountTmp(anBankAccountTmp, CustomerConstants.TMP_TYPE_CHANGE);
         }
         else {
-            tempBankAccountTmp.initModifyValue(anCustMechBankAccountTmp);
+            tempBankAccountTmp.initModifyValue(anBankAccountTmp);
             tempBankAccountTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
-            return saveBankAccountTmp(tempBankAccountTmp, tempBankAccountTmp.getId());
+            return saveBankAccountTmp(tempBankAccountTmp, tempBankAccountTmp.getId(), anFileList);
         }
     }
 
@@ -137,7 +147,7 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
         else {
             bankAccountTmp.initModifyValue(bankAccount, CustomerConstants.TMP_STATUS_NEW);
             bankAccountTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_DELETE);
-            return saveBankAccountTmp(bankAccountTmp, bankAccountTmp.getId());
+            return saveBankAccountTmp(bankAccountTmp, bankAccountTmp.getId(), null);
         }
     }
 
@@ -145,7 +155,7 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
      * 撤销变更记录
      */
     public int saveCancelChangeBankAccountTmp(Long anId) {
-        CustMechBankAccountTmp bankAccountTmp = this.findCustMechBankAccountTmp(anId);
+        CustMechBankAccountTmp bankAccountTmp = this.findBankAccountTmp(anId);
 
         Long tmpVersion = bankAccountTmp.getVersion();
         Long maxVersion = VersionHelper.generateVersion(this.mapper, bankAccountTmp.getCustNo());
@@ -168,11 +178,11 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
     /**
      * 加载变更列表中的流水列表
      */
-    public Collection<CustMechBankAccountTmp> queryCustMechBankAccountTmpByChangeApply(Long anApplyId) {
+    public Collection<CustMechBankAccountTmp> queryBankAccountTmpByChangeApply(Long anApplyId) {
         BTAssert.notNull(anApplyId, "公司编号不允许为空！");
         CustChangeApply changeApply = changeApplyService.findChangeApply(anApplyId);
 
-        long[] tmpIds = Pattern.compile(",").splitAsStream(changeApply.getTmpIds()).mapToLong(Long::valueOf).toArray();
+        long[] tmpIds = COMMA_PATTERN.splitAsStream(changeApply.getTmpIds()).mapToLong(Long::valueOf).toArray();
 
         Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put(CustomerConstants.ID, tmpIds);
@@ -202,7 +212,7 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
 
         String tempTmpIds = (String) anParam.get("tmpIds");
 
-        List<Long> tmpIds = Pattern.compile(",").splitAsStream(tempTmpIds).map(Long::valueOf).collect(Collectors.toList());
+        List<Long> tmpIds = COMMA_PATTERN.splitAsStream(tempTmpIds).map(Long::valueOf).collect(Collectors.toList());
 
         if (checkMatchNewChange(tmpIds, anCustNo) == false) {
             throw new BytterTradeException("代录编号列表不正确,请检查.");
@@ -268,7 +278,7 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
 
         String tempTmpIds = (String) anParam.get("tmpIds");
 
-        Pattern.compile(",").splitAsStream(tempTmpIds).map(Long::valueOf)
+        COMMA_PATTERN.splitAsStream(tempTmpIds).map(Long::valueOf)
                 .forEach(tmpId -> saveBankAccountTmpParentIdAndStatus(tmpId, anApplyId, CustomerConstants.TMP_STATUS_USEING));
 
         changeApplyService.saveChangeApply(anApplyId, tempTmpIds);
@@ -283,7 +293,7 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
     /**
      * 加载未提交的变更流水列表
      */
-    public Collection<CustMechBankAccountTmp> queryNewChangeCustMechBankAccountTmp(Long anCustNo) {
+    public Collection<CustMechBankAccountTmp> queryNewChangeBankAccountTmp(Long anCustNo) {
         BTAssert.notNull(anCustNo, "客户编号不允许为空!");
 
         Map<String, Object> conditionMap = new HashMap<>();
@@ -301,7 +311,7 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
     /**
      * 加载变更流水列表
      */
-    public Collection<CustMechBankAccountTmp> queryChangeCustMechBankAccountTmp(Long anApplyId) {
+    public Collection<CustMechBankAccountTmp> queryChangeBankAccountTmp(Long anApplyId) {
         BTAssert.notNull(anApplyId, "变更申请编号不允许为空!");
 
         CustChangeApply changeApply = checkChangeApply(anApplyId);
@@ -337,30 +347,31 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
     /**
      * 添加公司银行账户流水信息
      */
-    public CustMechBankAccountTmp addBankAccountTmp(CustMechBankAccountTmp anCustMechBankAccountTmp, String anTmpType) {
-        BTAssert.notNull(anCustMechBankAccountTmp, "公司银行账户流水信息不允许为空！");
-        Long custNo = anCustMechBankAccountTmp.getCustNo();
+    public CustMechBankAccountTmp addBankAccountTmp(CustMechBankAccountTmp anBankAccountTmp, String anTmpType) {
+        BTAssert.notNull(anBankAccountTmp, "公司银行账户流水信息不允许为空！");
+        Long custNo = anBankAccountTmp.getCustNo();
         Long version = VersionHelper.generateVersion(this.mapper, custNo);
 
-        anCustMechBankAccountTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW, anTmpType, version);
-        this.insert(anCustMechBankAccountTmp);
-        return anCustMechBankAccountTmp;
+        anBankAccountTmp.setVersion(version);
+        anBankAccountTmp.setTmpType(anTmpType);
+        // anCustMechBankAccountTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW, anTmpType, version);
+        this.insert(anBankAccountTmp);
+        return anBankAccountTmp;
     }
 
     /**
      * 修改公司银行账户流水信息
      */
-    public CustMechBankAccountTmp saveBankAccountTmp(CustMechBankAccountTmp anCustMechBankAccountTmp, Long anId) {
-        BTAssert.notNull(anCustMechBankAccountTmp, "公司银行账户流水信息不允许为空！");
+    public CustMechBankAccountTmp saveBankAccountTmp(CustMechBankAccountTmp anBankAccountTmp, Long anId, String anFileList) {
+        BTAssert.notNull(anBankAccountTmp, "公司银行账户流水信息不允许为空！");
         BTAssert.notNull(anId, "公司银行账户流水编号不允许为空！");
 
-        CustMechBankAccountTmp tempCustMechBankAccountTmp = this.selectByPrimaryKey(anId);
+        CustMechBankAccountTmp tempBankAccountTmp = this.selectByPrimaryKey(anId);
+        tempBankAccountTmp.initModifyValue(anBankAccountTmp);
+        tempBankAccountTmp.setBatchNo(fileItemService.updateCustFileItemInfo(anFileList, tempBankAccountTmp.getBatchNo()));
+        this.updateByPrimaryKeySelective(tempBankAccountTmp);
 
-        tempCustMechBankAccountTmp.initModifyValue(anCustMechBankAccountTmp);
-
-        this.updateByPrimaryKeySelective(tempCustMechBankAccountTmp);
-
-        return tempCustMechBankAccountTmp;
+        return tempBankAccountTmp;
     }
 
     /**
@@ -374,7 +385,6 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
         }
 
         bankAccountTmp.setBusinStatus(anBusinStatus);
-
         this.updateByPrimaryKeySelective(bankAccountTmp);
 
         return bankAccountTmp;
@@ -385,59 +395,62 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
      * 
      * @param anInsteadRecordId
      */
-    public CustMechBankAccountTmp addInsteadBankAccountTmp(CustMechBankAccountTmp anCustMechBankAccountTmp, Long anInsteadRecordId) {
-        BTAssert.notNull(anCustMechBankAccountTmp, "公司银行账户流水信息不允许为空！");
+    public CustMechBankAccountTmp addInsteadBankAccountTmp(CustMechBankAccountTmp anBankAccountTmp, Long anInsteadRecordId, String anFileList) {
+        BTAssert.notNull(anBankAccountTmp, "公司银行账户流水信息不允许为空！");
 
         checkInsteadRecord(anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_NEW, CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN,
                 CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT, CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_REJECT);
 
-        final Long refId = anCustMechBankAccountTmp.getRefId();
+        final Long refId = anBankAccountTmp.getRefId();
 
         CustInsteadRecord insteadRecord = checkInsteadRecord(anInsteadRecordId);
         BTAssert.isNull(refId, "引用编号需要为空!");
 
-        if (insteadRecord.getCustNo().equals(anCustMechBankAccountTmp.getCustNo()) == false) {
+        if (insteadRecord.getCustNo().equals(anBankAccountTmp.getCustNo()) == false) {
             throw new BytterTradeException("客户编号不匹配!");
         }
 
-        anCustMechBankAccountTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW);
-        anCustMechBankAccountTmp.setParentId(anInsteadRecordId);
-        anCustMechBankAccountTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_ADD);
+        anBankAccountTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW);
+        anBankAccountTmp.setParentId(anInsteadRecordId);
+        anBankAccountTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_ADD);
+        anBankAccountTmp.setBatchNo(fileItemService.updateCustFileItemInfo(anFileList, anBankAccountTmp.getBatchNo()));
 
-        return addBankAccountTmp(anCustMechBankAccountTmp, CustomerConstants.TMP_TYPE_INSTEAD);
+        return addBankAccountTmp(anBankAccountTmp, CustomerConstants.TMP_TYPE_INSTEAD);
     }
 
     /**
      * 添加修改代录流水
      */
-    public CustMechBankAccountTmp saveSaveInsteadBankAccountTmp(CustMechBankAccountTmp anCustMechBankAccountTmp, Long anInsteadRecordId) {
-        BTAssert.notNull(anCustMechBankAccountTmp, "公司银行账户流水信息不允许为空！");
+    public CustMechBankAccountTmp saveSaveInsteadBankAccountTmp(CustMechBankAccountTmp anBankAccountTmp, Long anInsteadRecordId, String anFileList) {
+        BTAssert.notNull(anBankAccountTmp, "公司银行账户流水信息不允许为空！");
 
         CustInsteadRecord insteadRecord = checkInsteadRecord(anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_NEW,
                 CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN, CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT,
                 CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_REJECT);
 
-        final Long refId = anCustMechBankAccountTmp.getRefId();
+        final Long refId = anBankAccountTmp.getRefId();
         BTAssert.notNull(refId, "引用编号不允许为空!");
 
         CustMechBankAccount bankAccount = bankAccountService.findCustMechBankAccount(refId);
         BTAssert.notNull(bankAccount, "没有找到引用的记录!");
 
-        if (insteadRecord.getCustNo().equals(anCustMechBankAccountTmp.getCustNo()) == false) {
+        if (insteadRecord.getCustNo().equals(anBankAccountTmp.getCustNo()) == false) {
             throw new BytterTradeException("客户编号不匹配!");
         }
 
         CustMechBankAccountTmp tempBankAccountTmp = findBankAccountTmpByRefId(refId, CustomerConstants.TMP_TYPE_INSTEAD);
         if (tempBankAccountTmp == null) {
-            anCustMechBankAccountTmp.setParentId(anInsteadRecordId);
-            anCustMechBankAccountTmp.setBusinStatus(CustomerConstants.TMP_STATUS_NEW);
-            anCustMechBankAccountTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
-            return addBankAccountTmp(anCustMechBankAccountTmp, CustomerConstants.TMP_TYPE_INSTEAD);
+            anBankAccountTmp.setParentId(anInsteadRecordId);
+            anBankAccountTmp.setBusinStatus(CustomerConstants.TMP_STATUS_NEW);
+            anBankAccountTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
+            // TODO @@@@@@@@@ batchNo 需要处理
+            anBankAccountTmp.setBatchNo(fileItemService.updateCustFileItemInfo(anFileList, anBankAccountTmp.getBatchNo()));
+            return addBankAccountTmp(anBankAccountTmp, CustomerConstants.TMP_TYPE_INSTEAD);
         }
         else {
-            tempBankAccountTmp.initModifyValue(anCustMechBankAccountTmp);
+            tempBankAccountTmp.initModifyValue(anBankAccountTmp);
             tempBankAccountTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
-            return saveBankAccountTmp(tempBankAccountTmp, tempBankAccountTmp.getId());
+            return saveBankAccountTmp(tempBankAccountTmp, tempBankAccountTmp.getId(), anFileList);
         }
     }
 
@@ -472,7 +485,7 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
         else {
             bankAccountTmp.initModifyValue(bankAccount, CustomerConstants.TMP_STATUS_NEW);
             bankAccountTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_DELETE);
-            return saveBankAccountTmp(bankAccountTmp, bankAccountTmp.getId());
+            return saveBankAccountTmp(bankAccountTmp, bankAccountTmp.getId(), null);
         }
     }
 
@@ -482,7 +495,7 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
      * @param anInsteadRecordId
      */
     public int saveCancelInsteadBankAccountTmp(Long anId, Long anInsteadRecordId) {
-        CustMechBankAccountTmp bankAccountTmp = this.findCustMechBankAccountTmp(anId);
+        CustMechBankAccountTmp bankAccountTmp = this.findBankAccountTmp(anId);
 
         checkInsteadRecord(anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_NEW, CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN,
                 CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT, CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_REJECT);
@@ -516,10 +529,10 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
 
         String tempTmpIds = (String) anParam.get("tmpIds");
 
-        Pattern.compile(",").splitAsStream(tempTmpIds).map(Long::valueOf)
+        COMMA_PATTERN.splitAsStream(tempTmpIds).map(Long::valueOf)
                 .forEach(tmpId -> saveBankAccountTmpParentIdAndStatus(tmpId, insteadRecord.getId(), CustomerConstants.TMP_STATUS_USEING));
 
-        insteadRecordService.saveCustInsteadRecordStatus(anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN);
+        insteadRecordService.saveInsteadRecordStatus(anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN);
 
         return insteadRecord;
     }
@@ -535,10 +548,10 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
 
         String tempTmpIds = (String) anParam.get("tmpIds");
 
-        Pattern.compile(",").splitAsStream(tempTmpIds).map(Long::valueOf)
+        COMMA_PATTERN.splitAsStream(tempTmpIds).map(Long::valueOf)
                 .forEach(tmpId -> saveBankAccountTmpParentIdAndStatus(tmpId, insteadRecord.getId(), CustomerConstants.TMP_STATUS_USEING));
 
-        insteadRecordService.saveCustInsteadRecord(anInsteadRecordId, tempTmpIds);
+        insteadRecordService.saveInsteadRecord(anInsteadRecordId, tempTmpIds);
 
         return insteadRecord;
     }
@@ -548,7 +561,6 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
      */
     @Override
     public void saveFormalData(Long anId) {
-
         Collection<CustMechBankAccountTmp> bankAccountTmps = this.selectByProperty("parentId", anId);
 
         for (CustMechBankAccountTmp bankAccountTmp : bankAccountTmps) {
@@ -588,7 +600,7 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
     private CustInsteadRecord checkInsteadRecord(Long anInsteadRecordId, String... anBusinStatus) {
         BTAssert.notNull(anInsteadRecordId, "代录记录编号不允许为空！");
 
-        CustInsteadRecord insteadRecord = insteadRecordService.findCustInsteadRecord(anInsteadRecordId);
+        CustInsteadRecord insteadRecord = insteadRecordService.findInsteadRecord(anInsteadRecordId);
         BTAssert.notNull(insteadRecord, "没有找到对应的代录记录");
 
         String insteadItem = insteadRecord.getInsteadItem();
@@ -632,7 +644,7 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
      * 检查是否匹配
      */
     private boolean checkMatchNewChange(List<Long> anChangeIds, Long anCustNo) {
-        Collection<CustMechBankAccountTmp> bankAccountTmps = queryNewChangeCustMechBankAccountTmp(anCustNo);
+        Collection<CustMechBankAccountTmp> bankAccountTmps = queryNewChangeBankAccountTmp(anCustNo);
         if (anChangeIds.size() != bankAccountTmps.size()) {
             return false;
         }
@@ -646,20 +658,17 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
             if (BetterStringUtils.equals(bankAccountTmp.getTmpOperType(), CustomerConstants.TMP_OPER_TYPE_NORMAL) == true) {
                 continue;
             }
-            Long id = bankAccountTmp.getId();
-            for (Long changeId : anChangeIds) {
-                if (id.equals(changeId) == true) {
-                    tempSet.add(changeId);
+            else {
+                Long id = bankAccountTmp.getId();
+                for (Long changeId : anChangeIds) {
+                    if (id.equals(changeId) == true) {
+                        tempSet.add(changeId);
+                    }
                 }
             }
         }
 
-        if (tempSet.size() == anChangeIds.size()) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return (tempSet.size() == anChangeIds.size());
     }
 
 }

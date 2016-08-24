@@ -275,7 +275,6 @@ public class CustMechBase implements BetterjrEntity {
     /**
      * 邮编
      */
-    @JsonIgnore
     @Column(name = "C_ZIPCODE",  columnDefinition="VARCHAR" )
     @MetaData( value="邮编", comments = "邮编")
     private String zipCode;

@@ -21,6 +21,8 @@ import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.mapper.pagehelper.PageHelper;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.betterjr.modules.account.service.CustAccountService;
+import com.betterjr.modules.document.service.CustFileInfoService;
+import com.betterjr.modules.document.service.CustFileItemService;
 import com.betterjr.modules.notice.constant.NoticeConstants;
 import com.betterjr.modules.notice.dao.NoticeMapper;
 import com.betterjr.modules.notice.entity.Notice;
@@ -33,6 +35,9 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
 
     @Resource
     private CustAccountService accountService;
+    
+    @Resource
+    private CustFileItemService fileItemService;
 
     /**
      * 未读消息
@@ -136,12 +141,11 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
 
         // 初始化
         anNotice.initAddValue(custName, anBusinStatus);
-
         anNotice.setPublishDate(BetterDateUtils.getNumDate());
         anNotice.setPublishTime(BetterDateUtils.getNumTime());
+        fileItemService.updateCustFileItemInfo(anFileList, anNotice.getBatchNo());
 
         this.insert(anNotice);
-
         noticeCustomerService.saveNoticeCustomer(anNotice, targetCusts);
         return anNotice;
     }
@@ -166,8 +170,8 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
             throw new BytterTradeException("本条公告已经发布,不允许修改!");
         }
 
+        fileItemService.updateCustFileItemInfo(anFileList, anNotice.getBatchNo());
         tempNotice.initModifyValue(anNotice, anBusinStatus);
-
         this.updateByPrimaryKeySelective(tempNotice);
 
         // 更新客户关系
@@ -216,9 +220,10 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
         this.updateByPrimaryKeySelective(tempNotice);
         return tempNotice;
     }
+    
 
     /**
-     * 公告置只删除
+     * 公告置删除状态
      */
     public NoticeCustomer saveSetDeletedNotice(Long anId, Long anCustNo) {
         BTAssert.notNull(anId, "公告编号不允许为空!");
@@ -249,7 +254,7 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
      * 
      */
     private NoticeCustomer checkNoticeCustomer(Long anId, Long anCustNo, Long anOperId) {
-        final NoticeCustomer noticeCustomer = noticeCustomerService.findNoticeCustomerByNoticeIdAndCustNoAndOperId(anId, anCustNo, anOperId);
+        final NoticeCustomer noticeCustomer = noticeCustomerService.findNoticeCustomerByCondition(anId, anCustNo, anOperId);
         BTAssert.notNull(noticeCustomer, "没有找到相应的公告接收记录!");
         return noticeCustomer;
     }

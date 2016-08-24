@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.exception.BytterTradeException;
@@ -30,6 +31,7 @@ import com.betterjr.modules.customer.entity.CustMechShareholder;
 import com.betterjr.modules.customer.entity.CustMechShareholderTmp;
 import com.betterjr.modules.customer.helper.IFormalDataService;
 import com.betterjr.modules.customer.helper.VersionHelper;
+import com.betterjr.modules.document.service.CustFileItemService;
 
 /**
  * 
@@ -38,6 +40,8 @@ import com.betterjr.modules.customer.helper.VersionHelper;
  */
 @Service
 public class CustMechShareholderTmpService extends BaseService<CustMechShareholderTmpMapper, CustMechShareholderTmp> implements IFormalDataService {
+    private static final Pattern COMMA_PATTERN = Pattern.compile(",");
+    
     @Resource
     private CustMechShareholderService shareholderService;
 
@@ -46,11 +50,15 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
 
     @Resource
     private CustChangeApplyService changeApplyService;
+    
+    @Resource
+    private CustFileItemService fileItemService;
+    
 
     /**
      * 查询公司股东流水信息
      */
-    public CustMechShareholderTmp findCustMechShareholderTmp(Long anId) {
+    public CustMechShareholderTmp findShareholderTmp(Long anId) {
         BTAssert.notNull(anId, "公司股东流水信息编号不允许为空！");
 
         final CustMechShareholderTmp shareholderTmp = this.selectByPrimaryKey(anId);
@@ -61,7 +69,7 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
     /**
      * 取上一版
      */
-    public CustMechShareholderTmp findCustMechShareholderTmpPrevVersion(CustMechShareholderTmp anShareholderTmp) {
+    public CustMechShareholderTmp findShareholderTmpPrevVersion(CustMechShareholderTmp anShareholderTmp) {
         Long custNo = anShareholderTmp.getCustNo();
         Long refId = anShareholderTmp.getRefId();
         Long version = anShareholderTmp.getVersion();
@@ -79,44 +87,46 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
     /**
      * 添加新增变更流水记录
      */
-    public CustMechShareholderTmp addChangeShareholderTmp(CustMechShareholderTmp anCustMechShareholderTmp) {
-        BTAssert.notNull(anCustMechShareholderTmp, "公司股东流水信息不允许为空！");
+    public CustMechShareholderTmp addChangeShareholderTmp(CustMechShareholderTmp anShareholderTmp, String anFileList) {
+        BTAssert.notNull(anShareholderTmp, "公司股东流水信息不允许为空！");
 
-        final Long refId = anCustMechShareholderTmp.getRefId();
+        final Long refId = anShareholderTmp.getRefId();
         BTAssert.isNull(refId, "引用编号不能有值!");
 
-        anCustMechShareholderTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW);
-        anCustMechShareholderTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_ADD);
-
-        return addShareholderTmp(anCustMechShareholderTmp, CustomerConstants.TMP_TYPE_CHANGE);
+        anShareholderTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW);
+        anShareholderTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_ADD);
+        anShareholderTmp.setBatchNo(fileItemService.updateCustFileItemInfo(anFileList, anShareholderTmp.getBatchNo()));
+        return addShareholderTmp(anShareholderTmp, CustomerConstants.TMP_TYPE_CHANGE);
     }
 
     /**
      * 添加修改变更记录
      */
-    public CustMechShareholderTmp saveSaveChangeShareholderTmp(CustMechShareholderTmp anCustMechShareholderTmp) {
-        BTAssert.notNull(anCustMechShareholderTmp, "公司股东流水信息不允许为空！");
+    public CustMechShareholderTmp saveSaveChangeShareholderTmp(CustMechShareholderTmp anShareholderTmp, String anFileList) {
+        BTAssert.notNull(anShareholderTmp, "公司股东流水信息不允许为空！");
 
-        final Long refId = anCustMechShareholderTmp.getRefId();
+        final Long refId = anShareholderTmp.getRefId();
         BTAssert.notNull(refId, "引用编号不允许为空!");
 
-        CustMechShareholder shareholder = shareholderService.findCustMechShareholder(refId);
+        CustMechShareholder shareholder = shareholderService.findShareholder(refId);
         BTAssert.notNull(shareholder, "没有找到引用的记录!");
 
-        if (shareholder.getCustNo().equals(anCustMechShareholderTmp.getCustNo()) == false) {
+        if (shareholder.getCustNo().equals(anShareholderTmp.getCustNo()) == false) {
             throw new BytterTradeException("客户编号不匹配!");
         }
 
         CustMechShareholderTmp tempShareholderTmp = findShareholderTmpByRefId(refId, CustomerConstants.TMP_TYPE_CHANGE);
         if (tempShareholderTmp == null) {
-            anCustMechShareholderTmp.setBusinStatus(CustomerConstants.TMP_STATUS_NEW);
-            anCustMechShareholderTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
-            return addShareholderTmp(anCustMechShareholderTmp, CustomerConstants.TMP_TYPE_CHANGE);
+            anShareholderTmp.setBusinStatus(CustomerConstants.TMP_STATUS_NEW);
+            anShareholderTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
+            // TODO @@@@@@@@@@@@@  需要特殊处理 batchNo
+            anShareholderTmp.setBatchNo(fileItemService.updateCustFileItemInfo(anFileList, anShareholderTmp.getBatchNo()));
+            return addShareholderTmp(anShareholderTmp, CustomerConstants.TMP_TYPE_CHANGE);
         }
         else {
-            tempShareholderTmp.initModifyValue(anCustMechShareholderTmp);
+            tempShareholderTmp.initModifyValue(anShareholderTmp);
             tempShareholderTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
-            return saveShareholderTmp(tempShareholderTmp, tempShareholderTmp.getId());
+            return saveShareholderTmp(tempShareholderTmp, tempShareholderTmp.getId(), anFileList);
         }
     }
 
@@ -126,7 +136,7 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
     public CustMechShareholderTmp saveDeleteChangeShareholderTmp(Long anRefId) {
         BTAssert.notNull(anRefId, "公司股东号不允许为空！");
 
-        CustMechShareholder shareholder = shareholderService.findCustMechShareholder(anRefId);
+        CustMechShareholder shareholder = shareholderService.findShareholder(anRefId);
         BTAssert.notNull(shareholder, "没有找到引用的记录!");
 
         CustMechShareholderTmp shareholderTmp = findShareholderTmpByRefId(anRefId, CustomerConstants.TMP_TYPE_CHANGE);
@@ -140,7 +150,7 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
         else {
             shareholderTmp.initModifyValue(shareholder, CustomerConstants.TMP_STATUS_NEW);
             shareholderTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_DELETE);
-            return saveShareholderTmp(shareholderTmp, shareholderTmp.getId());
+            return saveShareholderTmp(shareholderTmp, shareholderTmp.getId(), null);
         }
     }
 
@@ -148,7 +158,7 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
      * 撤销变更记录
      */
     public int saveCancelChangeShareholderTmp(Long anId) {
-        CustMechShareholderTmp shareholderTmp = this.findCustMechShareholderTmp(anId);
+        CustMechShareholderTmp shareholderTmp = this.findShareholderTmp(anId);
 
         Long tmpVersion = shareholderTmp.getVersion();
         Long maxVersion = VersionHelper.generateVersion(this.mapper, shareholderTmp.getCustNo());
@@ -175,7 +185,7 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
         BTAssert.notNull(anApplyId, "公司编号不允许为空！");
         CustChangeApply changeApply = changeApplyService.findChangeApply(anApplyId);
 
-        List<Long> tmpIds = Pattern.compile(",").splitAsStream(changeApply.getTmpIds()).map(Long::valueOf).collect(Collectors.toList());
+        List<Long> tmpIds = COMMA_PATTERN.splitAsStream(changeApply.getTmpIds()).map(Long::valueOf).collect(Collectors.toList());
 
         Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put(CustomerConstants.ID, tmpIds);
@@ -205,7 +215,7 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
 
         String tempTmpIds = (String) anParam.get("tmpIds");
 
-        List<Long> tmpIds = Pattern.compile(",").splitAsStream(tempTmpIds).map(Long::valueOf).collect(Collectors.toList());
+        List<Long> tmpIds = COMMA_PATTERN.splitAsStream(tempTmpIds).map(Long::valueOf).collect(Collectors.toList());
 
         if (checkMatchNewChange(tmpIds, anCustNo) == false) {
             throw new BytterTradeException("代录编号列表不正确,请检查.");
@@ -216,7 +226,7 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
             saveShareholderTmpParentIdAndStatus(id, changeApply.getId(), CustomerConstants.TMP_STATUS_USEING);
         }
 
-        Collection<CustMechShareholder> shareholders = shareholderService.queryCustMechShareholder(anCustNo);
+        Collection<CustMechShareholder> shareholders = shareholderService.queryShareholder(anCustNo);
         Collection<CustMechShareholderTmp> shareholderTmps = this.selectByProperty("parentId", changeApply.getId());
 
         saveNormalShareholders(shareholders, shareholderTmps, changeApply, CustomerConstants.TMP_TYPE_CHANGE);
@@ -230,16 +240,16 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
     private void saveNormalShareholders(Collection<CustMechShareholder> anShareholders, Collection<CustMechShareholderTmp> anShareholderTmps,
             CustChangeApply anChangeApply, String anTmpType) {
         Long parentId = anChangeApply.getId();
-        for (CustMechShareholder shareholder : anShareholders) {
-            if (checkIsNormalShareholder(shareholder, anShareholderTmps) == true) {
-                CustMechShareholderTmp shareholderTmp = new CustMechShareholderTmp();
-                shareholderTmp.initAddValue(shareholder, CustomerConstants.TMP_STATUS_USEING);
-                shareholderTmp.setRefId(shareholder.getId());
-                shareholderTmp.setParentId(parentId);
-                shareholderTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_NORMAL);
-                addShareholderTmp(shareholderTmp, anTmpType);
-            }
-        }
+        
+        anShareholders.stream().filter(shareholder -> checkIsNormalShareholder(shareholder, anShareholderTmps) == true).forEach(shareholder -> {
+            CustMechShareholderTmp shareholderTmp = new CustMechShareholderTmp();
+            shareholderTmp.initAddValue(shareholder, CustomerConstants.TMP_STATUS_USEING);
+            shareholderTmp.setRefId(shareholder.getId());
+            shareholderTmp.setParentId(parentId);
+            shareholderTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_NORMAL);
+            addShareholderTmp(shareholderTmp, anTmpType);
+        });
+
     }
 
     /**
@@ -271,7 +281,7 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
 
         String tempTmpIds = (String) anParam.get("tmpIds");
 
-        List<Long> tmpIds = Pattern.compile(",").splitAsStream(tempTmpIds).map(Long::valueOf).collect(Collectors.toList());
+        List<Long> tmpIds = COMMA_PATTERN.splitAsStream(tempTmpIds).map(Long::valueOf).collect(Collectors.toList());
 
         for (Long id : tmpIds) {
             saveShareholderTmpParentIdAndStatus(id, anApplyId, CustomerConstants.TMP_STATUS_USEING);
@@ -279,7 +289,7 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
 
         changeApplyService.saveChangeApply(anApplyId, tempTmpIds);
 
-        Collection<CustMechShareholder> shareholders = shareholderService.queryCustMechShareholder(custNo);
+        Collection<CustMechShareholder> shareholders = shareholderService.queryShareholder(custNo);
         Collection<CustMechShareholderTmp> shareholderTmps = this.selectByProperty("parentId", anApplyId);
         saveNormalShareholders(shareholders, shareholderTmps, changeApply, CustomerConstants.TMP_TYPE_CHANGE);
 
@@ -289,7 +299,7 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
     /**
      * 加载未提交的变更流水列表
      */
-    public Collection<CustMechShareholderTmp> queryNewChangeCustMechShareholderTmp(Long anCustNo) {
+    public Collection<CustMechShareholderTmp> queryNewChangeShareholderTmp(Long anCustNo) {
         BTAssert.notNull(anCustNo, "客户编号不允许为空!");
 
         Map<String, Object> conditionMap = new HashMap<>();
@@ -307,7 +317,7 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
     /**
      * 加载变更流水列表
      */
-    public Collection<CustMechShareholderTmp> queryChangeCustMechShareholderTmp(Long anApplyId) {
+    public Collection<CustMechShareholderTmp> queryChangeShareholderTmp(Long anApplyId) {
         BTAssert.notNull(anApplyId, "变更申请编号不允许为空!");
 
         CustChangeApply changeApply = checkChangeApply(anApplyId);
@@ -343,47 +353,51 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
     /**
      * 添加公司股东流水信息
      */
-    public CustMechShareholderTmp addShareholderTmp(CustMechShareholderTmp anCustMechShareholderTmp, String anTmpType) {
-        BTAssert.notNull(anCustMechShareholderTmp, "公司股东流水信息不允许为空！");
-        Long custNo = anCustMechShareholderTmp.getCustNo();
+    public CustMechShareholderTmp addShareholderTmp(CustMechShareholderTmp anShareholderTmp, String anTmpType) {
+        BTAssert.notNull(anShareholderTmp, "公司股东流水信息不允许为空！");
+        Long custNo = anShareholderTmp.getCustNo();
         Long version = VersionHelper.generateVersion(this.mapper, custNo);
 
-        anCustMechShareholderTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW, anTmpType, version);
-        this.insert(anCustMechShareholderTmp);
-        return anCustMechShareholderTmp;
+        //anShareholderTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW, anTmpType, version);
+        anShareholderTmp.setVersion(version);
+        anShareholderTmp.setTmpType(anTmpType);
+        
+        this.insert(anShareholderTmp);
+        return anShareholderTmp;
     }
 
     /**
      * 修改公司股东流水信息
      */
-    public CustMechShareholderTmp saveShareholderTmp(CustMechShareholderTmp anCustMechShareholderTmp, Long anId) {
-        BTAssert.notNull(anCustMechShareholderTmp, "公司股东流水信息不允许为空！");
+    public CustMechShareholderTmp saveShareholderTmp(CustMechShareholderTmp anShareholderTmp, Long anId, String anFileList) {
+        BTAssert.notNull(anShareholderTmp, "公司股东流水信息不允许为空！");
         BTAssert.notNull(anId, "公司股东流水编号不允许为空！");
 
-        CustMechShareholderTmp tempCustMechShareholderTmp = this.selectByPrimaryKey(anId);
+        CustMechShareholderTmp tempShareholderTmp = this.selectByPrimaryKey(anId);
+        
+        tempShareholderTmp.initModifyValue(anShareholderTmp);
+        if (anFileList != null) {
+            tempShareholderTmp.setBatchNo(fileItemService.updateCustFileItemInfo(anFileList, tempShareholderTmp.getBatchNo()));
+        }
+        this.updateByPrimaryKeySelective(tempShareholderTmp);
 
-        tempCustMechShareholderTmp.initModifyValue(anCustMechShareholderTmp);
-
-        this.updateByPrimaryKeySelective(tempCustMechShareholderTmp);
-
-        return tempCustMechShareholderTmp;
+        return tempShareholderTmp;
     }
 
     /**
      * 保存 parentId 和 状态
      */
     public CustMechShareholderTmp saveShareholderTmpParentIdAndStatus(Long anId, Long anParentId, String anBusinStatus) {
-        CustMechShareholderTmp ShareholderTmp = this.selectByPrimaryKey(anId);
+        CustMechShareholderTmp shareholderTmp = this.selectByPrimaryKey(anId);
 
         if (anParentId != null) {
-            ShareholderTmp.setParentId(anParentId);
+            shareholderTmp.setParentId(anParentId);
         }
 
-        ShareholderTmp.setBusinStatus(anBusinStatus);
+        shareholderTmp.setBusinStatus(anBusinStatus);
+        this.updateByPrimaryKeySelective(shareholderTmp);
 
-        this.updateByPrimaryKeySelective(ShareholderTmp);
-
-        return ShareholderTmp;
+        return shareholderTmp;
     }
 
     /**
@@ -391,59 +405,66 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
      * 
      * @param anInsteadRecordId
      */
-    public CustMechShareholderTmp addInsteadShareholderTmp(CustMechShareholderTmp anCustMechShareholderTmp, Long anInsteadRecordId) {
-        BTAssert.notNull(anCustMechShareholderTmp, "公司股东流水信息不允许为空！");
+    public CustMechShareholderTmp addInsteadShareholderTmp(CustMechShareholderTmp anShareholderTmp, Long anInsteadRecordId, String anFileList) {
+        BTAssert.notNull(anShareholderTmp, "公司股东流水信息不允许为空！");
 
-        checkInsteadRecord(anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_NEW, CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN,
-                CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT, CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_REJECT);
+        checkInsteadRecord(anInsteadRecordId, 
+                CustomerConstants.INSTEAD_RECORD_STATUS_NEW, 
+                CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN,
+                CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT, 
+                CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_REJECT);
 
-        final Long refId = anCustMechShareholderTmp.getRefId();
+        final Long refId = anShareholderTmp.getRefId();
 
         CustInsteadRecord insteadRecord = checkInsteadRecord(anInsteadRecordId);
         BTAssert.isNull(refId, "引用编号需要为空!");
 
-        if (insteadRecord.getCustNo().equals(anCustMechShareholderTmp.getCustNo()) == false) {
+        if (insteadRecord.getCustNo().equals(anShareholderTmp.getCustNo()) == false) {
             throw new BytterTradeException("客户编号不匹配!");
         }
 
-        anCustMechShareholderTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW);
-        anCustMechShareholderTmp.setParentId(anInsteadRecordId);
-        anCustMechShareholderTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_ADD);
-
-        return addShareholderTmp(anCustMechShareholderTmp, CustomerConstants.TMP_TYPE_INSTEAD);
+        anShareholderTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW);
+        anShareholderTmp.setParentId(anInsteadRecordId);
+        anShareholderTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_ADD);
+        anShareholderTmp.setBatchNo(fileItemService.updateCustFileItemInfo(anFileList, anShareholderTmp.getBatchNo()));
+        return addShareholderTmp(anShareholderTmp, CustomerConstants.TMP_TYPE_INSTEAD);
     }
 
     /**
      * 添加修改代录流水
      */
-    public CustMechShareholderTmp saveSaveInsteadShareholderTmp(CustMechShareholderTmp anCustMechShareholderTmp, Long anInsteadRecordId) {
-        BTAssert.notNull(anCustMechShareholderTmp, "公司股东流水信息不允许为空！");
+    public CustMechShareholderTmp saveSaveInsteadShareholderTmp(CustMechShareholderTmp anShareholderTmp, Long anInsteadRecordId, String anFileList) {
+        BTAssert.notNull(anShareholderTmp, "公司股东流水信息不允许为空！");
 
-        CustInsteadRecord insteadRecord = checkInsteadRecord(anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_NEW,
-                CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN, CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT,
+        CustInsteadRecord insteadRecord = checkInsteadRecord(anInsteadRecordId, 
+                CustomerConstants.INSTEAD_RECORD_STATUS_NEW,
+                CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN, 
+                CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT,
                 CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_REJECT);
 
-        final Long refId = anCustMechShareholderTmp.getRefId();
+        final Long refId = anShareholderTmp.getRefId();
         BTAssert.notNull(refId, "引用编号不允许为空!");
 
-        CustMechShareholder shareholder = shareholderService.findCustMechShareholder(refId);
+        CustMechShareholder shareholder = shareholderService.findShareholder(refId);
         BTAssert.notNull(shareholder, "没有找到引用的记录!");
 
-        if (insteadRecord.getCustNo().equals(anCustMechShareholderTmp.getCustNo()) == false) {
+        if (insteadRecord.getCustNo().equals(anShareholderTmp.getCustNo()) == false) {
             throw new BytterTradeException("客户编号不匹配!");
         }
 
         CustMechShareholderTmp tempShareholderTmp = findShareholderTmpByRefId(refId, CustomerConstants.TMP_TYPE_INSTEAD);
         if (tempShareholderTmp == null) {
-            anCustMechShareholderTmp.setParentId(anInsteadRecordId);
-            anCustMechShareholderTmp.setBusinStatus(CustomerConstants.TMP_STATUS_NEW);
-            anCustMechShareholderTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
-            return addShareholderTmp(anCustMechShareholderTmp, CustomerConstants.TMP_TYPE_INSTEAD);
+            anShareholderTmp.setParentId(anInsteadRecordId);
+            anShareholderTmp.setBusinStatus(CustomerConstants.TMP_STATUS_NEW);
+            anShareholderTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
+            // TODO @@@@@@@@@ 这里需要特殊处理 batchNo 的事宜
+            anShareholderTmp.setBatchNo(fileItemService.updateCustFileItemInfo(anFileList, anShareholderTmp.getBatchNo()));
+            return addShareholderTmp(anShareholderTmp, CustomerConstants.TMP_TYPE_INSTEAD);
         }
         else {
-            tempShareholderTmp.initModifyValue(anCustMechShareholderTmp);
+            tempShareholderTmp.initModifyValue(anShareholderTmp);
             tempShareholderTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
-            return saveShareholderTmp(tempShareholderTmp, tempShareholderTmp.getId());
+            return saveShareholderTmp(tempShareholderTmp, tempShareholderTmp.getId(), anFileList);
         }
     }
 
@@ -455,11 +476,13 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
     public CustMechShareholderTmp saveDeleteInsteadShareholderTmp(Long anRefId, Long anInsteadRecordId) {
         BTAssert.notNull(anRefId, "公司股东编号不允许为空！");
 
-        CustInsteadRecord insteadRecord = checkInsteadRecord(anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_NEW,
-                CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN, CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT,
+        CustInsteadRecord insteadRecord = checkInsteadRecord(anInsteadRecordId, 
+                CustomerConstants.INSTEAD_RECORD_STATUS_NEW,
+                CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN, 
+                CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT,
                 CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_REJECT);
 
-        CustMechShareholder shareholder = shareholderService.findCustMechShareholder(anRefId);
+        CustMechShareholder shareholder = shareholderService.findShareholder(anRefId);
         BTAssert.notNull(shareholder, "没有找到引用的记录!");
 
         if (insteadRecord.getCustNo().equals(shareholder.getCustNo()) == false) {
@@ -478,7 +501,7 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
         else {
             shareholderTmp.initModifyValue(shareholder, CustomerConstants.TMP_STATUS_NEW);
             shareholderTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_DELETE);
-            return saveShareholderTmp(shareholderTmp, shareholderTmp.getId());
+            return saveShareholderTmp(shareholderTmp, shareholderTmp.getId(), null);
         }
     }
 
@@ -488,10 +511,13 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
      * @param anInsteadRecordId
      */
     public int saveCancelInsteadShareholderTmp(Long anId, Long anInsteadRecordId) {
-        CustMechShareholderTmp shareholderTmp = this.findCustMechShareholderTmp(anId);
+        CustMechShareholderTmp shareholderTmp = this.findShareholderTmp(anId);
 
-        checkInsteadRecord(anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_NEW, CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN,
-                CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT, CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_REJECT);
+        checkInsteadRecord(anInsteadRecordId, 
+                CustomerConstants.INSTEAD_RECORD_STATUS_NEW, 
+                CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN,
+                CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT, 
+                CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_REJECT);
 
         Long tmpVersion = shareholderTmp.getVersion();
         Long maxVersion = VersionHelper.generateVersion(this.mapper, shareholderTmp.getCustNo());
@@ -522,10 +548,10 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
 
         String tempTmpIds = (String) anParam.get("tmpIds");
 
-        Pattern.compile(",").splitAsStream(tempTmpIds).map(Long::valueOf)
+        COMMA_PATTERN.splitAsStream(tempTmpIds).map(Long::valueOf)
                 .forEach(tmpId -> saveShareholderTmpParentIdAndStatus(tmpId, insteadRecord.getId(), CustomerConstants.TMP_STATUS_USEING));
 
-        insteadRecordService.saveCustInsteadRecordStatus(anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN);
+        insteadRecordService.saveInsteadRecordStatus(anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN);
 
         return insteadRecord;
     }
@@ -541,16 +567,10 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
 
         String tempTmpIds = (String) anParam.get("tmpIds");
 
-        List<String> strTmpIds = Arrays.asList(BetterStringUtils.split(tempTmpIds, ","));
-
-        List<Long> tmpIds = new ArrayList<>();
-
-        strTmpIds.forEach(strTmpId -> tmpIds.add(Long.valueOf(strTmpId)));
-
-        Pattern.compile(",").splitAsStream(tempTmpIds).map(Long::valueOf)
+        COMMA_PATTERN.splitAsStream(tempTmpIds).map(Long::valueOf)
                 .forEach(tmpId -> saveShareholderTmpParentIdAndStatus(tmpId, insteadRecord.getId(), CustomerConstants.TMP_STATUS_USEING));
 
-        insteadRecordService.saveCustInsteadRecord(anInsteadRecordId, tempTmpIds);
+        insteadRecordService.saveInsteadRecord(anInsteadRecordId, tempTmpIds);
 
         return insteadRecord;
     }
@@ -600,7 +620,7 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
     private CustInsteadRecord checkInsteadRecord(Long anInsteadRecordId, String... anBusinStatus) {
         BTAssert.notNull(anInsteadRecordId, "代录记录编号不允许为空！");
 
-        CustInsteadRecord insteadRecord = insteadRecordService.findCustInsteadRecord(anInsteadRecordId);
+        CustInsteadRecord insteadRecord = insteadRecordService.findInsteadRecord(anInsteadRecordId);
         BTAssert.notNull(insteadRecord, "没有找到对应的代录记录");
 
         String insteadItem = insteadRecord.getInsteadItem();
@@ -644,7 +664,7 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
      * 检查是否匹配
      */
     private boolean checkMatchNewChange(List<Long> anChangeIds, Long anCustNo) {
-        Collection<CustMechShareholderTmp> ShareholderTmps = queryNewChangeCustMechShareholderTmp(anCustNo);
+        Collection<CustMechShareholderTmp> ShareholderTmps = queryNewChangeShareholderTmp(anCustNo);
         if (anChangeIds.size() != ShareholderTmps.size()) {
             return false;
         }
@@ -658,20 +678,17 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
             if (BetterStringUtils.equals(shareholderTmp.getTmpOperType(), CustomerConstants.TMP_OPER_TYPE_NORMAL) == true) {
                 continue;
             }
-            Long id = shareholderTmp.getId();
-            for (Long changeId : anChangeIds) {
-                if (id.equals(changeId) == true) {
-                    tempSet.add(changeId);
+            else {
+                Long id = shareholderTmp.getId();
+                for (Long changeId : anChangeIds) {
+                    if (id.equals(changeId) == true) {
+                        tempSet.add(changeId);
+                    }
                 }
             }
         }
 
-        if (tempSet.size() == anChangeIds.size()) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return (tempSet.size() == anChangeIds.size());
     }
 
 }

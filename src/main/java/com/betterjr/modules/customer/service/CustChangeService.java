@@ -100,6 +100,7 @@ public class CustChangeService {
         IFormalDataService formalDataService = FormalDataHelper.getFormalDataService(changeApply);
         BTAssert.notNull(formalDataService, "变更项目不正确！");
 
+        
         formalDataService.saveFormalData(changeApply.getId());
 
         CustAuditLog auditLog = auditLogService.addCustAuditLog(CustomerConstants.AUDIT_TYPE_CHANGEAPPLY, CustomerConstants.AUDIT_STEP_AUDIT, anId, CustomerConstants.AUDIT_RESULT_PASS,
@@ -137,9 +138,8 @@ public class CustChangeService {
     public CustChangeApply saveCancelChangeApply(Long anId, String anReason) {
         BTAssert.notNull(anId, "变更申请编号不允许为空!");
 
-        final CustChangeApply tempChangeApply = changeApplyService.selectByPrimaryKey(anId);
+        final CustChangeApply tempChangeApply = changeApplyService.findChangeApply(anId);
         BTAssert.notNull(tempChangeApply, "没有找到相应的变更申请！");
-
         // 检查变更申请状态
         
         final CustChangeApply changeApply = changeApplyService.saveChangeApplyStatus(anId, CustomerConstants.CHANGE_APPLY_STATUS_CANCEL);

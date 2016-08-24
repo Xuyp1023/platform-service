@@ -30,7 +30,7 @@ public class CustMechShareholderService extends BaseService<CustMechShareholderM
      * @param anCustNo
      * @return
      */
-    public List<CustMechShareholder> queryCustMechShareholder(Long anCustNo) {
+    public List<CustMechShareholder> queryShareholder(Long anCustNo) {
         BTAssert.notNull(anCustNo, "客户编号不允许为空！");
         
         return this.selectByProperty("custNo", anCustNo);
@@ -39,7 +39,7 @@ public class CustMechShareholderService extends BaseService<CustMechShareholderM
     /**
      * 查询股东信息
      */
-    public CustMechShareholder findCustMechShareholder(Long anId) {
+    public CustMechShareholder findShareholder(Long anId) {
         BTAssert.notNull(anId, "股东编号不允许为空！");
         
         CustMechShareholder Shareholder = this.selectByPrimaryKey(anId);

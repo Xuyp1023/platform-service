@@ -19,6 +19,7 @@ import com.betterjr.modules.customer.constant.CustomerConstants;
 import com.betterjr.modules.customer.dao.CustInsteadApplyMapper;
 import com.betterjr.modules.customer.entity.CustInsteadApply;
 import com.betterjr.modules.customer.entity.CustInsteadRecord;
+import com.betterjr.modules.document.service.CustFileItemService;
 
 /**
  * 代录申请
@@ -34,13 +35,16 @@ public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper,
     @Resource
     private CustInsteadRecordService insteadRecordService;
 
+    @Resource
+    private CustFileItemService fileItemService;
+
     /**
      * 添加代录申请 检查是否已经有申请在进行中
      * 
      * @param anCustInsteadApply
      * @return
      */
-    public CustInsteadApply addCustInsteadApply(String anInsteadType, Long anCustNo) {
+    public CustInsteadApply addCustInsteadApply(String anInsteadType, Long anCustNo, String anFileList) {
         if (BetterStringUtils.isBlank(anInsteadType) == true) {
             throw new BytterTradeException(20061, "代录申请类型不允许为空！");
         }
@@ -50,6 +54,9 @@ public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper,
             custInsteadApply.initAddValue(anInsteadType, null, null);
         }
         else {// 变更代录 需要 custNo 和 custName
+
+            // TODO @@@@@@@@ 检查是否有正在进行的变更 代录
+
             BTAssert.notNull(anCustNo, "客户编号不能为空！");
 
             if (checkExistActiveInsteadApply(anCustNo) == true) {
@@ -59,6 +66,8 @@ public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper,
             String custName = accountService.queryCustName(anCustNo);
             custInsteadApply.initAddValue(anInsteadType, anCustNo, custName);
         }
+
+        custInsteadApply.setBatchNo(fileItemService.updateCustFileItemInfo(anFileList, custInsteadApply.getBatchNo()));
 
         this.insert(custInsteadApply);
         return custInsteadApply;
@@ -75,9 +84,13 @@ public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper,
         conditionMap.put(CustomerConstants.CUST_NO, anCustNo);
         // INSTEAD_APPLY_STATUS_CONFIRM_PASS 这两种状态表明 此申请已经完成 或者 取消
         // INSTEAD_APPLY_STATUS_CANCEL
-        String[] businStatues = { CustomerConstants.INSTEAD_APPLY_STATUS_NEW, CustomerConstants.INSTEAD_APPLY_STATUS_AUDIT_PASS,
-                CustomerConstants.INSTEAD_APPLY_STATUS_AUDIT_REJECT, CustomerConstants.INSTEAD_APPLY_STATUS_TYPE_IN,
-                CustomerConstants.INSTEAD_APPLY_STATUS_REVIEW_PASS, CustomerConstants.INSTEAD_APPLY_STATUS_REVIEW_REJECT,
+        String[] businStatues = { 
+                CustomerConstants.INSTEAD_APPLY_STATUS_NEW, 
+                CustomerConstants.INSTEAD_APPLY_STATUS_AUDIT_PASS,
+                CustomerConstants.INSTEAD_APPLY_STATUS_AUDIT_REJECT, 
+                CustomerConstants.INSTEAD_APPLY_STATUS_TYPE_IN,
+                CustomerConstants.INSTEAD_APPLY_STATUS_REVIEW_PASS, 
+                CustomerConstants.INSTEAD_APPLY_STATUS_REVIEW_REJECT,
                 CustomerConstants.INSTEAD_APPLY_STATUS_CONFIRM_REJECT };
         conditionMap.put("businStatus", businStatues);
         return Collections3.isEmpty(this.selectByProperty(conditionMap)) == false;
@@ -94,7 +107,7 @@ public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper,
 
         CustInsteadApply insteadApply = this.selectByPrimaryKey(anId);
 
-        List<CustInsteadRecord> insteadRecords = insteadRecordService.queryCustInsteadRecord(insteadApply.getId());
+        List<CustInsteadRecord> insteadRecords = insteadRecordService.queryInsteadRecord(insteadApply.getId());
         insteadApply.setInsteadItems(generateInsteadItems(insteadRecords));
 
         return insteadApply;
@@ -121,28 +134,36 @@ public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper,
             }
         }
 
-        if (flag) {
-            return "1";
-        }
-        else {
-            return "0";
-        }
+        return flag ? "1" : "0";
     }
 
     /**
-     * 保存代录申请
-     * 
-     * @param anCustInsteadApply
-     * @return
+     * 修改代录申请及文件列表
      */
-    public CustInsteadApply saveCustInsteadApply(Long anId, String anBusinStatus) {
+    public CustInsteadApply saveCustInsteadApply(CustInsteadApply anInsteadApply, String anFileList) {
+        BTAssert.notNull(anInsteadApply, "代录申请不允许为空！");
+
+        final CustInsteadApply tempInsteadApply = this.selectByPrimaryKey(anInsteadApply.getId());
+        BTAssert.notNull(tempInsteadApply, "没有找到对应的代录申请！");
+
+        tempInsteadApply.initModifyValue(anInsteadApply);
+        tempInsteadApply.setBatchNo(fileItemService.updateCustFileItemInfo(anFileList, anInsteadApply.getBatchNo()));
+        return tempInsteadApply;
+    }
+
+    /**
+     * 修改代录申请状态
+     */
+    public CustInsteadApply saveCustInsteadApplyStatus(Long anId, String anBusinStatus) {
         BTAssert.notNull(anId, "编号不允许为空！");
         BTAssert.notNull(anBusinStatus, "状态不允许为空！");
 
-        final CustInsteadApply tempCustInsteadApply = this.selectByPrimaryKey(anId);
-        tempCustInsteadApply.initModifyValue(anBusinStatus);
-        this.updateByPrimaryKeySelective(tempCustInsteadApply);
-        return tempCustInsteadApply;
+        final CustInsteadApply tempInsteadApply = this.selectByPrimaryKey(anId);
+        BTAssert.notNull(tempInsteadApply, "没有找到对应的代录申请！");
+
+        tempInsteadApply.initModifyValue(anBusinStatus);
+        this.updateByPrimaryKeySelective(tempInsteadApply);
+        return tempInsteadApply;
     }
 
     /**
@@ -164,4 +185,5 @@ public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper,
         }
         return this.selectPropertyByPage(CustInsteadApply.class, anParam, anPageNum, anPageSize, anFlag == 1);
     }
+
 }
