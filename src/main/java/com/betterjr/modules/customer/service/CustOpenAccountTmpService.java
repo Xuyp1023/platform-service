@@ -312,7 +312,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
             this.updateByPrimaryKeySelective(anOpenAccountInfo);
         }
         // 回写暂存流水号至代录申请表
-        custInsteadRecordService.saveCustInsteadRecord(anInsteadId, String.valueOf(anOpenAccountInfo.getId()));
+        custInsteadRecordService.saveInsteadRecord(anInsteadId, String.valueOf(anOpenAccountInfo.getId()));
 
         return anOpenAccountInfo;
     }
@@ -506,7 +506,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
             // 更新附件批次号
             anCustMechBusinLicenceInfo.setBatchNo(anNewBatchNo);
         }
-        custMechBusinLicenceService.addCustMechBusinLicence(anCustMechBusinLicenceInfo, anCustNo);
+        custMechBusinLicenceService.addBusinLicence(anCustMechBusinLicenceInfo, anCustNo);
     }
 
     private void addCustMechBankAccount(CustOpenAccountTmp anOpenAccountInfo, Multimap<String, Object> anCustFileItem, Long anCustNo, Long anOperId,

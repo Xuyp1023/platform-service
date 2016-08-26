@@ -68,7 +68,6 @@ public class CustAuditLogService extends BaseService<CustAuditLogMapper, CustAud
         BTAssert.notNull(anBusinId, "业务编号不允许为空!");
 
         Map<String, Object> conditionMap = new HashMap<>();
-
         conditionMap.put("auditType", anAuditType);
         conditionMap.put("businId", anBusinId);
 

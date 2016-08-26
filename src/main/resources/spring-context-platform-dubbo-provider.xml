@@ -47,7 +47,6 @@
 		</property>
 	</bean>
 
-
 	<bean class="com.betterjr.common.utils.PropertiesHolder">
 		<property name="properties" value="config.properties" />
 	</bean>
@@ -202,5 +201,6 @@
 	<import resource="platform-dubbo-provider.xml" />
 	<import resource="workflow-snaker.xml"/>
 	<import resource="mq-config.xml"/>
+	<import resource="job-config.xml"/>
 
 </beans>

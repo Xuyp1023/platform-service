@@ -65,33 +65,33 @@ public class CustMechBankAccountService extends BaseService<CustMechBankAccountM
     /**
      * 添加银行账户信息
      * 
-     * @param anCustMechBankAccount
+     * @param anBankAccount
      * @return
      */
-    public CustMechBankAccount addCustMechBankAccount(CustMechBankAccount anCustMechBankAccount, Long anCustNo) {
-        BTAssert.notNull(anCustMechBankAccount, "银行账户信息不允许为空！");
+    public CustMechBankAccount addCustMechBankAccount(CustMechBankAccount anBankAccount, Long anCustNo) {
+        BTAssert.notNull(anBankAccount, "银行账户信息不允许为空！");
         BTAssert.notNull(anCustNo, "客户编号不允许为空！");
 
         final CustInfo custInfo = accountService.selectByPrimaryKey(anCustNo);
-        anCustMechBankAccount.initAddValue(anCustNo, custInfo.getCustName(), custInfo.getRegOperId(), custInfo.getRegOperName(),
+        anBankAccount.initAddValue(anCustNo, custInfo.getCustName(), custInfo.getRegOperId(), custInfo.getRegOperName(),
                 custInfo.getOperOrg());
-        this.insert(anCustMechBankAccount);
-        return anCustMechBankAccount;
+        this.insert(anBankAccount);
+        return anBankAccount;
     }
     
     /**
      * 保存银行账户信息
      */
-    public CustMechBankAccount saveCustMechBankAccount(CustMechBankAccount anCustMechBankAccount, Long anId) {
+    public CustMechBankAccount saveCustMechBankAccount(CustMechBankAccount anBankAccount, Long anId) {
         BTAssert.notNull(anId, "银行账户编号不允许为空！");
-        BTAssert.notNull(anCustMechBankAccount, "银行账户信息不允许为空！");
+        BTAssert.notNull(anBankAccount, "银行账户信息不允许为空！");
         
-        final CustMechBankAccount tempCustMechBankAccount = this.selectByPrimaryKey(anId);
-        BTAssert.notNull(tempCustMechBankAccount, "对应的银行账户信息没有找到！");
+        final CustMechBankAccount tempBankAccount = this.selectByPrimaryKey(anId);
+        BTAssert.notNull(tempBankAccount, "对应的银行账户信息没有找到！");
         
-        tempCustMechBankAccount.initModifyValue(anCustMechBankAccount);
-        this.updateByPrimaryKeySelective(tempCustMechBankAccount);
-        return tempCustMechBankAccount;
+        tempBankAccount.initModifyValue(anBankAccount);
+        this.updateByPrimaryKeySelective(tempBankAccount);
+        return tempBankAccount;
     }
 
     /**
@@ -100,12 +100,12 @@ public class CustMechBankAccountService extends BaseService<CustMechBankAccountM
     public CustMechBankAccount saveCustMechBankAccount(CustMechBankAccountTmp anBankAccountTmp) {
         BTAssert.notNull(anBankAccountTmp, "银行账户流水编号不允许为空！");
         
-        final CustMechBankAccount tempCustMechBankAccount = this.selectByPrimaryKey(anBankAccountTmp.getRefId());
-        BTAssert.notNull(tempCustMechBankAccount, "对应的银行账户信息没有找到！");
+        final CustMechBankAccount tempBankAccount = this.selectByPrimaryKey(anBankAccountTmp.getRefId());
+        BTAssert.notNull(tempBankAccount, "对应的银行账户信息没有找到！");
         
-        tempCustMechBankAccount.initModifyValue(anBankAccountTmp);
-        this.updateByPrimaryKeySelective(tempCustMechBankAccount);
-        return tempCustMechBankAccount;
+        tempBankAccount.initModifyValue(anBankAccountTmp);
+        this.updateByPrimaryKeySelective(tempBankAccount);
+        return tempBankAccount;
     }
 
 

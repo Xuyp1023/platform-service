@@ -20,6 +20,7 @@ import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.account.service.CustOperatorService;
+import com.betterjr.modules.notice.constant.NoticeConstants;
 import com.betterjr.modules.notice.dao.NoticeCustomerMapper;
 import com.betterjr.modules.notice.entity.Notice;
 import com.betterjr.modules.notice.entity.NoticeCustomer;
@@ -33,9 +34,9 @@ public class NoticeCustomerService extends BaseService<NoticeCustomerMapper, Not
     private CustOperatorService custOperatorService;
 
     /**
-     *  
+     * 按条件查询 NoticeCustomer
      */
-    public NoticeCustomer findNoticeCustomerByNoticeIdAndCustNoAndOperId(Long anNoticeId, Long anCustNo, Long anOperId) {
+    public NoticeCustomer findNoticeCustomerByCondition(Long anNoticeId, Long anCustNo, Long anOperId) {
         BTAssert.notNull(anNoticeId, "公告编号不允许为空!");
         BTAssert.notNull(anOperId, "操作员编号不允许为空!");
 
@@ -43,6 +44,7 @@ public class NoticeCustomerService extends BaseService<NoticeCustomerMapper, Not
         conditionMap.put("noticeId", anNoticeId);
         conditionMap.put("custNo", anCustNo);
         conditionMap.put("operId", anOperId);
+        conditionMap.put("businStatus", NoticeConstants.NOTICE_STATUS_PUBLISHED);
         return Collections3.getFirst(this.selectByProperty(conditionMap));
     }
 
@@ -53,7 +55,7 @@ public class NoticeCustomerService extends BaseService<NoticeCustomerMapper, Not
         BTAssert.notNull(anNoticeId, "公告编号不允许为空!");
         BTAssert.notNull(anOperId, "操作员编号不允许为空!");
 
-        NoticeCustomer noticeCustomer = this.findNoticeCustomerByNoticeIdAndCustNoAndOperId(anNoticeId, anCustNo, anOperId);
+        NoticeCustomer noticeCustomer = this.findNoticeCustomerByCondition(anNoticeId, anCustNo, anOperId);
         noticeCustomer.initModifyValue(null, Boolean.TRUE);
 
         this.updateByPrimaryKeySelective(noticeCustomer);
@@ -67,13 +69,16 @@ public class NoticeCustomerService extends BaseService<NoticeCustomerMapper, Not
         BTAssert.notNull(anNoticeId, "公告编号不允许为空!");
         BTAssert.notNull(anOperId, "操作员编号不允许为空!");
 
-        NoticeCustomer noticeCustomer = this.findNoticeCustomerByNoticeIdAndCustNoAndOperId(anNoticeId, anCustNo, anOperId);
+        NoticeCustomer noticeCustomer = this.findNoticeCustomerByCondition(anNoticeId, anCustNo, anOperId);
         noticeCustomer.initModifyValue(Boolean.TRUE, null);
 
         this.updateByPrimaryKeySelective(noticeCustomer);
         return noticeCustomer;
     }
 
+    /**
+     * 按noticeId查询 NoticeCustomer
+     */
     public List<NoticeCustomer> queryNoticeCustomer(Long anNoticeId) {
         BTAssert.notNull(anNoticeId, "公告编号不允许为空!");
 
@@ -81,7 +86,7 @@ public class NoticeCustomerService extends BaseService<NoticeCustomerMapper, Not
     }
 
     /**
-     * 仅回传 custNo + custName 
+     * 根据 NoticeId 查询 已接收的 公司 仅回传 custNo + custName
      */
     public List<NoticeCustomer> querySimpleNoticeCustomer(Long anNoticeId) {
         BTAssert.notNull(anNoticeId, "公告编号不允许为空!");
@@ -90,7 +95,7 @@ public class NoticeCustomerService extends BaseService<NoticeCustomerMapper, Not
     }
 
     /**
-     * 发布新公告添加公告与客户操作员关系
+     * 公告与客户操作员关系
      */
     public void saveNoticeCustomer(Notice anNotice, String[] anTargetCusts) {
         BTAssert.notNull(anNotice, "公告不允许为空!");
@@ -109,6 +114,9 @@ public class NoticeCustomerService extends BaseService<NoticeCustomerMapper, Not
                 .forEach(noticeCustomer -> this.deleteByPrimaryKey(noticeCustomer.getId()));
     }
 
+    /**
+     * 检查是否存在于发布列表
+     */
     private boolean checkExistInSaveNoticeCustomer(NoticeCustomer anNoticeCustomer, List<Triple<Long, Long, Long>> anSaveNoticeCustomers) {
         Long noticeId = anNoticeCustomer.getNoticeId();
         Long custNo = anNoticeCustomer.getCustNo();
@@ -134,7 +142,7 @@ public class NoticeCustomerService extends BaseService<NoticeCustomerMapper, Not
         final CustInfo custInfo = accountService.findCustInfo(anCustNo);
         final List<CustOperatorInfo> operatorInfos = custOperatorService.queryOperatorInfoByCustNo(anCustNo);
         operatorInfos.forEach(operator -> {
-            final NoticeCustomer tempNoticeCustomer = this.findNoticeCustomerByNoticeIdAndCustNoAndOperId(anNoticeId, anCustNo, operator.getId());
+            final NoticeCustomer tempNoticeCustomer = this.findNoticeCustomerByCondition(anNoticeId, anCustNo, operator.getId());
             if (tempNoticeCustomer == null) {
                 final NoticeCustomer noticeCustomer = new NoticeCustomer();
                 noticeCustomer.initAddValue(anNoticeId, anCustNo, custInfo.getCustName(), operator.getId(), operator.getName());

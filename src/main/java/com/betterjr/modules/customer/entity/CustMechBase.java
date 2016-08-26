@@ -275,7 +275,6 @@ public class CustMechBase implements BetterjrEntity {
     /**
      * 邮编
      */
-    @JsonIgnore
     @Column(name = "C_ZIPCODE",  columnDefinition="VARCHAR" )
     @MetaData( value="邮编", comments = "邮编")
     private String zipCode;
@@ -1183,6 +1182,7 @@ public class CustMechBase implements BetterjrEntity {
         this.webaddr = anMechBaseTmp.getWebaddr();
         this.wechat = anMechBaseTmp.getWechat();
         this.zipCode = anMechBaseTmp.getZipCode();
+        this.batchNo = anMechBaseTmp.getBatchNo();
         
         this.modiOperId = UserUtils.getOperatorInfo().getId();
         this.modiOperName = UserUtils.getOperatorInfo().getName();

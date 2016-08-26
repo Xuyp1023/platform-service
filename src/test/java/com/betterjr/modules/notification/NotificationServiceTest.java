@@ -6,6 +6,7 @@ import java.util.concurrent.CountDownLatch;
 import org.junit.Test;
 
 import com.betterjr.common.notification.NotificationModel;
+import com.betterjr.common.notification.NotificationModel.Builder;
 import com.betterjr.common.service.NotificationService;
 import com.betterjr.common.utils.DictUtils;
 import com.betterjr.modules.BasicServiceTest;
@@ -37,12 +38,14 @@ public class NotificationServiceTest extends BasicServiceTest<NotificationServic
         baseInfo.setEmail("vanlin@163.com");
         baseInfo.setCustName("亿起融金融服务有限责任公司");
         
-        NotificationModel.Builder builder = NotificationModel.newBuilder("开户成功通知", platformCustNo, 1260L);
+        Builder builder = NotificationModel.newBuilder("开户成功通知", platformCustNo, 1260L);
         builder.addReceiveOperator(1258L);
         builder.addReceiveOperator(1259L);
         builder.addReceiveOperator(1260L);
         builder.addReceiveOperator(1261L);
         builder.addReceiveOperator(1262L);
+        builder.addReceiveEmail("liuwl@bytter.com");
+        builder.addReceiveMobile("13808060501");
         builder.setEntity(baseInfo);
         NotificationModel notificationModel = builder.build();
         
@@ -55,7 +58,6 @@ public class NotificationServiceTest extends BasicServiceTest<NotificationServic
     @Test
     public void testConsumerMessage() {
         createCoreUser();
-        
         
         pauseThread();
     }

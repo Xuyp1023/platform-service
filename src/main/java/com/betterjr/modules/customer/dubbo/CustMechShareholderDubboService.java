@@ -45,37 +45,37 @@ public class CustMechShareholderDubboService implements ICustMechShareholderServ
 
     @Override
     public String webQueryShareholder(Long anCustNo) {
-        return newOk("查询公司股东列表成功", shareholderService.queryCustMechShareholder(anCustNo)).toJson();
+        return newOk("查询公司股东列表成功", shareholderService.queryShareholder(anCustNo)).toJson();
     }
 
     @Override
     public String webFindShareholder(Long anId) {
-        CustMechShareholder Shareholder = shareholderService.findCustMechShareholder(anId);
+        CustMechShareholder Shareholder = shareholderService.findShareholder(anId);
         BTAssert.notNull(Shareholder, "没有找到股东信息!");
         return newOk("查询公司股东详情成功!", Shareholder).toJson();
     }
 
     @Override
     public String webFindShareholderTmp(Long anId) {
-        return newOk("查询公司股东列表成功", shareholderTmpService.findCustMechShareholderTmp(anId)).toJson();
+        return newOk("查询公司股东列表成功", shareholderTmpService.findShareholderTmp(anId)).toJson();
     }
 
     @Override
     public String webSaveShareholderTmp(Map<String, Object> anParam, Long anId, String anFileList) {
-        final CustMechShareholderTmp custMechShareholderTmp = (CustMechShareholderTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return newOk("公司股东-流水信息 修改成功", shareholderTmpService.saveShareholderTmp(custMechShareholderTmp, anId)).toJson();
+        final CustMechShareholderTmp custMechShareholderTmp = RuleServiceDubboFilterInvoker.getInputObj();
+        return newOk("公司股东-流水信息 修改成功", shareholderTmpService.saveShareholderTmp(custMechShareholderTmp, anId, anFileList)).toJson();
     }
 
     @Override
     public String webAddChangeShareholderTmp(Map<String, Object> anMap, String anFileList) {
-        final CustMechShareholderTmp custMechShareholderTmp = (CustMechShareholderTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return newOk("公司股东-流水信息 变更添加成功", shareholderTmpService.addChangeShareholderTmp(custMechShareholderTmp)).toJson();
+        final CustMechShareholderTmp custMechShareholderTmp = RuleServiceDubboFilterInvoker.getInputObj();
+        return newOk("公司股东-流水信息 变更添加成功", shareholderTmpService.addChangeShareholderTmp(custMechShareholderTmp, anFileList)).toJson();
     }
 
     @Override
     public String webSaveChangeShareholderTmp(Map<String, Object> anParam, String anFileList) {
-        final CustMechShareholderTmp custMechShareholderTmp = (CustMechShareholderTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return newOk("公司股东-流水信息 变更修改成功", shareholderTmpService.saveSaveChangeShareholderTmp(custMechShareholderTmp)).toJson();
+        final CustMechShareholderTmp custMechShareholderTmp = RuleServiceDubboFilterInvoker.getInputObj();
+        return newOk("公司股东-流水信息 变更修改成功", shareholderTmpService.saveSaveChangeShareholderTmp(custMechShareholderTmp, anFileList)).toJson();
     }
 
     @Override
@@ -90,12 +90,12 @@ public class CustMechShareholderDubboService implements ICustMechShareholderServ
 
     @Override
     public String webQueryNewChangeShareholderTmp(Long anCustNo) {
-        return newOk("公司股东-流水信息 列表查询成功", shareholderTmpService.queryNewChangeCustMechShareholderTmp(anCustNo)).toJson();
+        return newOk("公司股东-流水信息 列表查询成功", shareholderTmpService.queryNewChangeShareholderTmp(anCustNo)).toJson();
     }
 
     @Override
     public String webQueryChangeShareholderTmp(Long anApplyId) {
-        return newOk("公司股东-流水信息 列表查询成功", shareholderTmpService.queryChangeCustMechShareholderTmp(anApplyId)).toJson();
+        return newOk("公司股东-流水信息 列表查询成功", shareholderTmpService.queryChangeShareholderTmp(anApplyId)).toJson();
     }
 
     @Override
@@ -119,8 +119,8 @@ public class CustMechShareholderDubboService implements ICustMechShareholderServ
     public String webFindChangeApply(Long anApplyId, Long anTmpId) {
         final CustChangeApply changeApply = changeService.findChangeApply(anApplyId, CustomerConstants.ITEM_SHAREHOLDER);
 
-        final CustMechShareholderTmp nowData = shareholderTmpService.findCustMechShareholderTmp(anTmpId);
-        final CustMechShareholderTmp befData = shareholderTmpService.findCustMechShareholderTmpPrevVersion(nowData);
+        final CustMechShareholderTmp nowData = shareholderTmpService.findShareholderTmp(anTmpId);
+        final CustMechShareholderTmp befData = shareholderTmpService.findShareholderTmpPrevVersion(nowData);
 
         ChangeDetailBean<CustMechShareholderTmp> changeDetailBean = new ChangeDetailBean<>();
         changeDetailBean.setChangeApply(changeApply);
@@ -132,14 +132,14 @@ public class CustMechShareholderDubboService implements ICustMechShareholderServ
 
     @Override
     public String webAddInsteadShareholderTmp(Map<String, Object> anMap, Long anInsteadRecordId, String anFileList) {
-        final CustMechShareholderTmp custMechShareholderTmp = (CustMechShareholderTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return newOk("公司股东-流水信息 代录添加成功", shareholderTmpService.addInsteadShareholderTmp(custMechShareholderTmp, anInsteadRecordId)).toJson();
+        final CustMechShareholderTmp custMechShareholderTmp = RuleServiceDubboFilterInvoker.getInputObj();
+        return newOk("公司股东-流水信息 代录添加成功", shareholderTmpService.addInsteadShareholderTmp(custMechShareholderTmp, anInsteadRecordId, anFileList)).toJson();
     }
 
     @Override
     public String webSaveInsteadShareholderTmp(Map<String, Object> anParam, Long anInsteadRecordId, String anFileList) {
-        final CustMechShareholderTmp custMechShareholderTmp = (CustMechShareholderTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return newOk("公司股东-流水信息 代录修改成功", shareholderTmpService.saveSaveInsteadShareholderTmp(custMechShareholderTmp, anInsteadRecordId)).toJson();
+        final CustMechShareholderTmp custMechShareholderTmp = RuleServiceDubboFilterInvoker.getInputObj();
+        return newOk("公司股东-流水信息 代录修改成功", shareholderTmpService.saveSaveInsteadShareholderTmp(custMechShareholderTmp, anInsteadRecordId, anFileList)).toJson();
 
     }
 

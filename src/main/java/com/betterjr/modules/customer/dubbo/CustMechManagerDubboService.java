@@ -57,25 +57,25 @@ public class CustMechManagerDubboService implements ICustMechManagerService {
 
     @Override
     public String webFindManagerTmp(Long anId) {
-        return newOk("查询公司高管列表成功", managerTmpService.findCustMechManagerTmp(anId)).toJson();
+        return newOk("查询公司高管列表成功", managerTmpService.findManagerTmp(anId)).toJson();
     }
 
     @Override
     public String webSaveManagerTmp(Map<String, Object> anParam, Long anId, String anFileList) {
-        final CustMechManagerTmp custMechManagerTmp = (CustMechManagerTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return newOk("公司高管-流水信息 修改成功", managerTmpService.saveManagerTmp(custMechManagerTmp, anId)).toJson();
+        final CustMechManagerTmp custMechManagerTmp = RuleServiceDubboFilterInvoker.getInputObj();
+        return newOk("公司高管-流水信息 修改成功", managerTmpService.saveManagerTmp(custMechManagerTmp, anId, anFileList)).toJson();
     }
 
     @Override
     public String webAddChangeManagerTmp(Map<String, Object> anMap, String anFileList) {
         final CustMechManagerTmp custMechManagerTmp = (CustMechManagerTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return newOk("公司高管-流水信息 变更添加成功", managerTmpService.addChangeManagerTmp(custMechManagerTmp)).toJson();
+        return newOk("公司高管-流水信息 变更添加成功", managerTmpService.addChangeManagerTmp(custMechManagerTmp, anFileList)).toJson();
     }
 
     @Override
     public String webSaveChangeManagerTmp(Map<String, Object> anParam, String anFileList) {
         final CustMechManagerTmp custMechManagerTmp = (CustMechManagerTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return newOk("公司高管-流水信息 变更修改成功", managerTmpService.saveSaveChangeManagerTmp(custMechManagerTmp)).toJson();
+        return newOk("公司高管-流水信息 变更修改成功", managerTmpService.saveSaveChangeManagerTmp(custMechManagerTmp, anFileList)).toJson();
     }
 
     @Override
@@ -90,12 +90,12 @@ public class CustMechManagerDubboService implements ICustMechManagerService {
 
     @Override
     public String webQueryNewChangeManagerTmp(Long anCustNo) {
-        return newOk("公司高管-流水信息 列表查询成功", managerTmpService.queryNewChangeCustMechManagerTmp(anCustNo)).toJson();
+        return newOk("公司高管-流水信息 列表查询成功", managerTmpService.queryNewChangeManagerTmp(anCustNo)).toJson();
     }
 
     @Override
     public String webQueryChangeManagerTmp(Long anApplyId) {
-        return newOk("公司高管-流水信息 列表查询成功", managerTmpService.queryChangeCustMechManagerTmp(anApplyId)).toJson();
+        return newOk("公司高管-流水信息 列表查询成功", managerTmpService.queryChangeManagerTmp(anApplyId)).toJson();
     }
 
     @Override
@@ -119,8 +119,8 @@ public class CustMechManagerDubboService implements ICustMechManagerService {
     public String webFindChangeApply(Long anApplyId, Long anTmpId) {
         final CustChangeApply changeApply = changeService.findChangeApply(anApplyId, CustomerConstants.ITEM_MANAGER);
 
-        final CustMechManagerTmp nowData = managerTmpService.findCustMechManagerTmp(anTmpId);
-        final CustMechManagerTmp befData = managerTmpService.findCustMechManagerTmpPrevVersion(nowData);
+        final CustMechManagerTmp nowData = managerTmpService.findManagerTmp(anTmpId);
+        final CustMechManagerTmp befData = managerTmpService.findManagerTmpPrevVersion(nowData);
 
         ChangeDetailBean<CustMechManagerTmp> changeDetailBean = new ChangeDetailBean<>();
         changeDetailBean.setChangeApply(changeApply);
@@ -133,14 +133,13 @@ public class CustMechManagerDubboService implements ICustMechManagerService {
     @Override
     public String webAddInsteadManagerTmp(Map<String, Object> anMap, Long anInsteadRecordId, String anFileList) {
         final CustMechManagerTmp custMechManagerTmp = (CustMechManagerTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return newOk("公司高管-流水信息 代录添加成功", managerTmpService.addInsteadManagerTmp(custMechManagerTmp, anInsteadRecordId)).toJson();
+        return newOk("公司高管-流水信息 代录添加成功", managerTmpService.addInsteadManagerTmp(custMechManagerTmp, anInsteadRecordId, anFileList)).toJson();
     }
 
     @Override
     public String webSaveInsteadManagerTmp(Map<String, Object> anParam, Long anInsteadRecordId, String anFileList) {
         final CustMechManagerTmp custMechManagerTmp = (CustMechManagerTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return newOk("公司高管-流水信息 代录修改成功", managerTmpService.saveSaveInsteadManagerTmp(custMechManagerTmp, anInsteadRecordId)).toJson();
-
+        return newOk("公司高管-流水信息 代录修改成功", managerTmpService.saveSaveInsteadManagerTmp(custMechManagerTmp, anInsteadRecordId, anFileList)).toJson();
     }
 
     @Override
