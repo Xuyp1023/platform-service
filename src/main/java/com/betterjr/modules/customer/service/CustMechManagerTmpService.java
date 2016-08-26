@@ -92,11 +92,11 @@ public class CustMechManagerTmpService extends BaseService<CustMechManagerTmpMap
         final Long refId = anManagerTmp.getRefId();
         BTAssert.isNull(refId, "引用编号不能有值!");
 
-        anManagerTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW);
+        anManagerTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW, CustomerConstants.TMP_TYPE_CHANGE, null);
         anManagerTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_ADD);
         anManagerTmp.setBatchNo(fileItemService.updateCustFileItemInfo(anFileList, anManagerTmp.getBatchNo()));
 
-        return addManagerTmp(anManagerTmp, CustomerConstants.TMP_TYPE_CHANGE);
+        return addManagerTmp(anManagerTmp);
     }
 
     /**
@@ -117,15 +117,17 @@ public class CustMechManagerTmpService extends BaseService<CustMechManagerTmpMap
 
         CustMechManagerTmp tempManagerTmp = findManagerTmpByRefId(refId, CustomerConstants.TMP_TYPE_CHANGE);
         if (tempManagerTmp == null) {
+            anManagerTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW, CustomerConstants.TMP_TYPE_CHANGE, null);
             anManagerTmp.setBusinStatus(CustomerConstants.TMP_STATUS_NEW);
             anManagerTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
             anManagerTmp.setBatchNo(fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, anManagerTmp.getBatchNo()));
-            return addManagerTmp(anManagerTmp, CustomerConstants.TMP_TYPE_CHANGE);
+            return addManagerTmp(anManagerTmp);
         }
         else {
             tempManagerTmp.initModifyValue(anManagerTmp);
             tempManagerTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
-            return saveManagerTmp(tempManagerTmp, tempManagerTmp.getId(), anFileList);
+            tempManagerTmp.setBatchNo(fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, tempManagerTmp.getBatchNo()));
+            return saveManagerTmp(tempManagerTmp);
         }
     }
 
@@ -143,8 +145,9 @@ public class CustMechManagerTmpService extends BaseService<CustMechManagerTmpMap
             managerTmp = new CustMechManagerTmp();
             managerTmp.initAddValue(manager, CustomerConstants.TMP_STATUS_NEW);
             managerTmp.setRefId(anRefId);
+            managerTmp.setTmpType(CustomerConstants.TMP_TYPE_CHANGE);
             managerTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_DELETE);
-            return addManagerTmp(managerTmp, CustomerConstants.TMP_TYPE_CHANGE);
+            return addManagerTmp(managerTmp);
         }
         else {
             managerTmp.initModifyValue(manager, CustomerConstants.TMP_STATUS_NEW);
@@ -245,8 +248,9 @@ public class CustMechManagerTmpService extends BaseService<CustMechManagerTmpMap
                 managerTmp.initAddValue(manager, CustomerConstants.TMP_STATUS_USEING);
                 managerTmp.setRefId(manager.getId());
                 managerTmp.setParentId(parentId);
+                managerTmp.setTmpType(anTmpType);
                 managerTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_NORMAL);
-                addManagerTmp(managerTmp, anTmpType);
+                addManagerTmp(managerTmp);
             }
         }
     }
@@ -349,13 +353,12 @@ public class CustMechManagerTmpService extends BaseService<CustMechManagerTmpMap
     /**
      * 添加公司高管流水信息
      */
-    public CustMechManagerTmp addManagerTmp(CustMechManagerTmp anManagerTmp, String anTmpType) {
+    public CustMechManagerTmp addManagerTmp(CustMechManagerTmp anManagerTmp) {
         BTAssert.notNull(anManagerTmp, "公司高管流水信息不允许为空！");
         Long custNo = anManagerTmp.getCustNo();
         Long version = VersionHelper.generateVersion(this.mapper, custNo);
 
         //anCustMechManagerTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW, anTmpType, version);
-        anManagerTmp.setTmpType(anTmpType);
         anManagerTmp.setVersion(version);
         this.insert(anManagerTmp);
         return anManagerTmp;
@@ -419,12 +422,12 @@ public class CustMechManagerTmpService extends BaseService<CustMechManagerTmpMap
             throw new BytterTradeException("客户编号不匹配!");
         }
 
-        anManagerTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW);
+        anManagerTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW, CustomerConstants.TMP_TYPE_INSTEAD, null);
         anManagerTmp.setParentId(anInsteadRecordId);
         anManagerTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_ADD);
         anManagerTmp.setBatchNo(fileItemService.updateCustFileItemInfo(anFileList, anManagerTmp.getBatchNo()));
 
-        return addManagerTmp(anManagerTmp, CustomerConstants.TMP_TYPE_INSTEAD);
+        return addManagerTmp(anManagerTmp);
     }
 
     /**
@@ -449,16 +452,17 @@ public class CustMechManagerTmpService extends BaseService<CustMechManagerTmpMap
 
         CustMechManagerTmp tempManagerTmp = findManagerTmpByRefId(refId, CustomerConstants.TMP_TYPE_INSTEAD);
         if (tempManagerTmp == null) {
+            anManagerTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW, CustomerConstants.TMP_TYPE_INSTEAD, null);
             anManagerTmp.setParentId(anInsteadRecordId);
-            anManagerTmp.setBusinStatus(CustomerConstants.TMP_STATUS_NEW);
             anManagerTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
             anManagerTmp.setBatchNo(fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, anManagerTmp.getBatchNo()));
-            return addManagerTmp(anManagerTmp, CustomerConstants.TMP_TYPE_INSTEAD);
+            return addManagerTmp(anManagerTmp);
         }
         else {
             tempManagerTmp.initModifyValue(anManagerTmp);
             tempManagerTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
-            return saveManagerTmp(tempManagerTmp, tempManagerTmp.getId(), anFileList);
+            tempManagerTmp.setBatchNo(fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, tempManagerTmp.getBatchNo()));
+            return saveManagerTmp(tempManagerTmp);
         }
     }
 
@@ -487,8 +491,9 @@ public class CustMechManagerTmpService extends BaseService<CustMechManagerTmpMap
             managerTmp.initAddValue(manager, CustomerConstants.TMP_STATUS_NEW);
             managerTmp.setRefId(anRefId);
             managerTmp.setParentId(anInsteadRecordId);
+            managerTmp.setTmpType(CustomerConstants.TMP_TYPE_INSTEAD);
             managerTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_DELETE);
-            return addManagerTmp(managerTmp, CustomerConstants.TMP_TYPE_INSTEAD);
+            return addManagerTmp(managerTmp);
         }
         else {
             managerTmp.initModifyValue(manager, CustomerConstants.TMP_STATUS_NEW);
