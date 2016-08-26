@@ -9,10 +9,12 @@ import javax.persistence.Table;
 
 import com.betterjr.common.annotation.MetaData;
 import com.betterjr.common.entity.BetterjrEntity;
+import com.betterjr.common.mapper.CustDateJsonSerializer;
 import com.betterjr.common.selectkey.SerialGenerator;
 import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.UserUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @Access(AccessType.FIELD)
 @Entity
@@ -65,6 +67,7 @@ public class CustMechManager implements BetterjrEntity {
     /**
      * 出生日期
      */
+    @JsonSerialize(using = CustDateJsonSerializer.class)
     @Column(name = "D_BIRTHDATE",  columnDefinition="VARCHAR" )
     @MetaData( value="出生日期", comments = "出生日期")
     private String birthdate;

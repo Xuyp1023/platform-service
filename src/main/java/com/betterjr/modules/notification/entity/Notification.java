@@ -5,6 +5,7 @@ import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
 import com.betterjr.common.annotation.MetaData;
@@ -63,6 +64,7 @@ public class Notification implements BetterjrEntity {
      * 发送日期
      */
     @JsonSerialize(using = CustDateJsonSerializer.class)
+    @OrderBy("DESC")
     @Column(name = "D_SENT_DATE",  columnDefinition="VARCHAR" )
     @MetaData( value="发送日期", comments = "发送日期")
     private String sentDate;
@@ -71,6 +73,7 @@ public class Notification implements BetterjrEntity {
      * 发送时间
      */
     @JsonSerialize(using = CustTimeJsonSerializer.class)
+    @OrderBy("DESC")
     @Column(name = "T_SENT_TIME",  columnDefinition="VARCHAR" )
     @MetaData( value="发送时间", comments = "发送时间")
     private String sentTime;

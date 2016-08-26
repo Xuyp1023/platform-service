@@ -154,8 +154,11 @@ public class CustFileItemService extends BaseService<CustFileItemMapper, CustFil
      * @return
      */
     public List<CustFileItem> findCustFiles(Long anBatchNo) {
+        Map<String, Object> conditionMap = new HashMap<>();
+        conditionMap.put("batchNo", anBatchNo);
+        conditionMap.put("GTid", 0L);
 
-        return this.selectByProperty("batchNo", anBatchNo);
+        return this.selectByProperty(conditionMap);
     }
 
     /**

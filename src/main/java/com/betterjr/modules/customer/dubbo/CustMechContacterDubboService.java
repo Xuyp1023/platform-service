@@ -122,7 +122,9 @@ public class CustMechContacterDubboService implements ICustMechContacterService 
 
         ChangeDetailBean<CustMechContacterTmp> changeDetailBean = new ChangeDetailBean<>();
         changeDetailBean.setChangeApply(changeApply);
-        changeDetailBean.setNowData(nowData);
+        if (nowData.getTmpOperType() != CustomerConstants.TMP_OPER_TYPE_DELETE) {
+            changeDetailBean.setNowData(nowData);
+        }
         changeDetailBean.setBefData(befData);
 
         return newOk("公司联系人-变更详情查询 成功", changeDetailBean).toJson();

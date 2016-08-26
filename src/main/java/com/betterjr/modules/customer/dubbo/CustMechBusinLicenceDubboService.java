@@ -58,7 +58,9 @@ public class CustMechBusinLicenceDubboService implements ICustMechBusinLicenceSe
         
         ChangeDetailBean<CustMechBusinLicenceTmp> changeDetailBean = new ChangeDetailBean<>();
         changeDetailBean.setChangeApply(changeApply);
-        changeDetailBean.setNowData(nowData);
+        if (nowData.getTmpOperType() != CustomerConstants.TMP_OPER_TYPE_DELETE) {
+            changeDetailBean.setNowData(nowData);
+        }
         changeDetailBean.setBefData(befData);
         return AjaxObject.newOk("营业执照信息-变更详情查询 成功", changeDetailBean).toJson();
     }
