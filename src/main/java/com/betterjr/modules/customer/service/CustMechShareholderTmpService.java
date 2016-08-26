@@ -125,7 +125,8 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
         else {
             tempShareholderTmp.initModifyValue(anShareholderTmp);
             tempShareholderTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
-            return saveShareholderTmp(tempShareholderTmp, tempShareholderTmp.getId(), anFileList);
+            tempShareholderTmp.setBatchNo(fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, tempShareholderTmp.getBatchNo()));
+            return saveShareholderTmp(tempShareholderTmp);
         }
     }
 
@@ -463,7 +464,8 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
         else {
             tempShareholderTmp.initModifyValue(anShareholderTmp);
             tempShareholderTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
-            return saveShareholderTmp(tempShareholderTmp, tempShareholderTmp.getId(), anFileList);
+            tempShareholderTmp.setBatchNo(fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, tempShareholderTmp.getBatchNo()));
+            return saveShareholderTmp(tempShareholderTmp);
         }
     }
 
