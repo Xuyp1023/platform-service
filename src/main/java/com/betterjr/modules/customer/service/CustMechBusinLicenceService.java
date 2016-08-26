@@ -25,9 +25,6 @@ import com.betterjr.modules.customer.entity.CustMechBusinLicenceTmp;
  */
 @Service
 public class CustMechBusinLicenceService extends BaseService<CustMechBusinLicenceMapper, CustMechBusinLicence> {
-
-    private static Logger logger = LoggerFactory.getLogger(CustMechBusinLicenceService.class);
-
     @Resource
     private CustAccountService accountService;
     
@@ -40,11 +37,10 @@ public class CustMechBusinLicenceService extends BaseService<CustMechBusinLicenc
      * @param anCustNo
      * @return
      */
-    public CustMechBusinLicence findCustMechBusinLicenceByCustNo(Long anCustNo) {
+    public CustMechBusinLicence findBusinLicenceByCustNo(Long anCustNo) {
         BTAssert.notNull(anCustNo, "客户编号不允许为空！");
 
         final List<CustMechBusinLicence> businLicences = this.selectByProperty(CustomerConstants.CUST_NO, anCustNo);
-
         return Collections3.getFirst(businLicences);
     }
 
@@ -54,7 +50,7 @@ public class CustMechBusinLicenceService extends BaseService<CustMechBusinLicenc
      * @param anCustNo
      * @return
      */
-    public CustMechBusinLicence findCustMechBusinLicence(Long anId) {
+    public CustMechBusinLicence findBusinLicence(Long anId) {
         BTAssert.notNull(anId, "客户编号不允许为空！");
 
         final CustMechBusinLicence businLicence = this.selectByPrimaryKey(anId);
@@ -69,13 +65,11 @@ public class CustMechBusinLicenceService extends BaseService<CustMechBusinLicenc
      * @param anCustMechBusinLicence
      * @return
      */
-    public CustMechBusinLicence saveCustMechBusinLicence(CustMechBusinLicenceTmp anBusinLicenceTmp) {
+    public CustMechBusinLicence saveBusinLicence(CustMechBusinLicenceTmp anBusinLicenceTmp) {
         BTAssert.notNull(anBusinLicenceTmp, "营业执照流水信息不允许为空！");
 
-        String tmpType = anBusinLicenceTmp.getTmpType();
         Long custNo = anBusinLicenceTmp.getRefId();
-        CustMechBusinLicence tempCustMechBusinLicence = this.findCustMechBusinLicenceByCustNo(custNo);
-
+        CustMechBusinLicence tempCustMechBusinLicence = this.findBusinLicenceByCustNo(custNo);
         BTAssert.notNull(tempCustMechBusinLicence, "没有找到营业执照信息!");
 
         tempCustMechBusinLicence.initModifyValue(anBusinLicenceTmp);
@@ -87,20 +81,20 @@ public class CustMechBusinLicenceService extends BaseService<CustMechBusinLicenc
     /**
      * 营业执照信息-添加
      * 
-     * @param anCustMechBusinLicence
+     * @param anBusinLicence
      * @return
      */
-    public CustMechBusinLicence addCustMechBusinLicence(CustMechBusinLicence anCustMechBusinLicence, Long anCustNo) {
-        BTAssert.notNull(anCustMechBusinLicence, "营业执照信息不允许为空！");
+    public CustMechBusinLicence addBusinLicence(CustMechBusinLicence anBusinLicence, Long anCustNo) {
+        BTAssert.notNull(anBusinLicence, "营业执照信息不允许为空！");
 
         final CustInfo custInfo = accountService.selectByPrimaryKey(anCustNo);
-        anCustMechBusinLicence.initAddValue(anCustNo, custInfo.getCustName(), custInfo.getRegOperId(), custInfo.getRegOperName(), custInfo.getOperOrg());
-        this.insert(anCustMechBusinLicence);
+        anBusinLicence.initAddValue(anCustNo, custInfo.getCustName(), custInfo.getRegOperId(), custInfo.getRegOperName(), custInfo.getOperOrg());
+        this.insert(anBusinLicence);
         
         // 建立初始流水记录
-        businLicenceTmpService.addCustMechBusinLicenceTmp(anCustMechBusinLicence);
+        businLicenceTmpService.addBusinLicenceTmp(anBusinLicence);
         
-        return anCustMechBusinLicence;
+        return anBusinLicence;
     }
 
 }

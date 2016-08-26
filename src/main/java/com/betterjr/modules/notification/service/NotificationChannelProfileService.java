@@ -2,19 +2,26 @@ package com.betterjr.modules.notification.service;
 
 import java.util.List;
 
+import javax.annotation.Resource;
+
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
+import com.betterjr.modules.account.entity.CustInfo;
+import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.betterjr.modules.notification.dao.NotificationChannelProfileMapper;
 import com.betterjr.modules.notification.entity.NotificationChannelProfile;
 
 @Service
 public class NotificationChannelProfileService extends BaseService<NotificationChannelProfileMapper, NotificationChannelProfile> {
+    @Resource
+    private NotificationProfileVariableService profileVariableService;
+    
     /**
      * 查找 channel profile
      */
-    public List<NotificationChannelProfile> queryChannelProfileByParentProfileId(Long anProfileId) {
+    public List<NotificationChannelProfile> queryChannelProfileByProfileId(Long anProfileId) {
         BTAssert.notNull(anProfileId, "主模板编号不允许为空!");
 
         return this.selectByProperty("profileId", anProfileId);
@@ -35,4 +42,18 @@ public class NotificationChannelProfileService extends BaseService<NotificationC
         return tempChannelProfile;
     }
 
+    /**
+     * 将基础数据copy到新的数据上 
+     */
+    public void saveCopyBaseDataToTargetData(Long anBaseProfileId, Long anTargetProfileId, CustInfo anCustInfo, CustOperatorInfo anOperator) {
+        List<NotificationChannelProfile> channelProfiles = queryChannelProfileByProfileId(anBaseProfileId);
+        
+        for (NotificationChannelProfile channelProfile: channelProfiles) {
+            NotificationChannelProfile tempChannelProfile = new NotificationChannelProfile();
+            tempChannelProfile.initAddValue(anTargetProfileId, channelProfile, anCustInfo, anOperator);
+            this.insert(tempChannelProfile);
+            
+            profileVariableService.saveCopyBaseDataToTargetData(channelProfile.getId(), tempChannelProfile.getId(), anCustInfo, anOperator);
+        };
+    }
 }

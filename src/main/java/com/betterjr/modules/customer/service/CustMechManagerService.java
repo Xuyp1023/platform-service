@@ -54,24 +54,24 @@ public class CustMechManagerService extends BaseService<CustMechManagerMapper, C
         
         CustMechManager manager = new CustMechManager();
         manager.initAddValue(anManagerTmp);
-        
         this.insert(manager);
+        
         return manager;
     }
     
     /**
      * 保存高管信息
      */
-    public CustMechManager saveCustMechManager(CustMechManager anCustMechManager, Long anId) {
+    public CustMechManager saveCustMechManager(CustMechManager anManager, Long anId) {
         BTAssert.notNull(anId, "高管编号不允许为空！");
-        BTAssert.notNull(anCustMechManager, "高管信息不允许为空！");
+        BTAssert.notNull(anManager, "高管信息不允许为空！");
         
-        final CustMechManager tempCustMechManager = this.selectByPrimaryKey(anId);
-        BTAssert.notNull(tempCustMechManager, "对应的高管信息没有找到！");
+        final CustMechManager tempManager = this.selectByPrimaryKey(anId);
+        BTAssert.notNull(tempManager, "对应的高管信息没有找到！");
         
-        tempCustMechManager.initModifyValue(anCustMechManager);
-        this.updateByPrimaryKeySelective(tempCustMechManager);
-        return tempCustMechManager;
+        tempManager.initModifyValue(anManager);
+        this.updateByPrimaryKeySelective(tempManager);
+        return tempManager;
     }
 
     /**
@@ -80,12 +80,11 @@ public class CustMechManagerService extends BaseService<CustMechManagerMapper, C
     public CustMechManager saveCustMechManager(CustMechManagerTmp anManagerTmp) {
         BTAssert.notNull(anManagerTmp, "高管流水编号不允许为空！");
         
-        final CustMechManager tempCustMechManager = this.selectByPrimaryKey(anManagerTmp.getRefId());
-        BTAssert.notNull(tempCustMechManager, "对应的高管信息没有找到！");
+        final CustMechManager tempManager = this.selectByPrimaryKey(anManagerTmp.getRefId());
+        BTAssert.notNull(tempManager, "对应的高管信息没有找到！");
         
-        tempCustMechManager.initModifyValue(anManagerTmp);
-        this.updateByPrimaryKeySelective(tempCustMechManager);
-        return tempCustMechManager;
+        tempManager.initModifyValue(anManagerTmp);
+        this.updateByPrimaryKeySelective(tempManager);
+        return tempManager;
     }
-
 }

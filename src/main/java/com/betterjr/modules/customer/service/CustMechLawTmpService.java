@@ -1,12 +1,14 @@
 package com.betterjr.modules.customer.service;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.exception.BytterException;
@@ -23,8 +25,10 @@ import com.betterjr.modules.customer.entity.CustInsteadApply;
 import com.betterjr.modules.customer.entity.CustInsteadRecord;
 import com.betterjr.modules.customer.entity.CustMechLaw;
 import com.betterjr.modules.customer.entity.CustMechLawTmp;
+import com.betterjr.modules.customer.entity.CustMechManagerTmp;
 import com.betterjr.modules.customer.helper.IFormalDataService;
 import com.betterjr.modules.customer.helper.VersionHelper;
+import com.betterjr.modules.document.service.CustFileItemService;
 
 /**
  * 
@@ -48,6 +52,9 @@ public class CustMechLawTmpService extends BaseService<CustMechLawTmpMapper, Cus
     @Resource
     private CustAccountService custAccountService;
 
+    @Autowired
+    private CustFileItemService custFileItemService;
+
     /**
      * 
      * @param anId
@@ -62,9 +69,9 @@ public class CustMechLawTmpService extends BaseService<CustMechLawTmpMapper, Cus
     /**
      * 取上一版本
      */
-    public CustMechLawTmp findCustMechLawTmpPrevVersion(CustMechLawTmp anCustMechLawTmp) {
-        Long refId = anCustMechLawTmp.getRefId();
-        Long version = anCustMechLawTmp.getVersion();
+    public CustMechLawTmp findCustMechLawTmpPrevVersion(CustMechLawTmp anLawTmp) {
+        Long refId = anLawTmp.getRefId();
+        Long version = anLawTmp.getVersion();
 
         Long befVersion = this.mapper.selectPrevVersion(refId, version);
 
@@ -82,7 +89,7 @@ public class CustMechLawTmpService extends BaseService<CustMechLawTmpMapper, Cus
     public CustMechLawTmp findCustMechLawTmpByInsteadRecord(Long anInsteadRecordId) {
         BTAssert.notNull(anInsteadRecordId, "代录项目编号不允许为空！");
 
-        CustInsteadRecord insteadRecord = insteadRecordService.findCustInsteadRecord(anInsteadRecordId);
+        CustInsteadRecord insteadRecord = insteadRecordService.findInsteadRecord(anInsteadRecordId);
         BTAssert.notNull(insteadRecord, "代录项目没有找到!");
 
         if (BetterStringUtils.equals(insteadRecord.getInsteadItem(), CustomerConstants.ITEM_LAW) == false) {
@@ -100,19 +107,19 @@ public class CustMechLawTmpService extends BaseService<CustMechLawTmpMapper, Cus
     /**
      * 法人信息-流水信息-添加
      */
-    public CustMechLawTmp addCustMechLawTmp(CustMechLawTmp anCustMechLawTmp, String anTmpType) {
-        BTAssert.notNull(anCustMechLawTmp, "法人信息-流水信息  不能为空！");
+    public CustMechLawTmp addCustMechLawTmp(CustMechLawTmp anLawTmp, String anFileList, String anTmpType) {
+        BTAssert.notNull(anLawTmp, "法人信息-流水信息  不能为空！");
         BTAssert.notNull(anTmpType, "流水类型  不能为空！");
 
-        final Long custNo = anCustMechLawTmp.getRefId();
-        anCustMechLawTmp.setCustNo(anCustMechLawTmp.getRefId());
+        final Long custNo = anLawTmp.getRefId();
+        anLawTmp.setCustNo(anLawTmp.getRefId());
         final String custName = custAccountService.queryCustName(custNo);
-        anCustMechLawTmp.initAddValue(anTmpType, custNo, custName);
+        anLawTmp.initAddValue(anTmpType, custNo, custName);
+        anLawTmp.setBatchNo(custFileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, anLawTmp.getBatchNo()));
+        anLawTmp.setVersion(VersionHelper.generateVersion(this.mapper, custNo));
+        this.insert(anLawTmp);
 
-        anCustMechLawTmp.setVersion(VersionHelper.generateVersion(this.mapper, custNo));
-        this.insert(anCustMechLawTmp);
-
-        return anCustMechLawTmp;
+        return anLawTmp;
     }
 
     /**
@@ -135,46 +142,44 @@ public class CustMechLawTmpService extends BaseService<CustMechLawTmpMapper, Cus
     /**
      * 法人信息-流水信息-修改
      */
-    public CustMechLawTmp saveCustMechLawTmp(CustMechLawTmp anCustMechLawTmp, Long anId) {
+    public CustMechLawTmp saveCustMechLawTmp(CustMechLawTmp anLawTmp, Long anId, String anFileList) {
         BTAssert.notNull(anId, "法人信息-流水信息 编号不允许为空！");
 
-        final CustMechLawTmp tempCustMechLawTmp = this.selectByPrimaryKey(anId);
-        BTAssert.notNull(tempCustMechLawTmp, "没有找到对应的公司法人流水信息！");
+        final CustMechLawTmp tempLawTmp = this.selectByPrimaryKey(anId);
+        BTAssert.notNull(tempLawTmp, "没有找到对应的公司法人流水信息！");
+        tempLawTmp.setBatchNo(custFileItemService.updateCustFileItemInfo(anFileList, tempLawTmp.getBatchNo()));
+        tempLawTmp.initModifyValue(anLawTmp);
+        this.updateByPrimaryKey(tempLawTmp);
 
-        tempCustMechLawTmp.initModifyValue(anCustMechLawTmp);
-        this.updateByPrimaryKey(tempCustMechLawTmp);
-
-        return tempCustMechLawTmp;
+        return tempLawTmp;
     }
 
     /**
      * 法人信息-流水信息-变更申请
      */
-    public CustMechLawTmp addChangeApply(CustMechLawTmp anCustMechLawTmp, String anFileList) {
-        BTAssert.notNull(anCustMechLawTmp, "基本信息变更申请不能为空");
+    public CustMechLawTmp addChangeApply(CustMechLawTmp anLawTmp, String anFileList) {
+        BTAssert.notNull(anLawTmp, "基本信息变更申请不能为空");
 
-        // TODO 文件上传
-        CustMechLawTmp custMechLawTmp = addCustMechLawTmp(anCustMechLawTmp, CustomerConstants.TMP_TYPE_CHANGE);
+        CustMechLawTmp lawTmp = addCustMechLawTmp(anLawTmp, anFileList, CustomerConstants.TMP_TYPE_CHANGE);
 
-        CustChangeApply changeApply = changeApplyService.addChangeApply(custMechLawTmp.getRefId(), CustomerConstants.ITEM_LAW,
-                String.valueOf(custMechLawTmp.getId()));
+        CustChangeApply changeApply = changeApplyService.addChangeApply(lawTmp.getRefId(), CustomerConstants.ITEM_LAW,
+                String.valueOf(lawTmp.getId()));
 
-        saveCustMechLawTmpParentId(custMechLawTmp.getId(), changeApply.getId());
+        saveCustMechLawTmpParentId(lawTmp.getId(), changeApply.getId());
 
-        return custMechLawTmp;
+        return lawTmp;
     }
 
     /**
      * 法人信息-流水信息-变更修改/重新提交
      */
-    public CustMechLawTmp saveChangeApply(CustMechLawTmp anCustMechLawTmp, Long anApplyId, String anFileList) {
+    public CustMechLawTmp saveChangeApply(CustMechLawTmp anLawTmp, Long anApplyId, String anFileList) {
         CustChangeApply changeApply = checkChangeApply(anApplyId);
 
         Long tmpId = Long.valueOf(changeApply.getTmpIds());
-        BTAssert.notNull(anCustMechLawTmp, "公司基本信息-变更修改 不能为空");
+        BTAssert.notNull(anLawTmp, "公司基本信息-变更修改 不能为空");
 
-        // TODO 文件上传
-        CustMechLawTmp custMechLawTmp = saveCustMechLawTmp(anCustMechLawTmp, tmpId);
+        CustMechLawTmp custMechLawTmp = saveCustMechLawTmp(anLawTmp, tmpId, anFileList);
 
         changeApplyService.saveChangeApplyStatus(anApplyId, CustomerConstants.CHANGE_APPLY_STATUS_NEW);
 
@@ -184,17 +189,16 @@ public class CustMechLawTmpService extends BaseService<CustMechLawTmpMapper, Cus
     /**
      * 法人流水信息-添加代录
      */
-    public CustMechLawTmp addInsteadRecord(CustMechLawTmp anCustMechLawTmp, Long anInsteadRecordId, String anFileList) {
-        checkInsteadRecord(anCustMechLawTmp, anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_NEW);
+    public CustMechLawTmp addInsteadRecord(CustMechLawTmp anLawTmp, Long anInsteadRecordId, String anFileList) {
+        checkInsteadRecord(anLawTmp, anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_NEW);
 
-        // TODO 处理上传
-        final CustMechLawTmp custMechLawTmp = addCustMechLawTmp(anCustMechLawTmp, CustomerConstants.TMP_TYPE_INSTEAD);
+        final CustMechLawTmp lawTmp = addCustMechLawTmp(anLawTmp, anFileList, CustomerConstants.TMP_TYPE_INSTEAD);
 
-        CustInsteadRecord insteadRecord = insteadRecordService.saveCustInsteadRecord(anInsteadRecordId, String.valueOf(custMechLawTmp.getId()));
+        CustInsteadRecord insteadRecord = insteadRecordService.saveInsteadRecord(anInsteadRecordId, String.valueOf(lawTmp.getId()));
 
-        saveCustMechLawTmpParentId(custMechLawTmp.getId(), insteadRecord.getId());
+        saveCustMechLawTmpParentId(lawTmp.getId(), insteadRecord.getId());
 
-        return custMechLawTmp;
+        return lawTmp;
     }
 
     /**
@@ -203,18 +207,17 @@ public class CustMechLawTmpService extends BaseService<CustMechLawTmpMapper, Cus
      * @param anCustMechBaseTmp
      * @return
      */
-    public CustMechLawTmp saveInsteadRecord(CustMechLawTmp anCustMechLawTmp, Long anInsteadRecordId, String anFileList) {
-        CustInsteadRecord insteadRecord = checkInsteadRecord(anCustMechLawTmp, anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN,
+    public CustMechLawTmp saveInsteadRecord(CustMechLawTmp anLawTmp, Long anInsteadRecordId, String anFileList) {
+        CustInsteadRecord insteadRecord = checkInsteadRecord(anLawTmp, anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN,
                 CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT, CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_REJECT);
 
         Long tmpId = Long.valueOf(insteadRecord.getTmpIds());
 
-        // TODO 处理上传
-        final CustMechLawTmp custMechLawTmp = saveCustMechLawTmp(anCustMechLawTmp, tmpId);
+        final CustMechLawTmp tempLawTmp = saveCustMechLawTmp(anLawTmp, tmpId, anFileList);
 
-        insteadRecordService.saveCustInsteadRecordStatus(anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN);
+        insteadRecordService.saveInsteadRecordStatus(anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN);
 
-        return custMechLawTmp;
+        return tempLawTmp;
     }
 
     /**
@@ -241,7 +244,7 @@ public class CustMechLawTmpService extends BaseService<CustMechLawTmpMapper, Cus
         BTAssert.notNull(anCustMechLawTmp, "法人信息流水信息不允许为空！");
         BTAssert.notNull(anInsteadRecordId, "代录记录编号不允许为空！");
 
-        CustInsteadRecord insteadRecord = insteadRecordService.findCustInsteadRecord(anInsteadRecordId);
+        CustInsteadRecord insteadRecord = insteadRecordService.findInsteadRecord(anInsteadRecordId);
         BTAssert.notNull(insteadRecord, "没有找到对应的代录记录");
 
         String insteadItem = insteadRecord.getInsteadItem();
@@ -296,10 +299,11 @@ public class CustMechLawTmpService extends BaseService<CustMechLawTmpMapper, Cus
     @Override
     public void saveFormalData(Long anId) {
         BTAssert.notNull(anId, "编号不允许为空！");
+        CustMechLawTmp lawTmp = Collections3.getFirst(this.selectByProperty("parentId", anId));
 
-        final CustMechLawTmp custMechLawTmp = saveCustMechLawTmpStatus(anId, CustomerConstants.TMP_STATUS_USED);
+        final CustMechLawTmp tempLawTmp = saveCustMechLawTmpStatus(lawTmp.getId(), CustomerConstants.TMP_STATUS_USED);
 
-        lawService.saveCustMechLaw(custMechLawTmp);
+        lawService.saveCustMechLaw(tempLawTmp);
     }
 
     /**

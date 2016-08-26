@@ -579,7 +579,6 @@ public class CustMechManagerTmp implements BetterjrEntity {
         this.eduLevel = anCustMechManagerTmp.getEduLevel();
         this.position = anCustMechManagerTmp.getPosition();
         this.batchNo = anCustMechManagerTmp.getBatchNo();
-        
     }
 
     public void initModifyValue(CustMechManagerTmp anCustMechManagerTmp, String anBusinStatus, Long anVersion) {

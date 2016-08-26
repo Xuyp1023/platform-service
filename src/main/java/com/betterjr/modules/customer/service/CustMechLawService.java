@@ -38,9 +38,9 @@ public class CustMechLawService extends BaseService<CustMechLawMapper, CustMechL
     public CustMechLaw findCustMechLawByCustNo(Long anCustNo) {
         BTAssert.notNull(anCustNo, "客户编号不允许为空！");
 
-        final List<CustMechLaw> lawes = this.selectByProperty(CustomerConstants.CUST_NO, anCustNo);
+        final List<CustMechLaw> laws = this.selectByProperty(CustomerConstants.CUST_NO, anCustNo);
         
-        return Collections3.getFirst(lawes);
+        return Collections3.getFirst(laws);
     }
 
     /**
@@ -61,17 +61,16 @@ public class CustMechLawService extends BaseService<CustMechLawMapper, CustMechL
      * @param anCustMechLaw
      * @return
      */
-    public CustMechLaw saveCustMechLaw(CustMechLawTmp anCustMechLawTmp) {
-        BTAssert.notNull(anCustMechLawTmp, "法人流水信息不允许为空！");
+    public CustMechLaw saveCustMechLaw(CustMechLawTmp anLawTmp) {
+        BTAssert.notNull(anLawTmp, "法人流水信息不允许为空！");
 
         // 根据 类型区别保存数据方式
-        String tmpType = anCustMechLawTmp.getTmpType();
-        Long custNo = anCustMechLawTmp.getRefId();
+        Long custNo = anLawTmp.getRefId();
         CustMechLaw tempCustMechLaw = this.findCustMechLawByCustNo(custNo);
 
         BTAssert.notNull(tempCustMechLaw, "没有找到法人信息!");
 
-        tempCustMechLaw.initModifyValue(anCustMechLawTmp);
+        tempCustMechLaw.initModifyValue(anLawTmp);
         this.updateByPrimaryKeySelective(tempCustMechLaw);
 
         return tempCustMechLaw;
@@ -80,20 +79,20 @@ public class CustMechLawService extends BaseService<CustMechLawMapper, CustMechL
     /**
      * 法人信息-添加
      * 
-     * @param anCustMechLaw
+     * @param anLaw
      * @return
      */
-    public CustMechLaw addCustMechLaw(CustMechLaw anCustMechLaw, Long anCustNo) {
-        BTAssert.notNull(anCustMechLaw, "法人信息不允许为空！");
+    public CustMechLaw addCustMechLaw(CustMechLaw anLaw, Long anCustNo) {
+        BTAssert.notNull(anLaw, "法人信息不允许为空！");
         BTAssert.notNull(anCustNo, "客户编号不允许为空！");
 
         final CustInfo custInfo = accountService.selectByPrimaryKey(anCustNo);
-        anCustMechLaw.initAddValue(anCustNo, custInfo.getCustName(), custInfo.getRegOperId(), custInfo.getRegOperName(), custInfo.getOperOrg());
-        this.insert(anCustMechLaw);
+        anLaw.initAddValue(anCustNo, custInfo.getCustName(), custInfo.getRegOperId(), custInfo.getRegOperName(), custInfo.getOperOrg());
+        this.insert(anLaw);
         
-        lawTmpService.addCustMechLawTmp(anCustMechLaw);
+        lawTmpService.addCustMechLawTmp(anLaw);
         
-        return anCustMechLaw;
+        return anLaw;
     }
 
 }

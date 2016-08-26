@@ -19,7 +19,7 @@ public class CustMechLawTest extends BasicServiceTest<CustMechLawTmpService> {
         
         CustMechLawTmp lawTmp = new CustMechLawTmp();
         lawTmp.setRefId(100000177L);
-        lawTmpService.addCustMechLawTmp(lawTmp, "1");
+        lawTmpService.addCustMechLawTmp(lawTmp, null, "1");
     }
 
     @Override

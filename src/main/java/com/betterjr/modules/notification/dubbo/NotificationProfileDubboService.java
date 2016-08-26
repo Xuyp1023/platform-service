@@ -45,7 +45,7 @@ public class NotificationProfileDubboService implements INotificationProfileServ
 
     @Override
     public String webQueryNotificationChannelProfile(Long anProfileId) {
-        return newOk("消息通道模板-列表查询 成功", channelProfileService.queryChannelProfileByParentProfileId(anProfileId)).toJson();
+        return newOk("消息通道模板-列表查询 成功", channelProfileService.queryChannelProfileByProfileId(anProfileId)).toJson();
     }
 
     @Override

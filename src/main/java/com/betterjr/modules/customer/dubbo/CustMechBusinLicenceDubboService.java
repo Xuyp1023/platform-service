@@ -43,7 +43,7 @@ public class CustMechBusinLicenceDubboService implements ICustMechBusinLicenceSe
 
     @Override
     public String webFindBusinLicence(Long anCustNo) {
-        final CustMechBusinLicence businLicence = businLicenceService.findCustMechBusinLicenceByCustNo(anCustNo);
+        final CustMechBusinLicence businLicence = businLicenceService.findBusinLicenceByCustNo(anCustNo);
         return AjaxObject.newOk("营业执照信息-详情查询 成功", businLicence).toJson();
     }
 
@@ -72,13 +72,13 @@ public class CustMechBusinLicenceDubboService implements ICustMechBusinLicenceSe
 
     @Override
     public String webAddChangeApply(Map<String, Object> anParam, String anFileList) {
-        final CustMechBusinLicenceTmp businLicenceTmp = (CustMechBusinLicenceTmp) RuleServiceDubboFilterInvoker.getInputObj();
+        final CustMechBusinLicenceTmp businLicenceTmp = RuleServiceDubboFilterInvoker.getInputObj();
         return AjaxObject.newOk("营业执照信息-变更申请 成功", businLicenceTmpService.addChangeApply(businLicenceTmp, anFileList)).toJson();
     }
 
     @Override
     public String webSaveChangeApply(Map<String, Object> anParam, Long anApplyId, String anFileList) {
-        final CustMechBusinLicenceTmp businLicenceTmp = (CustMechBusinLicenceTmp) RuleServiceDubboFilterInvoker.getInputObj();
+        final CustMechBusinLicenceTmp businLicenceTmp = RuleServiceDubboFilterInvoker.getInputObj();
         return AjaxObject.newOk("营业执照信息-变更修改 成功", businLicenceTmpService.saveChangeApply(businLicenceTmp, anApplyId, anFileList)).toJson();
     }
     
@@ -89,13 +89,13 @@ public class CustMechBusinLicenceDubboService implements ICustMechBusinLicenceSe
 
     @Override
     public String webAddInsteadRecord(Map<String, Object> anParam, Long anInsteadRecordId, String anFileList) {
-        final CustMechBusinLicenceTmp businLicenceTmp = (CustMechBusinLicenceTmp) RuleServiceDubboFilterInvoker.getInputObj();
+        final CustMechBusinLicenceTmp businLicenceTmp = RuleServiceDubboFilterInvoker.getInputObj();
         return AjaxObject.newOk("营业执照信息息-添加代录 成功", businLicenceTmpService.addInsteadRecord(businLicenceTmp, anInsteadRecordId, anFileList)).toJson();
     }
 
     @Override
     public String webSaveInsteadRecord(Map<String, Object> anParam, Long anInsteadRecordId, String anFileList) {
-        final CustMechBusinLicenceTmp businLicenceTmp = (CustMechBusinLicenceTmp) RuleServiceDubboFilterInvoker.getInputObj();
+        final CustMechBusinLicenceTmp businLicenceTmp = RuleServiceDubboFilterInvoker.getInputObj();
         return AjaxObject.newOk("营业执照信息-代录修改 成功", businLicenceTmpService.saveInsteadRecord(businLicenceTmp, anInsteadRecordId, anFileList)).toJson();
      }
 

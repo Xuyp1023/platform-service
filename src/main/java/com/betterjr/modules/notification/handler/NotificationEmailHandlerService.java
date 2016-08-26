@@ -28,12 +28,16 @@ public class NotificationEmailHandlerService {
     @Resource
     private NotificationCustomerService notificationCustomerService;
 
+    /**
+     * 发送邮件 
+     */
     @RocketMQListener(topic = "NOTIFICATION_EMAIL_TOPIC", consumer = "notificationConsumer")
     public void processNotification(final Object anMessage) {
         final MQMessage message = (MQMessage) anMessage;
         Notification notification = (Notification) message.getObject();
 
         Session session = MailUtils.createSession();
+        // TODO 需要处理附件
         MimeMessage mimeMessage = MailUtils.createMessage(session, notification.getSubject(), notification.getContent(), null);
 
         List<NotificationCustomer> notifiCustomers = notificationCustomerService.queryNotifiCustomerByNotifiId(notification.getId());

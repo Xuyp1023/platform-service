@@ -34,6 +34,13 @@ public class NotificationSubscribe implements BetterjrEntity {
     @Column(name = "L_PROFILE_ID",  columnDefinition="INTEGER" )
     @MetaData( value="模板编号", comments = "模板编号")
     private Long profileId;
+    
+    /**
+     * 通道模板编号
+     */
+    @Column(name = "L_CHANNEL_PROFILE_ID",  columnDefinition="INTEGER" )
+    @MetaData( value="模板编号", comments = "模板编号")
+    private Long channelProfileId;
 
     /**
      * 模板名称
@@ -172,6 +179,14 @@ public class NotificationSubscribe implements BetterjrEntity {
 
     public void setProfileId(Long profileId) {
         this.profileId = profileId;
+    }
+
+    public Long getChannelProfileId() {
+        return channelProfileId;
+    }
+
+    public void setChannelProfileId(Long anChannelProfileId) {
+        channelProfileId = anChannelProfileId;
     }
 
     public String getProfileName() {
@@ -319,6 +334,7 @@ public class NotificationSubscribe implements BetterjrEntity {
         sb.append(", id=").append(id);
         sb.append(", version=").append(version);
         sb.append(", profileId=").append(profileId);
+        sb.append(", channelProfileId=").append(channelProfileId);
         sb.append(", profileName=").append(profileName);
         sb.append(", subscribe=").append(subscribe);
         sb.append(", channel=").append(channel);
@@ -356,6 +372,7 @@ public class NotificationSubscribe implements BetterjrEntity {
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
             && (this.getVersion() == null ? other.getVersion() == null : this.getVersion().equals(other.getVersion()))
             && (this.getProfileId() == null ? other.getProfileId() == null : this.getProfileId().equals(other.getProfileId()))
+            && (this.getChannelProfileId() == null ? other.getChannelProfileId() == null : this.getChannelProfileId().equals(other.getChannelProfileId()))
             && (this.getProfileName() == null ? other.getProfileName() == null : this.getProfileName().equals(other.getProfileName()))
             && (this.getSubscribe() == null ? other.getSubscribe() == null : this.getSubscribe().equals(other.getSubscribe()))
             && (this.getChannel() == null ? other.getChannel() == null : this.getChannel().equals(other.getChannel()))
@@ -382,6 +399,7 @@ public class NotificationSubscribe implements BetterjrEntity {
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
         result = prime * result + ((getVersion() == null) ? 0 : getVersion().hashCode());
         result = prime * result + ((getProfileId() == null) ? 0 : getProfileId().hashCode());
+        result = prime * result + ((getChannelProfileId() == null) ? 0 : getChannelProfileId().hashCode());
         result = prime * result + ((getProfileName() == null) ? 0 : getProfileName().hashCode());
         result = prime * result + ((getSubscribe() == null) ? 0 : getSubscribe().hashCode());
         result = prime * result + ((getChannel() == null) ? 0 : getChannel().hashCode());
@@ -403,7 +421,12 @@ public class NotificationSubscribe implements BetterjrEntity {
     }
     
     
-    public void initAddValue(CustOperatorInfo anOperator, CustInfo anCustomer) {
+    public void initAddValue(Long anProfileId, 
+            Long anChannelProfileId, 
+            String anChannel,
+            Long anSourceCustNo, 
+            CustOperatorInfo anOperator, 
+            CustInfo anCustomer) {
         this.id = SerialGenerator.getLongValue("NotificationSubscribe.id");
 
         this.regOperId = anOperator.getId();
@@ -418,8 +441,15 @@ public class NotificationSubscribe implements BetterjrEntity {
         this.modiDate = BetterDateUtils.getNumDate();
         this.modiTime = BetterDateUtils.getNumTime();
 
+        this.operId = anOperator.getId();
         this.custNo = anCustomer.getCustNo();
+        
+        this.profileId = anProfileId;
+        this.channelProfileId = anChannelProfileId;
+        this.sourceCustNo = anSourceCustNo;
+        this.channel = anChannel;
 
+        this.subscribe = Boolean.FALSE;
         this.businStatus = "0";
     }
 }

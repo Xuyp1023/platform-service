@@ -35,11 +35,6 @@ public class CustChangeApplyService extends BaseService<CustChangeApplyMapper, C
 
     /**
      * 添加变更申请
-     * 
-     * @param anCustNo
-     * @param anChangeItem
-     * @param anTmpIds
-     * @return
      */
     public CustChangeApply addChangeApply(Long anCustNo, String anChangeItem, String anTmpIds) {
         BTAssert.notNull(anCustNo, "客户编号不允许为空！");
@@ -50,6 +45,8 @@ public class CustChangeApplyService extends BaseService<CustChangeApplyMapper, C
             throw new BytterTradeException(40001, "不允许重复提交变更申请！");
         }
 
+        // TODO @@@@@@@@ 检查是否有正在进行的变更 代录
+        
         final CustChangeApply custChangeApply = new CustChangeApply();
         final String custName = custAccountService.queryCustName(anCustNo);
         custChangeApply.initAddValue(anCustNo, custName, anChangeItem, anTmpIds);
@@ -59,11 +56,6 @@ public class CustChangeApplyService extends BaseService<CustChangeApplyMapper, C
 
     /**
      * 变更申请 查询
-     * 
-     * @param anCustNo
-     * @param anChangeItem
-     * @param anTmpIds
-     * @return
      */
     public CustChangeApply findChangeApply(Long anId) {
         BTAssert.notNull(anId, "变更申请 编号不允许为空！");
@@ -72,11 +64,6 @@ public class CustChangeApplyService extends BaseService<CustChangeApplyMapper, C
 
     /**
      * 检查是否有未处理的变更申请
-     * 
-     * @param anCustNo
-     * @param anChangeItem
-     * @param anTmpIds
-     * @return
      */
     public Boolean checkExistChangeApply(Long anCustNo, String anChangeItem, String anBusinStatus) {
         BTAssert.notNull(anCustNo, "客户编号不允许为空！");
@@ -91,12 +78,9 @@ public class CustChangeApplyService extends BaseService<CustChangeApplyMapper, C
 
         return !Collections3.isEmpty(custChangeApplys);
     }
-    
+
     /**
      * 保存变更申请-修改状态
-     * 
-     * @param anCustChangeApply
-     * @return
      */
     public CustChangeApply saveChangeApply(Long anApplyId, String anTmpIds) {
         BTAssert.notNull(anApplyId, "编号不允许为空！");
@@ -105,7 +89,7 @@ public class CustChangeApplyService extends BaseService<CustChangeApplyMapper, C
         final CustChangeApply tempCustChangeApply = this.selectByPrimaryKey(anApplyId);
         tempCustChangeApply.setTmpIds(anTmpIds);
         tempCustChangeApply.setBusinStatus(CustomerConstants.CHANGE_APPLY_STATUS_NEW);
-        
+
         this.updateByPrimaryKeySelective(tempCustChangeApply);
 
         return tempCustChangeApply;
@@ -113,9 +97,6 @@ public class CustChangeApplyService extends BaseService<CustChangeApplyMapper, C
 
     /**
      * 保存变更申请-修改状态
-     * 
-     * @param anCustChangeApply
-     * @return
      */
     public CustChangeApply saveChangeApplyStatus(Long anId, String anBusinStatus) {
         BTAssert.notNull(anId, "编号不允许为空！");
@@ -130,8 +111,6 @@ public class CustChangeApplyService extends BaseService<CustChangeApplyMapper, C
 
     /**
      * 查询变更申请列表
-     * 
-     * @return
      */
     public Page<CustChangeApply> queryCustChangeApply(Map<String, Object> anParam, int anFlag, int anPageNum, int anPageSize) {
         final Object custName = anParam.get("LIKEcustName");
@@ -145,7 +124,7 @@ public class CustChangeApplyService extends BaseService<CustChangeApplyMapper, C
         if (businStatus == null || (businStatus instanceof String && BetterStringUtils.isBlank((String) businStatus))) {
             anParam.remove("businStatus");
         }
-        
+
         final Page<CustChangeApply> changeApplys = this.selectPropertyByPage(anParam, anPageNum, anPageSize, anFlag == 1);
 
         changeApplys.forEach(changeApply -> {

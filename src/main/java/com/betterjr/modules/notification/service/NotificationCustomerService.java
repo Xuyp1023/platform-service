@@ -19,14 +19,13 @@ import com.betterjr.modules.notification.entity.NotificationCustomer;
 @Service
 public class NotificationCustomerService extends BaseService<NotificationCustomerMapper, NotificationCustomer> {
     /**
-     * 添加
+     * 添加 NotificationCustomer
      */
     public NotificationCustomer addNotificationCustomer(NotificationCustomer anNotificationCustomer, CustOperatorInfo anOperator,
             CustInfo anCustomer) {
         BTAssert.notNull(anNotificationCustomer, "通知内容不允许为空!");
 
         anNotificationCustomer.initAddValue(anOperator, anCustomer);
-
         this.insert(anNotificationCustomer);
 
         return anNotificationCustomer;

@@ -43,6 +43,58 @@ public class CustFileItemService extends BaseService<CustFileItemMapper, CustFil
 
         return this.updateByPrimaryKeySelective(fileItem) == 1;
     }
+    
+    /**
+     * 根据文件编号,更新文件批次号,如果文件已经被其他批次号使用,copy一份
+     * @param anBatchNo
+     * @param anFileItemId
+     * @return
+     */
+    private boolean updateAndDuplicateConflictFileItems(Long anBatchNo, Long anFileItemId) {
+        CustFileItem fileItem = this.selectByPrimaryKey(anFileItemId);
+        
+        if (fileItem != null) {
+            if (fileItem.getBatchNo().equals(0L) == true) {
+                fileItem.setBatchNo(anBatchNo);
+                return this.updateByPrimaryKeySelective(fileItem) == 1;
+            } else if (fileItem.getBatchNo().equals(anBatchNo) == false) {
+                CustFileItem tempFileItem = new CustFileItem();
+                tempFileItem.initDuplicateConflictValue(fileItem);
+                tempFileItem.setBatchNo(anBatchNo);
+                return this.saveAndUpdateFileItem(tempFileItem);
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
+     * 更新文件列表的批次号,如果批次号不存在,则创建批次号,如果文件已经被其它批次号使用,则将文件复制一份,与当前批次号绑定,不影响以前的绑定关系
+     * @param anFileList
+     * @param anBatchNo
+     * @return
+     */
+    public Long updateAndDuplicateConflictFileItemInfo(String anFileList, Long anBatchNo) {
+        if (BetterStringUtils.isBlank(anFileList)) {
+
+            return anBatchNo;
+        }
+
+        if (anBatchNo == null) {
+            anBatchNo = CustFileUtils.findBatchNo();
+        }
+        
+        logger.info("fileList:" + anFileList);
+        String[] fileItems = BetterStringUtils.split(anFileList, ",");
+        for (String item : fileItems) {
+            if (BetterStringUtils.isNotBlank(item)) {
+                Long fileItemId = Long.valueOf(item.trim());
+                updateAndDuplicateConflictFileItems(anBatchNo, fileItemId);
+            }
+        }
+
+        return anBatchNo;
+    }
 
     /**
      * 更新文件列表的批次号，如果批次号不存在，则创建批次号

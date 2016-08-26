@@ -2,6 +2,11 @@ package com.betterjr.modules.notification.entity;
 
 import com.betterjr.common.annotation.*;
 import com.betterjr.common.entity.BetterjrEntity;
+import com.betterjr.common.selectkey.SerialGenerator;
+import com.betterjr.common.utils.BetterDateUtils;
+import com.betterjr.common.utils.UserUtils;
+import com.betterjr.modules.account.entity.CustInfo;
+import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
@@ -394,5 +399,29 @@ public class NotificationProfileVariable implements BetterjrEntity {
         result = prime * result + ((getCustNo() == null) ? 0 : getCustNo().hashCode());
         result = prime * result + ((getCustName() == null) ? 0 : getCustName().hashCode());
         return result;
+    }
+
+    public void initAddValue(Long anChannelProfileId, NotificationProfileVariable anProfileVariable, CustInfo anCustInfo,
+            CustOperatorInfo anOperator) {
+        this.id = SerialGenerator.getLongValue("NotificationProfileVariable.id");
+
+        this.regOperId = anOperator.getId();
+        this.regOperName = anOperator.getName();
+        this.operOrg = anOperator.getOperOrg();
+
+        this.regDate = BetterDateUtils.getNumDate();
+        this.regTime = BetterDateUtils.getNumTime();
+        
+        this.modiOperId = anOperator.getId();
+        this.modiOperName = anOperator.getName();
+        this.modiDate = BetterDateUtils.getNumDate();
+        this.modiTime = BetterDateUtils.getNumTime();
+        
+        this.channelProfileId = anChannelProfileId;
+        this.custNo = anCustInfo.getCustNo();
+        
+        this.variableName = anProfileVariable.getVariableName();
+        this.variableValue = anProfileVariable.getVariableValue();
+        this.variableMark = anProfileVariable.getVariableMark();
     }
 }

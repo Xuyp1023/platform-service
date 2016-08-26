@@ -57,25 +57,25 @@ public class CustMechBankAccountDubboService implements ICustMechBankAccountServ
     
     @Override
     public String webFindBankAccountTmp(Long anId) {
-        return newOk("查询公司银行账户列表成功", bankAccountTmpService.findCustMechBankAccountTmp(anId)).toJson();
+        return newOk("查询公司银行账户列表成功", bankAccountTmpService.findBankAccountTmp(anId)).toJson();
     }
     
     @Override
     public String webSaveBankAccountTmp(Map<String, Object> anParam, Long anId, String anFileList) {
-        final CustMechBankAccountTmp custMechBankAccountTmp = (CustMechBankAccountTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return newOk("公司银行账户-流水信息 修改成功", bankAccountTmpService.saveBankAccountTmp(custMechBankAccountTmp, anId)).toJson();
+        final CustMechBankAccountTmp bankAccountTmp = RuleServiceDubboFilterInvoker.getInputObj();
+        return newOk("公司银行账户-流水信息 修改成功", bankAccountTmpService.saveBankAccountTmp(bankAccountTmp, anId, anFileList)).toJson();
     }
 
     @Override
     public String webAddChangeBankAccountTmp(Map<String, Object> anMap, String anFileList) {
-        final CustMechBankAccountTmp custMechBankAccountTmp = (CustMechBankAccountTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return newOk("公司银行账户-流水信息 变更添加成功", bankAccountTmpService.addChangeBankAccountTmp(custMechBankAccountTmp)).toJson();
+        final CustMechBankAccountTmp custMechBankAccountTmp = RuleServiceDubboFilterInvoker.getInputObj();
+        return newOk("公司银行账户-流水信息 变更添加成功", bankAccountTmpService.addChangeBankAccountTmp(custMechBankAccountTmp, anFileList)).toJson();
     }
     
     @Override
     public String webSaveChangeBankAccountTmp(Map<String, Object> anParam, String anFileList) {
-        final CustMechBankAccountTmp custMechBankAccountTmp = (CustMechBankAccountTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return newOk("公司银行账户-流水信息 变更修改成功", bankAccountTmpService.saveSaveChangeBankAccountTmp(custMechBankAccountTmp)).toJson();
+        final CustMechBankAccountTmp custMechBankAccountTmp = RuleServiceDubboFilterInvoker.getInputObj();
+        return newOk("公司银行账户-流水信息 变更修改成功", bankAccountTmpService.saveSaveChangeBankAccountTmp(custMechBankAccountTmp, anFileList)).toJson();
     }
     
     @Override
@@ -90,12 +90,12 @@ public class CustMechBankAccountDubboService implements ICustMechBankAccountServ
     
     @Override
     public String webQueryNewChangeBankAccountTmp(Long anCustNo) {
-        return newOk("公司银行账户-流水信息 列表查询成功", bankAccountTmpService.queryNewChangeCustMechBankAccountTmp(anCustNo)).toJson();
+        return newOk("公司银行账户-流水信息 列表查询成功", bankAccountTmpService.queryNewChangeBankAccountTmp(anCustNo)).toJson();
     }
     
     @Override
     public String webQueryChangeBankAccountTmp(Long anApplyId) {
-        return newOk("公司银行账户-流水信息 列表查询成功", bankAccountTmpService.queryChangeCustMechBankAccountTmp(anApplyId)).toJson();
+        return newOk("公司银行账户-流水信息 列表查询成功", bankAccountTmpService.queryChangeBankAccountTmp(anApplyId)).toJson();
     }
     
     
@@ -120,8 +120,8 @@ public class CustMechBankAccountDubboService implements ICustMechBankAccountServ
     public String webFindChangeApply(Long anApplyId, Long anTmpId) {
         final CustChangeApply changeApply = changeService.findChangeApply(anApplyId, CustomerConstants.ITEM_BANKACCOUNT);
         
-        final CustMechBankAccountTmp nowData = bankAccountTmpService.findCustMechBankAccountTmp(anTmpId);
-        final CustMechBankAccountTmp befData = bankAccountTmpService.findCustMechBankAccountTmpPrevVersion(nowData);
+        final CustMechBankAccountTmp nowData = bankAccountTmpService.findBankAccountTmp(anTmpId);
+        final CustMechBankAccountTmp befData = bankAccountTmpService.findBankAccountTmpPrevVersion(nowData);
         
         ChangeDetailBean<CustMechBankAccountTmp> changeDetailBean = new ChangeDetailBean<>();
         changeDetailBean.setChangeApply(changeApply);
@@ -133,14 +133,14 @@ public class CustMechBankAccountDubboService implements ICustMechBankAccountServ
     
     @Override
     public String webAddInsteadBankAccountTmp(Map<String, Object> anMap, Long anInsteadRecordId, String anFileList) {
-        final CustMechBankAccountTmp custMechBankAccountTmp = (CustMechBankAccountTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return newOk("公司银行账户-流水信息 代录添加成功", bankAccountTmpService.addInsteadBankAccountTmp(custMechBankAccountTmp, anInsteadRecordId)).toJson();
+        final CustMechBankAccountTmp bankAccountTmp = RuleServiceDubboFilterInvoker.getInputObj();
+        return newOk("公司银行账户-流水信息 代录添加成功", bankAccountTmpService.addInsteadBankAccountTmp(bankAccountTmp, anInsteadRecordId, anFileList)).toJson();
     }
     
     @Override
     public String webSaveInsteadBankAccountTmp(Map<String, Object> anParam, Long anInsteadRecordId, String anFileList) {
-        final CustMechBankAccountTmp custMechBankAccountTmp = (CustMechBankAccountTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return newOk("公司银行账户-流水信息 代录修改成功", bankAccountTmpService.saveSaveInsteadBankAccountTmp(custMechBankAccountTmp, anInsteadRecordId)).toJson();
+        final CustMechBankAccountTmp bankAccountTmp = RuleServiceDubboFilterInvoker.getInputObj();
+        return newOk("公司银行账户-流水信息 代录修改成功", bankAccountTmpService.saveSaveInsteadBankAccountTmp(bankAccountTmp, anInsteadRecordId, anFileList)).toJson();
 
     }
     

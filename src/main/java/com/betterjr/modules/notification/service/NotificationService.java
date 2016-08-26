@@ -30,7 +30,6 @@ public class NotificationService extends BaseService<NotificationMapper, Notific
         BTAssert.notNull(anNotification, "通知内容不允许为空!");
 
         anNotification.initAddValue(anOperator, anCustomer);
-
         this.insert(anNotification);
 
         return anNotification;
@@ -71,7 +70,6 @@ public class NotificationService extends BaseService<NotificationMapper, Notific
         BTAssert.notNull(anId, "消息编号不允许为空!");
 
         CustOperatorInfo operator = UserUtils.getOperatorInfo();
-
         // 检查此消息有没被此人接收
         checkNotificationCustomer(anId, operator.getId());
 
@@ -85,17 +83,19 @@ public class NotificationService extends BaseService<NotificationMapper, Notific
         BTAssert.notNull(anId, "消息编号不允许为空!");
 
         CustOperatorInfo operator = UserUtils.getOperatorInfo();
-
         // 检查此消息有没被此人接收
         checkNotificationCustomer(anId, operator.getId());
 
         return notificationCustomerService.saveSetReadNotification(anId, operator.getId());
     }
-    
+
     /**
      * 
      */
     private NotificationCustomer checkNotificationCustomer(Long anId, Long anOperId) {
+        BTAssert.notNull(anId, "编号不允许为空!");
+        BTAssert.notNull(anOperId, "操作员编号不允许为空!");
+        
         final NotificationCustomer notificationCustomer = notificationCustomerService.findNotifiCustomerByNotifiIdAndOperId(anId, anOperId);
         BTAssert.notNull(notificationCustomer, "没有找到相应的站内消息接收记录!");
         return notificationCustomer;

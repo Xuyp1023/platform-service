@@ -2,8 +2,11 @@ package com.betterjr.modules.notification.entity;
 
 import com.betterjr.common.annotation.*;
 import com.betterjr.common.entity.BetterjrEntity;
+import com.betterjr.common.selectkey.SerialGenerator;
 import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.UserUtils;
+import com.betterjr.modules.account.entity.CustInfo;
+import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
@@ -48,6 +51,13 @@ public class NotificationProfile implements BetterjrEntity {
     @Column(name = "C_SUBSCRIBE_ENABLE",  columnDefinition="CHAR" )
     @MetaData( value="是否允许订阅 ：0不允许订阅", comments = "是否允许订阅 ：0不允许订阅，1允许订阅")
     private String subscribeEnable;
+    
+    /**
+     * 可订阅的角色范围,空代表所有关系客户
+     */
+    @Column(name = "C_SUBSCRIBE_RULE_LIST",  columnDefinition="CHAR" )
+    @MetaData( value="可订阅的角色范围,空代表所有关系客户", comments = "可订阅的角色范围,空代表所有关系客户")
+    private String subscribeRuleList;
 
     /**
      * 创建人(操作员)ID号
@@ -290,6 +300,14 @@ public class NotificationProfile implements BetterjrEntity {
         this.custName = custName == null ? null : custName.trim();
     }
 
+    public String getSubscribeRuleList() {
+        return subscribeRuleList;
+    }
+
+    public void setSubscribeRuleList(String anSubscribeRuleList) {
+        subscribeRuleList = anSubscribeRuleList;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -301,6 +319,7 @@ public class NotificationProfile implements BetterjrEntity {
         sb.append(", profileName=").append(profileName);
         sb.append(", profileType=").append(profileType);
         sb.append(", subscribeEnable=").append(subscribeEnable);
+        sb.append(", subscribeRuleList=").append(subscribeRuleList);
         sb.append(", regOperId=").append(regOperId);
         sb.append(", regOperName=").append(regOperName);
         sb.append(", regDate=").append(regDate);
@@ -336,6 +355,7 @@ public class NotificationProfile implements BetterjrEntity {
             && (this.getProfileName() == null ? other.getProfileName() == null : this.getProfileName().equals(other.getProfileName()))
             && (this.getProfileType() == null ? other.getProfileType() == null : this.getProfileType().equals(other.getProfileType()))
             && (this.getSubscribeEnable() == null ? other.getSubscribeEnable() == null : this.getSubscribeEnable().equals(other.getSubscribeEnable()))
+            && (this.getSubscribeRuleList() == null ? other.getSubscribeRuleList() == null : this.getSubscribeRuleList().equals(other.getSubscribeRuleList()))
             && (this.getRegOperId() == null ? other.getRegOperId() == null : this.getRegOperId().equals(other.getRegOperId()))
             && (this.getRegOperName() == null ? other.getRegOperName() == null : this.getRegOperName().equals(other.getRegOperName()))
             && (this.getRegDate() == null ? other.getRegDate() == null : this.getRegDate().equals(other.getRegDate()))
@@ -360,6 +380,7 @@ public class NotificationProfile implements BetterjrEntity {
         result = prime * result + ((getProfileName() == null) ? 0 : getProfileName().hashCode());
         result = prime * result + ((getProfileType() == null) ? 0 : getProfileType().hashCode());
         result = prime * result + ((getSubscribeEnable() == null) ? 0 : getSubscribeEnable().hashCode());
+        result = prime * result + ((getSubscribeRuleList() == null) ? 0 : getSubscribeRuleList().hashCode());
         result = prime * result + ((getRegOperId() == null) ? 0 : getRegOperId().hashCode());
         result = prime * result + ((getRegOperName() == null) ? 0 : getRegOperName().hashCode());
         result = prime * result + ((getRegDate() == null) ? 0 : getRegDate().hashCode());
@@ -383,5 +404,29 @@ public class NotificationProfile implements BetterjrEntity {
         this.modiTime = BetterDateUtils.getNumTime();
         
         this.businStatus = anBusinStatus;
+    }
+
+    public void initAddValue(NotificationProfile anNotificationProfile, CustInfo anCustInfo, CustOperatorInfo anOperator) {
+        this.id = SerialGenerator.getLongValue("NotificationProfile.id");
+
+        this.regOperId = anOperator.getId();
+        this.regOperName = anOperator.getName();
+        this.operOrg = anOperator.getOperOrg();
+
+        this.regDate = BetterDateUtils.getNumDate();
+        this.regTime = BetterDateUtils.getNumTime();
+        
+        this.modiOperId = anOperator.getId();
+        this.modiOperName = anOperator.getName();
+        this.modiDate = BetterDateUtils.getNumDate();
+        this.modiTime = BetterDateUtils.getNumTime();
+        
+        this.subscribeEnable = anNotificationProfile.getSubscribeEnable();
+        this.subscribeRuleList = anNotificationProfile.getSubscribeRuleList();
+        this.profileName = anNotificationProfile.getProfileName();
+        this.profileType = anNotificationProfile.getProfileType();
+        
+        this.custNo = anCustInfo.getCustNo();
+        this.custName = anCustInfo.getCustName();
     }
 }

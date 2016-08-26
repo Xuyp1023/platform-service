@@ -60,14 +60,12 @@ public class CustInsteadService {
             throw new BytterTradeException(20040, "代录类型不正确");
         }
 
-        // TODO 处理上传 代录申请附件
-
         String tempCustNo = (String) anParam.get("custNo");
         Long custNo = Long.valueOf(tempCustNo);
-        final CustInsteadApply custInsteadApply = insteadApplyService.addCustInsteadApply(insteadType, custNo);
+        final CustInsteadApply custInsteadApply = insteadApplyService.addCustInsteadApply(insteadType, custNo, anFileList);
 
         String insteadItems = (String) anParam.get("insteadItems");
-        insteadRecordService.addCustInsteadRecord(custInsteadApply, insteadType, insteadItems);
+        insteadRecordService.addInsteadRecord(custInsteadApply, insteadType, insteadItems);
 
         return custInsteadApply;
     }
@@ -76,10 +74,25 @@ public class CustInsteadService {
      * 代录申请 - 修改申请
      */
     public CustInsteadApply saveInsteadApply(Map<String, Object> anParam, Long anApplyId, String anFileList) {
+        BTAssert.notNull(anParam, "代录信息不允许为空！");
+        BTAssert.notNull(anApplyId, "代录编号不允许为空！");
+        
+        String insteadType = (String) anParam.get("insteadType");
+        if ((insteadType.equals(CustomerConstants.INSTEAD_APPLY_TYPE_OPENACCOUNT)
+                || insteadType.equals(CustomerConstants.INSTEAD_APPLY_TYPE_CHANGE)) == false) {
+            throw new BytterTradeException(20040, "代录类型不正确");
+        }
+        
+        final CustInsteadApply tempCustInsteadApply = insteadApplyService.findCustInsteadApply(anApplyId);
+        BTAssert.notNull(tempCustInsteadApply, "没有找到相应的代录申请!");
+        
+        final CustInsteadApply custInsteadApply = insteadApplyService.saveCustInsteadApply(tempCustInsteadApply, anFileList);
+        BTAssert.notNull(custInsteadApply, "保存代录申请发生错误!");
 
-        // TODO 处理上传 代录申请附件
-
-        return null;
+        String insteadItems = (String) anParam.get("insteadItems");
+        
+        insteadRecordService.saveInsteadRecord(custInsteadApply, insteadType, insteadItems);
+        return custInsteadApply;
     }
 
     /**
@@ -107,8 +120,11 @@ public class CustInsteadService {
     public Page<CustInsteadApply> queryInsteadApplyAuditList(Map<String, Object> anParam, int anFlag, int anPageNum, int anPageSize) {
         BTAssert.notEmpty(anParam, "查询参数不允许为空！");
 
-        String[] businStatues = { CustomerConstants.INSTEAD_APPLY_STATUS_NEW, CustomerConstants.INSTEAD_APPLY_STATUS_AUDIT_PASS,
-                CustomerConstants.INSTEAD_APPLY_STATUS_REVIEW_REJECT, CustomerConstants.INSTEAD_APPLY_STATUS_CONFIRM_REJECT };
+        String[] businStatues = { 
+                CustomerConstants.INSTEAD_APPLY_STATUS_NEW, 
+                CustomerConstants.INSTEAD_APPLY_STATUS_AUDIT_PASS,
+                CustomerConstants.INSTEAD_APPLY_STATUS_REVIEW_REJECT, 
+                CustomerConstants.INSTEAD_APPLY_STATUS_CONFIRM_REJECT };
         anParam.put("businStatus", businStatues);
         return insteadApplyService.queryCustInsteadApply(anParam, anFlag, anPageNum, anPageSize);
     }
@@ -141,7 +157,7 @@ public class CustInsteadService {
     public List<CustInsteadRecord> queryInsteadRecordByApply(Long anApplyId) {
         BTAssert.notNull(anApplyId, "代录申请编号不允许为空");
 
-        return insteadRecordService.queryCustInsteadRecordByApplyId(anApplyId);
+        return insteadRecordService.queryInsteadRecordByApplyId(anApplyId);
     }
 
     /**
@@ -178,7 +194,7 @@ public class CustInsteadService {
     public CustInsteadApply saveSubmitReviewInsteadApply(Long anId) {
         checkInsteadApply(anId, CustomerConstants.INSTEAD_APPLY_STATUS_TYPE_IN);
 
-        List<CustInsteadRecord> insteadRecords = insteadRecordService.queryCustInsteadRecordByApplyId(anId);
+        List<CustInsteadRecord> insteadRecords = insteadRecordService.queryInsteadRecordByApplyId(anId);
         List<String> businStatus = Arrays.asList(CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_PASS,
                 CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT, CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_PASS);
         boolean includeReviewRejectFlag = false;
@@ -224,7 +240,8 @@ public class CustInsteadService {
         }
 
         List<CustInsteadRecord> insteadRecords = insteadRecordService.selectByProperty("applyId", anId);
-        List<String> businStatus = Arrays.asList(CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_PASS,
+        List<String> businStatus = Arrays.asList(
+                CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_PASS,
                 CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_REJECT);
         boolean includeConfirmRejectFlag = false;
         for (CustInsteadRecord insteadRecord : insteadRecords) {
@@ -288,10 +305,14 @@ public class CustInsteadService {
      * 录入提交
      */
     public CustInsteadApply saveSubmitTypeInInsteadApply(Long anId) {
-        checkInsteadApply(anId, CustomerConstants.INSTEAD_APPLY_STATUS_AUDIT_PASS, CustomerConstants.INSTEAD_APPLY_STATUS_REVIEW_REJECT,
+        checkInsteadApply(anId, 
+                CustomerConstants.INSTEAD_APPLY_STATUS_AUDIT_PASS, 
+                CustomerConstants.INSTEAD_APPLY_STATUS_REVIEW_REJECT,
                 CustomerConstants.INSTEAD_APPLY_STATUS_CONFIRM_REJECT);
 
-        checkInsteadRecordByApplyId(anId, CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN, CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_PASS,
+        checkInsteadRecordByApplyId(anId, 
+                CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN, 
+                CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_PASS,
                 CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_PASS);
 
         final CustInsteadApply insteadApply = saveInsteadApplyStatus(anId, CustomerConstants.INSTEAD_APPLY_STATUS_TYPE_IN);
@@ -310,7 +331,8 @@ public class CustInsteadService {
         checkInsteadApply(anId, CustomerConstants.INSTEAD_APPLY_STATUS_TYPE_IN);
 
         List<CustInsteadRecord> insteadRecords = insteadRecordService.selectByProperty("applyId", anId);
-        List<String> businStatus = Arrays.asList(CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_PASS,
+        List<String> businStatus = Arrays.asList(
+                CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_PASS,
                 CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_PASS);
         for (CustInsteadRecord insteadRecord : insteadRecords) {
             if (businStatus.contains(insteadRecord.getBusinStatus()) == false) {
@@ -496,7 +518,7 @@ public class CustInsteadService {
         BTAssert.notEmpty(businStatues, "状态不允许为空！");
 
         List<String> businStatusList = Arrays.asList(businStatues);
-        List<CustInsteadRecord> insteadRecords = insteadRecordService.queryCustInsteadRecordByApplyId(anApplyId);
+        List<CustInsteadRecord> insteadRecords = insteadRecordService.queryInsteadRecordByApplyId(anApplyId);
         for (CustInsteadRecord insteadRecord : insteadRecords) {
             String businStatus = insteadRecord.getBusinStatus();
             if (businStatusList.contains(businStatus) == false) {
@@ -525,7 +547,7 @@ public class CustInsteadService {
      * 修改代录申请状态
      */
     public CustInsteadApply saveInsteadApplyStatus(Long anId, String anBusinStatus) {
-        final CustInsteadApply insteadApply = insteadApplyService.saveCustInsteadApply(anId, anBusinStatus);
+        final CustInsteadApply insteadApply = insteadApplyService.saveCustInsteadApplyStatus(anId, anBusinStatus);
         BTAssert.notNull(insteadApply, "修改代录申请审核状态失败！");
         return insteadApply;
     }
@@ -534,7 +556,7 @@ public class CustInsteadService {
      * 修改代录记录状态
      */
     public CustInsteadRecord saveInsteadRecordStatus(Long anId, String anBusinStatus) {
-        final CustInsteadRecord insteadRecord = insteadRecordService.saveCustInsteadRecordStatus(anId, anBusinStatus);
+        final CustInsteadRecord insteadRecord = insteadRecordService.saveInsteadRecordStatus(anId, anBusinStatus);
         BTAssert.notNull(insteadRecord, "修改代录记录审核状态失败！");
         return insteadRecord;
     }
@@ -547,5 +569,4 @@ public class CustInsteadService {
         CustAuditLog auditLog = auditLogService.addCustAuditLog(anAuditType, anStepNode, anBusinId, anAuditResult, anReason, anInsteadItem, anCustNo);
         BTAssert.notNull(auditLog, "审核记录添加失败!");
     }
-
 }
