@@ -16,6 +16,7 @@ import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
+import com.betterjr.common.utils.UserUtils;
 import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.customer.constant.CustomerConstants;
 import com.betterjr.modules.customer.dao.CustMechBusinLicenceTmpMapper;
@@ -107,7 +108,7 @@ public class CustMechBusinLicenceTmpService extends BaseService<CustMechBusinLic
         final CustMechBusinLicenceTmp tempBusinLicenceTmp = this.selectByPrimaryKey(anId);
         BTAssert.notNull(tempBusinLicenceTmp, "没有找到对应的营业执照流水信息！");
 
-        tempBusinLicenceTmp.setBatchNo(fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, tempBusinLicenceTmp.getBatchNo()));
+        tempBusinLicenceTmp.setBatchNo(fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, tempBusinLicenceTmp.getBatchNo(), UserUtils.getOperatorInfo()));
         tempBusinLicenceTmp.initModifyValue(anBusinLicenceTmp);
         this.updateByPrimaryKey(tempBusinLicenceTmp);
         return tempBusinLicenceTmp;

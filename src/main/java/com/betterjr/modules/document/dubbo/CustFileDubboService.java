@@ -11,6 +11,7 @@ import com.alibaba.dubbo.config.annotation.Service;
 import com.betterjr.common.config.ParamNames;
 import com.betterjr.common.data.KeyAndValueObject;
 import com.betterjr.common.utils.Collections3;
+import com.betterjr.common.utils.UserUtils;
 import com.betterjr.common.web.AjaxObject;
 import com.betterjr.modules.document.ICustFileService;
 import com.betterjr.modules.document.data.AccountAduitData;
@@ -138,16 +139,26 @@ public class CustFileDubboService implements ICustFileService{
     }
 
     @Override
-    public void deleteFileItem(Long anId, Long anBatchNo) {
+    public String webDeleteFileItem(Long anId, Long anBatchNo) {
         // TODO Auto-generated method stub
-        custFileItemService.deleteFileItem(anId, anBatchNo);
+        boolean result= custFileItemService.deleteFileItem(anId, anBatchNo);
+        if(result){
+            return AjaxObject.newOk("文件删除成功").toJson();
+        }
+        return AjaxObject.newOk("文件删除失败").toJson();
+    }
+    
+    @Override
+    public boolean deleteFileItem(Long anId, Long anBatchNo) {
+        // TODO Auto-generated method stub
+        return custFileItemService.deleteFileItem(anId, anBatchNo);
     }
 
     @Override
     public String webSaveAndUpdateFileItem(String filePath,Long fileLength, String anWorkType, String anFileName) {
         // TODO Auto-generated method stub
         CustFileItem fileItem = CustFileUtils.createDefFileItemForStore(filePath,fileLength, anWorkType, anFileName);
-        boolean result=this.custFileItemService.saveAndUpdateFileItem(fileItem);
+        boolean result=this.custFileItemService.saveAndUpdateFileItem(fileItem, UserUtils.getOperatorInfo());
         if(result){
             return AjaxObject.newOk("上传文件成功", fileItem).toJson();
         }

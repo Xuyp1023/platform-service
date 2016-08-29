@@ -22,6 +22,7 @@ import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
+import com.betterjr.common.utils.UserUtils;
 import com.betterjr.modules.customer.constant.CustomerConstants;
 import com.betterjr.modules.customer.dao.CustMechShareholderTmpMapper;
 import com.betterjr.modules.customer.entity.CustChangeApply;
@@ -93,10 +94,10 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
         final Long refId = anShareholderTmp.getRefId();
         BTAssert.isNull(refId, "引用编号不能有值!");
 
-        anShareholderTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW);
+        anShareholderTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW, CustomerConstants.TMP_TYPE_CHANGE, null);
         anShareholderTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_ADD);
         anShareholderTmp.setBatchNo(fileItemService.updateCustFileItemInfo(anFileList, anShareholderTmp.getBatchNo()));
-        return addShareholderTmp(anShareholderTmp, CustomerConstants.TMP_TYPE_CHANGE);
+        return addShareholderTmp(anShareholderTmp);
     }
 
     /**
@@ -117,15 +118,15 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
 
         CustMechShareholderTmp tempShareholderTmp = findShareholderTmpByRefId(refId, CustomerConstants.TMP_TYPE_CHANGE);
         if (tempShareholderTmp == null) {
-            anShareholderTmp.setBusinStatus(CustomerConstants.TMP_STATUS_NEW);
+            anShareholderTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW, CustomerConstants.TMP_TYPE_CHANGE, null);
             anShareholderTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
-            anShareholderTmp.setBatchNo(fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, anShareholderTmp.getBatchNo()));
-            return addShareholderTmp(anShareholderTmp, CustomerConstants.TMP_TYPE_CHANGE);
+            anShareholderTmp.setBatchNo(fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, anShareholderTmp.getBatchNo(), UserUtils.getOperatorInfo()));
+            return addShareholderTmp(anShareholderTmp);
         }
         else {
             tempShareholderTmp.initModifyValue(anShareholderTmp);
             tempShareholderTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
-            tempShareholderTmp.setBatchNo(fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, tempShareholderTmp.getBatchNo()));
+            tempShareholderTmp.setBatchNo(fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, tempShareholderTmp.getBatchNo(), UserUtils.getOperatorInfo()));
             return saveShareholderTmp(tempShareholderTmp);
         }
     }
@@ -144,8 +145,9 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
             shareholderTmp = new CustMechShareholderTmp();
             shareholderTmp.initAddValue(shareholder, CustomerConstants.TMP_STATUS_NEW);
             shareholderTmp.setRefId(anRefId);
+            shareholderTmp.setTmpType(CustomerConstants.TMP_TYPE_CHANGE);
             shareholderTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_DELETE);
-            return addShareholderTmp(shareholderTmp, CustomerConstants.TMP_TYPE_CHANGE);
+            return addShareholderTmp(shareholderTmp);
         }
         else {
             shareholderTmp.initModifyValue(shareholder, CustomerConstants.TMP_STATUS_NEW);
@@ -247,7 +249,8 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
             shareholderTmp.setRefId(shareholder.getId());
             shareholderTmp.setParentId(parentId);
             shareholderTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_NORMAL);
-            addShareholderTmp(shareholderTmp, anTmpType);
+            shareholderTmp.setTmpType(anTmpType);
+            addShareholderTmp(shareholderTmp);
         });
 
     }
@@ -353,14 +356,13 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
     /**
      * 添加公司股东流水信息
      */
-    public CustMechShareholderTmp addShareholderTmp(CustMechShareholderTmp anShareholderTmp, String anTmpType) {
+    public CustMechShareholderTmp addShareholderTmp(CustMechShareholderTmp anShareholderTmp) {
         BTAssert.notNull(anShareholderTmp, "公司股东流水信息不允许为空！");
         Long custNo = anShareholderTmp.getCustNo();
         Long version = VersionHelper.generateVersion(this.mapper, custNo);
 
         //anShareholderTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW, anTmpType, version);
         anShareholderTmp.setVersion(version);
-        anShareholderTmp.setTmpType(anTmpType);
         
         this.insert(anShareholderTmp);
         return anShareholderTmp;
@@ -424,11 +426,11 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
             throw new BytterTradeException("客户编号不匹配!");
         }
 
-        anShareholderTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW);
+        anShareholderTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW, CustomerConstants.TMP_TYPE_INSTEAD, null);
         anShareholderTmp.setParentId(anInsteadRecordId);
         anShareholderTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_ADD);
         anShareholderTmp.setBatchNo(fileItemService.updateCustFileItemInfo(anFileList, anShareholderTmp.getBatchNo()));
-        return addShareholderTmp(anShareholderTmp, CustomerConstants.TMP_TYPE_INSTEAD);
+        return addShareholderTmp(anShareholderTmp);
     }
 
     /**
@@ -455,16 +457,16 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
 
         CustMechShareholderTmp tempShareholderTmp = findShareholderTmpByRefId(refId, CustomerConstants.TMP_TYPE_INSTEAD);
         if (tempShareholderTmp == null) {
+            anShareholderTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW, CustomerConstants.TMP_TYPE_INSTEAD, null);
             anShareholderTmp.setParentId(anInsteadRecordId);
-            anShareholderTmp.setBusinStatus(CustomerConstants.TMP_STATUS_NEW);
             anShareholderTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
-            anShareholderTmp.setBatchNo(fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, anShareholderTmp.getBatchNo()));
-            return addShareholderTmp(anShareholderTmp, CustomerConstants.TMP_TYPE_INSTEAD);
+            anShareholderTmp.setBatchNo(fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, anShareholderTmp.getBatchNo(), UserUtils.getOperatorInfo()));
+            return addShareholderTmp(anShareholderTmp);
         }
         else {
             tempShareholderTmp.initModifyValue(anShareholderTmp);
             tempShareholderTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
-            tempShareholderTmp.setBatchNo(fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, tempShareholderTmp.getBatchNo()));
+            tempShareholderTmp.setBatchNo(fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, tempShareholderTmp.getBatchNo(), UserUtils.getOperatorInfo()));
             return saveShareholderTmp(tempShareholderTmp);
         }
     }
@@ -496,8 +498,9 @@ public class CustMechShareholderTmpService extends BaseService<CustMechSharehold
             shareholderTmp.initAddValue(shareholder, CustomerConstants.TMP_STATUS_NEW);
             shareholderTmp.setRefId(anRefId);
             shareholderTmp.setParentId(anInsteadRecordId);
+            shareholderTmp.setTmpType(CustomerConstants.TMP_TYPE_INSTEAD);
             shareholderTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_DELETE);
-            return addShareholderTmp(shareholderTmp, CustomerConstants.TMP_TYPE_INSTEAD);
+            return addShareholderTmp(shareholderTmp);
         }
         else {
             shareholderTmp.initModifyValue(shareholder, CustomerConstants.TMP_STATUS_NEW);

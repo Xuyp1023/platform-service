@@ -11,6 +11,8 @@ import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
+import com.betterjr.common.utils.UserUtils;
+import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.betterjr.modules.document.dao.CustFileItemMapper;
 import com.betterjr.modules.document.entity.CustFileItem;
 import com.betterjr.modules.document.utils.CustFileUtils;
@@ -50,7 +52,7 @@ public class CustFileItemService extends BaseService<CustFileItemMapper, CustFil
      * @param anFileItemId
      * @return
      */
-    private boolean updateAndDuplicateConflictFileItems(Long anBatchNo, Long anFileItemId) {
+    private boolean updateAndDuplicateConflictFileItems(Long anBatchNo, Long anFileItemId, CustOperatorInfo anOperator) {
         CustFileItem fileItem = this.selectByPrimaryKey(anFileItemId);
         
         if (fileItem != null) {
@@ -61,7 +63,7 @@ public class CustFileItemService extends BaseService<CustFileItemMapper, CustFil
                 CustFileItem tempFileItem = new CustFileItem();
                 tempFileItem.initDuplicateConflictValue(fileItem);
                 tempFileItem.setBatchNo(anBatchNo);
-                return this.saveAndUpdateFileItem(tempFileItem);
+                return this.saveAndUpdateFileItem(tempFileItem, anOperator);
             }
         }
         
@@ -74,7 +76,7 @@ public class CustFileItemService extends BaseService<CustFileItemMapper, CustFil
      * @param anBatchNo
      * @return
      */
-    public Long updateAndDuplicateConflictFileItemInfo(String anFileList, Long anBatchNo) {
+    public Long updateAndDuplicateConflictFileItemInfo(String anFileList, Long anBatchNo, CustOperatorInfo anOperator) {
         if (BetterStringUtils.isBlank(anFileList)) {
 
             return anBatchNo;
@@ -89,7 +91,7 @@ public class CustFileItemService extends BaseService<CustFileItemMapper, CustFil
         for (String item : fileItems) {
             if (BetterStringUtils.isNotBlank(item)) {
                 Long fileItemId = Long.valueOf(item.trim());
-                updateAndDuplicateConflictFileItems(anBatchNo, fileItemId);
+                updateAndDuplicateConflictFileItems(anBatchNo, fileItemId, anOperator);
             }
         }
 
@@ -199,16 +201,17 @@ public class CustFileItemService extends BaseService<CustFileItemMapper, CustFil
     /**
      * 保存文件信息，如果存在就更新，不存在就增加
      * @param anFileItem
+     * @param anOperator 
      * @return
      */
-    public boolean saveAndUpdateFileItem(CustFileItem anFileItem) {
+    public boolean saveAndUpdateFileItem(CustFileItem anFileItem, CustOperatorInfo anOperator) {
         CustFileItem tmpFileItem = this.selectByPrimaryKey(anFileItem.getId());
-        anFileItem.setRegDate(BetterDateUtils.getNumDate());
-        anFileItem.setRegTime(BetterDateUtils.getNumTime());
         if (tmpFileItem == null) {
+            anFileItem.initAddValue(anOperator);
             this.insert(anFileItem);
         }
         else {
+            tmpFileItem.initModifyValue(anOperator);
             this.updateByPrimaryKey(anFileItem);
         }
 
@@ -223,28 +226,36 @@ public class CustFileItemService extends BaseService<CustFileItemMapper, CustFil
      * @param anBatchNo
      *            文件批次号
      */
-    public void deleteFileItem(Long anId, Long anBatchNo) {
+    public boolean deleteFileItem(Long anId, Long anBatchNo) {
         logger.info("Detach file item from accept bill with item id " + anId);
         if (null == anId) {
             logger.error("附件编号不能为空");
-            return;
+            return false;
         }
         CustFileItem item = this.selectByPrimaryKey(anId);
         if (null == item) {
             logger.error("不能获取附件！" + anId + ", anBatchNo=" + anBatchNo);
 
-            return;
+            return false;
         }
         if (anBatchNo <= 0 || item.getBatchNo() != anBatchNo) {
             logger.error("获取附件！" + anId + ", anBatchNo=" + anBatchNo + ", batchNo不一致!");
 
-            return;
+            return false;
         }
 
+        CustOperatorInfo operator = UserUtils.getOperatorInfo();
+        if (BetterStringUtils.equals(operator.getOperOrg(), item.getOperOrg()) == false) {
+            logger.error("不是同一OperOrg的数据,不允许删除! operUser=" + operator.getName());
+            return false;
+        }
+        
         item.setBatchNo(-anBatchNo);
 
+        item.initModifyValue(operator);
         int result = this.updateByPrimaryKeySelective(item);
         logger.debug("update result:" + result);
+        return true;
     }
 
 }

@@ -17,6 +17,7 @@ import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
+import com.betterjr.common.utils.UserUtils;
 import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.customer.constant.CustomerConstants;
 import com.betterjr.modules.customer.dao.CustMechLawTmpMapper;
@@ -115,7 +116,7 @@ public class CustMechLawTmpService extends BaseService<CustMechLawTmpMapper, Cus
         anLawTmp.setCustNo(anLawTmp.getRefId());
         final String custName = custAccountService.queryCustName(custNo);
         anLawTmp.initAddValue(anTmpType, custNo, custName);
-        anLawTmp.setBatchNo(custFileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, anLawTmp.getBatchNo()));
+        anLawTmp.setBatchNo(custFileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, anLawTmp.getBatchNo(), UserUtils.getOperatorInfo()));
         anLawTmp.setVersion(VersionHelper.generateVersion(this.mapper, custNo));
         this.insert(anLawTmp);
 

@@ -15,6 +15,7 @@ import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
+import com.betterjr.common.utils.UserUtils;
 import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.customer.constant.CustomerConstants;
 import com.betterjr.modules.customer.dao.CustMechBaseTmpMapper;
@@ -110,7 +111,7 @@ public class CustMechBaseTmpService extends BaseService<CustMechBaseTmpMapper, C
 
         final Long custNo = anCustMechBaseTmp.getRefId();
 
-        anCustMechBaseTmp.setBatchNo(fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, anCustMechBaseTmp.getBatchNo()));
+        anCustMechBaseTmp.setBatchNo(fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, anCustMechBaseTmp.getBatchNo(), UserUtils.getOperatorInfo()));
         anCustMechBaseTmp.initAddValue(anTmpType, custNo);
         anCustMechBaseTmp.setVersion(VersionHelper.generateVersion(this.mapper, custNo));
         this.insert(anCustMechBaseTmp);
