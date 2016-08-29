@@ -1,9 +1,13 @@
 package com.betterjr.modules.workflow.service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +17,8 @@ import org.snaker.engine.entity.HistoryTask;
 import org.snaker.engine.entity.Order;
 import org.snaker.engine.entity.Task;
 import org.snaker.engine.entity.WorkItem;
+import org.snaker.engine.model.NodeModel;
+import org.snaker.engine.model.ProcessModel;
 import org.snaker.engine.spring.SpringSnakerEngine;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,6 +38,7 @@ import com.betterjr.modules.workflow.entity.CustFlowBase;
 import com.betterjr.modules.workflow.entity.CustFlowInstanceBusiness;
 import com.betterjr.modules.workflow.entity.CustFlowNode;
 import com.betterjr.modules.workflow.entity.CustFlowStep;
+import com.betterjr.modules.workflow.utils.SnakerHelper;
 import com.betterjr.modules.workflow.utils.SnakerPageUtils;
 
 @Service
@@ -39,7 +46,7 @@ public class FlowService {
     private static final Logger logger = LoggerFactory.getLogger(FlowService.class);
 
     @Autowired
-    private SpringSnakerEngine engine;
+    private BetterSpringSnakerEngine engine;
 
     @Autowired
     private CustFlowInstanceBusinessService businessService;
@@ -63,13 +70,17 @@ public class FlowService {
     public void start(FlowInput input) {
         Map<String, Object> formParas = input.toStartMap();
       //加载流程配置
-        BetterProcessService processService=(BetterProcessService)engine.process();
-        org.snaker.engine.entity.Process process = processService.getProcessByName(input.getType().name());
-        Order order = engine.startInstanceById(process.getId(), input.getOperator(), formParas);
+        String flowType=input.getType().name();
+        String coreOperOrg=input.getCoreOperOrg();
+        String financerOperOrg=input.getFinancerOperOrg();
+        org.snaker.engine.entity.Process process = engine.process().getProcessByName(flowType);
+        Order order = engine.startInstanceById(process.getId(), input.getOperator(), formParas,coreOperOrg,financerOperOrg);
         //更新 businessId与orderId 的mapping
         CustFlowInstanceBusiness business = new CustFlowInstanceBusiness();
         business.setBusinessId(input.getBusinessId());
         business.setFlowOrderId(order.getId());
+        business.setCoreOperOrg(input.getCoreOperOrg());
+        business.setFinancerOperOrg(input.getFinancerOperOrg());
         business.setUpdateTime(BetterDateUtils.getNow());
         this.businessService.insert(business);
 
@@ -82,38 +93,47 @@ public class FlowService {
      * @param input
      */
     public void exec(FlowInput input) {
-        CustFlowInstanceBusiness business = this.businessService.selectByPrimaryKey(input.getBusinessId());
+         CustFlowInstanceBusiness business = this.businessService.selectByPrimaryKey(input.getBusinessId());
         if (business == null) {
             logger.error("can not find order for business :" + input.getBusinessId());
             return;
         }
-        //查询当前节点角色，非保理，设置操作员为 SnakerEngine.AUTO
-        FlowStatus search=new FlowStatus();
-        search.setBusinessId(input.getBusinessId());
-        Page<FlowStatus> currentTask=this.queryCurrentWorkTask(null, search);
-        if(Collections3.isEmpty(currentTask)){
-            logger.error("can not find current Task for business :" + input.getBusinessId());
-            return;
-        }else{
-            FlowStatus sta=Collections3.getFirst(currentTask);
-            String role=this.nodeService.findNodeRoleById(sta.getCurrentNodeId());
-            if(!FlowNodeRole.Factoring.name().equalsIgnoreCase(role)){
-                input.setOperator(SnakerEngine.AUTO);
-            }
-        }
+
         //执行task
         Map<String, Object> formParas = input.toExecMap();
-        QueryFilter filter = new QueryFilter().setOrderId(business.getFlowOrderId()).setOperator(input.getOperator());
-        List<WorkItem> workItemList = engine.query().getWorkItems(null, filter);
+        String orderId=business.getFlowOrderId();
+        String coreOperOrg=business.getCoreOperOrg();
+        String financerOperOrg=business.getFinancerOperOrg();
+        
+        QueryFilter filter = new QueryFilter().setOrderId(orderId).setOperator(input.getOperator());
+        List<Task> workTaskList = engine.query().getActiveTasks(filter);
+        //回滚&终止 只要一个人操作，其他人由系统自动跟进。
+        if(!FlowCommand.GoNext.equals(input.getCommand()) && !Collections3.isEmpty(workTaskList)){
+            filter=new QueryFilter().setOrderId(orderId);
+            List<Task> newWorkTaskList = engine.query().getActiveTasks(filter);
+            
+            Map workMap=Collections3.extractToMap(workTaskList, "id");
+            for(Task task:newWorkTaskList){
+                if(workMap.containsKey(task.getId())){
+                    task.setOperator(input.getOperator());
+                }else{
+                    task.setOperator(SnakerEngine.AUTO);
+                }
+            }
+            
+            workTaskList=newWorkTaskList;
+        }
+
+        
         switch(input.getCommand()){
             case GoNext:
-                execTask(input, formParas, workItemList);
+                execTask(input, formParas, workTaskList,coreOperOrg,financerOperOrg);
                 break;
             case Rollback:
-                rollBackTask(input, formParas, workItemList);
+                rollBackTask(input, formParas, workTaskList,coreOperOrg,financerOperOrg);
                 break;
             case Exit:
-                exitTask(input, formParas, workItemList);
+                exitTask(input, formParas, workTaskList,coreOperOrg,financerOperOrg);
                 break;
             default:
                 break;
@@ -123,31 +143,66 @@ public class FlowService {
 
     }
     
-    private void exitTask(FlowInput input, Map<String, Object> formParas, List<WorkItem> workItemList) {
+    private void exitTask(FlowInput input, Map<String, Object> formParas, List<Task> workItemList,String coreOperOrg,String financerOperOrg) {
         if (workItemList != null && workItemList.size() > 0) {
             for (int index = 0; index < workItemList.size(); index++) {
-                String taskId = workItemList.get(index).getTaskId();
-                engine.executeAndJumpTask(taskId, input.getOperator(), formParas, "end");
+                String taskId = workItemList.get(index).getId();
+                String operator=workItemList.get(index).getOperator();
+                
+                //如果是系统自动跟进的任务，则不驱动流程
+                if(SnakerEngine.AUTO.equals(operator)){
+                    engine.executeTaskOnly(taskId, operator, formParas, coreOperOrg, financerOperOrg);
+                }
+                logger.info("exit task:" + workItemList.get(index));
+            }
+            
+            for (int index = 0; index < workItemList.size(); index++) {
+                String taskId = workItemList.get(index).getId();
+                String operator=workItemList.get(index).getOperator();
+                
+                //如果是系统自动跟进的任务，则不驱动流程
+                if(!SnakerEngine.AUTO.equals(operator)){
+                    engine.executeAndJumpTask(taskId, operator, formParas, Collections.singleton("end"),coreOperOrg,financerOperOrg);
+                }
                 logger.info("exit task:" + workItemList.get(index));
             }
         }
     }
     
-    private void rollBackTask(FlowInput input, Map<String, Object> formParas, List<WorkItem> workItemList) {
+    private void rollBackTask(FlowInput input, Map<String, Object> formParas,List<Task> workItemList,String coreOperOrg,String financerOperOrg) {
         if (workItemList != null && workItemList.size() > 0) {
             for (int index = 0; index < workItemList.size(); index++) {
-                String taskId = workItemList.get(index).getTaskId();
-                engine.executeAndJumpTask(taskId, input.getOperator(), formParas, input.getRollbackNodeId());
-                logger.info("rollback task:" + workItemList.get(index).getTaskKey());
+                String taskId = workItemList.get(index).getId();
+                String orderId= workItemList.get(index).getOrderId();
+                String operator=workItemList.get(index).getOperator();
+
+                QueryFilter filter=new QueryFilter();
+                filter.setOrderId(orderId);
+                List<HistoryTask> histList=engine.query().getHistoryTasks(filter);
+                Set<String> rollbackSet=new HashSet<String>();
+                for(HistoryTask hist:histList){
+                    String histName=hist.getTaskName();
+                    if(histName.startsWith(input.getRollbackNodeId()+"-")){
+                        rollbackSet.add(histName);
+                    }
+                }
+                
+                //如果是系统自动跟进的任务，则不驱动流程
+                if(SnakerEngine.AUTO.equals(operator)){
+                    engine.executeTaskOnly(taskId, operator, formParas, coreOperOrg, financerOperOrg);
+                }else{
+                    engine.executeAndJumpTask(taskId, operator, formParas,rollbackSet,coreOperOrg,financerOperOrg);
+                }
+                logger.info("rollback task:" + workItemList.get(index).getTaskName() + " to "+rollbackSet);
             }
         }
     }
 
-    private void execTask(FlowInput input, Map<String, Object> formParas, List<WorkItem> workItemList) {
+    private void execTask(FlowInput input, Map<String, Object> formParas, List<Task> workItemList,String coreOperOrg,String financerOperOrg) {
         if (workItemList != null && workItemList.size() > 0) {
             for (int index = 0; index < workItemList.size(); index++) {
-                String taskId = workItemList.get(index).getTaskId();
-                engine.executeTask(taskId, input.getOperator(), formParas);
+                String taskId = workItemList.get(index).getId();
+                engine.executeTask(taskId, input.getOperator(), formParas,coreOperOrg,financerOperOrg);
                 logger.info("finished task:" + workItemList.get(index));
             }
         }
@@ -173,7 +228,7 @@ public class FlowService {
             logger.warn("not found current task for order id:"+business.getFlowOrderId());
             return Collections.emptyList();
         }
-       String nodeId=task.getTaskName();
+       String nodeId=this.convertTaskName2NodeId(task.getTaskName()).toString();
        
 
 
@@ -216,7 +271,7 @@ public class FlowService {
             flow.setFlowNodeName(task.getDisplayName());
             flow.setOperator(task.getOperator());
             flow.setReason(var.getReason());
-            flow.setFlowNodeId(Long.parseLong(task.getTaskName()));
+            flow.setFlowNodeId(this.convertTaskName2NodeId(task.getTaskName()));
             historyList.add(flow);
         }
         return historyList;
@@ -333,7 +388,7 @@ public class FlowService {
                 status.setCreateOperator(it.getCreator());
                 status.setCreateTime(BetterDateUtils.parseDate(it.getOrderCreateTime()));
                 status.setCurrentNodeName(it.getTaskName());
-                status.setCurrentNodeId(Long.parseLong(it.getTaskKey()));
+                status.setCurrentNodeId(this.convertTaskName2NodeId(it.getTaskKey()));
                 status.setFlowName(it.getOrderId());
                 status.setFlowType(it.getProcessName());
                 status.setLastUpdateTime(BetterDateUtils.parseDate(it.getTaskEndTime()));
@@ -342,6 +397,12 @@ public class FlowService {
                 page.add(status);
             }
         }
+    }
+    
+    private Long convertTaskName2NodeId(String taskName){
+        List<String> list=BetterStringUtils.splitTrim(taskName, "-");
+        String node=Collections3.getFirst(list);
+        return Long.parseLong(node);
     }
     
     
@@ -365,5 +426,68 @@ public class FlowService {
         }
         
     }
+    
+    /**
+     * 显示流程图当前节点tips（操作人，抵达时间）
+     */
+    public Map<String, String> findTipsJson(String businessId, String taskName) {
+        CustFlowInstanceBusiness buObj=this.businessService.selectByPrimaryKey(Long.parseLong(businessId));
+        if(buObj==null){
+            logger.error("can not find order for business :"+businessId);
+            return Collections.EMPTY_MAP;
+        }
+        
+        String orderId=buObj.getFlowOrderId();
+        List<Task> tasks = this.engine.query().getActiveTasks(new QueryFilter().setOrderId(orderId));
+        StringBuilder builder = new StringBuilder();
+        String createTime = "";
+        for(Task task : tasks) {
+            if(task.getTaskName().equalsIgnoreCase(taskName)) {
+                String[] actors = this.engine.query().getTaskActorsByTaskId(task.getId());
+                for(String actor : actors) {
+                    builder.append(actor).append(",");
+                }
+                createTime = task.getCreateTime();
+            }
+        }
+        if(builder.length() > 0) {
+            builder.deleteCharAt(builder.length() - 1);
+        }
+        Map<String, String> data = new HashMap<String, String>();
+        data.put("actors", builder.toString());
+        data.put("createTime", createTime);
+        return data;
+    }
+    
+    /**
+     * 显示流程图
+     */
+    public Map<String, String> findFlowJson(String processId, String businessId) {
+        BetterProcessService processService=(BetterProcessService)this.engine.process();
+        CustFlowInstanceBusiness buObj=this.businessService.selectByPrimaryKey(Long.parseLong(businessId));
+        if(buObj==null){
+            logger.error("can not find order for business :"+businessId);
+            return Collections.EMPTY_MAP;
+        }
+        String coreOperOrg=buObj.getCoreOperOrg();
+        String financerOperOrg = buObj.getFinancerOperOrg();
+        String orderId=buObj.getFlowOrderId();
+        org.snaker.engine.entity.Process process = processService.getProcessWithOrgById(processId, coreOperOrg, financerOperOrg);
+        
+        ProcessModel model = process.getModel();
+        Map<String, String> jsonMap = new HashMap<String, String>();
+        if(model != null) {
+            jsonMap.put("process", SnakerHelper.getModelJson(model));
+        }
 
+        if(BetterStringUtils.isNotEmpty(orderId)) {
+            List<Task> tasks = this.engine.query().getActiveTasks(new QueryFilter().setOrderId(orderId));
+            List<HistoryTask> historyTasks = this.engine.query().getHistoryTasks(new QueryFilter().setOrderId(orderId));
+            jsonMap.put("state", SnakerHelper.getStateJson(model, tasks, historyTasks));
+        }
+        logger.info(jsonMap.get("state"));
+        //{"historyRects":{"rects":[{"paths":["TO 任务1"],"name":"开始"},{"paths":["TO 分支"],"name":"任务1"},{"paths":["TO 任务3","TO 任务4","TO 任务2"],"name":"分支"}]}}
+        return jsonMap;
+//        return new HashMap<String, String>();
+    }
 }

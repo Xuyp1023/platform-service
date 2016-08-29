@@ -9,9 +9,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.snaker.engine.SnakerEngine;
 
+import com.betterjr.common.data.PlatformBaseRuleType;
 import com.betterjr.common.utils.Collections3;
+import com.betterjr.common.utils.UserUtils;
 import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.BasicServiceTest;
+import com.betterjr.modules.account.data.CustContextInfo;
+import com.betterjr.modules.account.entity.CustOperatorInfo;
+import com.betterjr.modules.sys.security.ShiroUser;
 import com.betterjr.modules.workflow.data.FlowCommand;
 import com.betterjr.modules.workflow.data.FlowInput;
 import com.betterjr.modules.workflow.data.FlowStatus;
@@ -33,33 +38,37 @@ public class FlowServiceTest extends BasicServiceTest<FlowService> {
     @Test
     public void startAndExec() {
         FlowType type = FlowType.Trade;
-        Long businessId = new Random().nextLong();
-        BigDecimal money = new BigDecimal(10001l);
-
+        Long businessId =(long)(56383459l);
+        BigDecimal money = new BigDecimal(100001l);
+        String financerOperOrg="biet;Developer.Supplier.Company";
+        String coreOperOrg="biet;Developer.Core.Enterprise";
         FlowInput in = new FlowInput();
         in.setType(type);
         in.setMoney(money);
         in.setBusinessId(businessId);
-        in.setOperator("1262");
-
+        in.setOperator(financerOperOrg);
+        in.setCoreOperOrg(coreOperOrg);
+        in.setFinancerOperOrg(financerOperOrg);
 
         FlowService service = this.getServiceObject();
         service.start(in);
 
-//        String cuOperators[] = new String[] { "testUser3", "testUser4", "testUser7", "testUser8" };
-        String cuOperators[] = new String[] { "1259", SnakerEngine.AUTO,"1259",SnakerEngine.AUTO,"1259"};
+        String cuOperators[] = new String[] { "1259", financerOperOrg,"1259",coreOperOrg,"1118","1092"};
         for (String operator : cuOperators) {
+            try {
+                Thread.sleep(2000);
+            }
+            catch (InterruptedException e) {}
             in.setCommand(FlowCommand.GoNext);
             in.setOperator(operator);
             in.setReason("ok,pass");
             service.exec(in);
         }
     }
-    
+
     @Test
     public void rollBack() {
-        FlowType type = FlowType.Trade;
-        Long businessId = -7570516586381383190l;
+        Long businessId = 56383459l;
         BigDecimal money = new BigDecimal(10001l);
 
         FlowService service = this.getServiceObject();
@@ -67,16 +76,31 @@ public class FlowServiceTest extends BasicServiceTest<FlowService> {
         in.setMoney(money);
         in.setBusinessId(businessId);
         in.setCommand(FlowCommand.Rollback);
-        in.setRollbackNodeId("14");
+        in.setRollbackNodeId("150");
         in.setOperator( "1259");
-        in.setReason("rollback to 核心企业确认背景");
+        in.setReason("rollback to 放款确认");
+        service.exec(in);
+    }
+    
+    @Test
+    public void rollBack2() {
+        Long businessId = 56383459l;
+        BigDecimal money = new BigDecimal(10001l);
+
+        FlowService service = this.getServiceObject();
+        FlowInput in = new FlowInput();
+        in.setMoney(money);
+        in.setBusinessId(businessId);
+        in.setCommand(FlowCommand.Rollback);
+        in.setRollbackNodeId("140");
+        in.setOperator( "1118");
+        in.setReason("rollback to 核心企业确认");
         service.exec(in);
     }
     
     @Test
     public void exec() {
-        FlowType type = FlowType.Trade;
-        Long businessId = -7570516586381383190l;
+        Long businessId = 56383459l;
         BigDecimal money = new BigDecimal(10001l);
 
         FlowService service = this.getServiceObject();
@@ -84,15 +108,14 @@ public class FlowServiceTest extends BasicServiceTest<FlowService> {
         in.setMoney(money);
         in.setBusinessId(businessId);
         in.setCommand(FlowCommand.GoNext);
-        in.setOperator( SnakerEngine.AUTO);
+        in.setOperator("biet;Developer.Core.Enterprise");
         in.setReason("ok,pass");
         service.exec(in);
     }
     
     @Test
     public void exit() {
-        FlowType type = FlowType.Trade;
-        Long businessId = -7570516586381383190l;
+        Long businessId = 56383459l;
         BigDecimal money = new BigDecimal(10001l);
 
         FlowService service = this.getServiceObject();
@@ -100,8 +123,8 @@ public class FlowServiceTest extends BasicServiceTest<FlowService> {
         in.setMoney(money);
         in.setBusinessId(businessId);
         in.setCommand(FlowCommand.Exit);
-        in.setOperator("1259");
-        in.setReason("ok,pass");
+        in.setOperator( "1095");
+        in.setReason("拒绝，终止流程");
         service.exec(in);
     }
     
