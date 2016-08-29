@@ -4,7 +4,7 @@
 	default-lazy-init="true">
 
 	<description>SnakerEngine配置 </description>
-	<bean class="org.snaker.engine.spring.SpringSnakerEngine">
+	<bean class="com.betterjr.modules.workflow.service.BetterSpringSnakerEngine">
 		<property name="processService" ref="snakerProcessService"/>
 		<property name="orderService" ref="snakerOrderService"/>
 		<property name="taskService" ref="snakerTaskService"/>

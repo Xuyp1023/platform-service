@@ -7,12 +7,12 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.config.annotation.Service;
-import com.alibaba.dubbo.rpc.service.GenericService;
 import com.betterjr.common.mapper.BeanMapper;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.common.web.AjaxObject;
 import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.rule.service.RuleServiceDubboFilterInvoker;
+import com.betterjr.modules.sys.security.ShiroUser;
 import com.betterjr.modules.workflow.IFlowService;
 import com.betterjr.modules.workflow.data.CustFlowNodeData;
 import com.betterjr.modules.workflow.data.FlowInput;
@@ -105,7 +105,7 @@ public class FlowDubboService implements IFlowService {
     @Override
     public String webQueryCurrentUserWorkTask(Map<String, Object> anMap, int anFlag, int anPageNum, int anPageSize) {
         FlowStatus searchParam = (FlowStatus) RuleServiceDubboFilterInvoker.getInputObj();
-        searchParam.setOperator(UserUtils.getUser().getId().toString());
+        searchParam.setOperator(transCurrentUser());
         Page<FlowStatus> page = new Page<FlowStatus>(anPageNum, anPageSize, anFlag == 1);
         Page<FlowStatus> list = this.flowService.queryCurrentWorkTask(page, searchParam);
         return AjaxObject.newOkWithPage("查询当前用户需要审批的任务成功", list).toJson();
@@ -117,7 +117,7 @@ public class FlowDubboService implements IFlowService {
     @Override
     public String webQueryCurrentUserHistoryWorkTask(Map<String, Object> anMap, int anFlag, int anPageNum, int anPageSize) {
         FlowStatus searchParam = (FlowStatus) RuleServiceDubboFilterInvoker.getInputObj();
-        searchParam.setOperator(UserUtils.getUser().getId().toString());
+        searchParam.setOperator(transCurrentUser());
         Page<FlowStatus> page = new Page<FlowStatus>(anPageNum, anPageSize, anFlag == 1);
         Page<FlowStatus> list = this.flowService.queryHistoryWorkTask(page, searchParam);
         return AjaxObject.newOkWithPage("查询当前用户审批历史数据成功", list).toJson();
@@ -128,7 +128,7 @@ public class FlowDubboService implements IFlowService {
      */
     @Override
     public String webQueryWorkTaskByMonitor(Map<String, Object> anMap, int anFlag, int anPageNum, int anPageSize) {
-        String user = UserUtils.getUser().getId().toString();
+        String user = transCurrentUser();
         FlowStatus searchParam = (FlowStatus) RuleServiceDubboFilterInvoker.getInputObj();
         searchParam.setOperator(user);
         Page<FlowStatus> page = new Page<FlowStatus>(anPageNum, anPageSize, anFlag == 1);
@@ -231,6 +231,22 @@ public class FlowDubboService implements IFlowService {
         List<CustFlowNodeData> list= this.flowNodeService.findFlowNodesByType(flowType);
         return AjaxObject.newOk(list).toJson();
     }
+    
+    /**
+     * 显示流程图当前节点tips（操作人，抵达时间）
+     */
+    public String webFindTipsJson(String businessId, String taskName) {
+        // TODO Auto-generated method stub
+        return AjaxObject.newOk(this.flowService.findTipsJson(businessId, taskName)).toJson();
+    }
+
+    /**
+     * 显示流程图
+     */
+    public String webFindFlowJson(String processId, String businessId) {
+        // TODO Auto-generated method stub
+        return AjaxObject.newOk(this.flowService.findFlowJson(processId, businessId)).toJson();
+    }
 
     /**
      * 执行流程
@@ -238,6 +254,8 @@ public class FlowDubboService implements IFlowService {
     @Override
     public void exec(FlowInput input) {
         // TODO Auto-generated method stub
+        String op=this.transCurrentUser();
+        input.setOperator(op);
         this.flowService.exec(input);
     }
 
@@ -247,6 +265,8 @@ public class FlowDubboService implements IFlowService {
     @Override
     public void start(FlowInput input) {
         // TODO Auto-generated method stub
+        String op=this.transCurrentUser();
+        input.setOperator(op);
         this.flowService.start(input);
     }
 
@@ -259,7 +279,7 @@ public class FlowDubboService implements IFlowService {
         if (search == null) {
             search = new FlowStatus();
         }
-        search.setOperator(UserUtils.getUser().getId().toString());
+        search.setOperator(transCurrentUser());
         return this.flowService.queryCurrentWorkTask(page, search);
     }
     
@@ -283,7 +303,7 @@ public class FlowDubboService implements IFlowService {
         if (search == null) {
             search = new FlowStatus();
         }
-        search.setOperator(UserUtils.getUser().getId().toString());
+        search.setOperator(transCurrentUser());
         return this.flowService.queryHistoryWorkTask(page, search);
     }
 
@@ -299,4 +319,16 @@ public class FlowDubboService implements IFlowService {
         return this.flowNodeService.findFlowNodesByType(flowType);
     }
 
+
+    /**
+     * 如果当前操作人属于供应商，经销商，核心企业， 则切换查询参数为当前机构
+     * @return
+     */
+    private String transCurrentUser(){
+        ShiroUser user=UserUtils.getPrincipal();
+        if(ShiroUser.coreUser(user) || ShiroUser.sellerUser(user) || ShiroUser.supplierUser(user)){
+            return UserUtils.getOperatorInfo().getOperOrg();
+        }
+        return user.getUser().getId().toString();
+    }
 }

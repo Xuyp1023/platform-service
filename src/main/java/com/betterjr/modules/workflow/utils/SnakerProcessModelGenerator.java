@@ -22,6 +22,7 @@ import org.snaker.engine.model.TransitionModel;
 import com.alibaba.dubbo.common.utils.CollectionUtils;
 import com.betterjr.common.mapper.BeanMapper;
 import com.betterjr.common.mapper.JsonMapper;
+import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.modules.workflow.data.AuditType;
@@ -30,6 +31,8 @@ import com.betterjr.modules.workflow.entity.CustFlowBase;
 import com.betterjr.modules.workflow.entity.CustFlowMoney;
 import com.betterjr.modules.workflow.entity.CustFlowStep;
 import com.betterjr.modules.workflow.entity.CustFlowStepApprovers;
+import com.betterjr.modules.workflow.ext.ExtJoinModel;
+import com.betterjr.modules.workflow.ext.ExtTaskModel;
 
 public class SnakerProcessModelGenerator {
 
@@ -37,6 +40,16 @@ public class SnakerProcessModelGenerator {
     private List<CustFlowStep> stepList;
     private Map<Long, List<CustFlowStepApprovers>> stepApproversMap;
     private Map<Long, CustFlowMoney> moneyMap;
+    
+    private int xAxis=24;
+    private int yAxis=124;
+    private final int yIncrement=100;
+    private final int xIncrement=150;
+    private int transitionIndex=1;
+    
+    private HashMap<String,Integer> markRepeatCountMap=new HashMap<String,Integer>();
+    
+
 
     public SnakerProcessModelGenerator() {
         long processId = 100l;
@@ -165,24 +178,139 @@ public class SnakerProcessModelGenerator {
         Collections.sort(stepList);
         StartModel startModel = new StartModel();
         startModel.setName("start");
+        this.populateNodeLayout(startModel, xAxis, yAxis);
         nodeList.add(startModel);
         TransitionModel tranFromPrevStep = null;
         for (int index = 0; index < stepList.size(); index++) {
             if (index == 0) {
                 tranFromPrevStep = new TransitionModel();
+                populateTransitionModel(tranFromPrevStep);
                 startModel.setOutputs(Collections.singletonList(tranFromPrevStep));
                 tranFromPrevStep.setSource(startModel);
             }
             CustFlowStep step = stepList.get(index);
-            tranFromPrevStep = this.createOneStepProcess(step, tranFromPrevStep, nodeList);
+            List<NodeModel> stepNodeList=new ArrayList<NodeModel>();
+            TransitionModel nextStep = this.createOneStepProcess(step, tranFromPrevStep, stepNodeList);
+            this.populateStepLayout(tranFromPrevStep,stepNodeList,nodeList);
+            nodeList.addAll(stepNodeList);
+            tranFromPrevStep=nextStep;
         }
         EndModel endModel = new EndModel();
         endModel.setName("end");
+        xAxisIncrement();
+        this.populateNodeLayout(endModel, xAxis, yAxis);
         tranFromPrevStep.setTarget(endModel);
         endModel.setInputs(Collections.singletonList(tranFromPrevStep));
         nodeList.add(endModel);
 
         return process;
+    }
+
+    private void xAxisIncrement() {
+        this.xAxis=this.xAxis+xIncrement;
+    }
+    
+    /**
+     * 设置一个step生成的所有节点的layout
+     * @param start
+     * @param newNodeList
+     * @param prevNodeList
+     */
+    private void populateStepLayout(TransitionModel start,List<NodeModel> newNodeList,List<NodeModel> prevNodeList){
+        //step start
+        List<TaskModel> taskList=new ArrayList<TaskModel>();
+        List<DecisionModel> decisionList=new ArrayList<DecisionModel>();
+        List<ForkModel> forkList=new ArrayList<ForkModel>();
+        List<JoinModel> forkJoinList=new ArrayList<JoinModel>();
+        List<JoinModel> decisionJoinList=new ArrayList<JoinModel>();
+        for(NodeModel node:newNodeList){
+            if(node instanceof TaskModel){
+                taskList.add((TaskModel)node);
+            }
+            if(node instanceof DecisionModel){
+                decisionList.add((DecisionModel)node);
+            }
+            if(node instanceof ForkModel){
+                forkList.add((ForkModel)node);
+            }
+            if(node instanceof JoinModel){
+                boolean isDecisionJoin=true;
+                for(TransitionModel tm : node.getOutputs()) {
+                    if(tm.getTarget()!=null){
+                        isDecisionJoin=false;
+                        break;
+                    }
+                }
+                if(isDecisionJoin){
+                    decisionJoinList.add((JoinModel)node);
+                }else{
+                    forkJoinList.add((JoinModel)node);
+                }
+            }
+        }
+        
+        //re-change y-axis
+        int taskCount=taskList.size();
+        int topY=this.yAxis-(yIncrement*(taskCount/2+1));
+        if(topY<0){
+            this.yAxis=this.yAxis-topY;
+            
+            for(NodeModel prevNode:prevNodeList){
+                String layOut=prevNode.getLayout();
+                List<String> layOutItemList=BetterStringUtils.splitTrim(layOut, ",");
+                int y=BetterStringUtils.toInteger(layOutItemList.get(1));
+                y=y-topY;
+                layOutItemList.set(1,String.valueOf(y));
+                prevNode.setLayout(BetterStringUtils.join(layOutItemList, ","));
+            }
+        }
+
+        
+        //set layout
+        //decision
+        if(!Collections3.isEmpty(decisionList)){
+            this.populateStepSubLayout(decisionList);
+        }
+        //fork
+        if(!Collections3.isEmpty(forkList)){
+            this.populateStepSubLayout(forkList);
+        }
+        //task
+        if(!Collections3.isEmpty(taskList)){
+            this.populateStepSubLayout(taskList);
+        }
+        //fork join
+        if(!Collections3.isEmpty(forkJoinList)){
+            this.populateStepSubLayout(forkJoinList);
+        }
+        //decision join
+        if(!Collections3.isEmpty(decisionJoinList)){
+            this.populateStepSubLayout(decisionJoinList);
+        }
+    }
+
+    /**
+     * 每增加一级节点， 主x轴增加150； y轴根据节点个数平均分布于主Y轴上下，间隔为20
+     * @param nodeList
+     */
+    private void populateStepSubLayout(List<? extends NodeModel> nodeList) {
+        xAxisIncrement();
+        int count=nodeList.size();
+        for(int index=0;index<nodeList.size();index++){
+            NodeModel node=nodeList.get(index);
+            int y=this.yAxis+(yIncrement*(index-(count/2)));
+            this.populateNodeLayout(node, this.xAxis, y);
+        }
+    }
+
+    private void populateTransitionModel(TransitionModel model) {
+        model.setName("transition"+this.transitionIndex);
+        this.transitionIndex++;
+        model.setDisplayName("");
+    }
+
+    private void populateNodeLayout(NodeModel node,int x,int y) {
+        node.setLayout(x+","+y+",-1,-1");
     }
 
     private TransitionModel createOneStepProcess(CustFlowStep step, TransitionModel tranFromPrevStep, List<NodeModel> nodeList) {
@@ -199,6 +327,7 @@ public class SnakerProcessModelGenerator {
                 CustFlowStepApprovers newapp=new CustFlowStepApprovers();
                 newapp.setAuditMoneyId(CustFlowMoney.DefaultMoney);
                 newapp.setStepId(step.getId());
+                newapp.setId(-1l);
                 newapp.setWeight(CustFlowStepApprovers.MaxWeight);
                 this.stepApproversMap.put(step.getId(), Collections.singletonList(newapp));
                 stepApprovers= stepApproversMap.get(step.getId());
@@ -226,25 +355,30 @@ public class SnakerProcessModelGenerator {
             TransitionModel tail = null;
             if (classList.size() > 1) {
                 ForkModel forkModel = new ForkModel();
-                forkModel.setName(step.getId() + "-" + moneyId + "-fork");
+                forkModel.setName("fork-"+step.getId() + "-" + moneyId );
                 nodeList.add(forkModel);
-                JoinModel join2Model = new JoinModel();
-                join2Model.setName(step.getId() + "-" + moneyId + "-join");
+                JoinModel join2Model = new ExtJoinModel();
+                join2Model.setName("join-"+step.getId() + "-" + moneyId );
                 nodeList.add(join2Model);
                 List<TransitionModel> forkOutputs = new ArrayList<TransitionModel>();
                 List<TransitionModel> joinInputputs = new ArrayList<TransitionModel>();
-                for (CustFlowStepApprovers app : classList) {
-                    TaskModel taskModel = new TaskModel();
+                for (int classIndex=0;classIndex<classList.size();classIndex++) {
+                    CustFlowStepApprovers app=classList.get(classIndex);
+                    ExtTaskModel taskModel = new ExtTaskModel();
+                    taskModel.setHasWeight(true);
+                    taskModel.setWeight(app.getWeight());
                     nodeList.add(taskModel);
                     populateTaskModel(step, app, taskModel);
                     // task point to join
                     TransitionModel trans = new TransitionModel();
+                    this.populateTransitionModel(trans);
                     trans.setTarget(join2Model);
                     trans.setSource(taskModel);
                     joinInputputs.add(trans);
                     taskModel.setOutputs(Collections.singletonList(trans));
                     // add trans of task to list
                     TransitionModel trans2 = new TransitionModel();
+                    this.populateTransitionModel(trans2);
                     trans2.setTarget(taskModel);
                     trans2.setSource(forkModel);
                     taskModel.setInputs(Collections.singletonList(trans2));
@@ -254,6 +388,7 @@ public class SnakerProcessModelGenerator {
                 forkModel.setOutputs(forkOutputs);
                 // join point to trans
                 TransitionModel trans3 = new TransitionModel();
+                this.populateTransitionModel(trans3);
                 join2Model.setOutputs(Collections.singletonList(trans3));
                 join2Model.setInputs(joinInputputs);
                 trans3.setSource(join2Model);
@@ -262,12 +397,14 @@ public class SnakerProcessModelGenerator {
                 tail = trans3;
             }
             else {
-                for (CustFlowStepApprovers app : classList) {
-                    TaskModel taskModel = new TaskModel();
+                for (int classIndex=0;classIndex<classList.size();classIndex++) {
+                    CustFlowStepApprovers app=classList.get(classIndex);
+                    TaskModel taskModel = new ExtTaskModel();
                     nodeList.add(taskModel);
                     populateTaskModel(step, app, taskModel);
                     // task point to trans
                     TransitionModel trans = new TransitionModel();
+                    this.populateTransitionModel(trans);
                     taskModel.setOutputs(Collections.singletonList(trans));
                     trans.setSource(taskModel);
                     //
@@ -281,10 +418,10 @@ public class SnakerProcessModelGenerator {
 
         if (moneyClassMap.size() > 1) {
             DecisionModel decisionModel = new DecisionModel();
-            decisionModel.setName(step.getId() + "decision");
+            decisionModel.setName("decision"+step.getId());
             nodeList.add(decisionModel);
             JoinModel joinModel = new JoinModel();
-            joinModel.setName(step.getId() + "join");
+            joinModel.setName("join"+step.getId());
             nodeList.add(joinModel);
             // set decision point to head list
             List<TransitionModel> transList = new ArrayList<TransitionModel>();
@@ -292,10 +429,12 @@ public class SnakerProcessModelGenerator {
                 NodeModel node = headList.get(moneyId);
                 CustFlowMoney money = moneyMap.get(moneyId);
                 TransitionModel trans = new TransitionModel();
+                this.populateTransitionModel(trans);
                 trans.setTarget(node);
                 trans.setSource(decisionModel);
                 node.setInputs(Collections.singletonList(trans));
                 trans.setExpr(money.toSpelExpression());
+                trans.setDisplayName(money.toDisplayName());
                 transList.add(trans);
             }
             decisionModel.setOutputs(transList);
@@ -306,6 +445,7 @@ public class SnakerProcessModelGenerator {
             joinModel.setInputs(tailList);
 
             TransitionModel trans = new TransitionModel();
+            this.populateTransitionModel(trans);
             joinModel.setOutputs(Collections.singletonList(trans));
             trans.setSource(joinModel);
             tranFromPrevStep.setTarget(decisionModel);
@@ -322,14 +462,18 @@ public class SnakerProcessModelGenerator {
     }
 
     private void populateTaskModel(CustFlowStep step, CustFlowStepApprovers app, TaskModel taskModel) {
-        String nodeName = step.getNodeId().toString();
+        String nodeName = step.getNodeId()+"-"+app.getId();
+        String nodeDispName=step.getNodeName()+"-"+app.getId();
+
         taskModel.setName(nodeName);
+        taskModel.setDisplayName(nodeDispName);
+            
         if(FlowNodeRole.Factoring.name().equalsIgnoreCase(step.getNodeRole())){
             taskModel.setAssignee(app.getAuditOperId().toString());
         }else{
-            taskModel.setAssignee(SnakerEngine.AUTO);
+            taskModel.setAssignee(step.getNodeRole());
         }
-        taskModel.setDisplayName(step.getNodeName());
+        
     }
 
     public CustFlowBase getBase() {
