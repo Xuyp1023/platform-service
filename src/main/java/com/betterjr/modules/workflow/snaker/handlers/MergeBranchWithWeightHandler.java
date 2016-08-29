@@ -1,4 +1,4 @@
-package com.betterjr.modules.workflow.handlers;
+package com.betterjr.modules.workflow.snaker.handlers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,7 @@ import org.snaker.engine.model.TransitionModel;
 import org.snaker.engine.model.WorkModel;
 
 import com.betterjr.common.utils.Collections3;
-import com.betterjr.modules.workflow.ext.ExtTaskModel;
+import com.betterjr.modules.workflow.snaker.model.ExtTaskModel;
 
 public class MergeBranchWithWeightHandler extends MergeBranchHandler {
     protected JoinModel model;

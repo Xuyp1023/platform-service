@@ -1,4 +1,4 @@
-package com.betterjr.modules.workflow.service;
+package com.betterjr.modules.workflow.snaker.core;
 
 import java.util.List;
 
@@ -16,6 +16,7 @@ import com.betterjr.common.utils.UserUtils;
 import com.betterjr.modules.sys.security.ShiroUser;
 import com.betterjr.modules.workflow.data.FlowInput;
 import com.betterjr.modules.workflow.data.FlowNodeRole;
+import com.betterjr.modules.workflow.service.CustFlowBaseService;
 
 public class BetterProcessService extends ProcessService{
 	private static final String DEFAULT_SEPARATOR = ".";
