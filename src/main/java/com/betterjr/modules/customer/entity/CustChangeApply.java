@@ -5,6 +5,7 @@ import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -92,6 +93,7 @@ public class CustChangeApply implements BetterjrEntity {
      * 创建日期
      */
     @JsonSerialize(using = CustDateJsonSerializer.class)
+    @OrderBy("DESC")
     @Column(name = "D_REG_DATE", columnDefinition = "VARCHAR")
     @MetaData(value = "创建日期", comments = "创建日期")
     private String regDate;
@@ -99,6 +101,7 @@ public class CustChangeApply implements BetterjrEntity {
     /**
      * 创建时间
      */
+    @OrderBy("DESC")
     @Column(name = "T_REG_TIME", columnDefinition = "VARCHAR")
     @MetaData(value = "创建时间", comments = "创建时间")
     private String regTime;

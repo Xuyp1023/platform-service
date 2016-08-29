@@ -22,6 +22,7 @@ import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
+import com.betterjr.common.utils.UserUtils;
 import com.betterjr.modules.customer.constant.CustomerConstants;
 import com.betterjr.modules.customer.dao.CustMechManagerTmpMapper;
 import com.betterjr.modules.customer.entity.CustChangeApply;
@@ -120,13 +121,13 @@ public class CustMechManagerTmpService extends BaseService<CustMechManagerTmpMap
             anManagerTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW, CustomerConstants.TMP_TYPE_CHANGE, null);
             anManagerTmp.setBusinStatus(CustomerConstants.TMP_STATUS_NEW);
             anManagerTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
-            anManagerTmp.setBatchNo(fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, anManagerTmp.getBatchNo()));
+            anManagerTmp.setBatchNo(fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, anManagerTmp.getBatchNo(), UserUtils.getOperatorInfo()));
             return addManagerTmp(anManagerTmp);
         }
         else {
             tempManagerTmp.initModifyValue(anManagerTmp);
             tempManagerTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
-            tempManagerTmp.setBatchNo(fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, tempManagerTmp.getBatchNo()));
+            tempManagerTmp.setBatchNo(fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, tempManagerTmp.getBatchNo(), UserUtils.getOperatorInfo()));
             return saveManagerTmp(tempManagerTmp);
         }
     }
@@ -455,13 +456,13 @@ public class CustMechManagerTmpService extends BaseService<CustMechManagerTmpMap
             anManagerTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW, CustomerConstants.TMP_TYPE_INSTEAD, null);
             anManagerTmp.setParentId(anInsteadRecordId);
             anManagerTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
-            anManagerTmp.setBatchNo(fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, anManagerTmp.getBatchNo()));
+            anManagerTmp.setBatchNo(fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, anManagerTmp.getBatchNo(), UserUtils.getOperatorInfo()));
             return addManagerTmp(anManagerTmp);
         }
         else {
             tempManagerTmp.initModifyValue(anManagerTmp);
             tempManagerTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
-            tempManagerTmp.setBatchNo(fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, tempManagerTmp.getBatchNo()));
+            tempManagerTmp.setBatchNo(fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, tempManagerTmp.getBatchNo(), UserUtils.getOperatorInfo()));
             return saveManagerTmp(tempManagerTmp);
         }
     }

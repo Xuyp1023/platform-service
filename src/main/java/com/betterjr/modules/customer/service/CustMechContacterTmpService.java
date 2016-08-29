@@ -20,6 +20,7 @@ import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
+import com.betterjr.common.utils.UserUtils;
 import com.betterjr.modules.customer.constant.CustomerConstants;
 import com.betterjr.modules.customer.dao.CustMechContacterTmpMapper;
 import com.betterjr.modules.customer.entity.CustChangeApply;
@@ -38,7 +39,7 @@ import com.betterjr.modules.document.service.CustFileItemService;
 @Service
 public class CustMechContacterTmpService extends BaseService<CustMechContacterTmpMapper, CustMechContacterTmp> implements IFormalDataService {
     private static final Pattern COMMA_PATTERN = Pattern.compile(",");
-    
+
     @Resource
     private CustMechContacterService contacterService;
 
@@ -89,11 +90,11 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
         final Long refId = anContacterTmp.getRefId();
         BTAssert.isNull(refId, "引用编号不能有值!");
 
-        anContacterTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW);
+        anContacterTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW, CustomerConstants.TMP_TYPE_CHANGE, null);
         anContacterTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_ADD);
         anContacterTmp.setBatchNo(fileItemService.updateCustFileItemInfo(anFileList, anContacterTmp.getBatchNo()));
 
-        return addContacterTmp(anContacterTmp, CustomerConstants.TMP_TYPE_CHANGE);
+        return addContacterTmp(anContacterTmp);
     }
 
     /**
@@ -114,14 +115,17 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
 
         CustMechContacterTmp tempContacterTmp = findContacterTmpByRefId(refId, CustomerConstants.TMP_TYPE_CHANGE);
         if (tempContacterTmp == null) {
-            anContacterTmp.setBusinStatus(CustomerConstants.TMP_STATUS_NEW);
+            anContacterTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW, CustomerConstants.TMP_TYPE_CHANGE, null);
             anContacterTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
-            anContacterTmp.setBatchNo(fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, anContacterTmp.getBatchNo()));
-            return addContacterTmp(anContacterTmp, CustomerConstants.TMP_TYPE_CHANGE);
+            anContacterTmp.setBatchNo(
+                    fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, anContacterTmp.getBatchNo(), UserUtils.getOperatorInfo()));
+            return addContacterTmp(anContacterTmp);
         }
         else {
             tempContacterTmp.initModifyValue(anContacterTmp);
             tempContacterTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
+            tempContacterTmp.setBatchNo(
+                    fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, tempContacterTmp.getBatchNo(), UserUtils.getOperatorInfo()));
             return saveContacterTmp(tempContacterTmp, tempContacterTmp.getId(), anFileList);
         }
     }
@@ -140,8 +144,9 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
             contacterTmp = new CustMechContacterTmp();
             contacterTmp.initAddValue(contacter, CustomerConstants.TMP_STATUS_NEW);
             contacterTmp.setRefId(anRefId);
+            contacterTmp.setTmpType(CustomerConstants.TMP_TYPE_CHANGE);
             contacterTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_DELETE);
-            return addContacterTmp(contacterTmp, CustomerConstants.TMP_TYPE_CHANGE);
+            return addContacterTmp(contacterTmp);
         }
         else {
             contacterTmp.initModifyValue(contacter, CustomerConstants.TMP_STATUS_NEW);
@@ -242,8 +247,9 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
                 contacterTmp.initAddValue(contacter, CustomerConstants.TMP_STATUS_USEING);
                 contacterTmp.setRefId(contacter.getId());
                 contacterTmp.setParentId(parentId);
+                contacterTmp.setTmpType(anTmpType);
                 contacterTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_NORMAL);
-                addContacterTmp(contacterTmp, anTmpType);
+                addContacterTmp(contacterTmp);
             }
         }
     }
@@ -346,15 +352,13 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
     /**
      * 添加公司联系人流水信息
      */
-    public CustMechContacterTmp addContacterTmp(CustMechContacterTmp anContacterTmp, String anTmpType) {
+    public CustMechContacterTmp addContacterTmp(CustMechContacterTmp anContacterTmp) {
         BTAssert.notNull(anContacterTmp, "公司联系人流水信息不允许为空！");
         Long custNo = anContacterTmp.getCustNo();
         Long version = VersionHelper.generateVersion(this.mapper, custNo);
 
         anContacterTmp.setVersion(version);
-        anContacterTmp.setTmpType(anTmpType);
-        anContacterTmp.setBusinStatus(CustomerConstants.TMP_STATUS_NEW);
-        //anContacterTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW, anTmpType, version);
+        // anContacterTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW, anTmpType, version);
         this.insert(anContacterTmp);
         return anContacterTmp;
     }
@@ -373,12 +377,13 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
 
         return saveContacterTmp(tempContacterTmp);
     }
+
     public CustMechContacterTmp saveContacterTmp(CustMechContacterTmp anContacterTmp) {
         BTAssert.notNull(anContacterTmp, "公司联系人流水信息不允许为空！");
         this.updateByPrimaryKeySelective(anContacterTmp);
         return anContacterTmp;
     }
-    
+
     /**
      * 保存 parentId 和 状态
      */
@@ -403,11 +408,8 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
     public CustMechContacterTmp addInsteadContacterTmp(CustMechContacterTmp anContacterTmp, Long anInsteadRecordId, String anFileList) {
         BTAssert.notNull(anContacterTmp, "公司联系人流水信息不允许为空！");
 
-        checkInsteadRecord(anInsteadRecordId, 
-                CustomerConstants.INSTEAD_RECORD_STATUS_NEW, 
-                CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN,
-                CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT, 
-                CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_REJECT);
+        checkInsteadRecord(anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_NEW, CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN,
+                CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT, CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_REJECT);
 
         final Long refId = anContacterTmp.getRefId();
 
@@ -418,11 +420,11 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
             throw new BytterTradeException("客户编号不匹配!");
         }
 
-        anContacterTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW);
+        anContacterTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW, CustomerConstants.TMP_TYPE_INSTEAD, null);
         anContacterTmp.setParentId(anInsteadRecordId);
         anContacterTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_ADD);
         anContacterTmp.setBatchNo(fileItemService.updateCustFileItemInfo(anFileList, anContacterTmp.getBatchNo()));
-        return addContacterTmp(anContacterTmp, CustomerConstants.TMP_TYPE_INSTEAD);
+        return addContacterTmp(anContacterTmp);
     }
 
     /**
@@ -431,10 +433,8 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
     public CustMechContacterTmp saveSaveInsteadContacterTmp(CustMechContacterTmp anContacterTmp, Long anInsteadRecordId, String anFileList) {
         BTAssert.notNull(anContacterTmp, "公司联系人流水信息不允许为空！");
 
-        CustInsteadRecord insteadRecord = checkInsteadRecord(anInsteadRecordId, 
-                CustomerConstants.INSTEAD_RECORD_STATUS_NEW,
-                CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN, 
-                CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT,
+        CustInsteadRecord insteadRecord = checkInsteadRecord(anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_NEW,
+                CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN, CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT,
                 CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_REJECT);
 
         final Long refId = anContacterTmp.getRefId();
@@ -449,16 +449,19 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
 
         CustMechContacterTmp tempContacterTmp = findContacterTmpByRefId(refId, CustomerConstants.TMP_TYPE_INSTEAD);
         if (tempContacterTmp == null) {
-            anContacterTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW);
+            anContacterTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW, CustomerConstants.TMP_TYPE_INSTEAD, null);
             anContacterTmp.setParentId(anInsteadRecordId);
             anContacterTmp.setBusinStatus(CustomerConstants.TMP_STATUS_NEW);
             anContacterTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
-            anContacterTmp.setBatchNo(fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, anContacterTmp.getBatchNo()));
-            return addContacterTmp(anContacterTmp, CustomerConstants.TMP_TYPE_INSTEAD);
+            anContacterTmp.setBatchNo(
+                    fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, anContacterTmp.getBatchNo(), UserUtils.getOperatorInfo()));
+            return addContacterTmp(anContacterTmp);
         }
         else {
             tempContacterTmp.initModifyValue(anContacterTmp);
             tempContacterTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
+            tempContacterTmp.setBatchNo(
+                    fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, tempContacterTmp.getBatchNo(), UserUtils.getOperatorInfo()));
             return saveContacterTmp(tempContacterTmp, tempContacterTmp.getId(), anFileList);
         }
     }
@@ -471,10 +474,8 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
     public CustMechContacterTmp saveDeleteInsteadContacterTmp(Long anRefId, Long anInsteadRecordId) {
         BTAssert.notNull(anRefId, "公司联系人号不允许为空！");
 
-        CustInsteadRecord insteadRecord = checkInsteadRecord(anInsteadRecordId, 
-                CustomerConstants.INSTEAD_RECORD_STATUS_NEW,
-                CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN, 
-                CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT,
+        CustInsteadRecord insteadRecord = checkInsteadRecord(anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_NEW,
+                CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN, CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT,
                 CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_REJECT);
 
         CustMechContacter contacter = contacterService.findContacter(anRefId);
@@ -490,8 +491,9 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
             contacterTmp.initAddValue(contacter, CustomerConstants.TMP_STATUS_NEW);
             contacterTmp.setRefId(anRefId);
             contacterTmp.setParentId(anInsteadRecordId);
+            contacterTmp.setTmpType(CustomerConstants.TMP_TYPE_INSTEAD);
             contacterTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_DELETE);
-            return addContacterTmp(contacterTmp, CustomerConstants.TMP_TYPE_INSTEAD);
+            return addContacterTmp(contacterTmp);
         }
         else {
             contacterTmp.initModifyValue(contacter, CustomerConstants.TMP_STATUS_NEW);
@@ -508,11 +510,8 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
     public int saveCancelInsteadContacterTmp(Long anId, Long anInsteadRecordId) {
         CustMechContacterTmp contacterTmp = this.findContacterTmp(anId);
 
-        checkInsteadRecord(anInsteadRecordId, 
-                CustomerConstants.INSTEAD_RECORD_STATUS_NEW, 
-                CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN,
-                CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT, 
-                CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_REJECT);
+        checkInsteadRecord(anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_NEW, CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN,
+                CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT, CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_REJECT);
 
         Long tmpVersion = contacterTmp.getVersion();
         Long maxVersion = VersionHelper.generateVersion(this.mapper, contacterTmp.getCustNo());
