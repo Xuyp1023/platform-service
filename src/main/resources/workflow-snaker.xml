@@ -4,7 +4,7 @@
 	default-lazy-init="true">
 
 	<description>SnakerEngine配置 </description>
-	<bean class="com.betterjr.modules.workflow.service.BetterSpringSnakerEngine">
+	<bean class="com.betterjr.modules.workflow.snaker.core.BetterSpringSnakerEngine">
 		<property name="processService" ref="snakerProcessService"/>
 		<property name="orderService" ref="snakerOrderService"/>
 		<property name="taskService" ref="snakerTaskService"/>
@@ -12,24 +12,24 @@
 		<property name="managerService" ref="snakerManagerService"/>
 	</bean>
 	
-	<bean id="dbAccess" class="org.snaker.engine.access.mybatis.MybatisAccess">
+	<bean id="dbAccess" class="com.betterjr.modules.workflow.snaker.access.BetterMybatisAccess">
 		<property name="sqlSessionFactory" ref="sqlSessionFactory"/>
 	</bean>
 	
-	<bean id="snakerProcessService" class="com.betterjr.modules.workflow.service.BetterProcessService">
+	<bean id="snakerProcessService" class="com.betterjr.modules.workflow.snaker.core.BetterProcessService">
 		<property name="access" ref="dbAccess"/>
 		<!-- <property name="cacheManager" ref="cacheManager"/> -->
 	</bean>
 	<bean id="snakerOrderService" class="org.snaker.engine.core.OrderService">
 		<property name="access" ref="dbAccess"/>
 	</bean>
-	<bean id="snakerTaskService" class="com.betterjr.modules.workflow.service.BetterTaskService">
+	<bean id="snakerTaskService" class="com.betterjr.modules.workflow.snaker.core.BetterTaskService">
 		<property name="access" ref="dbAccess"/>
 	</bean>
 	<bean id="snakerManagerService" class="org.snaker.engine.core.ManagerService">
 		<property name="access" ref="dbAccess"/>
 	</bean>
-	<bean id="snakerQueryService" class="org.snaker.engine.core.QueryService">
+	<bean id="snakerQueryService" class="com.betterjr.modules.workflow.snaker.core.BetterQueryService">
 		<property name="access" ref="dbAccess"/>
 	</bean>
 	

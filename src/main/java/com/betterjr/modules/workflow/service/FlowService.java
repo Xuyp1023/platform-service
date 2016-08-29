@@ -1,7 +1,6 @@
 package com.betterjr.modules.workflow.service;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,31 +12,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.snaker.engine.SnakerEngine;
 import org.snaker.engine.access.QueryFilter;
+import org.snaker.engine.entity.HistoryOrder;
 import org.snaker.engine.entity.HistoryTask;
 import org.snaker.engine.entity.Order;
 import org.snaker.engine.entity.Task;
 import org.snaker.engine.entity.WorkItem;
-import org.snaker.engine.model.NodeModel;
 import org.snaker.engine.model.ProcessModel;
-import org.snaker.engine.spring.SpringSnakerEngine;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
-import com.betterjr.common.utils.UserUtils;
 import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.workflow.data.FlowCommand;
 import com.betterjr.modules.workflow.data.FlowInput;
-import com.betterjr.modules.workflow.data.FlowNodeRole;
 import com.betterjr.modules.workflow.data.FlowStatus;
 import com.betterjr.modules.workflow.data.TaskAuditHistory;
 import com.betterjr.modules.workflow.entity.CustFlowBase;
 import com.betterjr.modules.workflow.entity.CustFlowInstanceBusiness;
-import com.betterjr.modules.workflow.entity.CustFlowNode;
 import com.betterjr.modules.workflow.entity.CustFlowStep;
+import com.betterjr.modules.workflow.snaker.core.BetterProcessService;
+import com.betterjr.modules.workflow.snaker.core.BetterQueryService;
+import com.betterjr.modules.workflow.snaker.core.BetterSpringSnakerEngine;
 import com.betterjr.modules.workflow.utils.SnakerHelper;
 import com.betterjr.modules.workflow.utils.SnakerPageUtils;
 
@@ -292,7 +289,8 @@ public class FlowService {
         }else{
             page=new Page();
         }
-        List<WorkItem> list = this.engine.query().getWorkItems(snakerPage, filter);
+        BetterQueryService query=(BetterQueryService)this.engine.query();
+        List<WorkItem> list = query.getWorkItemsByLikeTaskName(snakerPage, filter);
         if(snakerPage!=null){
             page.setTotal(snakerPage.getTotalCount());
         }
@@ -308,12 +306,26 @@ public class FlowService {
         if (!BetterStringUtils.isBlank(search.getOperator())) {
             filter.setOperator(search.getOperator());
         }
+        //流程名称
         if (!BetterStringUtils.isBlank(search.getFlowName())) {
             filter.setOrderId(search.getFlowName());
         }
+        //流程类型
         if (!BetterStringUtils.isBlank(search.getFlowType())) {
-            filter.setProcessType(search.getFlowType());
+            filter.setDisplayName(search.getFlowType());
         }
+        //流程启动时间
+        if (!BetterStringUtils.isBlank(search.getGTFlowDate())) {
+            filter.setCreateTimeStart(search.getGTFlowDate());
+        }
+        if (!BetterStringUtils.isBlank(search.getLTFlowDate())) {
+            filter.setCreateTimeStart(search.getLTFlowDate());
+        }
+        //审批节点
+        if (search.getCurrentNodeId()!=null) {
+            filter.setName(search.getCurrentNodeId().toString());
+        }
+        
         if (search.getBusinessId()!=null && search.getBusinessId()>0) {
             CustFlowInstanceBusiness business = this.businessService.selectByPrimaryKey(search.getBusinessId());
             if (business != null) {
@@ -339,7 +351,8 @@ public class FlowService {
         }else{
             page=new Page();
         }
-        List<WorkItem> list = this.engine.query().getHistoryWorkItems(snakerPage, filter);
+        BetterQueryService query=(BetterQueryService)this.engine.query();
+        List<WorkItem> list = query.getHistoryWorkItemsByLikeTaskName(snakerPage, filter);
         if(snakerPage!=null){
             page.setTotal(snakerPage.getTotalCount());
         }
@@ -369,7 +382,8 @@ public class FlowService {
         }else{
             page=new Page();
         }
-        List<WorkItem> list = this.engine.query().getWorkItems(snakerPage, filter);
+        BetterQueryService query=(BetterQueryService)this.engine.query();
+        List<WorkItem> list = query.getWorkItemsByLikeTaskName(snakerPage, filter);
         if(snakerPage!=null){
             page.setTotal(snakerPage.getTotalCount());
         }
@@ -462,7 +476,7 @@ public class FlowService {
     /**
      * 显示流程图
      */
-    public Map<String, String> findFlowJson(String processId, String businessId) {
+    public Map<String, String> findFlowJson(String businessId) {
         BetterProcessService processService=(BetterProcessService)this.engine.process();
         CustFlowInstanceBusiness buObj=this.businessService.selectByPrimaryKey(Long.parseLong(businessId));
         if(buObj==null){
@@ -472,7 +486,9 @@ public class FlowService {
         String coreOperOrg=buObj.getCoreOperOrg();
         String financerOperOrg = buObj.getFinancerOperOrg();
         String orderId=buObj.getFlowOrderId();
-        org.snaker.engine.entity.Process process = processService.getProcessWithOrgById(processId, coreOperOrg, financerOperOrg);
+        
+        HistoryOrder histOrder=this.engine.query().getHistOrder(orderId);
+        org.snaker.engine.entity.Process process = processService.getProcessWithOrgById(histOrder.getProcessId(), coreOperOrg, financerOperOrg);
         
         ProcessModel model = process.getModel();
         Map<String, String> jsonMap = new HashMap<String, String>();

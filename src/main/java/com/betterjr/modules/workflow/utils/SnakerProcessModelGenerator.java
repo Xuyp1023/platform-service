@@ -31,8 +31,8 @@ import com.betterjr.modules.workflow.entity.CustFlowBase;
 import com.betterjr.modules.workflow.entity.CustFlowMoney;
 import com.betterjr.modules.workflow.entity.CustFlowStep;
 import com.betterjr.modules.workflow.entity.CustFlowStepApprovers;
-import com.betterjr.modules.workflow.ext.ExtJoinModel;
-import com.betterjr.modules.workflow.ext.ExtTaskModel;
+import com.betterjr.modules.workflow.snaker.model.ExtJoinModel;
+import com.betterjr.modules.workflow.snaker.model.ExtTaskModel;
 
 public class SnakerProcessModelGenerator {
 
@@ -463,7 +463,7 @@ public class SnakerProcessModelGenerator {
 
     private void populateTaskModel(CustFlowStep step, CustFlowStepApprovers app, TaskModel taskModel) {
         String nodeName = step.getNodeId()+"-"+app.getId();
-        String nodeDispName=step.getNodeName()+"-"+app.getId();
+        String nodeDispName=step.getNodeName();
 
         taskModel.setName(nodeName);
         taskModel.setDisplayName(nodeDispName);

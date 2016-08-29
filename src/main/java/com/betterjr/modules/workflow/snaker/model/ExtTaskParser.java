@@ -1,4 +1,4 @@
-package com.betterjr.modules.workflow.ext;
+package com.betterjr.modules.workflow.snaker.model;
 
 
 import org.snaker.engine.model.NodeModel;

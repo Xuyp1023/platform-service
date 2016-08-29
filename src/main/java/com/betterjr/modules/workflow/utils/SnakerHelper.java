@@ -36,7 +36,8 @@ import org.snaker.engine.model.SubProcessModel;
 import org.snaker.engine.model.TaskModel;
 import org.snaker.engine.model.TransitionModel;
 
-import com.betterjr.modules.workflow.ext.ExtTaskModel;
+import com.betterjr.modules.workflow.snaker.model.ExtJoinModel;
+import com.betterjr.modules.workflow.snaker.model.ExtTaskModel;
 
 /**
  * Snaker的帮助类
@@ -47,11 +48,13 @@ public class SnakerHelper {
 	private static Map<Class<? extends NodeModel>, String> mapper = new HashMap<Class<? extends NodeModel>, String>();
 	static {
 		mapper.put(ExtTaskModel.class, "task");
+		mapper.put(TaskModel.class, "task");
 		mapper.put(CustomModel.class, "custom");
 		mapper.put(DecisionModel.class, "decision");
 		mapper.put(EndModel.class, "end");
 		mapper.put(ForkModel.class, "fork");
 		mapper.put(JoinModel.class, "join");
+		mapper.put(ExtJoinModel.class, "join");
 		mapper.put(StartModel.class, "start");
 		mapper.put(SubProcessModel.class, "subprocess");
 	}

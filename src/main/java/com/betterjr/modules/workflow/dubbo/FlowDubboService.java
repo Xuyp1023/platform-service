@@ -243,9 +243,9 @@ public class FlowDubboService implements IFlowService {
     /**
      * 显示流程图
      */
-    public String webFindFlowJson(String processId, String businessId) {
+    public String webFindFlowJson( String businessId) {
         // TODO Auto-generated method stub
-        return AjaxObject.newOk(this.flowService.findFlowJson(processId, businessId)).toJson();
+        return AjaxObject.newOk(this.flowService.findFlowJson(businessId)).toJson();
     }
 
     /**

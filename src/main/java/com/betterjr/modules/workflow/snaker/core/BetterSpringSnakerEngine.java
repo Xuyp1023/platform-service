@@ -1,4 +1,4 @@
-package com.betterjr.modules.workflow.service;
+package com.betterjr.modules.workflow.snaker.core;
 
 import java.util.Collections;
 import java.util.HashMap;
