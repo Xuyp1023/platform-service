@@ -9,6 +9,7 @@ import javax.annotation.Resource;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import com.betterjr.common.utils.BTAssert;
+import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.customer.ICustMechShareholderService;
 import com.betterjr.modules.customer.constant.CustomerConstants;
@@ -124,7 +125,7 @@ public class CustMechShareholderDubboService implements ICustMechShareholderServ
 
         ChangeDetailBean<CustMechShareholderTmp> changeDetailBean = new ChangeDetailBean<>();
         changeDetailBean.setChangeApply(changeApply);
-        if (nowData.getTmpOperType() != CustomerConstants.TMP_OPER_TYPE_DELETE) {
+        if (BetterStringUtils.equals(nowData.getTmpOperType(), CustomerConstants.TMP_OPER_TYPE_DELETE) == false) {
             changeDetailBean.setNowData(nowData);
         }
         changeDetailBean.setBefData(befData);

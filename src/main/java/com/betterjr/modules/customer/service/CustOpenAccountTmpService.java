@@ -6,17 +6,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.exception.BytterTradeException;
 import com.betterjr.common.mapper.BeanMapper;
+import com.betterjr.common.mq.core.RocketMQProducer;
+import com.betterjr.common.mq.message.MQMessage;
 import com.betterjr.common.selectkey.SerialGenerator;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
+import com.betterjr.common.utils.DictUtils;
 import com.betterjr.common.utils.IdcardUtils;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.common.utils.reflection.ReflectionUtils;
@@ -87,6 +92,9 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
 
     @Autowired
     private CustOpenAccountAuditService custOpenAccountAuditService;
+    
+    @Resource
+    private RocketMQProducer betterProducer;
 
     /**
      * 开户资料读取
@@ -240,6 +248,17 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         // 写入开户日志
         custOpenAccountAuditService.addAuditOpenAccountApplyLog(anOpenAccountInfo.getId(), anAuditOpinion, "开户审核");
 
+        // 发消息
+        MQMessage anMessage = new MQMessage("CUSTOMER_OPENACCOUNT_TOPIC");
+        try {
+            anMessage.setObject(anOpenAccountInfo);
+            anMessage.addHead("type", "1");//开户成功
+            anMessage.addHead("operator", UserUtils.getOperatorInfo());
+            betterProducer.sendMessage(anMessage);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
         return anOpenAccountInfo;
     }
 
@@ -268,6 +287,19 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         // 写入开户日志
         custOpenAccountAuditService.addRefuseOpenAccountApplyLog(anOpenAccountInfo.getId(), anAuditOpinion, "开户审核");
 
+        // 发消息
+        MQMessage anMessage = new MQMessage("CUSTOMER_OPENACCOUNT_TOPIC");
+        
+        try {
+            anMessage.setObject(anOpenAccountInfo);
+            anMessage.addHead("type", "0"); //驳回
+            anMessage.addHead("operator", UserUtils.getOperatorInfo());
+            anMessage.addHead("auditOpinion", anAuditOpinion);
+            betterProducer.sendMessage(anMessage);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
         return anOpenAccountInfo;
     }
 

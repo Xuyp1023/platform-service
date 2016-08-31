@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,8 @@ import com.betterjr.modules.document.utils.CustFileUtils;
 @Service
 public class CustFileItemService extends BaseService<CustFileItemMapper, CustFileItem> {
 
+    private static final Pattern COMMA_PATTERN = Pattern.compile(",");
+    
     private static String[] queryConds = new String[] { "bizLicenseFile", "orgCodeFile", "taxRegistFile", "representIdFile", "bankAcctAckFile",
             "brokerIdFile" };
 
@@ -86,13 +90,22 @@ public class CustFileItemService extends BaseService<CustFileItemMapper, CustFil
             anBatchNo = CustFileUtils.findBatchNo();
         }
         
-        logger.info("fileList:" + anFileList);
-        String[] fileItems = BetterStringUtils.split(anFileList, ",");
-        for (String item : fileItems) {
-            if (BetterStringUtils.isNotBlank(item)) {
-                Long fileItemId = Long.valueOf(item.trim());
-                updateAndDuplicateConflictFileItems(anBatchNo, fileItemId, anOperator);
-            }
+        List<Long> fileItems = COMMA_PATTERN.splitAsStream(anFileList).map(Long::valueOf).collect(Collectors.toList());
+
+        return updateAndDuplicateConflictFileItemInfo(fileItems, anBatchNo, anOperator);
+    }
+    
+    public Long updateAndDuplicateConflictFileItemInfo(List<Long> fileItems, Long anBatchNo, CustOperatorInfo anOperator) {
+        if (Collections3.isEmpty(fileItems) == true) {
+            return anBatchNo;
+        }
+
+        if (anBatchNo == null) {
+            anBatchNo = CustFileUtils.findBatchNo();
+        }
+        
+        for (Long fileItem : fileItems) {
+            updateAndDuplicateConflictFileItems(anBatchNo, fileItem, anOperator);
         }
 
         return anBatchNo;

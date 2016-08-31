@@ -28,6 +28,13 @@ public class NotificationCustomer implements BetterjrEntity {
     @Column(name = "N_VERSION",  columnDefinition="INTEGER" )
     @MetaData( value="数据版本号", comments = "数据版本号")
     private Long version;
+    
+    /**
+     * 重发次数
+     */
+    @Column(name = "N_RETRY_COUNT",  columnDefinition="INTEGER" )
+    @MetaData( value="重发次数", comments = "重发次数")
+    private Integer retryCount;
 
     /**
      * 消息编号
@@ -182,6 +189,14 @@ public class NotificationCustomer implements BetterjrEntity {
 
     public void setVersion(Long version) {
         this.version = version;
+    }
+    
+    public Integer getRetryCount() {
+        return retryCount;
+    }
+
+    public void setRetryCount(Integer anRetryCount) {
+        retryCount = anRetryCount;
     }
 
     public Long getNotificationId() {
@@ -352,6 +367,7 @@ public class NotificationCustomer implements BetterjrEntity {
         sb.append("Hash = ").append(hashCode());
         sb.append(", id=").append(id);
         sb.append(", version=").append(version);
+        sb.append(", retryCount=").append(retryCount);
         sb.append(", notificationId=").append(notificationId);
         sb.append(", channel=").append(channel);
         sb.append(", isDeleted=").append(isDeleted);
@@ -391,6 +407,7 @@ public class NotificationCustomer implements BetterjrEntity {
         NotificationCustomer other = (NotificationCustomer) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
             && (this.getVersion() == null ? other.getVersion() == null : this.getVersion().equals(other.getVersion()))
+            && (this.getRetryCount() == null ? other.getRetryCount() == null : this.getRetryCount().equals(other.getRetryCount()))
             && (this.getNotificationId() == null ? other.getNotificationId() == null : this.getNotificationId().equals(other.getNotificationId()))
             && (this.getChannel() == null ? other.getChannel() == null : this.getChannel().equals(other.getChannel()))
             && (this.getIsDeleted() == null ? other.getIsDeleted() == null : this.getIsDeleted().equals(other.getIsDeleted()))
@@ -419,6 +436,7 @@ public class NotificationCustomer implements BetterjrEntity {
         int result = 1;
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
         result = prime * result + ((getVersion() == null) ? 0 : getVersion().hashCode());
+        result = prime * result + ((getRetryCount() == null) ? 0 : getRetryCount().hashCode());
         result = prime * result + ((getNotificationId() == null) ? 0 : getNotificationId().hashCode());
         result = prime * result + ((getChannel() == null) ? 0 : getChannel().hashCode());
         result = prime * result + ((getIsDeleted() == null) ? 0 : getIsDeleted().hashCode());
@@ -462,6 +480,8 @@ public class NotificationCustomer implements BetterjrEntity {
 
         this.isDeleted = NotificationConstants.IS_DELETED_FALSE;
         this.isRead = NotificationConstants.IS_READ_FALSE;
+        
+        this.retryCount = Integer.valueOf(0);
         
         this.businStatus = NotificationConstants.SEND_STATUS_NORMAL;
     }

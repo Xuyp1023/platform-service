@@ -4,20 +4,29 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
 	default-lazy-init="true">
 
-	<description>MessageQueue配置 </description>
+	<description>MQ 配置 </description>
 
-	<bean id="notificationProducer" class="com.betterjr.common.mq.core.RocketMQProducer">
+	<bean id="betterProducer" class="com.betterjr.common.mq.core.RocketMQProducer" scope="singleton">
 		<constructor-arg index="0" value="${rocketmq.namesrvAddr}" />
 		<constructor-arg index="1"
 			value="${rocketmq.producerGroupName1}" />
 	</bean>
-	<bean id="notificationConsumer" class="com.betterjr.common.mq.core.RocketMQConsumer">
+	<bean id="betterConsumer" class="com.betterjr.common.mq.core.RocketMQConsumer" scope="singleton">
 		<constructor-arg index="0" value="${rocketmq.namesrvAddr}" />
 		<constructor-arg index="1"
 			value="${rocketmq.consumerGroupName1}" />
 	</bean>
 
+	<bean class="com.betterjr.common.utils.MailUtils"
+		scope="singleton" lazy-init="false">
+		<constructor-arg index="0" value="${mail.from}" />
+		<constructor-arg index="1" value="${mail.smtp.host}" />
+		<constructor-arg index="2" value="${mail.smtp.port}" />
+		<constructor-arg index="3" value="${mail.username}" />
+		<constructor-arg index="4" value="${mail.password}" />
+	</bean>
+
 	<bean class="com.betterjr.common.service.NotificationService">
-		<constructor-arg index="0" ref="notificationProducer" />
+		<constructor-arg index="0" ref="betterProducer" />
 	</bean>
 </beans>

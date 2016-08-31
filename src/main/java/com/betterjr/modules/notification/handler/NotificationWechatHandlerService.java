@@ -10,7 +10,7 @@ import com.betterjr.common.mq.annotation.RocketMQListener;
 public class NotificationWechatHandlerService {
     private final static Logger logger = LoggerFactory.getLogger(NotificationWechatHandlerService.class);
     
-    @RocketMQListener(topic = "NOTIFICATION_WECHAT_TOPIC", consumer = "notificationConsumer")
+    //@RocketMQListener(topic = "NOTIFICATION_WECHAT_TOPIC", consumer = "betterConsumer")
     public void processNotification(final Object anMessage) {
         logger.info("微信发送!");
     }

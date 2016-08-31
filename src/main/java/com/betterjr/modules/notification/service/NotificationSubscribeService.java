@@ -13,6 +13,8 @@ import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.UserUtils;
+import com.betterjr.mapper.pagehelper.Page;
+import com.betterjr.mapper.pagehelper.PageHelper;
 import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.betterjr.modules.account.service.CustAccountService;
@@ -35,9 +37,11 @@ public class NotificationSubscribeService extends BaseService<NotificationSubscr
     @Resource
     private CustAccountService accountService;
     
-    public List<ProfileSubscribeModel> queryProfileSubscribe(Long anCustNo) {
+    public Page<ProfileSubscribeModel> queryProfileSubscribe(Long anCustNo, int anFlag, int anPageNum, int anPageSize) {
         BTAssert.notNull(anCustNo, "公司编号不允许为空!");
-        List<ProfileSubscribeModel> profileSubscribes = this.mapper.selectProfileSubscribe(anCustNo);
+        
+        PageHelper.startPage(anPageNum, anPageSize, anFlag == 1);
+        Page<ProfileSubscribeModel> profileSubscribes = this.mapper.selectProfileSubscribe(anCustNo);
         
         Long operId = UserUtils.getOperatorInfo().getId();
         
@@ -102,7 +106,7 @@ public class NotificationSubscribeService extends BaseService<NotificationSubscr
         BTAssert.notNull(channelProfile, "没有找到对应的消息通知模板!");
         
         Long sourceCustNo = profile.getCustNo();
-        String sourceCustName = profile.getCustName();
+//        String sourceCustName = profile.getCustName();
         
         Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("operId", operId);

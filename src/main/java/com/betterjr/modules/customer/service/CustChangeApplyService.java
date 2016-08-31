@@ -46,7 +46,7 @@ public class CustChangeApplyService extends BaseService<CustChangeApplyMapper, C
         }
 
         // TODO @@@@@@@@ 检查是否有正在进行的变更 代录
-        
+
         final CustChangeApply custChangeApply = new CustChangeApply();
         final String custName = custAccountService.queryCustName(anCustNo);
         custChangeApply.initAddValue(anCustNo, custName, anChangeItem, anTmpIds);
@@ -77,6 +77,21 @@ public class CustChangeApplyService extends BaseService<CustChangeApplyMapper, C
         List<CustChangeApply> custChangeApplys = this.selectByProperty(conditionMap);
 
         return !Collections3.isEmpty(custChangeApplys);
+    }
+
+    /**
+     * 
+     * @param anCustNo
+     * @return
+     */
+    public Boolean checkExistActiveChangeApply(Long anCustNo, String anChangeItem) {
+        Map<String, Object> conditionMap = new HashMap<>();
+
+        conditionMap.put(CustomerConstants.CUST_NO, anCustNo);
+        conditionMap.put("changeItem", anChangeItem);
+        String[] businStatues = { CustomerConstants.CHANGE_APPLY_STATUS_NEW };
+        conditionMap.put("businStatus", businStatues);
+        return Collections3.isEmpty(this.selectByProperty(conditionMap)) == false;
     }
 
     /**

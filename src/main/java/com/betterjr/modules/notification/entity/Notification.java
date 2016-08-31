@@ -124,6 +124,7 @@ public class Notification implements BetterjrEntity {
      * 创建日期
      */
     @JsonSerialize(using = CustDateJsonSerializer.class)
+    @OrderBy("DESC")
     @Column(name = "D_REG_DATE",  columnDefinition="VARCHAR" )
     @MetaData( value="创建日期", comments = "创建日期")
     private String regDate;
@@ -132,6 +133,7 @@ public class Notification implements BetterjrEntity {
      * 创建时间
      */
     @JsonSerialize(using = CustTimeJsonSerializer.class)
+    @OrderBy("DESC")
     @Column(name = "T_REG_TIME",  columnDefinition="VARCHAR" )
     @MetaData( value="创建时间", comments = "创建时间")
     private String regTime;
