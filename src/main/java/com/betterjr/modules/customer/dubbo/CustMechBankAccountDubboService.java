@@ -9,6 +9,7 @@ import javax.annotation.Resource;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import com.betterjr.common.utils.BTAssert;
+import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.customer.ICustMechBankAccountService;
 import com.betterjr.modules.customer.constant.CustomerConstants;
@@ -125,7 +126,9 @@ public class CustMechBankAccountDubboService implements ICustMechBankAccountServ
         
         ChangeDetailBean<CustMechBankAccountTmp> changeDetailBean = new ChangeDetailBean<>();
         changeDetailBean.setChangeApply(changeApply);
-        changeDetailBean.setNowData(nowData);
+        if (BetterStringUtils.equals(nowData.getTmpOperType(), CustomerConstants.TMP_OPER_TYPE_DELETE) == false) {
+            changeDetailBean.setNowData(nowData);
+        }
         changeDetailBean.setBefData(befData);
         
         return newOk("公司银行账户-变更详情查询 成功", changeDetailBean).toJson();

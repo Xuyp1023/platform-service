@@ -126,7 +126,7 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
             tempContacterTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
             tempContacterTmp.setBatchNo(
                     fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, tempContacterTmp.getBatchNo(), UserUtils.getOperatorInfo()));
-            return saveContacterTmp(tempContacterTmp, tempContacterTmp.getId(), anFileList);
+            return saveContacterTmp(tempContacterTmp);
         }
     }
 
@@ -462,7 +462,7 @@ public class CustMechContacterTmpService extends BaseService<CustMechContacterTm
             tempContacterTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
             tempContacterTmp.setBatchNo(
                     fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, tempContacterTmp.getBatchNo(), UserUtils.getOperatorInfo()));
-            return saveContacterTmp(tempContacterTmp, tempContacterTmp.getId(), anFileList);
+            return saveContacterTmp(tempContacterTmp);
         }
     }
 

@@ -124,7 +124,7 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
             tempBankAccountTmp.initModifyValue(anBankAccountTmp);
             tempBankAccountTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
             tempBankAccountTmp.setBatchNo(fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, tempBankAccountTmp.getBatchNo(), UserUtils.getOperatorInfo()));
-            return saveBankAccountTmp(tempBankAccountTmp, tempBankAccountTmp.getId(), anFileList);
+            return saveBankAccountTmp(tempBankAccountTmp);
         }
     }
 
@@ -455,7 +455,7 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
             tempBankAccountTmp.initModifyValue(anBankAccountTmp);
             tempBankAccountTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
             tempBankAccountTmp.setBatchNo(fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, tempBankAccountTmp.getBatchNo(), UserUtils.getOperatorInfo()));
-            return saveBankAccountTmp(tempBankAccountTmp, tempBankAccountTmp.getId(), anFileList);
+            return saveBankAccountTmp(tempBankAccountTmp);
         }
     }
 

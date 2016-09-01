@@ -1,25 +1,37 @@
 package com.betterjr.modules.notification.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
+import com.betterjr.common.data.NotificationAttachment;
 import com.betterjr.common.notification.NotificationConstants;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
+import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.mapper.pagehelper.PageHelper;
 import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
+import com.betterjr.modules.document.entity.CustFileItem;
+import com.betterjr.modules.document.service.CustFileItemService;
 import com.betterjr.modules.notification.dao.NotificationMapper;
 import com.betterjr.modules.notification.entity.Notification;
 import com.betterjr.modules.notification.entity.NotificationCustomer;
 
 @Service
 public class NotificationService extends BaseService<NotificationMapper, Notification> {
+    
+    @Resource
+    private CustFileItemService fileItemService;
+    
     @Resource
     private NotificationCustomerService notificationCustomerService;
 
@@ -100,5 +112,46 @@ public class NotificationService extends BaseService<NotificationMapper, Notific
         BTAssert.notNull(notificationCustomer, "没有找到相应的站内消息接收记录!");
         return notificationCustomer;
     }
+    
+    /**
+     * 
+     */
+    public List<Notification> queryUnsendSmsNotification() {
+        Map<String, Object> conditionMap = new HashMap<>();
+        conditionMap.put("channel", NotificationConstants.CHANNEL_SMS);
+        conditionMap.put("businStatus", new String[]{NotificationConstants.SEND_STATUS_FAIL, NotificationConstants.SEND_STATUS_NORMAL});
+        return this.selectPropertyByPage(conditionMap, 1, 50, false);
+    }
+    
+    /**
+     * 
+     * @param anId
+     * @param anBusinStatus
+     * @return
+     */
+    public Notification saveNotificationStatus(Long anId, String anBusinStatus) {
+        BTAssert.notNull(anId, "编号不允许为空");
+        BTAssert.notNull(anBusinStatus, "状态不允许为空！");
+        Notification notification = this.selectByPrimaryKey(anId);
+        notification.setBusinStatus(anBusinStatus);
+        this.updateByPrimaryKeySelective(notification);
+        return notification;
+    }
 
+    /**
+     * 组织附件 
+     */
+    public List<NotificationAttachment> buildAttachments(Long anBatchNo) {
+        List<CustFileItem> fileItems = fileItemService.findCustFiles(anBatchNo);
+        if (Collections3.isEmpty(fileItems) == false) {
+            List<NotificationAttachment> attachments = new ArrayList<>();
+
+            for (CustFileItem fileItem : fileItems) {
+                attachments.add(new NotificationAttachment(fileItem.getFileName(), fileItem.getFilePath()));
+            }
+
+            return attachments;
+        }
+        return null;
+    }
 }
