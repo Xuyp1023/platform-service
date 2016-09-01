@@ -41,7 +41,7 @@ public class CustMechFinanceDubboService implements ICustMechFinanceService {
 
     @Override
     public String webQueryFinanceList(Long anCustNo, String anFlag, int anPageNum, int anPageSize) {
-        return AjaxObject.newOk("财务上传记录查询成功", custMechFinanceRecordService.queryCustMechFinanceRecord(anCustNo, anFlag, anPageNum, anPageSize)).toJson(); 
+        return AjaxObject.newOkWithPage("财务上传记录查询成功", custMechFinanceRecordService.queryCustMechFinanceRecord(anCustNo, anFlag, anPageNum, anPageSize)).toJson(); 
     }
 
     @Override

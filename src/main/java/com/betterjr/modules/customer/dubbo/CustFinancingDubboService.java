@@ -32,7 +32,7 @@ public class CustFinancingDubboService implements ICustFinancingService {
 
     @Override
     public String webQueryFinancingList(Long anCustNo, String anFlag, int anPageNum, int anPageSize) {
-        return AjaxObject.newOk("融资信息查询成功", custFinancingService.queryCustFinancingByCustNo(anCustNo, anFlag, anPageNum, anPageSize)).toJson();
+        return AjaxObject.newOkWithPage("融资信息查询成功", custFinancingService.queryCustFinancingByCustNo(anCustNo, anFlag, anPageNum, anPageSize)).toJson();
     }
 
     @Override
