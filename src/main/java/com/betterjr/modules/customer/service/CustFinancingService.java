@@ -1,11 +1,10 @@
 package com.betterjr.modules.customer.service;
 
-import java.util.List;
-
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
+import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.customer.dao.CustFinancingMapper;
 import com.betterjr.modules.customer.entity.CustFinancing;
 
@@ -23,7 +22,7 @@ public class CustFinancingService extends BaseService<CustFinancingMapper, CustF
      * @param anCustNo
      * @return
      */
-    public List<CustFinancing> queryCustFinancingByCustNo(Long anCustNo, String anFlag, int anPageNum, int anPageSize) {
+    public Page<CustFinancing> queryCustFinancingByCustNo(Long anCustNo, String anFlag, int anPageNum, int anPageSize) {
         BTAssert.notNull(anCustNo, "客户编号不允许为空！");
         
         return this.selectPropertyByPage("custNo", anCustNo, anPageNum, anPageSize, "1".equals(anFlag));
