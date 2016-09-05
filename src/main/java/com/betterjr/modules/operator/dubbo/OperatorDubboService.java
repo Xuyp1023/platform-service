@@ -65,8 +65,8 @@ public class OperatorDubboService implements IOperatorService {
      * @param menuId
      * @return
      */
-    public String webFindSysMenuByMenuRole(String anRoleName){
-        return AjaxObject.newOk("获取菜单信息",manuManagerService.findSysMenuByRoleMenu(anRoleName)).toJson();
+    public String webFindSysMenuByMenuRole(String anRoleId){
+        return AjaxObject.newOk("获取菜单信息",manuManagerService.findSysMenuByRoleMenu(anRoleId)).toJson();
     }
 
     /****
