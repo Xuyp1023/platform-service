@@ -53,8 +53,8 @@ public class SysMenuManagerService {
      *            父菜单编号
      * @return
      */
-    public List findSysMenuByRoleMenu(String anRoleName) {
-        List<String> menuIds = sysMenuRuleService.findAllByRuleAndMenu(findRoleByOperator(anRoleName), 0);
+    public List findSysMenuByRoleMenu(String anRoleId) {
+        List<String> menuIds = sysMenuRuleService.findAllByRuleAndMenu(findRoleByOperator(anRoleId), 0);
         return sysMenuService.findAllMenuList(menuIds);
     }
     
@@ -62,10 +62,10 @@ public class SysMenuManagerService {
      * 根据当前操作员获取角色信息
      * @return
      */
-    public List findRoleByOperator(String anRoleName){
+    public List findRoleByOperator(String anRoleId){
         List tmpList = new ArrayList();
-        if(BetterStringUtils.isNotBlank(anRoleName)){
-            tmpList.add(anRoleName);
+        if(BetterStringUtils.isNotBlank(anRoleId)){
+            tmpList.add(anRoleId);
         }else{
             CustOperatorInfo operator=UserUtils.getOperatorInfo();
             String[] arrRule = BetterStringUtils.split(operatorRoleRelationService.findSysRoleByOperatorId(operator.getId()), ";|,");

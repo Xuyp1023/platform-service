@@ -44,9 +44,9 @@ public class SysOperatorRoleRelationService extends BaseService<SysOperatorRoleR
        for(int i=0;i<relationList.size();i++){
            SysOperatorRoleRelation roleRelation=relationList.get(i);
            if(i==0){
-               sb.append(roleRelation.getRoleName());
+               sb.append(roleRelation.getRoleId());
            }else{
-               sb.append(",").append(roleRelation.getRoleName());
+               sb.append(",").append(roleRelation.getRoleId());
            }
        }   
        return sb.toString();
