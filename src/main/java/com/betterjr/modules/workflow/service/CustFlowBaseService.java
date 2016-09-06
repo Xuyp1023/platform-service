@@ -129,10 +129,13 @@ public class CustFlowBaseService extends BaseService<CustFlowBaseMapper, CustFlo
         Long baseId=SerialGenerator.getLongValue(CustFlowBase.selectKey);
         this.insertOrUpdateWithPkId(base, baseId);
         // steps --> approvers
+        int stepIndex=1;
         if (!Collections3.isEmpty(base.getStepList())) {
             for (CustFlowStep step : base.getStepList()) {
                 Long stepId=SerialGenerator.getLongValue(CustFlowStep.selectKey);
                 step.setFlowBaseId(base.getId());
+                step.setOrderNum(stepIndex);
+                stepIndex++;
                 this.stepService.insertOrUpdateWithPkId(step, stepId);
                 
                 if (!Collections3.isEmpty(step.getStepApprovers())) {
