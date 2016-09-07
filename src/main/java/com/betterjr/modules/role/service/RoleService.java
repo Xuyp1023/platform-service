@@ -115,7 +115,7 @@ public class RoleService extends BaseService<RoleMapper, Role> {
      * @return
      */
     public Role findRoleByName(String roleName){
-        Map roleMp=new HashMap();
+        Map<String, Object> roleMp=new HashMap<>();
         roleMp.put("roleName", roleName);
         roleMp.put("businStatus", "1");
         List<Role> roleList= this.selectByProperty(roleMp);
@@ -128,7 +128,7 @@ public class RoleService extends BaseService<RoleMapper, Role> {
      */
     public List<SimpleDataEntity> queryRoleDefault(){
         List<SimpleDataEntity> result = new ArrayList<SimpleDataEntity>();
-        Map roleMp=new HashMap();
+        Map<String, Object> roleMp=new HashMap<>();
         roleMp.put("def", "0");
         for(Role role :this.selectByProperty(roleMp)){
             result.add(new SimpleDataEntity(role.getRoleName(), role.getRoleType()));
