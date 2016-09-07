@@ -98,4 +98,12 @@ public class OperatorDubboService implements IOperatorService {
         
         return AjaxObject.newOk("查询操作员",operatorRequestService.findOperatorById(operatorId)).toJson();
     }
+    
+    /****
+     * 获取当前登录机构下的所有操作员
+     */
+    @Override
+    public String webFindCustOperator() {
+        return AjaxObject.newOk("查询当前登录机构下的操作员", operatorRequestService.findCustOperator()).toJson();
+    }
 }

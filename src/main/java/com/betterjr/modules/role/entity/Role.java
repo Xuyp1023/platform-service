@@ -25,6 +25,9 @@ public class Role implements BetterjrEntity {
     @Column(name = "C_OPERORG",  columnDefinition="VARCHAR" )
     private String operOrg;
 
+    @Column(name = "C_DEFAULT",  columnDefinition="CHAR" )
+    private String def;
+
     private static final long serialVersionUID = 7232514578015396419L;
 
     public Long getId() {
@@ -122,6 +125,7 @@ public class Role implements BetterjrEntity {
         this.roleName=roleName;
         this.roleType=roleType;
         this.businStatus=businStatus;
+        this.def="1";
     }
     
     public Role(String roleId,String roleName,String roleType,String businStatus){
@@ -129,5 +133,6 @@ public class Role implements BetterjrEntity {
         this.roleName=roleName;
         this.roleType=roleType;
         this.businStatus=businStatus;
+        this.def="1";
     }
 }

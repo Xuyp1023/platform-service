@@ -135,4 +135,27 @@ public class OperatorRequestService extends BaseService<CustOperatorInfoMapper, 
         }
         return custOperatorInfo;
     }
+    
+
+    /***
+     * 查找当前登录机构操作员
+     * @return
+     */
+    public List<CustOptData> findCustOperator() {
+        List result = new ArrayList<>();
+        Map<String, Object> map = new HashMap<String, Object>();
+        CustOperatorInfo custOperator = (CustOperatorInfo) UserUtils.getPrincipal().getUser();
+        String operOrg = custOperator.getOperOrg();
+        map.put("operOrg", operOrg);
+        List<CustOperatorInfo> list=this.selectByProperty(map);
+        for (int i = 0; i < list.size(); i++) {
+            CustOperatorInfo custOperatorInfo = (CustOperatorInfo) list.get(i);
+            String ruleList = operatorRoleRelationService.findSysRoleByOperatorId(custOperatorInfo.getId());
+            if (BetterStringUtils.isNotBlank(ruleList)) {
+                custOperatorInfo.setRuleList(ruleList);
+            }
+            result.add(custOperatorInfo);
+        }
+        return result;
+    }
 }

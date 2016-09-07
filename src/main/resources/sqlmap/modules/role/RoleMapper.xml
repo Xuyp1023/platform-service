@@ -10,5 +10,6 @@
     <result column="C_ROLE_TYPE" jdbcType="VARCHAR" property="roleType" />
     <result column="C_BUSIN_STATUS" jdbcType="VARCHAR" property="businStatus" />
     <result column="C_OPERORG" jdbcType="VARCHAR" property="operOrg" />
+    <result column="C_DEFAULT" jdbcType="CHAR" property="def" />
   </resultMap>
 </mapper>

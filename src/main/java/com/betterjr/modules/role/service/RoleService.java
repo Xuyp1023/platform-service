@@ -1,5 +1,6 @@
 package com.betterjr.modules.role.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -7,6 +8,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.betterjr.common.data.SimpleDataEntity;
 import com.betterjr.common.exception.BytterDeclareException;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BetterStringUtils;
@@ -119,4 +121,20 @@ public class RoleService extends BaseService<RoleMapper, Role> {
         List<Role> roleList= this.selectByProperty(roleMp);
         return Collections3.getFirst(roleList);
     }
+    
+    /****
+     * 查询默认角色
+     * @return
+     */
+    public List<SimpleDataEntity> queryRoleDefault(){
+        List<SimpleDataEntity> result = new ArrayList<SimpleDataEntity>();
+        Map roleMp=new HashMap();
+        roleMp.put("def", "0");
+        for(Role role :this.selectByProperty(roleMp)){
+            result.add(new SimpleDataEntity(role.getRoleName(), role.getRoleType()));
+        }
+        logger.info(result.toString());
+        return result;
+    }
+    
 }
