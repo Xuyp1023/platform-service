@@ -1,10 +1,12 @@
 package com.betterjr.modules.role.dubbo;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.betterjr.common.data.SimpleDataEntity;
 import com.betterjr.common.web.AjaxObject;
 import com.betterjr.modules.role.IRoleService;
 import com.betterjr.modules.role.entity.Role;
@@ -67,6 +69,15 @@ public class RoleDubboService implements IRoleService {
     @Override
     public String webFindRole(){
         return AjaxObject.newOk("查询所有角色信息",roleService.findRole()).toJson();
+    }
+    
+    /****
+     * 查询默认角色
+     * @return
+     */
+    @Override
+    public String webQueryRoleDefault(){
+        return AjaxObject.newOk("查询默认角色",roleService.queryRoleDefault()).toJson();
     }
 
 }
