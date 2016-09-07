@@ -6,7 +6,7 @@ import com.alibaba.dubbo.config.annotation.Service;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.web.AjaxObject;
 import com.betterjr.modules.customer.ICustAuditLogService;
-import com.betterjr.modules.customer.constant.CustomerConstants;
+import com.betterjr.modules.customer.constants.CustomerConstants;
 import com.betterjr.modules.customer.service.CustAuditLogService;
 
 @Service(interfaceClass = ICustAuditLogService.class)

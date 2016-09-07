@@ -8,7 +8,6 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
-import com.betterjr.common.notification.NotificationConstants;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.Collections3;
@@ -19,6 +18,7 @@ import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.account.service.CustCertService;
+import com.betterjr.modules.notification.constants.NotificationConstants;
 import com.betterjr.modules.notification.dao.NotificationProfileMapper;
 import com.betterjr.modules.notification.entity.NotificationProfile;
 

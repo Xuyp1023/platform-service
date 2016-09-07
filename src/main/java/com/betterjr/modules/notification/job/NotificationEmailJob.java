@@ -13,9 +13,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.data.NotificationAttachment;
-import com.betterjr.common.notification.NotificationConstants;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.MailUtils;
+import com.betterjr.modules.notification.constants.NotificationConstants;
 import com.betterjr.modules.notification.entity.Notification;
 import com.betterjr.modules.notification.entity.NotificationCustomer;
 import com.betterjr.modules.notification.service.NotificationCustomerService;

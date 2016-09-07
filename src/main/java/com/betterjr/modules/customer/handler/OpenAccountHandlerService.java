@@ -6,11 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.betterjr.common.mq.annotation.RocketMQListener;
 import com.betterjr.common.mq.message.MQMessage;
-import com.betterjr.common.notification.NotificationModel;
-import com.betterjr.common.notification.NotificationModel.Builder;
-import com.betterjr.common.service.NotificationService;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.DictUtils;
@@ -18,6 +16,9 @@ import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.customer.entity.CustOpenAccountTmp;
+import com.betterjr.modules.notification.INotificationService;
+import com.betterjr.modules.notification.NotificationModel;
+import com.betterjr.modules.notification.NotificationModel.Builder;
 
 @Service
 public class OpenAccountHandlerService {
@@ -26,11 +27,11 @@ public class OpenAccountHandlerService {
     @Resource
     public CustAccountService accountService;
 
-    @Resource(type = NotificationService.class)
-    public NotificationService sendService;
+    @Reference(interfaceClass = INotificationService.class)
+    public INotificationService notificationService;
 
     /**
-     * 发送邮件
+     * 开户消息
      */
     @RocketMQListener(topic = "CUSTOMER_OPENACCOUNT_TOPIC", consumer = "betterConsumer")
     public void processNotification(final Object anMessage) {
@@ -50,7 +51,7 @@ public class OpenAccountHandlerService {
                 builder.setEntity(openAccountTmp);
                 builder.addReceiveEmail(openAccountTmp.getOperEmail());
                 builder.addReceiveMobile(openAccountTmp.getOperMobile());
-                sendService.sendNotifition(builder.build());
+                notificationService.sendNotification(builder.build());
             }
             else if (BetterStringUtils.equals("0", type)) { // 开户审核驳回通知
                 Builder builder = NotificationModel.newBuilder("开户审核驳回通知", customer, operator);
@@ -58,7 +59,7 @@ public class OpenAccountHandlerService {
                 builder.addReceiveEmail(openAccountTmp.getOperEmail());
                 builder.addReceiveMobile(openAccountTmp.getOperMobile());
                 builder.addParam("auditOpinion", message.getHead("auditOpinion"));
-                sendService.sendNotifition(builder.build());
+                notificationService.sendNotification(builder.build());
             }
             else {
                 logger.error("消息类型不正确！");

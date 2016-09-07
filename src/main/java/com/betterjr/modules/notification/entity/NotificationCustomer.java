@@ -2,11 +2,11 @@ package com.betterjr.modules.notification.entity;
 
 import com.betterjr.common.annotation.*;
 import com.betterjr.common.entity.BetterjrEntity;
-import com.betterjr.common.notification.NotificationConstants;
 import com.betterjr.common.selectkey.SerialGenerator;
 import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
+import com.betterjr.modules.notification.constants.NotificationConstants;
 
 import javax.persistence.*;
 

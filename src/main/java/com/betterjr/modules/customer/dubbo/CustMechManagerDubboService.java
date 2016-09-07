@@ -12,7 +12,7 @@ import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.customer.ICustMechManagerService;
-import com.betterjr.modules.customer.constant.CustomerConstants;
+import com.betterjr.modules.customer.constants.CustomerConstants;
 import com.betterjr.modules.customer.entity.CustChangeApply;
 import com.betterjr.modules.customer.entity.CustMechManager;
 import com.betterjr.modules.customer.entity.CustMechManagerTmp;

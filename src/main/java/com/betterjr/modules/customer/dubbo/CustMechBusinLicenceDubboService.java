@@ -8,7 +8,7 @@ import com.alibaba.dubbo.config.annotation.Service;
 import com.betterjr.common.web.AjaxObject;
 import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.customer.ICustMechBusinLicenceService;
-import com.betterjr.modules.customer.constant.CustomerConstants;
+import com.betterjr.modules.customer.constants.CustomerConstants;
 import com.betterjr.modules.customer.entity.CustChangeApply;
 import com.betterjr.modules.customer.entity.CustMechBaseTmp;
 import com.betterjr.modules.customer.entity.CustMechBusinLicence;

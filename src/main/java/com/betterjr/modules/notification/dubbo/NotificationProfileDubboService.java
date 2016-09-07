@@ -7,8 +7,8 @@ import javax.annotation.Resource;
 import static com.betterjr.common.web.AjaxObject.*;
 
 import com.alibaba.dubbo.config.annotation.Service;
-import com.betterjr.common.notification.NotificationConstants;
 import com.betterjr.modules.notification.INotificationProfileService;
+import com.betterjr.modules.notification.constants.NotificationConstants;
 import com.betterjr.modules.notification.entity.NotificationChannelProfile;
 import com.betterjr.modules.notification.service.NotificationChannelProfileService;
 import com.betterjr.modules.notification.service.NotificationProfileService;

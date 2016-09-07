@@ -11,8 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.betterjr.common.notification.NotificationConstants;
 import com.betterjr.common.utils.Collections3;
+import com.betterjr.modules.notification.constants.NotificationConstants;
 import com.betterjr.modules.notification.entity.Notification;
 import com.betterjr.modules.notification.entity.NotificationCustomer;
 import com.betterjr.modules.notification.service.NotificationCustomerService;
@@ -41,7 +41,9 @@ public class NotificationSmsJob extends AbstractSimpleElasticJob {
 
     @Override
     public void process(JobExecutionMultipleShardingContext anParamJobExecutionMultipleShardingContext) {
-        logger.info("定时发送短信 : " + new Date());
+        logger.debug("定时发送短信 : " + new Date());
+        
+        // TODO 处理批量发送
         while(true) {
             List<Notification> notifications = notificationService.queryUnsendSmsNotification();
             if (Collections3.isEmpty(notifications) == true) {
@@ -61,12 +63,12 @@ public class NotificationSmsJob extends AbstractSimpleElasticJob {
             });
         }
         
+        // TODO 单条发送逻辑
         while(true) {
             List<NotificationCustomer> customers = notificationCustomerService.queryUnsendSmsNotificationCustomer(smsRetry);
             if (Collections3.isEmpty(customers) == true) {
                 break;
             }
-            // TODO 单条发送逻辑
             
             if (1 == 1) { //发送成功的
                 notificationCustomerService.saveNotificationCustomerStatus(0L, NotificationConstants.SEND_STATUS_SUCCESS);

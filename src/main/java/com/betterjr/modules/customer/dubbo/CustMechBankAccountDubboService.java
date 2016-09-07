@@ -12,7 +12,7 @@ import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.customer.ICustMechBankAccountService;
-import com.betterjr.modules.customer.constant.CustomerConstants;
+import com.betterjr.modules.customer.constants.CustomerConstants;
 import com.betterjr.modules.customer.entity.CustChangeApply;
 import com.betterjr.modules.customer.entity.CustMechBankAccount;
 import com.betterjr.modules.customer.entity.CustMechBankAccountTmp;

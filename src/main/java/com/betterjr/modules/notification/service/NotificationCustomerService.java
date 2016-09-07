@@ -6,13 +6,13 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
-import com.betterjr.common.notification.NotificationConstants;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.mapper.pagehelper.PageHelper;
 import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
+import com.betterjr.modules.notification.constants.NotificationConstants;
 import com.betterjr.modules.notification.dao.NotificationCustomerMapper;
 import com.betterjr.modules.notification.entity.Notification;
 import com.betterjr.modules.notification.entity.NotificationCustomer;
@@ -69,7 +69,7 @@ public class NotificationCustomerService extends BaseService<NotificationCustome
     }
     
     /**
-     * 查询- notification 已经发送成功 但 notificationCustomer 未发送成功的记录
+     * 查询- notification 已经发送成功 但 notificationCustomer 未发送成功的记录 SMS
      */
     public List<NotificationCustomer> queryUnsendSmsNotificationCustomer(Integer anRetry) {
         PageHelper.startPage(1, 50, false);
@@ -77,7 +77,7 @@ public class NotificationCustomerService extends BaseService<NotificationCustome
     }
     
     /**
-     * 查询- notification 已经发送成功 但 notificationCustomer 未发送成功的记录
+     * 查询- notification 已经发送成功 但 notificationCustomer 未发送成功的记录 EMAIL
      */
     public List<NotificationCustomer> queryUnsendEmailNotificationCustomer(Integer anRetry) {
         PageHelper.startPage(1, 50, false);

@@ -6,7 +6,6 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.service.BaseService;
@@ -37,6 +36,14 @@ public class NotificationSubscribeService extends BaseService<NotificationSubscr
     @Resource
     private CustAccountService accountService;
     
+    /**
+     * 查询订阅列表
+     * @param anCustNo
+     * @param anFlag
+     * @param anPageNum
+     * @param anPageSize
+     * @return
+     */
     public Page<ProfileSubscribeModel> queryProfileSubscribe(Long anCustNo, int anFlag, int anPageNum, int anPageSize) {
         BTAssert.notNull(anCustNo, "公司编号不允许为空!");
         
@@ -51,6 +58,14 @@ public class NotificationSubscribeService extends BaseService<NotificationSubscr
         return profileSubscribes;
     }
     
+    /**
+     * 获取订阅通道
+     * @param anOperId
+     * @param anCustNo
+     * @param anSourceCustNo
+     * @param anProfileId
+     * @return
+     */
     private List<ChannelSubscribeModel> queryChannelSubscribe(Long anOperId, Long anCustNo, Long anSourceCustNo, Long anProfileId) {
         // Long operId, Long custNo, Long sourceCustNo, Long profileId
         List<ChannelSubscribeModel> channelSubscribes = this.mapper.selectChannelSubscribe(anOperId, anCustNo, anSourceCustNo, anProfileId);

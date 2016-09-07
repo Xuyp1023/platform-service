@@ -25,6 +25,7 @@
 		com.betterjr.modules.workflow;
         com.betterjr.modules.operator;
         com.betterjr.modules.role;
+        com.betterjr.modules.cert;
 		com.betterjr.modules.account.service;
         com.betterjr.modules.rule.service;
         com.betterjr.modules.rule.validator;
@@ -202,6 +203,6 @@
 	<import resource="platform-dubbo-provider.xml" />
 	<import resource="workflow-snaker.xml"/>
 	<import resource="mq-config.xml"/>
-	<import resource="job-config.xml"/>
+<!-- 	<import resource="job-config.xml"/> -->
 
 </beans>

@@ -5,15 +5,14 @@ import java.util.concurrent.CountDownLatch;
 
 import org.junit.Test;
 
-import com.betterjr.common.notification.NotificationModel;
-import com.betterjr.common.notification.NotificationModel.Builder;
-import com.betterjr.common.service.NotificationService;
 import com.betterjr.common.utils.DictUtils;
 import com.betterjr.modules.BasicServiceTest;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.account.service.CustOperatorService;
 import com.betterjr.modules.customer.entity.CustMechBase;
+import com.betterjr.modules.notification.NotificationModel.Builder;
+import com.betterjr.modules.notification.service.NotificationService;
 import com.betterjr.modules.sys.entity.DictItemInfo;
 
 public class NotificationServiceTest extends BasicServiceTest<NotificationService> {

@@ -37,34 +37,6 @@ public class NoticeCustomer implements BetterjrEntity {
     private Long noticeId;
 
     /**
-     * 是否删除 0未删除 1已删除
-     */
-    @Column(name = "C_IS_DELETED", columnDefinition = "CHAR")
-    @MetaData(value = "是否删除 0未删除 1已删除", comments = "是否删除 0未删除 1已删除")
-    private Boolean isDeleted;
-
-    /**
-     * 是否已读:0未读，1已读
-     */
-    @Column(name = "C_IS_READ", columnDefinition = "CHAR")
-    @MetaData(value = "是否已读:0未读，1已读", comments = "是否已读:0未读，1已读")
-    private Boolean isRead;
-
-    /**
-     * 接收企业经办人ID
-     */
-    @Column(name = "L_OPERID", columnDefinition = "INTEGER")
-    @MetaData(value = "接收企业经办人ID", comments = "接收企业经办人ID")
-    private Long operId;
-
-    /**
-     * 接收企业经办人姓名
-     */
-    @Column(name = "C_OPERNAME", columnDefinition = "VARCHAR")
-    @MetaData(value = "接收企业经办人姓名", comments = "接收企业经办人姓名")
-    private String operName;
-
-    /**
      * 接收企业名称
      */
     @Column(name = "C_CUSTNAME", columnDefinition = "VARCHAR")
@@ -186,38 +158,6 @@ public class NoticeCustomer implements BetterjrEntity {
         this.noticeId = noticeId;
     }
 
-    public Boolean getIsDeleted() {
-        return isDeleted;
-    }
-
-    public void setIsDeleted(Boolean isDeleted) {
-        this.isDeleted = isDeleted;
-    }
-
-    public Boolean getIsRead() {
-        return isRead;
-    }
-
-    public void setIsRead(Boolean isRead) {
-        this.isRead = isRead;
-    }
-
-    public Long getOperId() {
-        return operId;
-    }
-
-    public void setOperId(Long operId) {
-        this.operId = operId;
-    }
-
-    public String getOperName() {
-        return operName;
-    }
-
-    public void setOperName(String operName) {
-        this.operName = operName == null ? null : operName.trim();
-    }
-
     public String getCustName() {
         return custName;
     }
@@ -331,10 +271,6 @@ public class NoticeCustomer implements BetterjrEntity {
         sb.append(", id=").append(id);
         sb.append(", version=").append(version);
         sb.append(", noticeId=").append(noticeId);
-        sb.append(", isDeleted=").append(isDeleted);
-        sb.append(", isRead=").append(isRead);
-        sb.append(", operId=").append(operId);
-        sb.append(", operName=").append(operName);
         sb.append(", custName=").append(custName);
         sb.append(", regOperId=").append(regOperId);
         sb.append(", regOperName=").append(regOperName);
@@ -368,10 +304,6 @@ public class NoticeCustomer implements BetterjrEntity {
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
                 && (this.getVersion() == null ? other.getVersion() == null : this.getVersion().equals(other.getVersion()))
                 && (this.getNoticeId() == null ? other.getNoticeId() == null : this.getNoticeId().equals(other.getNoticeId()))
-                && (this.getIsDeleted() == null ? other.getIsDeleted() == null : this.getIsDeleted().equals(other.getIsDeleted()))
-                && (this.getIsRead() == null ? other.getIsRead() == null : this.getIsRead().equals(other.getIsRead()))
-                && (this.getOperId() == null ? other.getOperId() == null : this.getOperId().equals(other.getOperId()))
-                && (this.getOperName() == null ? other.getOperName() == null : this.getOperName().equals(other.getOperName()))
                 && (this.getCustName() == null ? other.getCustName() == null : this.getCustName().equals(other.getCustName()))
                 && (this.getRegOperId() == null ? other.getRegOperId() == null : this.getRegOperId().equals(other.getRegOperId()))
                 && (this.getRegOperName() == null ? other.getRegOperName() == null : this.getRegOperName().equals(other.getRegOperName()))
@@ -394,10 +326,6 @@ public class NoticeCustomer implements BetterjrEntity {
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
         result = prime * result + ((getVersion() == null) ? 0 : getVersion().hashCode());
         result = prime * result + ((getNoticeId() == null) ? 0 : getNoticeId().hashCode());
-        result = prime * result + ((getIsDeleted() == null) ? 0 : getIsDeleted().hashCode());
-        result = prime * result + ((getIsRead() == null) ? 0 : getIsRead().hashCode());
-        result = prime * result + ((getOperId() == null) ? 0 : getOperId().hashCode());
-        result = prime * result + ((getOperName() == null) ? 0 : getOperName().hashCode());
         result = prime * result + ((getCustName() == null) ? 0 : getCustName().hashCode());
         result = prime * result + ((getRegOperId() == null) ? 0 : getRegOperId().hashCode());
         result = prime * result + ((getRegOperName() == null) ? 0 : getRegOperName().hashCode());
@@ -414,7 +342,7 @@ public class NoticeCustomer implements BetterjrEntity {
         return result;
     }
 
-    public void initAddValue(Long anNoticeId, Long anCustNo, String anCustName, Long anOperId, String anOperName) {
+    public void initAddValue(Long anNoticeId, Long anCustNo, String anCustName) {
         this.id = SerialGenerator.getLongValue("NoticeCustomer.id");
 
         this.modiOperId = UserUtils.getOperatorInfo().getId();
@@ -427,28 +355,9 @@ public class NoticeCustomer implements BetterjrEntity {
         this.regDate = BetterDateUtils.getNumDate();
         this.regTime = BetterDateUtils.getNumTime();
 
-        this.isRead = Boolean.FALSE;
-        this.isDeleted = Boolean.FALSE;
 
         this.noticeId = anNoticeId;
         this.custNo = anCustNo;
         this.custName = anCustName;
-        this.operId = anOperId;
-        this.operName = anOperName;
-    }
-
-    public void initModifyValue(Boolean anIsRead, Boolean anIsDeleted) {
-        this.modiOperId = UserUtils.getOperatorInfo().getId();
-        this.modiOperName = UserUtils.getOperatorInfo().getName();
-        this.modiDate = BetterDateUtils.getNumDate();
-        this.modiTime = BetterDateUtils.getNumTime();
-
-        if (anIsRead != null) {
-            this.isRead = anIsRead;
-        }
-        
-        if (anIsDeleted != null) {
-            this.isDeleted = anIsDeleted;
-        }
     }
 }

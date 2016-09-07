@@ -1,16 +1,15 @@
 package com.betterjr.modules.notice.service;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
-import com.betterjr.common.data.SimpleDataEntity;
 import com.betterjr.common.exception.BytterTradeException;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
@@ -19,25 +18,39 @@ import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.mapper.pagehelper.PageHelper;
+import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.betterjr.modules.account.service.CustAccountService;
-import com.betterjr.modules.document.service.CustFileInfoService;
+import com.betterjr.modules.account.service.CustCertService;
+import com.betterjr.modules.customer.service.CustRelationService;
 import com.betterjr.modules.document.service.CustFileItemService;
-import com.betterjr.modules.notice.constant.NoticeConstants;
+import com.betterjr.modules.notice.constants.NoticeConstants;
 import com.betterjr.modules.notice.dao.NoticeMapper;
 import com.betterjr.modules.notice.entity.Notice;
 import com.betterjr.modules.notice.entity.NoticeCustomer;
+import com.betterjr.modules.notice.entity.NoticeOperator;
 
 @Service
 public class NoticeService extends BaseService<NoticeMapper, Notice> {
+    private static final String DELIMITER_COMMA = ",";
+
     @Resource
     private NoticeCustomerService noticeCustomerService;
 
     @Resource
+    private NoticeOperatorService noticeOperatorService;
+
+    @Resource
     private CustAccountService accountService;
-    
+
     @Resource
     private CustFileItemService fileItemService;
+
+    @Resource
+    private CustRelationService relationService;
+
+    @Resource
+    private CustCertService custCertService;
 
     /**
      * 未读消息
@@ -46,7 +59,9 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
         final CustOperatorInfo operator = UserUtils.getOperatorInfo();
 
         PageHelper.startPage(anPageNum, anPageSize, anFlag == 1);
-        return this.mapper.selectNoticeByCondition(operator.getId(), Boolean.FALSE);
+        final Page<Notice> notices = this.mapper.selectUnreadNotice(operator.getId(), anParam);
+        notices.stream().forEach(notice -> notice.setContent(""));
+        return notices;
     }
 
     /**
@@ -56,7 +71,9 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
         final CustOperatorInfo operator = UserUtils.getOperatorInfo();
 
         PageHelper.startPage(anPageNum, anPageSize, anFlag == 1);
-        return this.mapper.selectNoticeByCondition(operator.getId(), Boolean.TRUE);
+        final Page<Notice> notices = this.mapper.selectReadNotice(operator.getId(), anParam);
+        notices.stream().forEach(notice -> notice.setContent(""));
+        return notices;
     }
 
     /**
@@ -76,26 +93,15 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
         final CustOperatorInfo operator = UserUtils.getOperatorInfo();
 
         // 校验是否有权限读
-        Notice notice = this.selectByPrimaryKey(anId);
-        
-        if (BetterStringUtils.equals(operator.getOperOrg(), notice.getOperOrg()) == false) {
-            throw new BytterTradeException("公告详情查询错误!");
+        Long receiveCount = this.mapper.selectCountReceiveNotice(operator.getId(), anId);
+
+        if (receiveCount > 0) {
+            Notice notice = this.selectByPrimaryKey(anId);
+
+            return notice;
         }
 
-        Set<SimpleDataEntity> targetCust = queryTargetCust(notice);
-
-        notice.setTargetCust(targetCust);
-        return notice;
-    }
-
-    private Set<SimpleDataEntity> queryTargetCust(Notice anNotice) {
-        final List<NoticeCustomer> noticeCustomers = noticeCustomerService.querySimpleNoticeCustomer(anNotice.getId());
-        final Set<SimpleDataEntity> targetCusts = new HashSet<>();
-
-        noticeCustomers.forEach(
-                noticeCustomer -> targetCusts.add(new SimpleDataEntity(String.valueOf(noticeCustomer.getCustNo()), noticeCustomer.getCustName())));
-
-        return targetCusts;
+        throw new BytterTradeException("公告详情查询错误!");
     }
 
     /**
@@ -112,9 +118,7 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
             anParam.put("LIKEsubject", "%" + subject + "%");
         }
 
-        anParam.put("businStatus", new String[] { 
-                NoticeConstants.NOTICE_STATUS_CANCELED, 
-                NoticeConstants.NOTICE_STATUS_PUBLISHED,
+        anParam.put("businStatus", new String[] { NoticeConstants.NOTICE_STATUS_CANCELED, NoticeConstants.NOTICE_STATUS_PUBLISHED,
                 NoticeConstants.NOTICE_STATUS_STORED });
         anParam.put("operOrg", operator.getOperOrg());
 
@@ -123,12 +127,9 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
 
     /**
      * 添加
-     * 
-     * @param anNoticeStatusPublished
      */
     public Notice addNotice(Notice anNotice, String anTargetCust, String anFileList, String anBusinStatus) {
         BTAssert.notNull(anNotice, "公告内容不允许为空!");
-        BTAssert.notNull(anTargetCust, "公告客户不允许为空!");
 
         final Long custNo = anNotice.getCustNo();
         BTAssert.notNull(custNo, "客户编号不允许为空!");
@@ -136,11 +137,13 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
         String custName = accountService.queryCustName(custNo);
         BTAssert.notNull(custName, "客户名称不允许为空!");
 
-        final String[] targetCusts = BetterStringUtils.split(anTargetCust, ",");
+        final String[] targetCusts = findTargetCusts(custNo, anTargetCust);
+
         BTAssert.notEmpty(targetCusts, "公告客户列表不允许为空!");
 
         // 初始化
         anNotice.initAddValue(custName, anBusinStatus);
+        anNotice.setTargetCust(anTargetCust);
         anNotice.setPublishDate(BetterDateUtils.getNumDate());
         anNotice.setPublishTime(BetterDateUtils.getNumTime());
         fileItemService.updateCustFileItemInfo(anFileList, anNotice.getBatchNo());
@@ -148,6 +151,37 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
         this.insert(anNotice);
         noticeCustomerService.saveNoticeCustomer(anNotice, targetCusts);
         return anNotice;
+    }
+
+    private String[] findTargetCusts(Long anCustNo, String anTargetCust) {
+        String[] targetCusts = null;
+                
+        if (BetterStringUtils.isBlank(anTargetCust) == true) {
+            // 取所有接口
+            if (UserUtils.coreUser() == true) { // 平台面向所有客户发送公告
+                List<String> custNoList = accountService.queryAllCustInfo().stream().map(custInfo -> String.valueOf(custInfo.getCustNo()))
+                        .collect(Collectors.toList());
+                targetCusts = custNoList.toArray(new String[custNoList.size()]);
+            }
+            else { // 当前机构面向所有关系客户发送公告
+                List<String> custNoList = relationService.queryCustRelation(anCustNo).stream().map(data -> data.getValue())
+                        .collect(Collectors.toList());
+                targetCusts = custNoList.toArray(new String[custNoList.size()]);
+            }
+        }
+        else {
+            if (UserUtils.coreUser() == true) { // 平台面向指定类型客户发送公告
+                String[] roles = BetterStringUtils.split(anTargetCust, DELIMITER_COMMA);
+                Set<String> operOrgSet = custCertService.queryOperOrgByRoles(roles);
+                List<String> custNoList = accountService.queryCustInfoByOperOrgSet(operOrgSet).stream()
+                        .map(custInfo -> String.valueOf(custInfo.getCustNo())).collect(Collectors.toList());
+                targetCusts = custNoList.toArray(new String[custNoList.size()]);
+            }
+            else { // 当前机构面向指定关系客户发送公告
+                targetCusts = BetterStringUtils.split(anTargetCust, DELIMITER_COMMA);
+            }
+        }
+        return targetCusts;
     }
 
     /**
@@ -158,12 +192,17 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
     public Notice saveNotice(Notice anNotice, Long anId, String anTargetCust, String anFileList, String anBusinStatus) {
         BTAssert.notNull(anNotice, "公告内容不允许为空!");
 
-        final String[] targetCusts = BetterStringUtils.split(anTargetCust, ",");
+        final Long custNo = anNotice.getCustNo();
+        BTAssert.notNull(custNo, "客户编号不允许为空!");
+
+        String custName = accountService.queryCustName(custNo);
+        BTAssert.notNull(custName, "客户名称不允许为空!");
+
+        final String[] targetCusts = findTargetCusts(custNo, anTargetCust);
+
         BTAssert.notEmpty(targetCusts, "公告客户列表不允许为空!");
 
-        Notice tempNotice = checkNoticeStatus(anId, 
-                NoticeConstants.NOTICE_STATUS_STORED, 
-                NoticeConstants.NOTICE_STATUS_CANCELED);
+        Notice tempNotice = checkNoticeStatus(anId, NoticeConstants.NOTICE_STATUS_STORED, NoticeConstants.NOTICE_STATUS_CANCELED);
 
         String tempBusinStatus = tempNotice.getBusinStatus();
         if (BetterStringUtils.equals(tempBusinStatus, NoticeConstants.NOTICE_STATUS_PUBLISHED) == true) {
@@ -172,6 +211,7 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
 
         fileItemService.updateCustFileItemInfo(anFileList, anNotice.getBatchNo());
         tempNotice.initModifyValue(anNotice, anBusinStatus);
+        tempNotice.setTargetCust(anTargetCust);
         this.updateByPrimaryKeySelective(tempNotice);
 
         // 更新客户关系
@@ -211,21 +251,18 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
      * 删除
      */
     public Notice saveDeleteNotice(Long anId) {
-        Notice tempNotice = checkNoticeStatus(anId, 
-                NoticeConstants.NOTICE_STATUS_CANCELED, 
-                NoticeConstants.NOTICE_STATUS_STORED);
+        Notice tempNotice = checkNoticeStatus(anId, NoticeConstants.NOTICE_STATUS_CANCELED, NoticeConstants.NOTICE_STATUS_STORED);
 
         tempNotice.initModifyValue(NoticeConstants.NOTICE_STATUS_DELETED);
 
         this.updateByPrimaryKeySelective(tempNotice);
         return tempNotice;
     }
-    
 
     /**
      * 公告置删除状态
      */
-    public NoticeCustomer saveSetDeletedNotice(Long anId, Long anCustNo) {
+    public NoticeOperator saveSetDeletedNotice(Long anId, Long anCustNo) {
         BTAssert.notNull(anId, "公告编号不允许为空!");
 
         CustOperatorInfo operator = UserUtils.getOperatorInfo();
@@ -233,13 +270,15 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
         // 检查此消息有没被此人接收
         checkNoticeCustomer(anId, anCustNo, operator.getId());
 
-        return noticeCustomerService.saveSetDeletedNotice(anId, anCustNo, operator.getId());
+        CustInfo customer = accountService.findCustInfo(anCustNo);
+
+        return noticeOperatorService.saveSetDeletedNotice(anId, customer, operator);
     }
 
     /**
      * 公告置已读
      */
-    public NoticeCustomer saveSetReadNotice(Long anId, Long anCustNo) {
+    public NoticeOperator saveSetReadNotice(Long anId, Long anCustNo) {
         BTAssert.notNull(anId, "公告编号不允许为空!");
 
         CustOperatorInfo operator = UserUtils.getOperatorInfo();
@@ -247,18 +286,23 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
         // 检查此消息有没被此人接收
         checkNoticeCustomer(anId, anCustNo, operator.getId());
 
-        return noticeCustomerService.saveSetReadNotice(anId, anCustNo, operator.getId());
+        CustInfo customer = accountService.findCustInfo(anCustNo);
+
+        return noticeOperatorService.saveSetReadNotice(anId, customer, operator);
     }
 
     /**
      * 
      */
     private NoticeCustomer checkNoticeCustomer(Long anId, Long anCustNo, Long anOperId) {
-        final NoticeCustomer noticeCustomer = noticeCustomerService.findNoticeCustomerByCondition(anId, anCustNo, anOperId);
+        final NoticeCustomer noticeCustomer = noticeCustomerService.findNoticeCustomerByCondition(anId, anCustNo);
         BTAssert.notNull(noticeCustomer, "没有找到相应的公告接收记录!");
         return noticeCustomer;
     }
 
+    /**
+     * 检查公告状态
+     */
     private Notice checkNoticeStatus(Long anId, String... anBusinStatus) {
         BTAssert.notNull(anId, "公告编号不允许为空!");
         Notice tempNotice = this.selectByPrimaryKey(anId);

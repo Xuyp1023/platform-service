@@ -20,7 +20,7 @@ import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.account.service.CustAndOperatorRelaService;
-import com.betterjr.modules.customer.constant.CustomerConstants;
+import com.betterjr.modules.customer.constants.CustomerConstants;
 import com.betterjr.modules.customer.dao.CustRelationMapper;
 import com.betterjr.modules.customer.entity.CustRelation;
 import com.betterjr.modules.sys.entity.DictItemInfo;

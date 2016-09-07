@@ -11,7 +11,7 @@ import com.betterjr.common.utils.BetterStringUtils;
 import static com.betterjr.common.web.AjaxObject.*;
 import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.customer.ICustMechContacterService;
-import com.betterjr.modules.customer.constant.CustomerConstants;
+import com.betterjr.modules.customer.constants.CustomerConstants;
 import com.betterjr.modules.customer.entity.CustChangeApply;
 import com.betterjr.modules.customer.entity.CustMechContacter;
 import com.betterjr.modules.customer.entity.CustMechContacterTmp;

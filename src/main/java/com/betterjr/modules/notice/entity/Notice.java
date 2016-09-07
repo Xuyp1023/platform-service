@@ -1,8 +1,5 @@
 package com.betterjr.modules.notice.entity;
 
-import java.util.List;
-import java.util.Set;
-
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
@@ -12,7 +9,6 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import com.betterjr.common.annotation.MetaData;
-import com.betterjr.common.data.SimpleDataEntity;
 import com.betterjr.common.entity.BetterjrEntity;
 import com.betterjr.common.mapper.CustDateJsonSerializer;
 import com.betterjr.common.mapper.CustTimeJsonSerializer;
@@ -177,11 +173,12 @@ public class Notice implements BetterjrEntity {
     @MetaData( value="发布客户名称", comments = "发布客户名称")
     private String custName;
     
-    @Transient
-    private Long receiveOperId;
-    
-    @Transient
-    private String receiveOperName;
+    /**
+     * 公告范围  目标列表  为空表示所有，  平台 保理公司，核心企业，供应商，经销商  ，非平台用户，列表内为客户列表 
+     */
+    @Column(name = "C_TARGET_CUST",  columnDefinition="VARCHAR" )
+    @MetaData( value="公告范围", comments = "公告范围  目标列表  为空表示所有，  平台 保理公司，核心企业，供应商，经销商  ，非平台用户，列表内为客户列表 ")
+    private String targetCust;
     
     @Transient
     private Long receiveCustNo;
@@ -189,8 +186,6 @@ public class Notice implements BetterjrEntity {
     @Transient
     private String receiveCustName;
     
-    @Transient
-    private Set<SimpleDataEntity> targetCust;
 
     private static final long serialVersionUID = 1468812783876L;
 
@@ -354,11 +349,11 @@ public class Notice implements BetterjrEntity {
         this.custName = custName == null ? null : custName.trim();
     }
     
-    public Set<SimpleDataEntity> getTargetCust() {
+    public String getTargetCust() {
         return targetCust;
     }
 
-    public void setTargetCust(Set<SimpleDataEntity> anTargetCust) {
+    public void setTargetCust(String anTargetCust) {
         targetCust = anTargetCust;
     }
     
@@ -378,22 +373,6 @@ public class Notice implements BetterjrEntity {
         receiveCustName = anReceiveCustName;
     }
     
-    public Long getReceiveOperId() {
-        return receiveOperId;
-    }
-
-    public void setReceiveOperId(Long anReceiveOperId) {
-        receiveOperId = anReceiveOperId;
-    }
-
-    public String getReceiveOperName() {
-        return receiveOperName;
-    }
-
-    public void setReceiveOperName(String anReceiveOperName) {
-        receiveOperName = anReceiveOperName;
-    }
-
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -407,6 +386,7 @@ public class Notice implements BetterjrEntity {
         sb.append(", publishDate=").append(publishDate);
         sb.append(", publishTime=").append(publishTime);
         sb.append(", batchNo=").append(batchNo);
+        sb.append(", targetCust=").append(targetCust);
         sb.append(", regOperId=").append(regOperId);
         sb.append(", regOperName=").append(regOperName);
         sb.append(", regDate=").append(regDate);
@@ -444,6 +424,7 @@ public class Notice implements BetterjrEntity {
             && (this.getPublishDate() == null ? other.getPublishDate() == null : this.getPublishDate().equals(other.getPublishDate()))
             && (this.getPublishTime() == null ? other.getPublishTime() == null : this.getPublishTime().equals(other.getPublishTime()))
             && (this.getBatchNo() == null ? other.getBatchNo() == null : this.getBatchNo().equals(other.getBatchNo()))
+            && (this.getTargetCust() == null ? other.getTargetCust() == null : this.getTargetCust().equals(other.getTargetCust()))
             && (this.getRegOperId() == null ? other.getRegOperId() == null : this.getRegOperId().equals(other.getRegOperId()))
             && (this.getRegOperName() == null ? other.getRegOperName() == null : this.getRegOperName().equals(other.getRegOperName()))
             && (this.getRegDate() == null ? other.getRegDate() == null : this.getRegDate().equals(other.getRegDate()))
@@ -470,6 +451,7 @@ public class Notice implements BetterjrEntity {
         result = prime * result + ((getPublishDate() == null) ? 0 : getPublishDate().hashCode());
         result = prime * result + ((getPublishTime() == null) ? 0 : getPublishTime().hashCode());
         result = prime * result + ((getBatchNo() == null) ? 0 : getBatchNo().hashCode());
+        result = prime * result + ((getTargetCust() == null) ? 0 : getTargetCust().hashCode());
         result = prime * result + ((getRegOperId() == null) ? 0 : getRegOperId().hashCode());
         result = prime * result + ((getRegOperName() == null) ? 0 : getRegOperName().hashCode());
         result = prime * result + ((getRegDate() == null) ? 0 : getRegDate().hashCode());
@@ -506,12 +488,12 @@ public class Notice implements BetterjrEntity {
     }
 
     public void initModifyValue(Notice anNotice, String anBusinStatus) {
-        this.modiOperId = UserUtils.getOperatorInfo().getId();
-        this.modiOperName = UserUtils.getOperatorInfo().getName();
-        this.modiDate = BetterDateUtils.getNumDate();
-        this.modiTime = BetterDateUtils.getNumTime();     
+        initModifyValue(anBusinStatus);
         
-        this.businStatus = anBusinStatus;
+        this.subject = anNotice.subject;
+        this.content = anNotice.content;
+        this.targetCust = anNotice.targetCust;
+        this.batchNo = anNotice.batchNo;
     }
 
     public void initModifyValue(String anBusinStatus) {

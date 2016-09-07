@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
-import com.betterjr.modules.customer.constant.CustomerConstants;
+import com.betterjr.modules.customer.constants.CustomerConstants;
 import com.betterjr.modules.customer.dao.CustRelationAuditMapper;
 import com.betterjr.modules.customer.entity.CustRelation;
 import com.betterjr.modules.customer.entity.CustRelationAudit;

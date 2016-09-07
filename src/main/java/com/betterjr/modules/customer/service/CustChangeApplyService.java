@@ -15,7 +15,7 @@ import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.account.service.CustAccountService;
-import com.betterjr.modules.customer.constant.CustomerConstants;
+import com.betterjr.modules.customer.constants.CustomerConstants;
 import com.betterjr.modules.customer.dao.CustChangeApplyMapper;
 import com.betterjr.modules.customer.entity.CustAuditLog;
 import com.betterjr.modules.customer.entity.CustChangeApply;
@@ -45,7 +45,7 @@ public class CustChangeApplyService extends BaseService<CustChangeApplyMapper, C
             throw new BytterTradeException(40001, "不允许重复提交变更申请！");
         }
 
-        // TODO @@@@@@@@ 检查是否有正在进行的变更 代录
+        // TODO @@@@@@@@ 检查是否有正在进行的 代录
 
         final CustChangeApply custChangeApply = new CustChangeApply();
         final String custName = custAccountService.queryCustName(anCustNo);

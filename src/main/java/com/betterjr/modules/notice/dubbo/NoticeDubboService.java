@@ -7,7 +7,7 @@ import javax.annotation.Resource;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.betterjr.common.web.AjaxObject;
 import com.betterjr.modules.notice.INoticeService;
-import com.betterjr.modules.notice.constant.NoticeConstants;
+import com.betterjr.modules.notice.constants.NoticeConstants;
 import com.betterjr.modules.notice.entity.Notice;
 import com.betterjr.modules.notice.service.NoticeService;
 import com.betterjr.modules.rule.service.RuleServiceDubboFilterInvoker;
@@ -19,12 +19,14 @@ public class NoticeDubboService implements INoticeService {
 
     @Override
     public String webQueryUnreadNotice(Map<String, Object> anParam, int anFlag, int anPageNum, int anPageSize) {
-        return AjaxObject.newOkWithPage("未读公告列表-查询成功", noticeService.queryUnreadNotice(anParam, anFlag, anPageNum, anPageSize)).toJson();
+        final Map<String, Object> param = RuleServiceDubboFilterInvoker.getInputObj();
+        return AjaxObject.newOkWithPage("未读公告列表-查询成功", noticeService.queryUnreadNotice(param, anFlag, anPageNum, anPageSize)).toJson();
     }
 
     @Override
     public String webQueryReadNotice(Map<String, Object> anParam, int anFlag, int anPageNum, int anPageSize) {
-        return AjaxObject.newOkWithPage("已读公告列表-查询成功", noticeService.queryReadNotice(anParam, anFlag, anPageNum, anPageSize)).toJson();
+        final Map<String, Object> param = RuleServiceDubboFilterInvoker.getInputObj();
+        return AjaxObject.newOkWithPage("已读公告列表-查询成功", noticeService.queryReadNotice(param, anFlag, anPageNum, anPageSize)).toJson();
     }
 
     @Override

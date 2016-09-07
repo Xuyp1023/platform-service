@@ -10,8 +10,12 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
+import com.alibaba.rocketmq.client.producer.SendResult;
+import com.alibaba.rocketmq.client.producer.SendStatus;
 import com.betterjr.common.data.NotificationAttachment;
-import com.betterjr.common.notification.NotificationConstants;
+import com.betterjr.common.mq.codec.MQCodecType;
+import com.betterjr.common.mq.core.RocketMQProducer;
+import com.betterjr.common.mq.message.MQMessage;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.Collections3;
@@ -22,18 +26,23 @@ import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.betterjr.modules.document.entity.CustFileItem;
 import com.betterjr.modules.document.service.CustFileItemService;
+import com.betterjr.modules.notification.NotificationModel;
+import com.betterjr.modules.notification.constants.NotificationConstants;
 import com.betterjr.modules.notification.dao.NotificationMapper;
 import com.betterjr.modules.notification.entity.Notification;
 import com.betterjr.modules.notification.entity.NotificationCustomer;
 
 @Service
 public class NotificationService extends BaseService<NotificationMapper, Notification> {
-    
+
     @Resource
     private CustFileItemService fileItemService;
-    
+
     @Resource
     private NotificationCustomerService notificationCustomerService;
+
+    @Resource(name = "betterProducer")
+    private RocketMQProducer betterProducer;
 
     /**
      * 添加
@@ -107,22 +116,22 @@ public class NotificationService extends BaseService<NotificationMapper, Notific
     private NotificationCustomer checkNotificationCustomer(Long anId, Long anOperId) {
         BTAssert.notNull(anId, "编号不允许为空!");
         BTAssert.notNull(anOperId, "操作员编号不允许为空!");
-        
+
         final NotificationCustomer notificationCustomer = notificationCustomerService.findNotifiCustomerByNotifiIdAndOperId(anId, anOperId);
         BTAssert.notNull(notificationCustomer, "没有找到相应的站内消息接收记录!");
         return notificationCustomer;
     }
-    
+
     /**
      * 
      */
     public List<Notification> queryUnsendSmsNotification() {
         Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("channel", NotificationConstants.CHANNEL_SMS);
-        conditionMap.put("businStatus", new String[]{NotificationConstants.SEND_STATUS_FAIL, NotificationConstants.SEND_STATUS_NORMAL});
+        conditionMap.put("businStatus", new String[] { NotificationConstants.SEND_STATUS_FAIL, NotificationConstants.SEND_STATUS_NORMAL });
         return this.selectPropertyByPage(conditionMap, 1, 50, false);
     }
-    
+
     /**
      * 
      * @param anId
@@ -139,7 +148,7 @@ public class NotificationService extends BaseService<NotificationMapper, Notific
     }
 
     /**
-     * 组织附件 
+     * 组织附件
      */
     public List<NotificationAttachment> buildAttachments(Long anBatchNo) {
         List<CustFileItem> fileItems = fileItemService.findCustFiles(anBatchNo);
@@ -153,5 +162,29 @@ public class NotificationService extends BaseService<NotificationMapper, Notific
             return attachments;
         }
         return null;
+    }
+
+    /**
+     * 发送消息通知 NotificationModel
+     */
+    public boolean sendNotifition(NotificationModel anNotificationModel) {
+        final MQMessage message = new MQMessage(NotificationConstants.NOTIFICATION_TOPIC, MQCodecType.FST);
+        message.setObject(anNotificationModel);
+
+        try {
+            final SendResult sendResult = betterProducer.sendMessage(message);
+
+            if (sendResult.getSendStatus().equals(SendStatus.SEND_OK)) {
+                return true;
+            }
+            else {
+                logger.warn("消息通知发送失败 SendResult=" + sendResult.toString());
+                return false;
+            }
+        }
+        catch (Exception e) {
+            logger.error("消息通知发送错误", e);
+            return false;
+        }
     }
 }

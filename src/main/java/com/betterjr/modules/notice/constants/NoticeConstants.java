@@ -1,4 +1,4 @@
-package com.betterjr.modules.notice.constant;
+package com.betterjr.modules.notice.constants;
 
 public interface NoticeConstants {
     String NOTICE_STATUS_STORED = "0";

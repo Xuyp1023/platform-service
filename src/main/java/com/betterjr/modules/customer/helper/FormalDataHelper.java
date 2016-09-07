@@ -1,7 +1,7 @@
 package com.betterjr.modules.customer.helper;
 
 import com.betterjr.common.service.SpringContextHolder;
-import com.betterjr.modules.customer.constant.CustomerConstants;
+import com.betterjr.modules.customer.constants.CustomerConstants;
 import com.betterjr.modules.customer.entity.CustChangeApply;
 import com.betterjr.modules.customer.entity.CustInsteadRecord;
 import com.betterjr.modules.customer.service.CustMechBankAccountTmpService;

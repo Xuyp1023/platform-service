@@ -26,7 +26,4 @@
 		<constructor-arg index="4" value="${mail.password}" />
 	</bean>
 
-	<bean class="com.betterjr.common.service.NotificationService">
-		<constructor-arg index="0" ref="betterProducer" />
-	</bean>
 </beans>

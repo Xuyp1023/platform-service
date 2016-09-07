@@ -1,4 +1,4 @@
-package com.betterjr.modules.customer.constant;
+package com.betterjr.modules.customer.constants;
 
 public interface CustomerConstants {
     // 状态
