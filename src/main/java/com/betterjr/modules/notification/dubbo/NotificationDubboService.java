@@ -10,7 +10,6 @@ import javax.annotation.Resource;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.betterjr.modules.notification.INotificationService;
 import com.betterjr.modules.notification.NotificationModel;
-import com.betterjr.modules.notification.WechatModel;
 import com.betterjr.modules.notification.service.NotificationService;
 
 @Service(interfaceClass = INotificationService.class)
@@ -47,10 +46,4 @@ public class NotificationDubboService implements INotificationService {
     public boolean sendNotification(NotificationModel anNotificationModel) {
         return notificationService.sendNotifition(anNotificationModel);
     }
-
-    @Override
-    public boolean sendWechat(WechatModel anWechatModel) {
-        return Boolean.FALSE;
-    }
-    
 }
