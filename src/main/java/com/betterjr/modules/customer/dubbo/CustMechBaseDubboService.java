@@ -46,11 +46,37 @@ public class CustMechBaseDubboService implements ICustMechBaseService {
     private CustChangeService changeService;
 
     @Override
+    public String webCheckOrgType(String anRole) {
+        boolean flag = false;
+        switch (anRole.trim()) {
+        case "FACTOR_USER":
+            flag = UserUtils.factorUser();
+            break;
+        case "SELLER_USER":
+            flag = UserUtils.sellerUser();
+            break;
+        case "CORE_USER":
+            flag = UserUtils.coreUser();
+            break;
+        case "SUPPLIER_USER":
+            flag = UserUtils.supplierUser();
+            break;
+        case "PLATFORM_USER":
+            flag = UserUtils.platformUser();
+            break;
+        default:
+            return AjaxObject.newError("检查机构类型错误").toJson();
+        }
+
+        return AjaxObject.newOk("检查机构类型成功", flag).toJson();
+    }
+
+    @Override
     public String webQueryCustInfo() {
         Collection<CustInfo> custInfos = baseService.queryCustInfo();
         return AjaxObject.newOk("查询操作员所有的公司列表成功", custInfos).toJson();
     }
-    
+
     @Override
     public String webQueryCustInfoSelect() {
         Collection<SimpleDataEntity> custInfos = baseService.queryCustInfoSelect();
@@ -66,17 +92,17 @@ public class CustMechBaseDubboService implements ICustMechBaseService {
     @Override
     public String webFindChangeApply(Long anId) {
         final CustChangeApply changeApply = changeService.findChangeApply(anId, CustomerConstants.ITEM_BASE);
-        // 通过changeApply找到 
+        // 通过changeApply找到
         final Long tmpId = Long.valueOf(changeApply.getTmpIds());
-        
+
         final CustMechBaseTmp nowData = baseTmpService.findCustMechBaseTmp(tmpId);
         final CustMechBaseTmp befData = baseTmpService.findCustMechBaseTmpPrevVersion(nowData);
-        
+
         ChangeDetailBean<CustMechBaseTmp> changeDetailBean = new ChangeDetailBean<>();
         changeDetailBean.setChangeApply(changeApply);
         changeDetailBean.setNowData(nowData);
         changeDetailBean.setBefData(befData);
-        
+
         return AjaxObject.newOk("公司基本信息-变更详情查询 成功", changeDetailBean).toJson();
     }
 
