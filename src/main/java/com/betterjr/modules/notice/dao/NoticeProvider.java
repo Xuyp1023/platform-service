@@ -32,13 +32,16 @@ public class NoticeProvider {
         Map<String, Object> param = (Map<String, Object>) anParam.get("param");
         Optional<Object> custNo = Optional.ofNullable(param.get("custNo"));
         custNo.ifPresent(data -> {
-            sql.append(" AND snc.L_CUSTNO = ");
-            sql.append(data);
-            sql.append(" ");
+            final String tempCustNo = String.valueOf(data);
+            if (BetterStringUtils.isBlank(tempCustNo) == false) {
+                sql.append(" AND snc.L_CUSTNO = ");
+                sql.append(tempCustNo);
+                sql.append(" ");
+            }
         });
         Optional<Object> LIKEsubject = Optional.ofNullable(param.get("LIKEsubject"));
         LIKEsubject.ifPresent(data -> {
-            final String subject = (String)data;
+            final String subject = String.valueOf(data);
             if (BetterStringUtils.isBlank(subject) == false) {
                 sql.append(" AND sn.C_SUBJECT LIKE '%");
                 sql.append(subject);
@@ -47,15 +50,21 @@ public class NoticeProvider {
         });
         Optional<Object> GTEpublishDate = Optional.ofNullable(param.get("GTEpublishDate"));
         GTEpublishDate.ifPresent(data -> {
-            sql.append(" AND sn.D_PUBLISH_DATE >= ");
-            sql.append(data);
-            sql.append(" ");
+            final String publishDate = String.valueOf(data);
+            if (BetterStringUtils.isBlank(publishDate) == false) {
+                sql.append(" AND sn.D_PUBLISH_DATE >= ");
+                sql.append(publishDate);
+                sql.append(" ");
+            }
         });
         Optional<Object> LTEpublishDate = Optional.ofNullable(param.get("LTEpublishDate"));
         LTEpublishDate.ifPresent(data -> {
-            sql.append(" AND sn.D_PUBLISH_DATE <= ");
-            sql.append(data);
-            sql.append(" ");
+            final String publishDate = String.valueOf(data);
+            if (BetterStringUtils.isBlank(publishDate) == false) {
+                sql.append(" AND sn.D_PUBLISH_DATE <= ");
+                sql.append(publishDate);
+                sql.append(" ");
+            }
         });
         return sql.toString();
     }
@@ -75,13 +84,16 @@ public class NoticeProvider {
         Map<String, Object> param = (Map<String, Object>) anParam.get("param");
         Optional<Object> custNo = Optional.ofNullable(param.get("custNo"));
         custNo.ifPresent(data -> {
-            sql.append(" AND snc.L_CUSTNO = ");
-            sql.append(data);
-            sql.append(" ");
+            final String tempCustNo = String.valueOf(data);
+            if (BetterStringUtils.isBlank(tempCustNo) == false) {
+                sql.append(" AND snc.L_CUSTNO = ");
+                sql.append(tempCustNo);
+                sql.append(" ");
+            }
         });
         Optional<Object> LIKEsubject = Optional.ofNullable(param.get("LIKEsubject"));
         LIKEsubject.ifPresent(data -> {
-            final String subject = (String)data;
+            final String subject = String.valueOf(data);
             if (BetterStringUtils.isBlank(subject) == false) {
                 sql.append(" AND sn.C_SUBJECT LIKE '%");
                 sql.append(subject);
@@ -90,15 +102,21 @@ public class NoticeProvider {
         });
         Optional<Object> GTEpublishDate = Optional.ofNullable(param.get("GTEpublishDate"));
         GTEpublishDate.ifPresent(data -> {
-            sql.append(" AND sn.D_PUBLISH_DATE >= ");
-            sql.append(data);
-            sql.append(" ");
+            final String publishDate = String.valueOf(data);
+            if (BetterStringUtils.isBlank(publishDate) == false) {
+                sql.append(" AND sn.D_PUBLISH_DATE >= ");
+                sql.append(publishDate);
+                sql.append(" ");
+            }
         });
         Optional<Object> LTEpublishDate = Optional.ofNullable(param.get("LTEpublishDate"));
         LTEpublishDate.ifPresent(data -> {
-            sql.append(" AND sn.D_PUBLISH_DATE <= ");
-            sql.append(data);
-            sql.append(" ");
+            final String publishDate = String.valueOf(data);
+            if (BetterStringUtils.isBlank(publishDate) == false) {
+                sql.append(" AND sn.D_PUBLISH_DATE <= ");
+                sql.append(publishDate);
+                sql.append(" ");
+            }
         });
         return sql.toString();
     }
