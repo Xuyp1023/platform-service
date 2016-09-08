@@ -1,6 +1,7 @@
 package com.betterjr.modules.notice.service;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -60,7 +61,6 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
 
         PageHelper.startPage(anPageNum, anPageSize, anFlag == 1);
         final Page<Notice> notices = this.mapper.selectUnreadNotice(operator.getId(), anParam);
-        notices.stream().forEach(notice -> notice.setContent(""));
         return notices;
     }
 
@@ -72,7 +72,6 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
 
         PageHelper.startPage(anPageNum, anPageSize, anFlag == 1);
         final Page<Notice> notices = this.mapper.selectReadNotice(operator.getId(), anParam);
-        notices.stream().forEach(notice -> notice.setContent(""));
         return notices;
     }
 
@@ -91,17 +90,40 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
         BTAssert.notNull(anId, "公告编号不允许为空!");
 
         final CustOperatorInfo operator = UserUtils.getOperatorInfo();
+        
+        final Notice notice = this.selectByPrimaryKey(anId);
+        BTAssert.notNull(notice, "没有找到相应公告！");
+        
+        // 校验是否是自己拥有的公司发布
+        if (checkOwnCust(operator, notice) == true) {
+            return notice;
+        }
 
         // 校验是否有权限读
         Long receiveCount = this.mapper.selectCountReceiveNotice(operator.getId(), anId);
 
         if (receiveCount > 0) {
-            Notice notice = this.selectByPrimaryKey(anId);
-
             return notice;
         }
 
         throw new BytterTradeException("公告详情查询错误!");
+    }
+
+    /**
+     * @param anOperator
+     * @param anNotice
+     * @return
+     */
+    private boolean checkOwnCust(CustOperatorInfo anOperator, Notice anNotice) {
+        Collection<CustInfo> custInfos = accountService.findCustInfoByOperator(anOperator.getId(), anOperator.getOperOrg());
+        
+        Long noticeCustNo = anNotice.getCustNo();
+        for (CustInfo custInfo: custInfos) {
+            if (noticeCustNo.equals(custInfo.getCustNo())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -146,7 +168,7 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
         anNotice.setTargetCust(anTargetCust);
         anNotice.setPublishDate(BetterDateUtils.getNumDate());
         anNotice.setPublishTime(BetterDateUtils.getNumTime());
-        fileItemService.updateCustFileItemInfo(anFileList, anNotice.getBatchNo());
+        anNotice.setBatchNo(fileItemService.updateCustFileItemInfo(anFileList, anNotice.getBatchNo()));
 
         this.insert(anNotice);
         noticeCustomerService.saveNoticeCustomer(anNotice, targetCusts);
@@ -158,7 +180,7 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
                 
         if (BetterStringUtils.isBlank(anTargetCust) == true) {
             // 取所有接口
-            if (UserUtils.coreUser() == true) { // 平台面向所有客户发送公告
+            if (UserUtils.platformUser() == true) { // 平台面向所有客户发送公告
                 List<String> custNoList = accountService.queryAllCustInfo().stream().map(custInfo -> String.valueOf(custInfo.getCustNo()))
                         .collect(Collectors.toList());
                 targetCusts = custNoList.toArray(new String[custNoList.size()]);
@@ -170,7 +192,7 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
             }
         }
         else {
-            if (UserUtils.coreUser() == true) { // 平台面向指定类型客户发送公告
+            if (UserUtils.platformUser() == true) { // 平台面向指定类型客户发送公告
                 String[] roles = BetterStringUtils.split(anTargetCust, DELIMITER_COMMA);
                 Set<String> operOrgSet = custCertService.queryOperOrgByRoles(roles);
                 List<String> custNoList = accountService.queryCustInfoByOperOrgSet(operOrgSet).stream()
@@ -209,7 +231,7 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
             throw new BytterTradeException("本条公告已经发布,不允许修改!");
         }
 
-        fileItemService.updateCustFileItemInfo(anFileList, anNotice.getBatchNo());
+        tempNotice.setBatchNo(fileItemService.updateCustFileItemInfo(anFileList, anNotice.getBatchNo()));
         tempNotice.initModifyValue(anNotice, anBusinStatus);
         tempNotice.setTargetCust(anTargetCust);
         this.updateByPrimaryKeySelective(tempNotice);

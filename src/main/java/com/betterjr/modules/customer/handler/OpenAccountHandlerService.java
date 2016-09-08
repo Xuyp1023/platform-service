@@ -19,6 +19,7 @@ import com.betterjr.modules.customer.entity.CustOpenAccountTmp;
 import com.betterjr.modules.notification.INotificationService;
 import com.betterjr.modules.notification.NotificationModel;
 import com.betterjr.modules.notification.NotificationModel.Builder;
+import com.betterjr.modules.notification.service.NotificationService;
 
 @Service
 public class OpenAccountHandlerService {
@@ -27,8 +28,8 @@ public class OpenAccountHandlerService {
     @Resource
     public CustAccountService accountService;
 
-    @Reference(interfaceClass = INotificationService.class)
-    public INotificationService notificationService;
+    @Resource
+    public NotificationService notificationService;
 
     /**
      * 开户消息

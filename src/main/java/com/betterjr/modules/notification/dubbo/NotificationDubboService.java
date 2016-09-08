@@ -44,6 +44,6 @@ public class NotificationDubboService implements INotificationService {
 
     @Override
     public boolean sendNotification(NotificationModel anNotificationModel) {
-        return notificationService.sendNotifition(anNotificationModel);
+        return notificationService.sendNotification(anNotificationModel);
     }
 }

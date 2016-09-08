@@ -22,13 +22,17 @@ public interface NoticeMapper extends Mapper<Notice> {
     @ResultType(Notice.class)
     public Page<Notice> selectReadNotice(@Param("operId") Long operId, @Param("param") Map<String, Object> param);
 
-    @Select("SELECT COUNT(sn.ID) " + "FROM t_sys_notice sn " + "LEFT JOIN t_sys_notice_cust snc ON sn.ID = snc.L_NOTICE_ID  "
+    @Select("SELECT COUNT(sn.ID) " 
+            + "FROM t_sys_notice sn " 
+            + "LEFT JOIN t_sys_notice_cust snc ON sn.ID = snc.L_NOTICE_ID  "
             + "LEFT JOIN t_sys_notice_oper sno ON sn.ID = sno.L_NOTICE_ID AND (sno.L_OPERID = #{operId} AND sno.L_CUSTNO = snc.L_CUSTNO) "
             + "WHERE sn.C_BUSIN_STATUS = '1' AND EXISTS (SELECT cor.* FROM t_cust_operator_relation cor WHERE cor.L_OPERNO = #{operId} AND snc.L_CUSTNO = cor.L_CUSTNO) AND sno.ID IS NULL")
     @ResultType(Long.class)
     public Long selectCountUnreadNotice(@Param("operId") Long operId);
 
-    @Select("SELECT COUNT(sn.ID) " + "FROM t_sys_notice sn " + "LEFT JOIN t_sys_notice_cust snc ON sn.ID = snc.L_NOTICE_ID "
+    @Select("SELECT COUNT(sn.ID) " 
+            + "FROM t_sys_notice sn " 
+            + "LEFT JOIN t_sys_notice_cust snc ON sn.ID = snc.L_NOTICE_ID "
             + "WHERE sn.C_BUSIN_STATUS = '1' AND EXISTS (SELECT cor.* FROM t_cust_operator_relation cor WHERE cor.L_OPERNO = #{operId} AND snc.L_CUSTNO = cor.L_CUSTNO) AND sn.ID = #{noticeId}")
     @ResultType(Long.class)
     public Long selectCountReceiveNotice(@Param("operId") Long operId, @Param("noticeId") Long noticeId);

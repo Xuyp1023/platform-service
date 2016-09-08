@@ -52,7 +52,7 @@ public class NotificationServiceTest extends BasicServiceTest<NotificationServic
         NotificationModel notificationModel = builder.build();
         
 //        for (long i = 0; i <  1000000L; i++)
-        sendService.sendNotifition(notificationModel);
+        sendService.sendNotification(notificationModel);
         
         pauseThread();
     }

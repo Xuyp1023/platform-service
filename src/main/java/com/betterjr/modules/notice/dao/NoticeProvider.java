@@ -24,7 +24,7 @@ public class NoticeProvider {
      */
     @SuppressWarnings("unchecked")
     public String selectUnreadNoticeSql(final Map<String, Object> anParam) {
-        final StringBuilder sql = new StringBuilder("SELECT sn.ID as id, sn.C_SUBJECT as subject, sn.D_PUBLISH_DATE as publishDate, sn.T_PUBLISH_TIME as publishTime, sn.L_CUSTNO as custNo, sn.C_CUSTNAME as custName, snc.L_CUSTNO as receiveCustNo, snc.C_CUSTNAME as receiveCustName, snc.L_CUSTNO AS receiveCustNo, snc.C_CUSTNAME AS receiveCustName ");
+        final StringBuilder sql = new StringBuilder("SELECT sn.ID as id, sn.C_SUBJECT as subject, sn.D_PUBLISH_DATE as publishDate, sn.T_PUBLISH_TIME as publishTime, sn.L_CUSTNO as custNo, sn.C_CUSTNAME as custName, snc.L_CUSTNO as receiveCustNo, snc.C_CUSTNAME as receiveCustName ");
         sql.append("FROM t_sys_notice sn ");
         sql.append("LEFT JOIN t_sys_notice_cust snc ON sn.ID = snc.L_NOTICE_ID ");
         sql.append("LEFT JOIN t_sys_notice_oper sno ON sn.ID = sno.L_NOTICE_ID AND (sno.L_OPERID = #{operId} AND sno.L_CUSTNO = snc.L_CUSTNO) ");
@@ -67,7 +67,7 @@ public class NoticeProvider {
      */
     @SuppressWarnings("unchecked")
     public String selectReadNoticeSql(final Map<String, Object> anParam) {
-        final StringBuilder sql = new StringBuilder("SELECT sn.ID as id, sn.C_SUBJECT as subject, sn.D_PUBLISH_DATE as publishDate, sn.T_PUBLISH_TIME as publishTime, sn.L_CUSTNO as custNo, sn.C_CUSTNAME as custName, snc.L_CUSTNO as receiveCustNo, snc.C_CUSTNAME as receiveCustName, snc.L_CUSTNO AS receiveCustNo, snc.C_CUSTNAME AS receiveCustName ");
+        final StringBuilder sql = new StringBuilder("SELECT sn.ID as id, sn.C_SUBJECT as subject, sn.D_PUBLISH_DATE as publishDate, sn.T_PUBLISH_TIME as publishTime, sn.L_CUSTNO as custNo, sn.C_CUSTNAME as custName, snc.L_CUSTNO as receiveCustNo, snc.C_CUSTNAME as receiveCustName ");
         sql.append("FROM t_sys_notice sn ");
         sql.append("LEFT JOIN t_sys_notice_cust snc ON sn.ID = snc.L_NOTICE_ID ");
         sql.append("LEFT JOIN t_sys_notice_oper sno ON sn.ID = sno.L_NOTICE_ID AND (sno.L_OPERID = #{operId} AND sno.L_CUSTNO = snc.L_CUSTNO) ");

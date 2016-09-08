@@ -167,7 +167,7 @@ public class NotificationService extends BaseService<NotificationMapper, Notific
     /**
      * 发送消息通知 NotificationModel
      */
-    public boolean sendNotifition(NotificationModel anNotificationModel) {
+    public boolean sendNotification(NotificationModel anNotificationModel) {
         final MQMessage message = new MQMessage(NotificationConstants.NOTIFICATION_TOPIC, MQCodecType.FST);
         message.setObject(anNotificationModel);
 
