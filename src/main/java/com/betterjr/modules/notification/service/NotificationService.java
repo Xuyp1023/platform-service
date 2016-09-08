@@ -63,7 +63,7 @@ public class NotificationService extends BaseService<NotificationMapper, Notific
         CustOperatorInfo operator = UserUtils.getOperatorInfo();
 
         PageHelper.startPage(anPageNum, anPageSize, anFlag == 1);
-        return this.mapper.selectNotificationByCondition(operator.getId(), NotificationConstants.IS_READ_FALSE);
+        return this.mapper.selectNotificationByCondition(operator.getId(), NotificationConstants.IS_READ_FALSE, anParam);
     }
 
     /**
@@ -73,7 +73,7 @@ public class NotificationService extends BaseService<NotificationMapper, Notific
         CustOperatorInfo operator = UserUtils.getOperatorInfo();
 
         PageHelper.startPage(anPageNum, anPageSize, anFlag == 1);
-        return this.mapper.selectNotificationByCondition(operator.getId(), NotificationConstants.IS_READ_TRUE);
+        return this.mapper.selectNotificationByCondition(operator.getId(), NotificationConstants.IS_READ_TRUE, anParam);
     }
 
     /**

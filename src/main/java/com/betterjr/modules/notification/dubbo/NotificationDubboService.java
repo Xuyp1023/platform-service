@@ -11,6 +11,7 @@ import com.alibaba.dubbo.config.annotation.Service;
 import com.betterjr.modules.notification.INotificationService;
 import com.betterjr.modules.notification.NotificationModel;
 import com.betterjr.modules.notification.service.NotificationService;
+import com.betterjr.modules.rule.service.RuleServiceDubboFilterInvoker;
 
 @Service(interfaceClass = INotificationService.class)
 public class NotificationDubboService implements INotificationService {
@@ -19,12 +20,14 @@ public class NotificationDubboService implements INotificationService {
 
     @Override
     public String webQueryUnreadNotification(Map<String, Object> anParam, int anFlag, int anPageNum, int anPageSize) {
-        return newOkWithPage("未读消息-列表查询 成功", notificationService.queryUnreadNotification(anParam, anFlag, anPageNum, anPageSize)).toJson();
+        final Map<String, Object> param = RuleServiceDubboFilterInvoker.getInputObj();
+        return newOkWithPage("未读消息-列表查询 成功", notificationService.queryUnreadNotification(param, anFlag, anPageNum, anPageSize)).toJson();
     }
 
     @Override
     public String webQueryReadNotification(Map<String, Object> anParam, int anFlag, int anPageNum, int anPageSize) {
-        return newOkWithPage("已读消息-列表查询 成功", notificationService.queryReadNotification(anParam, anFlag, anPageNum, anPageSize)).toJson();
+        final Map<String, Object> param = RuleServiceDubboFilterInvoker.getInputObj();
+        return newOkWithPage("已读消息-列表查询 成功", notificationService.queryReadNotification(param, anFlag, anPageNum, anPageSize)).toJson();
     }
 
     @Override

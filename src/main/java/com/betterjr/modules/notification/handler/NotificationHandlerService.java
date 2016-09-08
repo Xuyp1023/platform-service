@@ -302,9 +302,7 @@ public class NotificationHandlerService {
     private String resolveTemplateContent(String anTemplateContent, List<NotificationProfileVariable> anProfileVariables, Map<String, Object> anParam)
             throws UnsupportedEncodingException {
 
-        String decodeStr = Base64Coder.decodeString(anTemplateContent);
-        String originStr = URLDecoder.decode(decodeStr, "UTF-8");
-        final String templateContent = preproccessTemplateContent(originStr, anProfileVariables);
+        final String templateContent = preproccessTemplateContent(anTemplateContent, anProfileVariables);
 
         StringBuffer sb = freemarkerService.processTemplateByContents(templateContent, anParam);
         return sb.toString();
