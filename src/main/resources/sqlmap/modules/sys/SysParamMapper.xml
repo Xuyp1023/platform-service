@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.betterjr.modules.sys.dao.SysParamMapper">
+  <resultMap id="BaseResultMap" type="com.betterjr.modules.sys.entity.SysParam">
+    <!--
+      WARNING - @mbggenerated
+    -->
+    <id column="ID" jdbcType="INTEGER" property="id" />
+    <result column="C_NAME" jdbcType="VARCHAR" property="name" />
+    <result column="C_DISPLAY_NAME" jdbcType="VARCHAR" property="displayName" />
+    <result column="C_TYPE" jdbcType="CHAR" property="type" />
+    <result column="L_CUSTNO" jdbcType="INTEGER" property="custNo" />
+    <result column="C_CUSTNAME" jdbcType="VARCHAR" property="custName" />
+    <result column="L_OPERID" jdbcType="INTEGER" property="operId" />
+    <result column="L_OPERNAME" jdbcType="VARCHAR" property="operName" />
+    <result column="C_DESCRIPTION" jdbcType="VARCHAR" property="cDescription" />
+    <result column="L_REG_OPERID" jdbcType="INTEGER" property="regOperId" />
+    <result column="C_REG_OPERNAME" jdbcType="VARCHAR" property="regOperName" />
+    <result column="D_REG_DATE" jdbcType="VARCHAR" property="regDate" />
+    <result column="T_REG_TIME" jdbcType="VARCHAR" property="regTime" />
+    <result column="C_MODI_OPERNAME" jdbcType="VARCHAR" property="modiOperName" />
+    <result column="L_MODI_OPERID" jdbcType="INTEGER" property="modiOperId" />
+    <result column="D_MODI_DATE" jdbcType="VARCHAR" property="modifyDate" />
+    <result column="T_MODI_TIME" jdbcType="VARCHAR" property="modifyTime" />
+    <result column="C_OPERORG" jdbcType="VARCHAR" property="operOrg" />
+    <result column="C_BUSIN_STATUS" jdbcType="CHAR" property="businStatus" />
+    <result column="C_LAST_STATUS" jdbcType="CHAR" property="lastStatus" />
+  </resultMap>
+</mapper>

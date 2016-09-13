@@ -427,7 +427,6 @@ public class NotificationChannelProfile implements BetterjrEntity {
         //
         this.lastStatus = this.businStatus;
         this.businStatus = anChannelProfile.getBusinStatus();
-//        this.subject = anChannelProfile.getSubject();
 //        this.content = anChannelProfile.getContent();
 //        this.reference = anChannelProfile.getReference();
     }

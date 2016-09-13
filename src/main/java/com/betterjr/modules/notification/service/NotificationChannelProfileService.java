@@ -19,6 +19,8 @@ import com.betterjr.modules.notification.entity.NotificationChannelProfile;
 
 @Service
 public class NotificationChannelProfileService extends BaseService<NotificationChannelProfileMapper, NotificationChannelProfile> {
+    private static final String UTF_8 = "UTF-8";
+    
     @Resource
     private NotificationProfileVariableService profileVariableService;
     
@@ -41,12 +43,23 @@ public class NotificationChannelProfileService extends BaseService<NotificationC
         NotificationChannelProfile tempChannelProfile = this.selectByPrimaryKey(anChannelProfileId);
         BTAssert.notNull(tempChannelProfile, "没有找到相应的模板!");
         
+        // 修改状态
         tempChannelProfile.initModifyValue(anChannelProfile);
         
         try {
-            tempChannelProfile.setSubject(resolveContent(anChannelProfile.getSubject()));
-            tempChannelProfile.setContent(resolveContent(anChannelProfile.getContent()));
-            tempChannelProfile.setReference(resolveContent(anChannelProfile.getReference()));
+            // 发送通道类型:0站内消息，1电子邮   修改主题，内容
+            // 2短信    修改内容
+            // 3微信    
+            switch (tempChannelProfile.getChannel()) {
+            case "0":
+            case "1":
+                tempChannelProfile.setSubject(anChannelProfile.getSubject());
+                tempChannelProfile.setContent(resolveContent(anChannelProfile.getContent()));
+                break;
+            case "2":
+                tempChannelProfile.setContent(resolveContent(anChannelProfile.getContent()));
+                break;
+            }
         }
         catch (UnsupportedEncodingException e) {
             throw new BytterTradeException("模板编码解析错误！");
@@ -63,7 +76,7 @@ public class NotificationChannelProfileService extends BaseService<NotificationC
      */
     private String resolveContent(String anContent) throws UnsupportedEncodingException {
         final String decodeStr = Base64Coder.decodeString(anContent);
-        final String originStr = URLDecoder.decode(decodeStr, "UTF-8");
+        final String originStr = URLDecoder.decode(decodeStr, UTF_8);
         return originStr;
     }
 

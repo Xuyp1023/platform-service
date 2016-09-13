@@ -46,9 +46,9 @@ public class NotificationEmailHandlerService {
 
         MimeMessage mimeMessage = MailUtils.createMessage(session, notification.getSubject(), notification.getContent(), attachments);
 
-        List<NotificationCustomer> notifiCustomers = notificationCustomerService.queryNotifiCustomerByNotifiId(notification.getId());
+        List<NotificationCustomer> notificationCustomers = notificationCustomerService.queryNotifiCustomerByNotifiId(notification.getId());
 
-        notifiCustomers.forEach(notificationCustomer -> {
+        notificationCustomers.forEach(notificationCustomer -> {
             sendMail(session, mimeMessage, notificationCustomer);
         });
 

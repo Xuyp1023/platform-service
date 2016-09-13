@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.betterjr.modules.sys.dao.SysParamItemMapper">
+  <resultMap id="BaseResultMap" type="com.betterjr.modules.sys.entity.SysParamItem">
+    <!--
+      WARNING - @mbggenerated
+    -->
+    <id column="ID" jdbcType="INTEGER" property="id" />
+    <result column="L_PARAM_ID" jdbcType="INTEGER" property="paramId" />
+    <result column="C_KEY" jdbcType="VARCHAR" property="key" />
+    <result column="C_VALUE1" jdbcType="VARCHAR" property="value1" />
+    <result column="C_VALUE2" jdbcType="VARCHAR" property="value2" />
+    <result column="C_VALUE3" jdbcType="VARCHAR" property="value3" />
+    <result column="C_VALUE4" jdbcType="VARCHAR" property="value4" />
+    <result column="C_VALUE5" jdbcType="VARCHAR" property="value5" />
+    <result column="C_VALUE6" jdbcType="VARCHAR" property="value6" />
+    <result column="C_VALUE7" jdbcType="VARCHAR" property="value7" />
+    <result column="C_VALUE8" jdbcType="VARCHAR" property="value8" />
+    <result column="C_VALUE9" jdbcType="VARCHAR" property="value9" />
+    <result column="L_REG_OPERID" jdbcType="INTEGER" property="regOperId" />
+    <result column="C_REG_OPERNAME" jdbcType="VARCHAR" property="regOperName" />
+    <result column="D_REG_DATE" jdbcType="VARCHAR" property="regDate" />
+    <result column="T_REG_TIME" jdbcType="VARCHAR" property="regTime" />
+    <result column="L_MODI_OPERID" jdbcType="INTEGER" property="modiOperId" />
+    <result column="C_MODI_OPERNAME" jdbcType="VARCHAR" property="modiOperName" />
+    <result column="D_MODI_DATE" jdbcType="VARCHAR" property="modifyDate" />
+    <result column="T_MODI_TIME" jdbcType="VARCHAR" property="modifyTime" />
+    <result column="C_OPERORG" jdbcType="VARCHAR" property="operOrg" />
+    <result column="C_BUSIN_STATUS" jdbcType="CHAR" property="businStatus" />
+    <result column="C_LAST_STATUS" jdbcType="CHAR" property="lastStatus" />
+  </resultMap>
+</mapper>

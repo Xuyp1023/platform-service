@@ -11,7 +11,7 @@
 	default-lazy-init="true">
 
 	<description>Elastic-Job 配置 </description>
-	
+
 	<reg:zookeeper id="regCenter" server-lists="${elastic.job.serverLists}"
 		namespace="notification" base-sleep-time-milliseconds="${elastic.job.baseSleepTimeMilliseconds}"
 		max-sleep-time-milliseconds="${elastic.job.maxSleepTimeMilliseconds}"
@@ -26,10 +26,15 @@
 		class="com.betterjr.modules.notification.job.NotificationEmailJob"
 		registry-center-ref="regCenter" cron="0 0/2 * * * ?"
 		sharding-total-count="1" sharding-item-parameters="0=A" />
-		
-	<bean class="com.betterjr.modules.notification.provider.SmsUtils" scope="singleton" lazy-init="false">
-        <constructor-arg index="0" value="${sms.spId}" />
-        <constructor-arg index="1" value="${sms.password}" />
-        <constructor-arg index="2" value="${sms.accessCode}" />
-    </bean>
+
+	<job:simple id="wechatJob" class="com.betterjr.modules.wechat.job.WechatJob"
+		registry-center-ref="regCenter" cron="0 0/5 * * * * ?"
+		sharding-total-count="1" sharding-item-parameters="0=A" />
+
+	<bean class="com.betterjr.modules.notification.provider.SmsUtils"
+		scope="singleton" lazy-init="false">
+		<constructor-arg index="0" value="${sms.spId}" />
+		<constructor-arg index="1" value="${sms.password}" />
+		<constructor-arg index="2" value="${sms.accessCode}" />
+	</bean>
 </beans>
