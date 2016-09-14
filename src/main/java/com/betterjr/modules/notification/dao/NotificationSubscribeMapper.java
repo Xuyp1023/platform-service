@@ -15,13 +15,13 @@ import com.betterjr.modules.notification.model.ProfileSubscribeModel;
 
 @BetterjrMapper
 public interface NotificationSubscribeMapper extends Mapper<NotificationSubscribe> {
-    
-    @Select("SELECT ID as id, C_PROFILE_NAME as profileName, L_CUSTNO as custNo, C_CUSTNAME as custName " + 
-            "FROM t_sys_notifi_profile snp " + 
-            "WHERE (snp.L_CUSTNO IN (" + 
-            "SELECT cr1.L_RELATE_CUSTNO FROM t_cust_relation cr1 WHERE cr1.L_CUSTNO = #{custNo} " + 
-            "UNION " + 
-            "SELECT cr2.L_CUSTNO FROM t_cust_relation cr2 WHERE cr2.L_RELATE_CUSTNO = #{custNo}" + 
+
+    @Select("SELECT ID as id, C_PROFILE_NAME as profileName, L_CUSTNO as custNo, C_CUSTNAME as custName " +
+            "FROM t_sys_notifi_profile snp " +
+            "WHERE (snp.L_CUSTNO IN (" +
+            "SELECT cr1.L_RELATE_CUSTNO FROM t_cust_relation cr1 WHERE cr1.L_CUSTNO = #{custNo} " +
+            "UNION " +
+            "SELECT cr2.L_CUSTNO FROM t_cust_relation cr2 WHERE cr2.L_RELATE_CUSTNO = #{custNo} " +
             ") OR snp.L_CUSTNO = 102202018) AND C_SUBSCRIBE_ENABLE = '1'")
     @ResultType(ProfileSubscribeModel.class)
     public Page<ProfileSubscribeModel> selectProfileSubscribe(@Param("custNo") Long custNo);

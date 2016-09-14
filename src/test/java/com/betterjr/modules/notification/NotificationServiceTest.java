@@ -16,9 +16,9 @@ import com.betterjr.modules.notification.service.NotificationService;
 import com.betterjr.modules.sys.entity.DictItemInfo;
 
 public class NotificationServiceTest extends BasicServiceTest<NotificationService> {
-    
+
     private CustOperatorInfo createCoreUser() {
-        CustOperatorInfo operatorInfo = new CustOperatorInfo();
+        final CustOperatorInfo operatorInfo = new CustOperatorInfo();
         operatorInfo.setId(1L);
         operatorInfo.setName("测试");
         operatorInfo.setOperCode("biet;Developer.Core.Enterprise");
@@ -27,20 +27,20 @@ public class NotificationServiceTest extends BasicServiceTest<NotificationServic
 
     @Test
     public void testSendNotificationModel() {
-        CustOperatorInfo operator = createCoreUser();
-        
-        List<DictItemInfo> anPlatformGroupDict = DictUtils.getDictList("PlatformGroup");
-        Long platformCustNo = Long.valueOf(anPlatformGroupDict.iterator().next().getItemValue());
-        CustAccountService accountService = getCtx().getBean(CustAccountService.class);
-        CustOperatorService operatorService = getCtx().getBean(CustOperatorService.class);
-        NotificationService sendService = getCtx().getBean(NotificationService.class);
+        final CustOperatorInfo operator = createCoreUser();
 
-        CustMechBase baseInfo = new CustMechBase();
+        final List<DictItemInfo> anPlatformGroupDict = DictUtils.getDictList("PlatformGroup");
+        final Long platformCustNo = Long.valueOf(anPlatformGroupDict.iterator().next().getItemValue());
+        final CustAccountService accountService = getCtx().getBean(CustAccountService.class);
+        final CustOperatorService operatorService = getCtx().getBean(CustOperatorService.class);
+        final NotificationService sendService = getCtx().getBean(NotificationService.class);
+
+        final CustMechBase baseInfo = new CustMechBase();
         baseInfo.setCustNo(100L);
         baseInfo.setEmail("vanlin@163.com");
         baseInfo.setCustName("亿起融金融服务有限责任公司");
-        
-        Builder builder = NotificationModel.newBuilder("开户成功通知", accountService.findCustInfo(platformCustNo), operatorService.findCustOperatorInfo(1260L));
+
+        final Builder builder = NotificationModel.newBuilder("开户成功通知", accountService.findCustInfo(platformCustNo), operatorService.findCustOperatorInfo(1260L));
         builder.addReceiveOperator(1258L);
         builder.addReceiveOperator(1259L);
         builder.addReceiveOperator(1260L);
@@ -49,27 +49,27 @@ public class NotificationServiceTest extends BasicServiceTest<NotificationServic
         builder.addReceiveEmail("liuwl@bytter.com");
         builder.addReceiveMobile("13808060501");
         builder.setEntity(baseInfo);
-        NotificationModel notificationModel = builder.build();
-        
-//        for (long i = 0; i <  1000000L; i++)
-        sendService.sendNotification(notificationModel);
-        
+        final NotificationModel notificationModel = builder.build();
+
+        //        for (long i = 0; i <  1000000L; i++)
+        //sendService.sendNotification(notificationModel);
+
         pauseThread();
     }
-    
+
     @Test
     public void testConsumerMessage() {
         createCoreUser();
-        
+
         pauseThread();
     }
-    
+
     private void pauseThread() {
-        CountDownLatch countDownLatch = new CountDownLatch(1);
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
         try {
             countDownLatch.await();
         }
-        catch (InterruptedException e) {
+        catch (final InterruptedException e) {
             e.printStackTrace();
         }
     }

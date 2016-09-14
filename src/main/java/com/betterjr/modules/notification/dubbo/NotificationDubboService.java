@@ -9,7 +9,6 @@ import javax.annotation.Resource;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import com.betterjr.modules.notification.INotificationService;
-import com.betterjr.modules.notification.NotificationModel;
 import com.betterjr.modules.notification.service.NotificationService;
 import com.betterjr.modules.rule.service.RuleServiceDubboFilterInvoker;
 
@@ -19,13 +18,13 @@ public class NotificationDubboService implements INotificationService {
     private NotificationService notificationService;
 
     @Override
-    public String webQueryUnreadNotification(Map<String, Object> anParam, int anFlag, int anPageNum, int anPageSize) {
+    public String webQueryUnreadNotification(final Map<String, Object> anParam, final int anFlag, final int anPageNum, final int anPageSize) {
         final Map<String, Object> param = RuleServiceDubboFilterInvoker.getInputObj();
         return newOkWithPage("未读消息-列表查询 成功", notificationService.queryUnreadNotification(param, anFlag, anPageNum, anPageSize)).toJson();
     }
 
     @Override
-    public String webQueryReadNotification(Map<String, Object> anParam, int anFlag, int anPageNum, int anPageSize) {
+    public String webQueryReadNotification(final Map<String, Object> anParam, final int anFlag, final int anPageNum, final int anPageSize) {
         final Map<String, Object> param = RuleServiceDubboFilterInvoker.getInputObj();
         return newOkWithPage("已读消息-列表查询 成功", notificationService.queryReadNotification(param, anFlag, anPageNum, anPageSize)).toJson();
     }
@@ -36,17 +35,13 @@ public class NotificationDubboService implements INotificationService {
     }
 
     @Override
-    public String webFindNotification(Long anId) {
+    public String webFindNotification(final Long anId) {
         return newOk("消息详情-查询 成功", notificationService.findNotification(anId)).toJson();
     }
 
     @Override
-    public String webSetReadNotificationStatus(Long anId) {
+    public String webSetReadNotificationStatus(final Long anId) {
         return newOk("消息设置已读状态 成功", notificationService.saveSetReadNotification(anId)).toJson();
     }
 
-    @Override
-    public boolean sendNotification(NotificationModel anNotificationModel) {
-        return notificationService.sendNotification(anNotificationModel);
-    }
 }

@@ -192,7 +192,7 @@
 		<aop:pointcut id="appService"
 			expression="execution(* com.betterjr..service.*Service.*(..)) 
 			or execution(* org.snaker.engine.core..*.*(..))
-			or execution(* org.betterjr..job.*Job.*(..))
+			or execution(* com.betterjr..job.*Job.*(..))
 			or execution(* com.betterjr..handler.*HandlerService.*(..))" />
 		<aop:advisor advice-ref="txAdvice" pointcut-ref="appService" />
 	</aop:config>
