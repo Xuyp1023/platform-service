@@ -26,16 +26,16 @@ import com.betterjr.modules.notification.model.ProfileSubscribeModel;
 
 @Service
 public class NotificationSubscribeService extends BaseService<NotificationSubscribeMapper, NotificationSubscribe> {
-    
+
     @Resource
     private NotificationProfileService profileService;
-    
+
     @Resource
     private NotificationChannelProfileService channelProfileService;
-    
+
     @Resource
     private CustAccountService accountService;
-    
+
     /**
      * 查询订阅列表
      * @param anCustNo
@@ -44,20 +44,20 @@ public class NotificationSubscribeService extends BaseService<NotificationSubscr
      * @param anPageSize
      * @return
      */
-    public Page<ProfileSubscribeModel> queryProfileSubscribe(Long anCustNo, int anFlag, int anPageNum, int anPageSize) {
+    public Page<ProfileSubscribeModel> queryProfileSubscribe(final Long anCustNo, final int anFlag, final int anPageNum, final int anPageSize) {
         BTAssert.notNull(anCustNo, "公司编号不允许为空!");
-        
+
         PageHelper.startPage(anPageNum, anPageSize, anFlag == 1);
-        Page<ProfileSubscribeModel> profileSubscribes = this.mapper.selectProfileSubscribe(anCustNo);
-        
-        Long operId = UserUtils.getOperatorInfo().getId();
-        
+        final Page<ProfileSubscribeModel> profileSubscribes = this.mapper.selectProfileSubscribe(anCustNo);
+
+        final Long operId = UserUtils.getOperatorInfo().getId();
+
         profileSubscribes.forEach(profileSubscribe -> {
             queryChannelSubscribe(operId, anCustNo, profileSubscribe.getCustNo(), profileSubscribe.getId());
         });
         return profileSubscribes;
     }
-    
+
     /**
      * 获取订阅通道
      * @param anOperId
@@ -66,70 +66,69 @@ public class NotificationSubscribeService extends BaseService<NotificationSubscr
      * @param anProfileId
      * @return
      */
-    private List<ChannelSubscribeModel> queryChannelSubscribe(Long anOperId, Long anCustNo, Long anSourceCustNo, Long anProfileId) {
+    private List<ChannelSubscribeModel> queryChannelSubscribe(final Long anOperId, final Long anCustNo, final Long anSourceCustNo, final Long anProfileId) {
         // Long operId, Long custNo, Long sourceCustNo, Long profileId
-        List<ChannelSubscribeModel> channelSubscribes = this.mapper.selectChannelSubscribe(anOperId, anCustNo, anSourceCustNo, anProfileId);
+        final List<ChannelSubscribeModel> channelSubscribes = this.mapper.selectChannelSubscribe(anOperId, anCustNo, anSourceCustNo, anProfileId);
         return channelSubscribes;
     }
-    
+
     // 确认订阅 删数据
-    public void saveConfirmSubscribe(Long anCustNo, Long anChannelProfileId) {
+    public void saveConfirmSubscribe(final Long anCustNo, final Long anChannelProfileId) {
         BTAssert.notNull(anCustNo, "公司编号不允许为空!");
         BTAssert.notNull(anChannelProfileId, "通道模板编号不允许为空!");
-        
-        Long operId = UserUtils.getOperatorInfo().getId();
-        
-        NotificationChannelProfile channelProfile = channelProfileService.selectByPrimaryKey(anChannelProfileId);
+
+        final Long operId = UserUtils.getOperatorInfo().getId();
+
+        final NotificationChannelProfile channelProfile = channelProfileService.selectByPrimaryKey(anChannelProfileId);
         BTAssert.notNull(channelProfile, "没有找到对应的通道模板!");
-        
-        Long profileId = channelProfile.getProfileId();
-        NotificationProfile profile = profileService.selectByPrimaryKey(profileId);
+
+        final Long profileId = channelProfile.getProfileId();
+        final NotificationProfile profile = profileService.selectByPrimaryKey(profileId);
         BTAssert.notNull(channelProfile, "没有找到对应的消息通知模板!");
-        
-        Long sourceCustNo = profile.getCustNo();
-        
-        Map<String, Object> conditionMap = new HashMap<>();
+
+        final Long sourceCustNo = profile.getCustNo();
+
+        final Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("operId", operId);
         conditionMap.put("custNo", anCustNo);
         conditionMap.put("sourceCustNo", sourceCustNo);
         conditionMap.put("profileId", profileId);
         conditionMap.put("channelProfileId", anChannelProfileId);
-        
-        NotificationSubscribe notificationSubscribe = Collections3.getFirst(this.selectByProperty(conditionMap));
+
+        final NotificationSubscribe notificationSubscribe = Collections3.getFirst(this.selectByProperty(conditionMap));
         if (notificationSubscribe != null) {
             this.delete(notificationSubscribe);
         }
     }
-    
+
     // 撤销订阅 加数据
-    public void saveCancelSubscribe(Long anCustNo, Long anChannelProfileId) {
+    public void saveCancelSubscribe(final Long anCustNo, final Long anChannelProfileId) {
         BTAssert.notNull(anCustNo, "公司编号不允许为空!");
         BTAssert.notNull(anChannelProfileId, "通道模板编号不允许为空!");
-        
-        CustOperatorInfo operator = UserUtils.getOperatorInfo();
-        Long operId = operator.getId();
-        
-        CustInfo customer = accountService.findCustInfo(anCustNo);
-        
-        NotificationChannelProfile channelProfile = channelProfileService.selectByPrimaryKey(anChannelProfileId);
+
+        final CustOperatorInfo operator = UserUtils.getOperatorInfo();
+        final Long operId = operator.getId();
+
+        final CustInfo customer = accountService.findCustInfo(anCustNo);
+
+        final NotificationChannelProfile channelProfile = channelProfileService.selectByPrimaryKey(anChannelProfileId);
         BTAssert.notNull(channelProfile, "没有找到对应的通道模板!");
-        
-        Long profileId = channelProfile.getProfileId();
-        String channel = channelProfile.getChannel();
-        
-        NotificationProfile profile = profileService.selectByPrimaryKey(profileId);
+
+        final Long profileId = channelProfile.getProfileId();
+        final String channel = channelProfile.getChannel();
+
+        final NotificationProfile profile = profileService.selectByPrimaryKey(profileId);
         BTAssert.notNull(channelProfile, "没有找到对应的消息通知模板!");
-        
-        Long sourceCustNo = profile.getCustNo();
-//        String sourceCustName = profile.getCustName();
-        
-        Map<String, Object> conditionMap = new HashMap<>();
+
+        final Long sourceCustNo = profile.getCustNo();
+
+        final Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("operId", operId);
         conditionMap.put("custNo", anCustNo);
         conditionMap.put("sourceCustNo", sourceCustNo);
         conditionMap.put("profileId", profileId);
         conditionMap.put("channelProfileId", anChannelProfileId);
-        
+
         NotificationSubscribe notificationSubscribe = Collections3.getFirst(this.selectByProperty(conditionMap));
         if (notificationSubscribe != null) {
             notificationSubscribe.setSubscribe(Boolean.FALSE);
@@ -139,5 +138,28 @@ public class NotificationSubscribeService extends BaseService<NotificationSubscr
             notificationSubscribe.initAddValue(profileId, anChannelProfileId, channel, sourceCustNo, operator, customer);
             this.insert(notificationSubscribe);
         }
+    }
+
+    /**
+     * @param anProfileId
+     * @param anChannelProfileId
+     * @param anCustNo
+     * @param anId
+     * @return
+     */
+    public boolean checkSubscribe(final Long anProfileId, final Long anChannelProfileId, final Long anCustNo, final Long anOperId, final Long sourceCustNo) {
+        final Map<String, Object> conditionMap = new HashMap<>();
+        conditionMap.put("operId", anOperId);
+        conditionMap.put("custNo", anCustNo);
+        conditionMap.put("sourceCustNo", sourceCustNo);
+        conditionMap.put("profileId", anProfileId);
+        conditionMap.put("channelProfileId", anChannelProfileId);
+
+
+        if (Collections3.isEmpty(this.selectByProperty(conditionMap))) {
+            return true;
+        }
+        //未订阅有记录
+        return false;
     }
 }
