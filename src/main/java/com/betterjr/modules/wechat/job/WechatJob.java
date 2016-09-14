@@ -87,11 +87,6 @@ public class WechatJob extends AbstractSimpleElasticJob {
         }
         finally {
             users.clear();
-            try {
-                Thread.sleep(30 * 1000);
-            }
-            catch (final InterruptedException e) {
-            }
         }
     }
 

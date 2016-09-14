@@ -169,17 +169,15 @@ public class NotificationHandlerService {
                 // 未订阅不产生数据
                 final boolean subscribeFlag = subscribeService.checkSubscribe(anNotification.getProfileId(),
                         anNotification.getChannelProfileId(),
-                        tempOperator.getRight().getCustNo(),
-                        tempOperator.getLeft().getId(),
+                        tempOperator.getRight(),
+                        tempOperator.getLeft(),
                         anSendCustomer.getCustNo());
 
                 if (subscribeFlag) {
                     addNotificationCustomer(anNotification,
                             getSendNo(anNotification, tempOperator.getLeft()),
-                            tempOperator.getLeft().getId(),
-                            tempOperator.getLeft().getName(),
-                            tempOperator.getRight().getCustNo(),
-                            tempOperator.getRight().getCustName(),
+                            tempOperator.getLeft(),
+                            tempOperator.getRight(),
                             anSendOperator,
                             anSendCustomer);
                 }
@@ -190,7 +188,7 @@ public class NotificationHandlerService {
         if (Collections3.isEmpty(emails) == false
                 && StringUtils.equals(NotificationConstants.CHANNEL_EMAIL, anNotification.getChannel())) {
             for (final String email : emails) {
-                addNotificationCustomer(anNotification, email, null, null, null, null, anSendOperator, anSendCustomer);
+                addNotificationCustomer(anNotification, email, null, null, anSendOperator, anSendCustomer);
             }
         }
 
@@ -198,7 +196,7 @@ public class NotificationHandlerService {
         if (Collections3.isEmpty(mobiles) == false
                 && StringUtils.equals(NotificationConstants.CHANNEL_SMS, anNotification.getChannel())) {
             for (final String mobile : mobiles) {
-                addNotificationCustomer(anNotification, mobile, null, null, null, null, anSendOperator, anSendCustomer);
+                addNotificationCustomer(anNotification, mobile, null, null, anSendOperator, anSendCustomer);
             }
         }
 
@@ -216,20 +214,23 @@ public class NotificationHandlerService {
      */
     private NotificationCustomer addNotificationCustomer(final Notification anNotification,
             final String anSendNo,
-            final Long anOperId,
-            final String anOperName,
-            final Long anCustNo,
-            final String anCustName,
+            final CustOperatorInfo anOperator,
+            final CustInfo anCustInfo,
             final CustOperatorInfo anSendOperator,
             final CustInfo anSendCustomer) {
         final NotificationCustomer tempNotificationCustomer = new NotificationCustomer();
-        tempNotificationCustomer.setOperId(anOperId);
-        tempNotificationCustomer.setOperName(anOperName);
         tempNotificationCustomer.setChannel(anNotification.getChannel());
         tempNotificationCustomer.setNotificationId(anNotification.getId());
 
-        tempNotificationCustomer.setCustNo(anCustNo);
-        tempNotificationCustomer.setCustName(anCustName);
+        if (anOperator != null) {
+            tempNotificationCustomer.setOperId(anOperator.getId());
+            tempNotificationCustomer.setOperName(anOperator.getName());
+        }
+
+        if (anCustInfo != null) {
+            tempNotificationCustomer.setCustNo(anCustInfo.getCustNo());
+            tempNotificationCustomer.setCustName(anCustInfo.getCustName());
+        }
 
         tempNotificationCustomer.setSendNo(anSendNo);
 
@@ -384,6 +385,7 @@ public class NotificationHandlerService {
             channel = "短信";
             break;
         case NotificationConstants.CHANNEL_WECHAT:
+            channel = "微信";
             break;
         default:
         }
@@ -403,6 +405,7 @@ public class NotificationHandlerService {
             sendNo = anReceiveOperator.getMobileNo();
             break;
         case NotificationConstants.CHANNEL_WECHAT:
+            sendNo = String.valueOf(anReceiveOperator.getId());
             break;
         default:
         }
