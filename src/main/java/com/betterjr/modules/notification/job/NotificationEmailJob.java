@@ -4,8 +4,6 @@ import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,27 +29,27 @@ import com.dangdang.ddframe.job.plugin.job.type.simple.AbstractSimpleElasticJob;
 @Service
 public class NotificationEmailJob extends AbstractSimpleElasticJob {
     private final static Logger logger = LoggerFactory.getLogger(NotificationSmsJob.class);
-    
+
     @Resource
     private NotificationService notificationService;
-    
+
     @Resource
     private NotificationCustomerService notificationCustomerService;
-    
+
     @Value("${mail.retry}")
     private Integer mailRetry;
-    
+
     @Override
-    public void process(JobExecutionMultipleShardingContext anShardingContext) {
+    public void process(final JobExecutionMultipleShardingContext anShardingContext) {
         logger.info("邮件定时处理重发 : " + new Date());
-        
+
         while(true) {
-            List<NotificationCustomer> customers = notificationCustomerService.queryUnsendEmailNotificationCustomer(mailRetry);
+            final List<NotificationCustomer> customers = notificationCustomerService.queryUnsendEmailNotificationCustomer(mailRetry);
             if (Collections3.isEmpty(customers) == true) {
                 break;
             }
-            
-            for (NotificationCustomer customer: customers) {
+
+            for (final NotificationCustomer customer: customers) {
                 // 单条发送逻辑
                 if (sendMail(customer) == true) {
                     notificationCustomerService.saveNotificationCustomerStatus(customer.getId(), NotificationConstants.SEND_STATUS_SUCCESS);
@@ -61,17 +59,17 @@ public class NotificationEmailJob extends AbstractSimpleElasticJob {
             }
         }
     }
-    
+
     /**
-     * 单条发送 
+     * 单条发送
      */
-    private boolean sendMail(NotificationCustomer anCustomer) {
-        Notification notification = notificationService.findNotification(anCustomer.getNotificationId());
+    private boolean sendMail(final NotificationCustomer anCustomer) {
+        final Notification notification = notificationService.findNotification(anCustomer.getNotificationId(), anCustomer.getOperId(), NotificationConstants.CHANNEL_EMAIL);
 
-        Long batchNo = notification.getBatchNo();
+        final Long batchNo = notification.getBatchNo();
 
-        List<NotificationAttachment> attachments = notificationService.buildAttachments(batchNo);
-        
+        final List<NotificationAttachment> attachments = notificationService.buildAttachments(batchNo);
+
         return MailUtils.sendMail(anCustomer.getSendNo(), notification.getSubject(), notification.getContent(), attachments);
     }
 

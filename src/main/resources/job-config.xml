@@ -28,7 +28,7 @@
 		sharding-total-count="1" sharding-item-parameters="0=A" />
 
 	<job:simple id="wechatJob" class="com.betterjr.modules.wechat.job.WechatJob"
-		registry-center-ref="regCenter" cron="0 0/5 * * * * ?"
+		registry-center-ref="regCenter" cron="0/5 * * * * ?"
 		sharding-total-count="1" sharding-item-parameters="0=A" />
 
 	<bean class="com.betterjr.modules.notification.provider.SmsUtils"

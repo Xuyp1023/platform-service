@@ -82,11 +82,22 @@ public class NotificationService extends BaseService<NotificationMapper, Notific
 
         final CustOperatorInfo operator = UserUtils.getOperatorInfo();
         // 检查此消息有没被此人接收
-        checkNotificationCustomer(anId, operator.getId());
+        checkNotificationCustomer(anId, operator.getId(), NotificationConstants.CHANNEL_INBOX);
 
         return this.selectByPrimaryKey(anId);
     }
 
+    /**
+     * 消息详情
+     */
+    public Notification findNotification(final Long anId, final Long anOperId, final String anChannel) {
+        BTAssert.notNull(anId, "消息编号不允许为空!");
+
+        // 检查此消息有没被此人接收
+        checkNotificationCustomer(anId, anOperId, anChannel);
+
+        return this.selectByPrimaryKey(anId);
+    }
     /**
      * 设置消息已读
      */
@@ -95,7 +106,7 @@ public class NotificationService extends BaseService<NotificationMapper, Notific
 
         final CustOperatorInfo operator = UserUtils.getOperatorInfo();
         // 检查此消息有没被此人接收
-        checkNotificationCustomer(anId, operator.getId());
+        checkNotificationCustomer(anId, operator.getId(), NotificationConstants.CHANNEL_INBOX);
 
         return notificationCustomerService.saveSetReadNotification(anId, operator.getId());
     }
@@ -103,11 +114,11 @@ public class NotificationService extends BaseService<NotificationMapper, Notific
     /**
      *
      */
-    private NotificationCustomer checkNotificationCustomer(final Long anId, final Long anOperId) {
+    private NotificationCustomer checkNotificationCustomer(final Long anId, final Long anOperId, final String anChannel) {
         BTAssert.notNull(anId, "编号不允许为空!");
         BTAssert.notNull(anOperId, "操作员编号不允许为空!");
 
-        final NotificationCustomer notificationCustomer = notificationCustomerService.findNotifiCustomerByNotifiIdAndOperId(anId, anOperId);
+        final NotificationCustomer notificationCustomer = notificationCustomerService.findNotifiCustomerByNotifiIdAndOperId(anId, anOperId, anChannel);
         BTAssert.notNull(notificationCustomer, "没有找到相应的站内消息接收记录!");
         return notificationCustomer;
     }

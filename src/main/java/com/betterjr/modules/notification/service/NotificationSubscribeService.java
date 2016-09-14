@@ -143,18 +143,20 @@ public class NotificationSubscribeService extends BaseService<NotificationSubscr
     /**
      * @param anProfileId
      * @param anChannelProfileId
-     * @param anCustNo
+     * @param anCustInfo
      * @param anId
      * @return
      */
-    public boolean checkSubscribe(final Long anProfileId, final Long anChannelProfileId, final Long anCustNo, final Long anOperId, final Long sourceCustNo) {
+    public boolean checkSubscribe(final Long anProfileId, final Long anChannelProfileId, final CustInfo anCustInfo, final CustOperatorInfo anOperator, final Long sourceCustNo) {
         final Map<String, Object> conditionMap = new HashMap<>();
-        conditionMap.put("operId", anOperId);
-        conditionMap.put("custNo", anCustNo);
+        conditionMap.put("operId", anOperator.getId());
         conditionMap.put("sourceCustNo", sourceCustNo);
         conditionMap.put("profileId", anProfileId);
         conditionMap.put("channelProfileId", anChannelProfileId);
 
+        if (anCustInfo != null) {
+            conditionMap.put("custNo", anCustInfo.getCustNo());
+        }
 
         if (Collections3.isEmpty(this.selectByProperty(conditionMap))) {
             return true;
