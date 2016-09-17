@@ -53,7 +53,7 @@ public class NotificationSubscribeService extends BaseService<NotificationSubscr
         final Long operId = UserUtils.getOperatorInfo().getId();
 
         profileSubscribes.forEach(profileSubscribe -> {
-            queryChannelSubscribe(operId, anCustNo, profileSubscribe.getCustNo(), profileSubscribe.getId());
+        	profileSubscribe.setChannels(queryChannelSubscribe(operId, anCustNo, profileSubscribe.getCustNo(), profileSubscribe.getId()));
         });
         return profileSubscribes;
     }
