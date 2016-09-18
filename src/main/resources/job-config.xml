@@ -13,7 +13,7 @@
 	<description>Elastic-Job 配置 </description>
 
 	<reg:zookeeper id="regCenter" server-lists="${elastic.job.serverLists}"
-		namespace="notification" base-sleep-time-milliseconds="${elastic.job.baseSleepTimeMilliseconds}"
+		namespace="${elastic.job.maxRetries}" base-sleep-time-milliseconds="${elastic.job.baseSleepTimeMilliseconds}"
 		max-sleep-time-milliseconds="${elastic.job.maxSleepTimeMilliseconds}"
 		max-retries="${elastic.job.maxRetries}" />
 
