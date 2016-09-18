@@ -228,6 +228,6 @@
 	<import resource="platform-dubbo-provider.xml" />
 	<import resource="workflow-snaker.xml"/>
 	<import resource="mq-config.xml"/>
-<!-- 	<import resource="job-config.xml"/> -->
+	<import resource="job-config.xml"/>
 
 </beans>
