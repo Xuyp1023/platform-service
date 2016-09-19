@@ -13,20 +13,17 @@ import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.customer.ICustMechLawService;
 import com.betterjr.modules.customer.constants.CustomerConstants;
 import com.betterjr.modules.customer.entity.CustChangeApply;
-import com.betterjr.modules.customer.entity.CustMechBaseTmp;
-import com.betterjr.modules.customer.entity.CustMechBusinLicenceTmp;
 import com.betterjr.modules.customer.entity.CustMechLaw;
 import com.betterjr.modules.customer.entity.CustMechLawTmp;
 import com.betterjr.modules.customer.helper.ChangeDetailBean;
 import com.betterjr.modules.customer.service.CustChangeService;
-import com.betterjr.modules.customer.service.CustInsteadService;
 import com.betterjr.modules.customer.service.CustMechLawService;
 import com.betterjr.modules.customer.service.CustMechLawTmpService;
 import com.betterjr.modules.rule.service.RuleServiceDubboFilterInvoker;
 
 /**
  * 法人
- * 
+ *
  * @author liuwl
  *
  */
@@ -44,6 +41,12 @@ public class CustMechLawDubboService implements ICustMechLawService {
     private CustChangeService changeService;
 
     @Override
+    public CustMechLaw findLawInfo(Long anCustNo) {
+        final CustMechLaw custMechLaw = lawService.findCustMechLawByCustNo(anCustNo);
+        return custMechLaw;
+    }
+
+    @Override
     public String webFindLawInfo(Long anCustNo) {
         final CustMechLaw custMechLaw = lawService.findCustMechLawByCustNo(anCustNo);
         return AjaxObject.newOk("法人信息-详情查询 成功", custMechLaw).toJson();
@@ -52,17 +55,17 @@ public class CustMechLawDubboService implements ICustMechLawService {
     @Override
     public String webFindChangeApply(Long anId) {
         final CustChangeApply changeApply = changeService.findChangeApply(anId, CustomerConstants.ITEM_LAW);
-        
+
         final Long tmpId = Long.valueOf(changeApply.getTmpIds());
-        
+
         final CustMechLawTmp nowData = lawTmpService.findCustMechLawTmp(tmpId);
         final CustMechLawTmp befData = lawTmpService.findCustMechLawTmpPrevVersion(nowData);
-        
+
         ChangeDetailBean<CustMechLawTmp> changeDetailBean = new ChangeDetailBean<>();
         changeDetailBean.setChangeApply(changeApply);
         changeDetailBean.setNowData(nowData);
         changeDetailBean.setBefData(befData);
-        
+
         return AjaxObject.newOk("法人信息-变更详情查询 成功", changeDetailBean).toJson();
     }
 

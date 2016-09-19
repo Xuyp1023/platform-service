@@ -58,7 +58,7 @@ public class CustOpenAccountDubboService implements ICustOpenAccountService {
     @Override
     public String webQueryOpenAccountApply(String anFlag, int anPageNum, int anPageSize) {
 
-        return AjaxObject.newOk("开户申请待审批列表查询成功", custOpenAccountTmpService.queryOpenAccountApply(anFlag, anPageNum, anPageSize)).toJson();
+        return AjaxObject.newOkWithPage("开户申请待审批列表查询成功", custOpenAccountTmpService.queryOpenAccountApply(anFlag, anPageNum, anPageSize)).toJson();
     }
 
     @Override
