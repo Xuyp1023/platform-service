@@ -79,16 +79,16 @@ public class CustRelationDubboService implements ICustRelationService {
 
         return AjaxObject.newOk("核心企业下拉列表查询成功", custRelationService.queryCoreKeyAndValue(anCustNo)).toJson();
     }
-    
+
     @Override
     public String webQuerySupplierByCore(Long anCoreCustNo) {
-        
+
         return AjaxObject.newOk("供应商下拉列表查询成功", custRelationService.querySupplierByCore(anCoreCustNo)).toJson();
     }
 
     @Override
     public String webQuerySellerByCore(Long anCoreCustNo) {
-        
+
         return AjaxObject.newOk("经销商下拉列表查询成功", custRelationService.querySellerByCore(anCoreCustNo)).toJson();
     }
 
@@ -120,6 +120,14 @@ public class CustRelationDubboService implements ICustRelationService {
     public String webQueryFactorCustRelation(Long anFactorNo, String anCreditType) {
 
         return AjaxObject.newOk("保理机构关系客户查询成功", custRelationService.queryFactorCustRelation(anFactorNo, anCreditType)).toJson();
+    }
+
+    /* (non-Javadoc)
+     * @see com.betterjr.modules.customer.ICustRelationService#webQueryFactorList()
+     */
+    @Override
+    public String webQueryFactorRelation(Long anCustNo) {
+        return AjaxObject.newOk("客户与保理机构关系查询成功", custRelationService.queryFactorRelation(anCustNo)).toJson();
     }
 
 }

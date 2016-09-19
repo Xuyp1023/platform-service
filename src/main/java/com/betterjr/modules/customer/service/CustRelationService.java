@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,7 @@ import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.account.service.CustAndOperatorRelaService;
+import com.betterjr.modules.account.service.CustCertService;
 import com.betterjr.modules.customer.constants.CustomerConstants;
 import com.betterjr.modules.customer.dao.CustRelationMapper;
 import com.betterjr.modules.customer.entity.CustRelation;
@@ -37,9 +40,12 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
     @Autowired
     private CustAndOperatorRelaService custAndOperatorRelaService;
 
+    @Resource
+    private CustCertService custCertService;
+
     /**
      * 开通保理融资业务状态
-     * 
+     *
      * @param anCustNo
      * @return
      */
@@ -89,7 +95,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
 
     /**
      * 核心企业下拉列表查询,适用于供应商/经销商相关查询
-     * 
+     *
      * @param anCustNo
      * @return
      */
@@ -110,7 +116,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
 
     /**
      * 供应商下拉列表查询,使用于核心企业查询
-     * 
+     *
      * @param anCoreCustNo
      * @return
      */
@@ -131,7 +137,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
 
     /**
      * 经销商下拉列表查询,使用于核心企业查询
-     * 
+     *
      * @param anCoreCustNo
      * @return
      */
@@ -152,7 +158,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
 
     /**
      * 保理公司与核心企业关系查询
-     * 
+     *
      * @param anFactorNo
      * @return
      */
@@ -173,7 +179,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
 
     /**
      * 保理机构下拉列表查询,适用于供应商/经销商/核心企业相关查询
-     * 
+     *
      * @param anCustNo
      * @return
      */
@@ -195,7 +201,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
 
     /**
      * 客户与电子合同服务商关系查询
-     * 
+     *
      * @param anCustNo
      * @return
      */
@@ -216,7 +222,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
 
     /**
      * 客户关系查询
-     * 
+     *
      * @param anCustNo
      * @return
      */
@@ -248,7 +254,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
 
     /**
      * 保理机构关系客户查询
-     * 
+     *
      * @param anFactorNo:保理机构
      * @param anRelateType:授信对象(1:供应商;2:经销商;3:核心企业;)
      * @return
@@ -274,7 +280,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
 
     /**
      * 客户白名单受理列表
-     * 
+     *
      * @param anBusinStatus
      * @param anFlag
      * @param anPageNum
@@ -298,7 +304,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
 
     /**
      * 客户白名单受理
-     * 
+     *
      * @param anId
      * @param anAuditOpinion
      * @return
@@ -320,7 +326,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
 
     /**
      * 客户白名单受理-驳回
-     * 
+     *
      * @param anId
      * @param anAuditOpinion
      * @return
@@ -342,7 +348,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
 
     /**
      * 客户白名单审批列表
-     * 
+     *
      * @param anBusinStatus
      * @param anFlag
      * @param anPageNum
@@ -368,7 +374,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
 
     /**
      * 客户白名单审批
-     * 
+     *
      * @param anId
      * @param anAuditOpinion
      * @return
@@ -390,7 +396,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
 
     /**
      * 客户白名单审批-驳回
-     * 
+     *
      * @param anId
      * @param anAuditOpinion
      * @return
@@ -412,7 +418,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
 
     /**
      * 开通保理融资业务申请
-     * 
+     *
      * @param anCustNo
      * @param anProviderCustList
      * @param anFactorCustList
@@ -517,6 +523,28 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
             anRuleList.add(CustomerConstants.RELATE_TYPE_SELLER_FACTOR);
         }
         return anRuleList;
+    }
+
+    /**
+     * @return
+     */
+    public List<SimpleDataEntity> queryFactorRelation(Long anCustNo) {
+        List<SimpleDataEntity> result = new ArrayList<SimpleDataEntity>();
+        if (null == anCustNo) {
+            return result;
+        }
+        if (UserUtils.supplierUser()) {
+            Map<String, Object> anMap = new HashMap<String, Object>();
+            anMap.put("custNo", anCustNo);
+            anMap.put("relateType", CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR);
+            anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
+
+            List<CustRelation> relations = this.selectByProperty(anMap);
+            for (CustRelation relation : relations) {
+                result.add(new SimpleDataEntity(relation.getCustName(), String.valueOf(relation.getCustNo())));
+            }
+        }
+        return result;
     }
 
 }
