@@ -543,6 +543,16 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
             for (CustRelation relation : relations) {
                 result.add(new SimpleDataEntity(relation.getCustName(), String.valueOf(relation.getCustNo())));
             }
+        } else if (UserUtils.coreUser()) {
+            Map<String, Object> anMap = new HashMap<String, Object>();
+            anMap.put("custNo", anCustNo);
+            anMap.put("relateType", CustomerConstants.RELATE_TYPE_CORE_FACTOR);
+            anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
+
+            List<CustRelation> relations = this.selectByProperty(anMap);
+            for (CustRelation relation : relations) {
+                result.add(new SimpleDataEntity(relation.getCustName(), String.valueOf(relation.getCustNo())));
+            }
         }
         return result;
     }
