@@ -14,7 +14,7 @@ import com.betterjr.modules.rule.service.RuleServiceDubboFilterInvoker;
 
 /**
  * 开户流水
- * 
+ *
  * @author liuwl
  *
  */
@@ -34,6 +34,12 @@ public class CustOpenAccountDubboService implements ICustOpenAccountService {
     }
 
     @Override
+    public String webFindOpenAccountInfo(Long anId) {
+
+        return AjaxObject.newOk("开户资料读取成功", custOpenAccountTmpService.findOpenAccountInfo(anId)).toJson();
+    }
+
+    @Override
     public String webSaveOpenAccountInfo(Map<String, Object> anMap, Long anId, String anFileList) {
 
         CustOpenAccountTmp anOpenAccountInfo = (CustOpenAccountTmp) RuleServiceDubboFilterInvoker.getInputObj();
@@ -41,6 +47,7 @@ public class CustOpenAccountDubboService implements ICustOpenAccountService {
         return AjaxObject.newOk("开户资料暂存成功", custOpenAccountTmpService.saveOpenAccountInfo(anOpenAccountInfo, anId, anFileList)).toJson();
     }
 
+    @Override
     public String webSaveOpenAccountApply(Map<String, Object> anMap, Long anId, String anFileList) {
 
         CustOpenAccountTmp anOpenAccountInfo = (CustOpenAccountTmp) RuleServiceDubboFilterInvoker.getInputObj();
@@ -48,16 +55,19 @@ public class CustOpenAccountDubboService implements ICustOpenAccountService {
         return AjaxObject.newOk("开户申请提交成功", custOpenAccountTmpService.saveOpenAccountApply(anOpenAccountInfo, anId, anFileList)).toJson();
     }
 
+    @Override
     public String webQueryOpenAccountApply(String anFlag, int anPageNum, int anPageSize) {
 
         return AjaxObject.newOk("开户申请待审批列表查询成功", custOpenAccountTmpService.queryOpenAccountApply(anFlag, anPageNum, anPageSize)).toJson();
     }
 
+    @Override
     public String webSaveAuditOpenAccountApply(Long anId, String anAuditOpinion) {
 
         return AjaxObject.newOk("开户审核生效", custOpenAccountTmpService.saveAuditOpenAccountApply(anId, anAuditOpinion)).toJson();
     }
 
+    @Override
     public String webSaveRefuseOpenAccountApply(Long anId, String anAuditOpinion) {
 
         return AjaxObject.newOk("开户申请驳回", custOpenAccountTmpService.saveRefuseOpenAccountApply(anId, anAuditOpinion)).toJson();

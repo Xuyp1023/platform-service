@@ -21,7 +21,6 @@ import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
-import com.betterjr.common.utils.DictUtils;
 import com.betterjr.common.utils.IdcardUtils;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.common.utils.reflection.ReflectionUtils;
@@ -50,7 +49,7 @@ import com.betterjr.modules.document.utils.CustFileUtils;
 import com.google.common.collect.Multimap;
 
 /**
- * 
+ *
  * @author liuwl
  *
  */
@@ -92,13 +91,13 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
 
     @Autowired
     private CustOpenAccountAuditService custOpenAccountAuditService;
-    
+
     @Resource
     private RocketMQProducer betterProducer;
 
     /**
      * 开户资料读取
-     * 
+     *
      * @return
      */
     public CustOpenAccountTmp findOpenAccountInfo() {
@@ -109,6 +108,26 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         }
         // 读取暂存的记录
         return findTempStoreAccountInfo();
+    }
+
+    /**
+     * 开户资料读取
+     *
+     * @return
+     */
+    public CustOpenAccountTmp findOpenAccountInfo(Long anId) {
+        BTAssert.notNull(anId, "编号不允许为空");
+
+        // 读取被驳回的记录
+        CustOpenAccountTmp openAccountInfo = this.selectByPrimaryKey(anId);
+        BTAssert.notNull(openAccountInfo, "没有找到开户信息");
+
+        if (UserUtils.platformUser() == false
+                && BetterStringUtils.equals(UserUtils.getOperatorInfo().getOperOrg(), openAccountInfo.getOperOrg()) == false) {
+            throw new BytterTradeException("接口调用错误");
+        }
+
+        return openAccountInfo;
     }
 
     private CustOpenAccountTmp findTempStoreAccountInfo() {
@@ -129,7 +148,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
 
     /**
      * 开户资料暂存
-     * 
+     *
      * @param anOpenAccountInfo
      * @param anFileList
      * @return
@@ -162,7 +181,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
 
     /**
      * 开户申请
-     * 
+     *
      * @param anOpenAccountInfo
      * @param anId
      * @return
@@ -206,7 +225,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
 
     /**
      * 开户申请待审批列表
-     * 
+     *
      * @param anFlag
      * @param anPageNum
      * @param anPageSize
@@ -221,7 +240,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
 
     /**
      * 开户审核生效
-     * 
+     *
      * @param anId
      * @param anAuditOpinion
      * @return
@@ -252,19 +271,19 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         MQMessage anMessage = new MQMessage("CUSTOMER_OPENACCOUNT_TOPIC");
         try {
             anMessage.setObject(anOpenAccountInfo);
-            anMessage.addHead("type", "1");//开户成功
+            anMessage.addHead("type", "1");// 开户成功
             anMessage.addHead("operator", UserUtils.getOperatorInfo());
             betterProducer.sendMessage(anMessage);
         }
         catch (Exception e) {
-            e.printStackTrace();
+            logger.error("异步消息发送失败！", e);
         }
         return anOpenAccountInfo;
     }
 
     /**
      * 开户申请驳回
-     * 
+     *
      * @param anId
      * @param anAuditOpinion
      * @return
@@ -289,23 +308,23 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
 
         // 发消息
         MQMessage anMessage = new MQMessage("CUSTOMER_OPENACCOUNT_TOPIC");
-        
+
         try {
             anMessage.setObject(anOpenAccountInfo);
-            anMessage.addHead("type", "0"); //驳回
+            anMessage.addHead("type", "0"); // 驳回
             anMessage.addHead("operator", UserUtils.getOperatorInfo());
             anMessage.addHead("auditOpinion", anAuditOpinion);
             betterProducer.sendMessage(anMessage);
         }
         catch (Exception e) {
-            e.printStackTrace();
+            logger.error("异步消息发送失败！", e);
         }
         return anOpenAccountInfo;
     }
 
     /**
      * 代录开户资料提交
-     * 
+     *
      * @param anOpenAccountInfo
      * @param anInsteadId
      * @param anFileList
@@ -351,7 +370,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
 
     /**
      * 代录开户资料读取
-     * 
+     *
      * @param anInsteadId
      * @return
      */
@@ -615,7 +634,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
 
     /**
      * 更新文件信息
-     * 
+     *
      * @param anCustFileItem
      * @param anFileInfoType
      * @param anCustNo
@@ -645,7 +664,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
 
     /**
      * 写入文件认证信息
-     * 
+     *
      * @param anCustNo
      * @param anBatchNo
      * @param anFileCount
@@ -693,10 +712,11 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
             logger.warn("银行账号已存在");
             throw new BytterTradeException(40001, "银行账号已存在");
         }
-        
+
         // 检查是否黑名单
-        String anFlag = blacklistService.checkBlacklistExists(anOpenAccountInfo.getCustName(), anOpenAccountInfo.getOrgCode(), anOpenAccountInfo.getLawName());
-        if (BetterStringUtils.equals(anFlag, "1")){
+        String anFlag = blacklistService.checkBlacklistExists(anOpenAccountInfo.getCustName(), anOpenAccountInfo.getOrgCode(),
+                anOpenAccountInfo.getLawName());
+        if (BetterStringUtils.equals(anFlag, "1")) {
             logger.warn("从黑名单库中检测到当前客户开户资料信息,请确认!");
             throw new BytterTradeException(40001, "从黑名单库中检测到当前客户开户资料信息,请确认!");
         }
