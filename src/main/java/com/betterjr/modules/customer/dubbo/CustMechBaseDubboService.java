@@ -92,6 +92,12 @@ public class CustMechBaseDubboService implements ICustMechBaseService {
     }
 
     @Override
+    public CustMechBase findBaseInfo(final Long anCustNo) {
+        final CustMechBase custMechBase = baseService.findCustMechBaseByCustNo(anCustNo);
+        return custMechBase;
+    }
+
+    @Override
     public String webFindChangeApply(final Long anId) {
         final CustChangeApply changeApply = changeService.findChangeApply(anId, CustomerConstants.ITEM_BASE);
         // 通过changeApply找到
