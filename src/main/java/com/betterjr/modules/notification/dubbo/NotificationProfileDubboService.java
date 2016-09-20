@@ -1,10 +1,11 @@
 package com.betterjr.modules.notification.dubbo;
 
+import static com.betterjr.common.web.AjaxObject.newOk;
+import static com.betterjr.common.web.AjaxObject.newOkWithPage;
+
 import java.util.Map;
 
 import javax.annotation.Resource;
-
-import static com.betterjr.common.web.AjaxObject.*;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import com.betterjr.modules.notification.INotificationProfileService;
@@ -27,35 +28,35 @@ public class NotificationProfileDubboService implements INotificationProfileServ
     private NotificationProfileVariableService profileVariableService;
 
     @Override
-    public String webQueryNotificationProfile(Long anCustNo, int anFlag, int anPageNum, int anPageSize) {
+    public String webQueryNotificationProfile(final Long anCustNo, final int anFlag, final int anPageNum, final int anPageSize) {
         return newOkWithPage("消息模板-列表查询 成功", profileService.queryNotificationProfile(anCustNo, anFlag, anPageNum, anPageSize)).toJson();
     }
 
     @Override
-    public String webSetEnabledNotificationProfile(Long anProfileId) {
-        return newOk("消息模板-设置启用 成功", profileService.saveSetNotificationProfileStatus(anProfileId, NotificationConstants.PROFILE_STATUS_ENABLED))
+    public String webSetEnabledNotificationProfile(final Long anProfileId, final Long anCustNo) {
+        return newOk("消息模板-设置启用 成功", profileService.saveSetNotificationProfileStatus(anProfileId, anCustNo, NotificationConstants.PROFILE_STATUS_ENABLED))
                 .toJson();
     }
 
     @Override
-    public String webSetDisabledNotificationProfile(Long anProfileId) {
-        return newOk("消息模板-设置禁用 成功", profileService.saveSetNotificationProfileStatus(anProfileId, NotificationConstants.PROFILE_STATUS_DISABLED))
+    public String webSetDisabledNotificationProfile(final Long anProfileId, final Long anCustNo) {
+        return newOk("消息模板-设置禁用 成功", profileService.saveSetNotificationProfileStatus(anProfileId, anCustNo, NotificationConstants.PROFILE_STATUS_DISABLED))
                 .toJson();
     }
 
     @Override
-    public String webQueryNotificationChannelProfile(Long anProfileId) {
-        return newOk("消息通道模板-列表查询 成功", channelProfileService.queryChannelProfileByProfileId(anProfileId)).toJson();
+    public String webQueryNotificationChannelProfile(final Long anProfileId, final Long anCustNo) {
+        return newOk("消息通道模板-列表查询 成功", channelProfileService.queryChannelProfileByProfileId(anProfileId, anCustNo)).toJson();
     }
 
     @Override
-    public String webSaveNotificationChannelProfile(Map<String, Object> anParam, Long anChannelProfileId) {
-        NotificationChannelProfile channelProfile = RuleServiceDubboFilterInvoker.getInputObj();
-        return newOk("消息通道模板-保存 成功", channelProfileService.saveChannelProfile(channelProfile, anChannelProfileId)).toJson();
+    public String webSaveNotificationChannelProfile(final Map<String, Object> anParam, final Long anChannelProfileId, final Long anCustNo) {
+        final NotificationChannelProfile channelProfile = RuleServiceDubboFilterInvoker.getInputObj();
+        return newOk("消息通道模板-保存 成功", channelProfileService.saveChannelProfile(channelProfile, anChannelProfileId, anCustNo)).toJson();
     }
 
     @Override
-    public String webQueryNotificationProfileVariable(Long anChannelProfileId) {
+    public String webQueryNotificationProfileVariable(final Long anChannelProfileId, final Long anCustNo) {
         return newOk("模板预定规则-列表查询 成功", profileVariableService.queryVariableByProfileId(anChannelProfileId)).toJson();
     }
 
