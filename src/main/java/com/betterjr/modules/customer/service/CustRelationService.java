@@ -358,10 +358,10 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
     public Page<CustRelation> queryRelationAudit(final String anBusinStatus, final String anFlag, final int anPageNum, final int anPageSize) {
         final Long operId = UserUtils.getOperatorInfo().getId();
         final String operOrg = UserUtils.getOperatorInfo().getOperOrg();
-        final Long factorNo = Collections3.getFirst(custAndOperatorRelaService.findCustNoList(operId, operOrg));
         final Map<String, Object> anMap = new HashMap<String, Object>();
-        anMap.put("relateCustno", factorNo);
-        anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR, CustomerConstants.RELATE_TYPE_CORE_FACTOR,
+        anMap.put("relateCustno", UserUtils.findCustNoList());
+        anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR,
+                CustomerConstants.RELATE_TYPE_CORE_FACTOR,
                 CustomerConstants.RELATE_TYPE_SELLER_FACTOR });
         if (BetterStringUtils.isBlank(anBusinStatus) == true) {
             anMap.put("businStatus", new String[] { CustomerConstants.RELATE_STATUS_ACCEPT, CustomerConstants.RELATE_STATUS_AUDIT });
