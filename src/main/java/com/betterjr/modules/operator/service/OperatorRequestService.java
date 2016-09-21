@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.betterjr.common.data.CustPasswordType;
 import com.betterjr.common.exception.BytterTradeException;
 import com.betterjr.common.mapper.BeanMapper;
 import com.betterjr.common.service.BaseService;
@@ -20,6 +21,7 @@ import com.betterjr.modules.account.dao.CustOperatorInfoMapper;
 import com.betterjr.modules.account.data.CustOptData;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.betterjr.modules.account.entity.CustOperatorInfoRequest;
+import com.betterjr.modules.account.service.CustPassService;
 
 /***
  * 操作员管理
@@ -37,6 +39,8 @@ public class OperatorRequestService extends BaseService<CustOperatorInfoMapper, 
     private OperatorService custOptService;
     @Autowired
     private SysOperatorRoleRelationService operatorRoleRelationService;
+    @Autowired
+    private CustPassService custPassService;
     
     /**
      * 新增操作员
@@ -157,5 +161,21 @@ public class OperatorRequestService extends BaseService<CustOperatorInfoMapper, 
             result.add(custOperatorInfo);
         }
         return result;
+    }
+    
+    /***
+     * 修改密码
+     * @param anNewPasswd
+     * @param anOkPasswd
+     * @param anPasswd
+     * @return
+     */
+    public boolean updatePasword(String anNewPasswd,String anOkPasswd,String anPasswd){
+        try {
+            return custPassService.savePassword(CustPasswordType.ORG, anNewPasswd, anOkPasswd, anPasswd);
+        }
+        catch (Exception e) {
+            throw new BytterTradeException(e.getMessage());
+        }
     }
 }
