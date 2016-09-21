@@ -29,6 +29,7 @@
         com.betterjr.modules.wechat.service;
         com.betterjr.modules.wechat.job;
         com.betterjr.modules.cert.service;
+        com.betterjr.modules.sms.service;
 		com.betterjr.modules.account.service;
         com.betterjr.modules.rule.service;
         com.betterjr.modules.rule.validator;

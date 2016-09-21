@@ -18,6 +18,7 @@
 		com.betterjr.modules.workflow,
         com.betterjr.modules.operator,
         com.betterjr.modules.role,
+		com.betterjr.modules.sms,
         com.betterjr.modules.wechat.dubbo,
         com.betterjr.modules.wechat.service,
         com.betterjr.modules.cert.dubbo,

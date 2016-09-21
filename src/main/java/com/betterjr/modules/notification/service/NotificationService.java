@@ -129,6 +129,7 @@ public class NotificationService extends BaseService<NotificationMapper, Notific
     public List<Notification> queryUnsendSmsNotification() {
         final Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("channel", NotificationConstants.CHANNEL_SMS);
+        conditionMap.put("NEimmediate", NotificationConstants.IMMEDIATE_TRUE); // immediate 不为 1
         conditionMap.put("businStatus", new String[] { NotificationConstants.SEND_STATUS_FAIL, NotificationConstants.SEND_STATUS_NORMAL });
         return this.selectPropertyByPage(conditionMap, 1, 50, false);
     }

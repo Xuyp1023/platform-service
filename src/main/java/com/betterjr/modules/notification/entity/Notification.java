@@ -203,13 +203,20 @@ public class Notification implements BetterjrEntity {
     @MetaData( value="发送客户名称", comments = "发送客户名称")
     private String custName;
 
+    /**
+     * 是否立即发送 0否 1是
+     */
+    @Column(name = "C_IMMEDIATE",  columnDefinition="CHAR" )
+    @MetaData( value="是否立即发送", comments = "是否立即发送 0否 1是")
+    private String immediate;
+
     private static final long serialVersionUID = 1468812783878L;
 
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -217,7 +224,7 @@ public class Notification implements BetterjrEntity {
         return version;
     }
 
-    public void setVersion(Long version) {
+    public void setVersion(final Long version) {
         this.version = version;
     }
 
@@ -225,7 +232,7 @@ public class Notification implements BetterjrEntity {
         return profileId;
     }
 
-    public void setProfileId(Long profileId) {
+    public void setProfileId(final Long profileId) {
         this.profileId = profileId;
     }
 
@@ -233,7 +240,7 @@ public class Notification implements BetterjrEntity {
         return channelProfileId;
     }
 
-    public void setChannelProfileId(Long channelProfileId) {
+    public void setChannelProfileId(final Long channelProfileId) {
         this.channelProfileId = channelProfileId;
     }
 
@@ -241,7 +248,7 @@ public class Notification implements BetterjrEntity {
         return channel;
     }
 
-    public void setChannel(String channel) {
+    public void setChannel(final String channel) {
         this.channel = channel == null ? null : channel.trim();
     }
 
@@ -249,7 +256,7 @@ public class Notification implements BetterjrEntity {
         return sentDate;
     }
 
-    public void setSentDate(String sentDate) {
+    public void setSentDate(final String sentDate) {
         this.sentDate = sentDate == null ? null : sentDate.trim();
     }
 
@@ -257,7 +264,7 @@ public class Notification implements BetterjrEntity {
         return sentTime;
     }
 
-    public void setSentTime(String sentTime) {
+    public void setSentTime(final String sentTime) {
         this.sentTime = sentTime == null ? null : sentTime.trim();
     }
 
@@ -265,7 +272,7 @@ public class Notification implements BetterjrEntity {
         return subject;
     }
 
-    public void setSubject(String subject) {
+    public void setSubject(final String subject) {
         this.subject = subject == null ? null : subject.trim();
     }
 
@@ -273,7 +280,7 @@ public class Notification implements BetterjrEntity {
         return content;
     }
 
-    public void setContent(String content) {
+    public void setContent(final String content) {
         this.content = content == null ? null : content.trim();
     }
 
@@ -281,7 +288,7 @@ public class Notification implements BetterjrEntity {
         return reference;
     }
 
-    public void setReference(String reference) {
+    public void setReference(final String reference) {
         this.reference = reference == null ? null : reference.trim();
     }
 
@@ -289,7 +296,7 @@ public class Notification implements BetterjrEntity {
         return batchNo;
     }
 
-    public void setBatchNo(Long batchNo) {
+    public void setBatchNo(final Long batchNo) {
         this.batchNo = batchNo;
     }
 
@@ -297,7 +304,7 @@ public class Notification implements BetterjrEntity {
         return regOperId;
     }
 
-    public void setRegOperId(Long regOperId) {
+    public void setRegOperId(final Long regOperId) {
         this.regOperId = regOperId;
     }
 
@@ -305,7 +312,7 @@ public class Notification implements BetterjrEntity {
         return regOperName;
     }
 
-    public void setRegOperName(String regOperName) {
+    public void setRegOperName(final String regOperName) {
         this.regOperName = regOperName == null ? null : regOperName.trim();
     }
 
@@ -313,7 +320,7 @@ public class Notification implements BetterjrEntity {
         return regDate;
     }
 
-    public void setRegDate(String regDate) {
+    public void setRegDate(final String regDate) {
         this.regDate = regDate == null ? null : regDate.trim();
     }
 
@@ -321,7 +328,7 @@ public class Notification implements BetterjrEntity {
         return regTime;
     }
 
-    public void setRegTime(String regTime) {
+    public void setRegTime(final String regTime) {
         this.regTime = regTime == null ? null : regTime.trim();
     }
 
@@ -329,7 +336,7 @@ public class Notification implements BetterjrEntity {
         return modiOperId;
     }
 
-    public void setModiOperId(Long modiOperId) {
+    public void setModiOperId(final Long modiOperId) {
         this.modiOperId = modiOperId;
     }
 
@@ -337,7 +344,7 @@ public class Notification implements BetterjrEntity {
         return modiOperName;
     }
 
-    public void setModiOperName(String modiOperName) {
+    public void setModiOperName(final String modiOperName) {
         this.modiOperName = modiOperName == null ? null : modiOperName.trim();
     }
 
@@ -345,7 +352,7 @@ public class Notification implements BetterjrEntity {
         return modiDate;
     }
 
-    public void setModiDate(String modiDate) {
+    public void setModiDate(final String modiDate) {
         this.modiDate = modiDate == null ? null : modiDate.trim();
     }
 
@@ -353,7 +360,7 @@ public class Notification implements BetterjrEntity {
         return modiTime;
     }
 
-    public void setModiTime(String modiTime) {
+    public void setModiTime(final String modiTime) {
         this.modiTime = modiTime == null ? null : modiTime.trim();
     }
 
@@ -361,7 +368,7 @@ public class Notification implements BetterjrEntity {
         return operOrg;
     }
 
-    public void setOperOrg(String operOrg) {
+    public void setOperOrg(final String operOrg) {
         this.operOrg = operOrg == null ? null : operOrg.trim();
     }
 
@@ -369,7 +376,7 @@ public class Notification implements BetterjrEntity {
         return businStatus;
     }
 
-    public void setBusinStatus(String businStatus) {
+    public void setBusinStatus(final String businStatus) {
         this.businStatus = businStatus == null ? null : businStatus.trim();
     }
 
@@ -377,7 +384,7 @@ public class Notification implements BetterjrEntity {
         return lastStatus;
     }
 
-    public void setLastStatus(String lastStatus) {
+    public void setLastStatus(final String lastStatus) {
         this.lastStatus = lastStatus == null ? null : lastStatus.trim();
     }
 
@@ -385,7 +392,7 @@ public class Notification implements BetterjrEntity {
         return custNo;
     }
 
-    public void setCustNo(Long custNo) {
+    public void setCustNo(final Long custNo) {
         this.custNo = custNo;
     }
 
@@ -393,13 +400,21 @@ public class Notification implements BetterjrEntity {
         return custName;
     }
 
-    public void setCustName(String custName) {
+    public void setCustName(final String custName) {
         this.custName = custName == null ? null : custName.trim();
+    }
+
+    public String getImmediate() {
+        return immediate;
+    }
+
+    public void setImmediate(final String anImmediate) {
+        immediate = anImmediate;
     }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         sb.append(getClass().getSimpleName());
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
@@ -427,13 +442,14 @@ public class Notification implements BetterjrEntity {
         sb.append(", lastStatus=").append(lastStatus);
         sb.append(", custNo=").append(custNo);
         sb.append(", custName=").append(custName);
+        sb.append(", immediate=").append(immediate);
         sb.append(", serialVersionUID=").append(serialVersionUID);
         sb.append("]");
         return sb.toString();
     }
 
     @Override
-    public boolean equals(Object that) {
+    public boolean equals(final Object that) {
         if (this == that) {
             return true;
         }
@@ -443,31 +459,32 @@ public class Notification implements BetterjrEntity {
         if (getClass() != that.getClass()) {
             return false;
         }
-        Notification other = (Notification) that;
+        final Notification other = (Notification) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-            && (this.getVersion() == null ? other.getVersion() == null : this.getVersion().equals(other.getVersion()))
-            && (this.getProfileId() == null ? other.getProfileId() == null : this.getProfileId().equals(other.getProfileId()))
-            && (this.getChannelProfileId() == null ? other.getChannelProfileId() == null : this.getChannelProfileId().equals(other.getChannelProfileId()))
-            && (this.getChannel() == null ? other.getChannel() == null : this.getChannel().equals(other.getChannel()))
-            && (this.getSentDate() == null ? other.getSentDate() == null : this.getSentDate().equals(other.getSentDate()))
-            && (this.getSentTime() == null ? other.getSentTime() == null : this.getSentTime().equals(other.getSentTime()))
-            && (this.getSubject() == null ? other.getSubject() == null : this.getSubject().equals(other.getSubject()))
-            && (this.getContent() == null ? other.getContent() == null : this.getContent().equals(other.getContent()))
-            && (this.getReference() == null ? other.getReference() == null : this.getReference().equals(other.getReference()))
-            && (this.getBatchNo() == null ? other.getBatchNo() == null : this.getBatchNo().equals(other.getBatchNo()))
-            && (this.getRegOperId() == null ? other.getRegOperId() == null : this.getRegOperId().equals(other.getRegOperId()))
-            && (this.getRegOperName() == null ? other.getRegOperName() == null : this.getRegOperName().equals(other.getRegOperName()))
-            && (this.getRegDate() == null ? other.getRegDate() == null : this.getRegDate().equals(other.getRegDate()))
-            && (this.getRegTime() == null ? other.getRegTime() == null : this.getRegTime().equals(other.getRegTime()))
-            && (this.getModiOperId() == null ? other.getModiOperId() == null : this.getModiOperId().equals(other.getModiOperId()))
-            && (this.getModiOperName() == null ? other.getModiOperName() == null : this.getModiOperName().equals(other.getModiOperName()))
-            && (this.getModiDate() == null ? other.getModiDate() == null : this.getModiDate().equals(other.getModiDate()))
-            && (this.getModiTime() == null ? other.getModiTime() == null : this.getModiTime().equals(other.getModiTime()))
-            && (this.getOperOrg() == null ? other.getOperOrg() == null : this.getOperOrg().equals(other.getOperOrg()))
-            && (this.getBusinStatus() == null ? other.getBusinStatus() == null : this.getBusinStatus().equals(other.getBusinStatus()))
-            && (this.getLastStatus() == null ? other.getLastStatus() == null : this.getLastStatus().equals(other.getLastStatus()))
-            && (this.getCustNo() == null ? other.getCustNo() == null : this.getCustNo().equals(other.getCustNo()))
-            && (this.getCustName() == null ? other.getCustName() == null : this.getCustName().equals(other.getCustName()));
+                && (this.getVersion() == null ? other.getVersion() == null : this.getVersion().equals(other.getVersion()))
+                && (this.getProfileId() == null ? other.getProfileId() == null : this.getProfileId().equals(other.getProfileId()))
+                && (this.getChannelProfileId() == null ? other.getChannelProfileId() == null : this.getChannelProfileId().equals(other.getChannelProfileId()))
+                && (this.getChannel() == null ? other.getChannel() == null : this.getChannel().equals(other.getChannel()))
+                && (this.getSentDate() == null ? other.getSentDate() == null : this.getSentDate().equals(other.getSentDate()))
+                && (this.getSentTime() == null ? other.getSentTime() == null : this.getSentTime().equals(other.getSentTime()))
+                && (this.getSubject() == null ? other.getSubject() == null : this.getSubject().equals(other.getSubject()))
+                && (this.getContent() == null ? other.getContent() == null : this.getContent().equals(other.getContent()))
+                && (this.getReference() == null ? other.getReference() == null : this.getReference().equals(other.getReference()))
+                && (this.getBatchNo() == null ? other.getBatchNo() == null : this.getBatchNo().equals(other.getBatchNo()))
+                && (this.getRegOperId() == null ? other.getRegOperId() == null : this.getRegOperId().equals(other.getRegOperId()))
+                && (this.getRegOperName() == null ? other.getRegOperName() == null : this.getRegOperName().equals(other.getRegOperName()))
+                && (this.getRegDate() == null ? other.getRegDate() == null : this.getRegDate().equals(other.getRegDate()))
+                && (this.getRegTime() == null ? other.getRegTime() == null : this.getRegTime().equals(other.getRegTime()))
+                && (this.getModiOperId() == null ? other.getModiOperId() == null : this.getModiOperId().equals(other.getModiOperId()))
+                && (this.getModiOperName() == null ? other.getModiOperName() == null : this.getModiOperName().equals(other.getModiOperName()))
+                && (this.getModiDate() == null ? other.getModiDate() == null : this.getModiDate().equals(other.getModiDate()))
+                && (this.getModiTime() == null ? other.getModiTime() == null : this.getModiTime().equals(other.getModiTime()))
+                && (this.getOperOrg() == null ? other.getOperOrg() == null : this.getOperOrg().equals(other.getOperOrg()))
+                && (this.getBusinStatus() == null ? other.getBusinStatus() == null : this.getBusinStatus().equals(other.getBusinStatus()))
+                && (this.getLastStatus() == null ? other.getLastStatus() == null : this.getLastStatus().equals(other.getLastStatus()))
+                && (this.getCustNo() == null ? other.getCustNo() == null : this.getCustNo().equals(other.getCustNo()))
+                && (this.getImmediate() == null ? other.getImmediate() == null : this.getImmediate().equals(other.getImmediate()))
+                && (this.getCustName() == null ? other.getCustName() == null : this.getCustName().equals(other.getCustName()));
     }
 
     @Override
@@ -497,11 +514,12 @@ public class Notification implements BetterjrEntity {
         result = prime * result + ((getBusinStatus() == null) ? 0 : getBusinStatus().hashCode());
         result = prime * result + ((getLastStatus() == null) ? 0 : getLastStatus().hashCode());
         result = prime * result + ((getCustNo() == null) ? 0 : getCustNo().hashCode());
+        result = prime * result + ((getImmediate() == null) ? 0 : getImmediate().hashCode());
         result = prime * result + ((getCustName() == null) ? 0 : getCustName().hashCode());
         return result;
     }
-    
-    public void initAddValue(CustOperatorInfo anOperator, CustInfo anCustomer) {
+
+    public void initAddValue(final CustOperatorInfo anOperator, final CustInfo anCustomer) {
         this.id = SerialGenerator.getLongValue("Notification.id");
 
         this.regOperId = anOperator.getId();

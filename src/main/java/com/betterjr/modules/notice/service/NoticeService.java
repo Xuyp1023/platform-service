@@ -181,7 +181,7 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
         if (BetterStringUtils.isBlank(anTargetCust) == true) {
             // 取所有接口
             if (UserUtils.platformUser() == true) { // 平台面向所有客户发送公告
-                List<String> custNoList = accountService.queryAllCustInfo().stream().map(custInfo -> String.valueOf(custInfo.getCustNo()))
+                List<String> custNoList = accountService.queryValidCustInfo().stream().map(custInfo -> String.valueOf(custInfo.getCustNo()))
                         .collect(Collectors.toList());
                 targetCusts = custNoList.toArray(new String[custNoList.size()]);
             }

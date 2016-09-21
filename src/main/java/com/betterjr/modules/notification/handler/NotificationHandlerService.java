@@ -26,6 +26,7 @@ import com.betterjr.common.mq.message.MQMessage;
 import com.betterjr.common.service.FreemarkerService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterDateUtils;
+import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
@@ -167,20 +168,20 @@ public class NotificationHandlerService {
         if (Collections3.isEmpty(operators) == false) {
             for (final Pair<CustOperatorInfo, CustInfo> tempOperator : operators) {
                 // 未订阅不产生数据
-                final boolean subscribeFlag = subscribeService.checkSubscribe(anNotification.getProfileId(),
+                /*final boolean subscribeFlag = subscribeService.checkSubscribe(anNotification.getProfileId(),
                         anNotification.getChannelProfileId(),
                         tempOperator.getRight(),
                         tempOperator.getLeft(),
                         anSendCustomer.getCustNo());
 
-                if (subscribeFlag) {
-                    addNotificationCustomer(anNotification,
-                            getSendNo(anNotification, tempOperator.getLeft()),
-                            tempOperator.getLeft(),
-                            tempOperator.getRight(),
-                            anSendOperator,
-                            anSendCustomer);
-                }
+                if (subscribeFlag) {*/
+                addNotificationCustomer(anNotification,
+                        getSendNo(anNotification, tempOperator.getLeft()),
+                        tempOperator.getLeft(),
+                        tempOperator.getRight(),
+                        anSendOperator,
+                        anSendCustomer);
+                //}
             }
         }
 
@@ -200,12 +201,18 @@ public class NotificationHandlerService {
             }
         }
 
-        if (StringUtils.equals(NotificationConstants.CHANNEL_EMAIL, anNotification.getChannel())) {
+        if (BetterStringUtils.equals(NotificationConstants.CHANNEL_EMAIL, anNotification.getChannel())) {
             processEmail(anNotification, anSendOperator, anSendCustomer);
         }
 
-        if (StringUtils.equals(NotificationConstants.CHANNEL_WECHAT, anNotification.getChannel())) {
+        if (BetterStringUtils.equals(NotificationConstants.CHANNEL_WECHAT, anNotification.getChannel())) {
             processWechat(anNotification, anSendOperator, anSendCustomer);
+        }
+
+        // 需要即时发送的短信消息
+        if (BetterStringUtils.equals(NotificationConstants.CHANNEL_SMS, anNotification.getChannel())
+                && BetterStringUtils.equals(anNotification.getImmediate(), NotificationConstants.IMMEDIATE_TRUE)) {
+            processSms(anNotification, anSendOperator, anSendCustomer);
         }
     }
 
@@ -280,6 +287,26 @@ public class NotificationHandlerService {
     }
 
     /**
+     * 处理sms消息
+     */
+    private void processSms(final Notification anNotification, final CustOperatorInfo anSendOperator, final CustInfo anSendCustomer) {
+        final MQMessage message = new MQMessage(NotificationConstants.NOTIFICATION_SMS_TOPIC, MQCodecType.FST);
+        message.setObject(anNotification);
+        message.addHead("sendOperator", anSendOperator);
+        message.addHead("sendCustomer", anSendCustomer);
+        try {
+            final SendResult sendResult = betterProducer.sendMessage(message);
+
+            if (sendResult.getSendStatus().equals(SendStatus.SEND_OK) == false) {
+                logger.warn("消息通知发送失败 SendResult=" + sendResult.toString());
+            }
+        }
+        catch (final Exception e) {
+            logger.error("消息通知发送错误", e);
+        }
+    }
+
+    /**
      * 添加消息
      */
     private Notification addNotification(final NotificationProfile anProfile,
@@ -299,6 +326,7 @@ public class NotificationHandlerService {
         tempNotification.setReference(resolveTemplateContent(anChannelProfile.getReference(), profileVariables, anParam));
         tempNotification.setSentDate(BetterDateUtils.getNumDate());
         tempNotification.setSentTime(BetterDateUtils.getNumTime());
+        tempNotification.setImmediate(BetterStringUtils.isBlank(anProfile.getImmediate()) ? NotificationConstants.IMMEDIATE_FALSE : NotificationConstants.IMMEDIATE_TRUE);
         tempNotification.setBatchNo(anBatchNo);
 
         final Notification notification = notificationService.addNotification(tempNotification, anOperator, anCustomer);
