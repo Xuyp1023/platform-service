@@ -1,10 +1,13 @@
 package com.betterjr.modules.customer.dubbo;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import com.betterjr.common.web.AjaxObject;
 import com.betterjr.modules.customer.ICustRelationService;
+import com.betterjr.modules.customer.data.CustRelationData;
 import com.betterjr.modules.customer.service.CustRelationAuditService;
 import com.betterjr.modules.customer.service.CustRelationService;
 
@@ -120,6 +123,16 @@ public class CustRelationDubboService implements ICustRelationService {
     public String webQueryFactorCustRelation(Long anFactorNo, String anCreditType) {
 
         return AjaxObject.newOk("保理机构关系客户查询成功", custRelationService.queryFactorCustRelation(anFactorNo, anCreditType)).toJson();
+    }
+    
+    /****
+     * 查询客户号根据类型返回关联关系信息
+     * @param anCustNo 关系客户号
+     * @param anCreditType 关系类型
+     * @return 关系列表
+     */
+    public List<CustRelationData> webQueryCustRelationData(Long anCustNo,String anCreditType){
+        return custRelationService.queryCustRelationData(anCustNo,anCreditType);
     }
 
     /* (non-Javadoc)

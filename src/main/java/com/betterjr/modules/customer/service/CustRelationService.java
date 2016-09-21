@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.betterjr.common.data.SimpleDataEntity;
 import com.betterjr.common.exception.BytterTradeException;
+import com.betterjr.common.mapper.BeanMapper;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterStringUtils;
@@ -25,6 +26,7 @@ import com.betterjr.modules.account.service.CustAndOperatorRelaService;
 import com.betterjr.modules.account.service.CustCertService;
 import com.betterjr.modules.customer.constants.CustomerConstants;
 import com.betterjr.modules.customer.dao.CustRelationMapper;
+import com.betterjr.modules.customer.data.CustRelationData;
 import com.betterjr.modules.customer.entity.CustRelation;
 import com.betterjr.modules.sys.entity.DictItemInfo;
 
@@ -523,6 +525,25 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
             anRuleList.add(CustomerConstants.RELATE_TYPE_SELLER_FACTOR);
         }
         return anRuleList;
+    }
+    
+    /****
+     * 查询客户号根据类型返回关联关系信息
+     * @param anCustNo 关系客户号
+     * @param anCreditType 关系类型
+     * @return 关系列表
+     */
+    public List<CustRelationData> queryCustRelationData(Long anCustNo,String anCreditType){
+        List<CustRelationData> dataList=new ArrayList<CustRelationData>();
+        Map<String, Object> anMap = new HashMap<String, Object>();
+        anMap.put("custNo", anCustNo);
+        anMap.put("relateType", anCreditType);
+        anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
+        for(CustRelation custRelation:this.selectByProperty(anMap)){
+            CustRelationData relationData=BeanMapper.map(custRelation,CustRelationData.class);
+            dataList.add(relationData);
+        }
+        return dataList;
     }
 
     /**

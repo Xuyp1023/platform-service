@@ -65,12 +65,12 @@ public class SysOperatorRoleRelationService extends BaseService<SysOperatorRoleR
        logger.info("ruleList:"+ruleList);
        String[] ruleArr=ruleList.split(",");
        for(int i=0;i<ruleArr.length;i++){
-           String roleName=ruleArr[i];
-           Role role=roleService.findRoleByName(roleName);
+           Long roleId=Long.parseLong(ruleArr[i]);
+           Role role=roleService.findRoleById(roleId);
            if(role==null){
                throw new BytterTradeException("角色信息未找到");
            }
-           SysOperatorRoleRelation roleRelation=new SysOperatorRoleRelation(role.getId(), anOperatorId, roleName);
+           SysOperatorRoleRelation roleRelation=new SysOperatorRoleRelation(role.getId(), anOperatorId, role.getRoleName());
            this.insert(roleRelation);
        }
     }

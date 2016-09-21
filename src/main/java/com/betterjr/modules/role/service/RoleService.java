@@ -92,7 +92,7 @@ public class RoleService extends BaseService<RoleMapper, Role> {
      */
     public Page<Role> queryRole(Map<String, Object> anMap,int anPageNum,int anPageSize){
         Map<String, Object> map=new HashMap<String, Object>();
-        map.put("businStatus", new String[]{"0","1"});
+        map.put("businStatus", new String[]{"1"});
         if(BetterStringUtils.isNotBlank((String)anMap.get("roleName"))){
             map.put("roleName", anMap.get("roleName"));
         }
@@ -114,9 +114,9 @@ public class RoleService extends BaseService<RoleMapper, Role> {
      * @param roleName
      * @return
      */
-    public Role findRoleByName(String roleName){
+    public Role findRoleById(Long roleId){
         Map<String, Object> roleMp=new HashMap<>();
-        roleMp.put("roleName", roleName);
+        roleMp.put("id", roleId);
         roleMp.put("businStatus", "1");
         List<Role> roleList= this.selectByProperty(roleMp);
         return Collections3.getFirst(roleList);

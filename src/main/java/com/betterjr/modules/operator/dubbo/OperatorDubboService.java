@@ -106,4 +106,19 @@ public class OperatorDubboService implements IOperatorService {
     public String webFindCustOperator() {
         return AjaxObject.newOk("查询当前登录机构下的操作员", operatorRequestService.findCustOperator()).toJson();
     }
+    
+    /****
+     * 修改密码
+     * @param anNewPasswd 新密码
+     * @param anOkPasswd  确认密码
+     * @param anPasswd 原密码
+     * @return
+     */
+    public String webUpdatePassword(String anNewPasswd,String anOkPasswd,String anPasswd){
+        if(operatorRequestService.updatePasword(anNewPasswd,anOkPasswd,anPasswd)){
+            return AjaxObject.newOk("密码修改成功").toJson();
+        }else{
+            return AjaxObject.newError("密码修改失败").toJson();
+        }
+    }
 }
