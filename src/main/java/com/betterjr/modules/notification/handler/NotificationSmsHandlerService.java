@@ -51,11 +51,13 @@ public class NotificationSmsHandlerService {
         if (BetterStringUtils.equals(notification.getImmediate(), NotificationConstants.IMMEDIATE_TRUE) == true) {
             final List<NotificationCustomer> notificationCustomers = notificationCustomerService.queryNotifiCustomerByNotifiId(notification.getId());
 
-            final String mobileList = notificationCustomers.stream().map(notificationCustomer -> notificationCustomer.getSendNo()).filter(mobile->BetterStringUtils.isMobileNo(mobile)).collect(Collectors.joining(","));
+            final String mobileList = notificationCustomers.stream().map(notificationCustomer -> notificationCustomer.getSendNo()).filter(BetterStringUtils::isMobileNo).collect(Collectors.joining(","));
 
-            final String result = SmsUtils.send(notification.getContent(), mobileList);
+            if (BetterStringUtils.isNotBlank(mobileList)) {
+                final String result = SmsUtils.send(notification.getContent(), mobileList);
 
-            logger.info("短信发送结果：" + result);
+                logger.info("短信发送结果：" + result);
+            }
         }
     }
 }

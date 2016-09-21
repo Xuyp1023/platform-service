@@ -144,6 +144,9 @@ public class NotificationService extends BaseService<NotificationMapper, Notific
         BTAssert.notNull(anId, "编号不允许为空");
         BTAssert.notNull(anBusinStatus, "状态不允许为空！");
         final Notification notification = this.selectByPrimaryKey(anId);
+        if (null == notification) {
+            return null;
+        }
         notification.setBusinStatus(anBusinStatus);
         this.updateByPrimaryKeySelective(notification);
         return notification;
