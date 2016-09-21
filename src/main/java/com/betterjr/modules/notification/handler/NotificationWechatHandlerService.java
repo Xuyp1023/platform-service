@@ -38,9 +38,9 @@ public class NotificationWechatHandlerService {
 
         final List<NotificationCustomer> notificationCustomers = notificationCustomerService.queryNotifiCustomerByNotifiId(notification.getId());
 
-        notificationCustomers.forEach(notificationCustomer -> {
+        for(final NotificationCustomer notificationCustomer: notificationCustomers) {
             sendWechat(notification, notificationCustomer);
-        });
+        }
 
         notificationService.saveNotificationStatus(notification.getId(), NotificationConstants.SEND_STATUS_SUCCESS);
     }

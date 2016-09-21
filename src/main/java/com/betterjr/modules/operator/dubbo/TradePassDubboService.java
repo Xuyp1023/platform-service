@@ -59,7 +59,7 @@ public class TradePassDubboService implements ITradePassService {
         final VerifyCode verifyCode = verificationCodeService.sendVerifyCode(mobile, VerifyCodeType.CHANGE_TRADE_PASSWORD);
         BTAssert.notNull(verifyCode, "没有生成验证码！");
 
-        JedisUtils.setObject(SmsConstants.smsModifyTradePassVerifyCodePrefix + operator.getId(), verifyCode, SmsConstants.SEC_300);
+        JedisUtils.setObject(SmsConstants.smsModifyTradePassVerifyCodePrefix + operator.getId(), verifyCode, SmsConstants.SEC_600);
         return AjaxObject.newOk("发送验证码成功").toJson();
     }
 
@@ -75,7 +75,7 @@ public class TradePassDubboService implements ITradePassService {
         BTAssert.notNull(verifyCode, "验证码已过期");
 
         if (BetterStringUtils.equals(verifyCode.getVerifiCode(), anVerifyCode)) {
-            JedisUtils.setObject(SmsConstants.smsModifyTradePassVerifyCodePrefix + operator.getId(), verifyCode, SmsConstants.SEC_600);
+            JedisUtils.setObject(SmsConstants.smsModifyTradePassVerifyCodePrefix + operator.getId(), "true", SmsConstants.SEC_300);
 
             return AjaxObject.newOk("验证码验证成功").toJson();
         } else {
