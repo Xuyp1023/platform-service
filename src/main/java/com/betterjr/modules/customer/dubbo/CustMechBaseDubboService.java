@@ -11,12 +11,14 @@ import org.slf4j.LoggerFactory;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import com.betterjr.common.data.SimpleDataEntity;
+import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.common.web.AjaxObject;
 import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
+import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.customer.ICustMechBaseService;
 import com.betterjr.modules.customer.constants.CustomerConstants;
 import com.betterjr.modules.customer.entity.CustChangeApply;
@@ -46,6 +48,33 @@ public class CustMechBaseDubboService implements ICustMechBaseService {
 
     @Resource
     private CustChangeService changeService;
+
+    @Resource
+    private CustAccountService accountService;
+
+    /* (non-Javadoc)
+     * @see com.betterjr.modules.customer.ICustMechBaseService#webQueryValidCustInfo()
+     */
+    @Override
+    public String webQueryValidCustInfo(final Map<String, Object> anParam, final int anFlag, final int anPageNum, final int anPageSize) {
+        BTAssert.isTrue(UserUtils.platformUser(), "本接口只允许平台调用");
+
+        final Map<String, Object> param = RuleServiceDubboFilterInvoker.getInputObj();
+
+        return AjaxObject.newOkWithPage("查询所有有效客户成功", accountService.queryValidCustInfo(param, anFlag, anPageNum, anPageSize)).toJson();
+    }
+
+    /* (non-Javadoc)
+     * @see com.betterjr.modules.customer.ICustMechBaseService#webQueryInvalidCustInfo()
+     */
+    @Override
+    public String webQueryInvalidCustInfo(final Map<String, Object> anParam, final int anFlag, final int anPageNum, final int anPageSize) {
+        BTAssert.isTrue(UserUtils.platformUser(), "本接口只允许平台调用");
+
+        final Map<String, Object> param = RuleServiceDubboFilterInvoker.getInputObj();
+
+        return AjaxObject.newOkWithPage("查询所有未生效客户成功", accountService.queryInvalidCustInfo(param, anFlag, anPageNum, anPageSize)).toJson();
+    }
 
     @Override
     public String webCheckOrgType(final String anRole) {
@@ -165,4 +194,6 @@ public class CustMechBaseDubboService implements ICustMechBaseService {
 
         return AjaxObject.newOk("微信用户信息获取 成功", resultMap).toJson();
     }
+
+
 }

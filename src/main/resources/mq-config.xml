@@ -25,5 +25,10 @@
 		<constructor-arg index="3" value="${mail.username}" />
 		<constructor-arg index="4" value="${mail.password}" />
 	</bean>
-
+    <bean class="com.betterjr.modules.notification.provider.SmsUtils"
+        scope="singleton" lazy-init="false">
+        <constructor-arg index="0" value="${sms.spId}" />
+        <constructor-arg index="1" value="${sms.password}" />
+        <constructor-arg index="2" value="${sms.accessCode}" />
+    </bean>
 </beans>

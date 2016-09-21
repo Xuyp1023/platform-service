@@ -22,7 +22,7 @@ import com.betterjr.modules.customer.entity.CustMechBaseTmp;
 
 /**
  * 客户基本信息管理
- * 
+ *
  * @author liuwl
  *
  */
@@ -39,38 +39,38 @@ public class CustMechBaseService extends BaseService<CustMechBaseMapper, CustMec
 
     /**
      * 公司基本信息-查询详情
-     * 
+     *
      * @param anCustNo
      * @return
      */
-    public CustMechBase findCustMechBaseByCustNo(Long anCustNo) {
+    public CustMechBase findCustMechBaseByCustNo(final Long anCustNo) {
         BTAssert.notNull(anCustNo, "客户编号不允许为空！");
 
-        CustMechBase custMechBase = this.selectByPrimaryKey(anCustNo);
+        final CustMechBase custMechBase = this.selectByPrimaryKey(anCustNo);
 
         return custMechBase;
     }
 
     /**
      * 公司基本信息-修改
-     * 
+     *
      * @param anCustMechBase
      * @return
      */
-    public CustMechBase saveCustMechBase(CustMechBaseTmp anCustMechBaseTmp) {
+    public CustMechBase saveCustMechBase(final CustMechBaseTmp anCustMechBaseTmp) {
         BTAssert.notNull(anCustMechBaseTmp, "客户基本信息流不允许为空！");
 
-        Long custNo = anCustMechBaseTmp.getRefId();
+        final Long custNo = anCustMechBaseTmp.getRefId();
 
         final CustMechBase tempCustMechBase = this.findCustMechBaseByCustNo(custNo);
         BTAssert.notNull(tempCustMechBase, "对应的客户基本信息没有找到！");
 
         tempCustMechBase.initModifyValue(anCustMechBaseTmp);
         this.updateByPrimaryKey(tempCustMechBase);
-        
-        CustInfo custInfo = accountService.findCustInfo(custNo);
+
+        final CustInfo custInfo = accountService.findCustInfo(custNo);
         custInfo.setCustName(tempCustMechBase.getCustName());
-        
+
         accountService.updateByPrimaryKeySelective(custInfo);
 
         return tempCustMechBase;
@@ -78,16 +78,16 @@ public class CustMechBaseService extends BaseService<CustMechBaseMapper, CustMec
 
     /**
      * 公司基本信息-添加
-     * 
+     *
      * @param anCustMechBase
      * @return
      */
-    public CustMechBase addCustMechBase(CustMechBase anCustMechBase, Long anCustNo) {
+    public CustMechBase addCustMechBase(final CustMechBase anCustMechBase, final Long anCustNo) {
         BTAssert.notNull(anCustNo, "客户编号不允许为空！");
         BTAssert.notNull(anCustMechBase, "客户基本信息不允许为空！");
 
         // 检查 custNo 是否已经存在
-        CustMechBase tempCustMechBase = findCustMechBaseByCustNo(anCustNo);
+        final CustMechBase tempCustMechBase = findCustMechBaseByCustNo(anCustNo);
         BTAssert.isNull(tempCustMechBase, "客户基本信息已存在，不允许重复录入！");
 
         final CustInfo custInfo = accountService.selectByPrimaryKey(anCustNo);
@@ -102,7 +102,7 @@ public class CustMechBaseService extends BaseService<CustMechBaseMapper, CustMec
 
     /**
      * 公司列表
-     * 
+     *
      * @return
      */
     public Collection<CustInfo> queryCustInfo() {
@@ -112,16 +112,16 @@ public class CustMechBaseService extends BaseService<CustMechBaseMapper, CustMec
 
     /**
      * 公司列表 供选择框使用
-     * 
+     *
      * @return
      */
     public Collection<SimpleDataEntity> queryCustInfoSelect() {
         final CustOperatorInfo operator = UserUtils.getOperatorInfo();
-        List<CustInfo> custInfos = accountService.findCustInfoByOperator(operator.getId(), operator.getOperOrg());
-        Collection<SimpleDataEntity> custInfoSelects = new ArrayList<>();
+        final List<CustInfo> custInfos = accountService.findCustInfoByOperator(operator.getId(), operator.getOperOrg());
+        final Collection<SimpleDataEntity> custInfoSelects = new ArrayList<>();
 
         custInfos.forEach(custInfo -> custInfoSelects.add(new SimpleDataEntity(custInfo.getCustName(), String.valueOf(custInfo.getCustNo()))));
-        
+
         return custInfoSelects;
     }
 }
