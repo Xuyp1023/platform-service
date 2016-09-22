@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -16,9 +17,11 @@ import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.account.entity.CustCertInfo;
+import com.betterjr.modules.account.entity.CustCertRule;
 import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.betterjr.modules.account.service.CustAccountService;
+import com.betterjr.modules.account.service.CustCertRuleService;
 import com.betterjr.modules.account.service.CustCertService;
 import com.betterjr.modules.notification.constants.NotificationConstants;
 import com.betterjr.modules.notification.dao.NotificationProfileMapper;
@@ -31,6 +34,9 @@ public class NotificationProfileService extends BaseService<NotificationProfileM
 
     @Resource
     private CustCertService certService;
+
+    @Resource
+    private CustCertRuleService certRuleService;
 
     @Resource
     private NotificationChannelProfileService channelProfileService;
@@ -58,47 +64,37 @@ public class NotificationProfileService extends BaseService<NotificationProfileM
     }
 
     public NotificationProfile findDefaultProfileByProfileNameAndCustNo(final String anProfileName, final Long anCustNo) {
-        final List<String> types = getCustTypesByCustNo(anCustNo); // 公司类型
+        final List<String> rules = getCustRulesByCustNo(anCustNo); // 公司类型
 
         final Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("profileName", anProfileName);
         conditionMap.put("LTid", 0);                    // 编号小于0
         conditionMap.put("NEcustom", NotificationConstants.PROFILE_CUSTOM);              // NotEqual非custom
-        conditionMap.put("profileType", types);         // 公司类型需要匹配
+        conditionMap.put("profileRule", rules);         // 公司类型需要匹配
 
         return Collections3.getFirst(this.selectByProperty(conditionMap));
     }
 
     // 模板类型  0:平台,1:保理公司,2:核心企业,3:供应商,4:经销商
-    public List<String> getCustTypesByCustNo(final Long anCustNo) {
-        final List<String> types = new ArrayList<>();
+    public List<String> getCustRulesByCustNo(final Long anCustNo) {
+        final List<String> rules = new ArrayList<>();
 
         final CustInfo custInfo = accountService.findCustInfo(anCustNo);
         if (custInfo == null) {
-            return types;
+            return rules;
         }
 
         final CustCertInfo certInfo = certService.findCertByOperOrg(custInfo.getOperOrg());
         if (certInfo == null) {
-            return types;
+            return rules;
         }
 
-        if (UserUtils.coreCustomer(certInfo)) {
-            types.add(NotificationConstants.PROFILE_TYPE_CORE);
-        }
-        if (UserUtils.platformCustomer(certInfo)) {
-            types.add(NotificationConstants.PROFILE_TYPE_PLATFORM);
-        }
-        if (UserUtils.factorCustomer(certInfo)) {
-            types.add(NotificationConstants.PROFILE_TYPE_FACTOR);
-        }
-        if (UserUtils.supplierCustomer(certInfo)) {
-            types.add(NotificationConstants.PROFILE_TYPE_SUPPLIER);
-        }
-        if (UserUtils.sellerCustomer(certInfo)) {
-            types.add(NotificationConstants.PROFILE_TYPE_SELLER);
-        }
-        return types;
+        final List<CustCertRule> certRules = certRuleService.queryCertRuleListBySerialNo(certInfo.getSerialNo());
+
+        rules.addAll(certRules.stream().map(certRule->certRule.getRule()).collect(Collectors.toList()));
+
+        return rules;
+
     }
 
     /**
@@ -107,12 +103,12 @@ public class NotificationProfileService extends BaseService<NotificationProfileM
     public Page<NotificationProfile> queryNotificationProfile(final Long anCustNo, final int anFlag, final int anPageNum, final int anPageSize) {
         BTAssert.notNull(anCustNo, "客户编号不允许为空!");
 
-        final List<String> types = getCustTypesByCustNo(anCustNo);  // 公司类型
+        final List<String> rules = getCustRulesByCustNo(anCustNo);  // 公司类型
 
         final Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("LTid", 0);
         conditionMap.put("NEcustom", NotificationConstants.PROFILE_CUSTOM);
-        conditionMap.put("profileType", types);
+        conditionMap.put("profileRule", rules);
 
         final Page<NotificationProfile> profilePage = this.selectPropertyByPage(conditionMap, anPageNum, anPageSize, anFlag == 1);
 

@@ -8,7 +8,7 @@ import com.betterjr.modules.notification.INotificationSubscribeService;
 import com.betterjr.modules.notification.service.NotificationSubscribeService;
 
 /**
- * 
+ *
  * @author liuwl
  *
  */
@@ -18,19 +18,19 @@ public class NotificationSubscribeDubboService implements INotificationSubscribe
     private NotificationSubscribeService subscribeService;
 
     @Override
-    public String webQuerySubscribeByCustNo(Long anCustNo, int anFlag, int anPageNum, int anPageSize) {
+    public String webQuerySubscribeByCustNo(final Long anCustNo, final int anFlag, final int anPageNum, final int anPageSize) {
         return AjaxObject.newOkWithPage("查询订阅列表成功!", subscribeService.queryProfileSubscribe(anCustNo, anFlag, anPageNum, anPageSize)).toJson();
     }
 
     @Override
-    public String webCancelSubscribe(Long anCustNo, Long anChannelProfileId) {
-        subscribeService.saveCancelSubscribe(anCustNo, anChannelProfileId);
+    public String webCancelSubscribe(final Long anCustNo, final Long anSourceCustNo, final String anProfileName, final String anChannel) {
+        subscribeService.saveCancelSubscribe(anCustNo, anSourceCustNo, anProfileName, anChannel);
         return AjaxObject.newOk("取消订阅成功!").toJson();
     }
 
     @Override
-    public String webConfirmSubscribe(Long anCustNo, Long anChannelProfileId) {
-        subscribeService.saveConfirmSubscribe(anCustNo, anChannelProfileId);
+    public String webConfirmSubscribe(final Long anCustNo, final Long anSourceCustNo, final String anProfileName, final String anChannel) {
+        subscribeService.saveConfirmSubscribe(anCustNo, anSourceCustNo, anProfileName, anChannel);
         return AjaxObject.newOk("订阅成功!").toJson();
     }
 

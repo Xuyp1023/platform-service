@@ -30,7 +30,7 @@
 	<dubbo:application name="${dubbo.application}" />
 
 	<!-- 用dubbo协议在20880端口暴露服务 -->
-	<dubbo:protocol name="dubbo" port="${dubbo.protocol.port}" serialization="${dubbo.protocol.serialization}" />
+	<dubbo:protocol name="dubbo" port="${dubbo.protocol.port}" server="netty" serialization="${dubbo.protocol.serialization}" />
 	
 	<!-- 声明所有服务接口的默认设置 -->
 	<dubbo:provider timeout="50000" retries="0" loadbalance="random"
