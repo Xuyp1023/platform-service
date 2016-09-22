@@ -468,7 +468,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         anCustInfo.setCustName(anOpenAccountInfo.getCustName());
         anCustInfo.setIdentType("1");
         anCustInfo.setIdentNo(anOpenAccountInfo.getBusinLicence());
-        anCustInfo.setVaildDate(anOpenAccountInfo.getBusinLicenceValidDate());
+        anCustInfo.setValidDate(anOpenAccountInfo.getBusinLicenceValidDate());
         anCustInfo.setRegDate(BetterDateUtils.getNumDate());
         anCustInfo.setRegTime(BetterDateUtils.getNumTime());
         anCustInfo.setBusinStatus("0");
