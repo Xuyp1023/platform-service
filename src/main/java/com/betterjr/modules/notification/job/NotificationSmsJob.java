@@ -75,7 +75,7 @@ public class NotificationSmsJob extends AbstractSimpleElasticJob {
 
             for (final NotificationCustomer notificationCustomer: customers) {
                 final Long notificationId = notificationCustomer.getNotificationId();
-                final Notification notification = notificationService.findNotification(notificationId);
+                final Notification notification = notificationService.findNotificationById(notificationId);
                 if (notification != null && BetterStringUtils.isMobileNo(notificationCustomer.getSendNo())) {
                     final String result = SmsUtils.send(notification.getContent(), notificationCustomer.getSendNo());
                     logger.info("发送结果：" + result);
