@@ -51,5 +51,6 @@ public class NotificationWechatHandlerService {
      */
     private void sendWechat(final Notification anNotification, final NotificationCustomer anNotificationCustomer) {
         wechatService.sendWechatMessage(anNotificationCustomer.getOperId(), anNotification.getContent());
+        notificationCustomerService.saveNotificationCustomerStatus(anNotificationCustomer.getId(), NotificationConstants.SEND_STATUS_SUCCESS);
     }
 }

@@ -58,6 +58,10 @@ public class NotificationSmsHandlerService {
 
                 logger.info("短信发送结果：" + result);
             }
+            for (final NotificationCustomer notificationCustomer: notificationCustomers) {
+                notificationCustomerService.saveNotificationCustomerStatus(notificationCustomer.getId(), NotificationConstants.SEND_STATUS_SUCCESS);
+            }
+            notificationService.saveNotificationStatus(notification.getId(), NotificationConstants.SEND_STATUS_SUCCESS);
         }
     }
 }

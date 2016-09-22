@@ -90,6 +90,15 @@ public class NotificationService extends BaseService<NotificationMapper, Notific
     /**
      * 消息详情
      */
+    public Notification findNotificationById(final Long anId) {
+        BTAssert.notNull(anId, "消息编号不允许为空!");
+
+        return this.selectByPrimaryKey(anId);
+    }
+
+    /**
+     * 消息详情
+     */
     public Notification findNotification(final Long anId, final Long anOperId, final String anChannel) {
         BTAssert.notNull(anId, "消息编号不允许为空!");
 
@@ -143,7 +152,7 @@ public class NotificationService extends BaseService<NotificationMapper, Notific
     public Notification saveNotificationStatus(final Long anId, final String anBusinStatus) {
         BTAssert.notNull(anId, "编号不允许为空");
         BTAssert.notNull(anBusinStatus, "状态不允许为空！");
-        final Notification notification = this.selectByPrimaryKey(anId);
+        final Notification notification = findNotificationById(anId);
         if (null == notification) {
             return null;
         }
