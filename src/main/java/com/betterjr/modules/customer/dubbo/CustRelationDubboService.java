@@ -7,7 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.betterjr.common.web.AjaxObject;
 import com.betterjr.modules.customer.ICustRelationService;
+
 import com.betterjr.modules.customer.data.CustRelationData;
+
+import com.betterjr.modules.customer.entity.CustRelation;
+
 import com.betterjr.modules.customer.service.CustRelationAuditService;
 import com.betterjr.modules.customer.service.CustRelationService;
 
@@ -141,6 +145,18 @@ public class CustRelationDubboService implements ICustRelationService {
     @Override
     public String webQueryFactorRelation(Long anCustNo) {
         return AjaxObject.newOk("客户与保理机构关系查询成功", custRelationService.queryFactorRelation(anCustNo)).toJson();
+    }
+
+    @Override
+    public CustRelation findOneRelation(Long anCustNo, Long anRelateCustno, String anPartnerCustNo) {
+        // TODO Auto-generated method stub
+        return custRelationService.findOneRelation(anCustNo, anRelateCustno, anPartnerCustNo);
+    }
+
+    @Override
+    public boolean saveFactorRelationStatus(Long anCustNo, String anScfId, String anStatus, String anFactorNo) {
+        // TODO Auto-generated method stub
+        return this.custRelationService.saveFactorRelationStatus(anCustNo, anScfId, anStatus, anFactorNo);
     }
 
 }

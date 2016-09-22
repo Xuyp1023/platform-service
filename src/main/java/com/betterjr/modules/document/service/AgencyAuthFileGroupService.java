@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.modules.document.dao.AgencyAuthorFileGroupMapper;
 import com.betterjr.modules.document.entity.AgencyAuthorFileGroup;
+import com.betterjr.modules.document.utils.DownloadFileService;
 
 @Service
 public class AgencyAuthFileGroupService extends BaseService<AgencyAuthorFileGroupMapper, AgencyAuthorFileGroup> {

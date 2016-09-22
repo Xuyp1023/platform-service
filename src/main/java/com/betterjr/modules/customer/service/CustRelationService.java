@@ -11,10 +11,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.data.SimpleDataEntity;
+import com.betterjr.common.data.WebServiceErrorCode;
 import com.betterjr.common.exception.BytterTradeException;
+
 import com.betterjr.common.mapper.BeanMapper;
+
+import com.betterjr.common.exception.BytterWebServiceException;
+
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
+import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.DictUtils;
@@ -506,6 +512,8 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         anMap.put("relateType", anRelateType);
         return Collections3.getFirst(this.selectByProperty(anMap));
     }
+    
+    
 
     private Long findCustNoByOperator() {
         final Long operId = UserUtils.getOperatorInfo().getId();
@@ -527,6 +535,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         return anRuleList;
     }
     
+
     /****
      * 查询客户号根据类型返回关联关系信息
      * @param anCustNo 关系客户号
@@ -576,6 +585,50 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
             }
         }
         return result;
+
+    /**
+     * 检查客户保理, 
+     * 客户只能是供应商|经销商|核心企业
+     * relateType为 ： 0,2,3
+     * 
+     * @param anCustNo
+     *            客户号
+     * @param anRelateCustno
+     *            保理公司编号，对应接口中定义的relateCustno
+     * @param anPartnerCustNo
+     *            客户在保理公司的客户号
+     * @return
+     */
+    public CustRelation findOneRelation(Long anCustNo, Long anRelateCustno,String anPartnerCustNo) {
+        String relateTypes="0,2,3";
+        List<CustRelation> dataList=this.mapper.findOneRelation(anCustNo, anRelateCustno, anPartnerCustNo, relateTypes);
+        if (!Collections3.isEmpty(dataList)) {
+            return Collections3.getFirst(dataList);
+        }else{
+            logger.error("[Not exists record: anCustNo = " + anCustNo + ", anRelateCustno =" + anRelateCustno + ", anPartnerCustNo =" + anPartnerCustNo + ", relateTypes =" + relateTypes + "]");
+            throw new BytterWebServiceException(WebServiceErrorCode.E1006);
+        }
+    }
+    
+    /**
+     * 更新关联关系的状态
+     * 
+     * @param anCustNo
+     * @param anScfId
+     * @param anStatus
+     * @param anFactorNo
+     */
+    public boolean saveFactorRelationStatus(Long anCustNo, String anScfId, String anStatus, String anFactorNo) {
+        CustRelation factorRel = findOneRelation(anCustNo, Long.parseLong(anFactorNo), anScfId);
+        if (factorRel != null) {
+            factorRel.setBusinStatus(anStatus);
+            factorRel.setModiDate(BetterDateUtils.getNumDate());
+//            factorRel.setLicenseDate(BetterDateUtils.getNumDate());
+            return this.updateByPrimaryKey(factorRel) == 1;
+        }
+
+        return false;
+
     }
 
 }
