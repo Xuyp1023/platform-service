@@ -34,6 +34,12 @@ public class BlacklistService extends BaseService<BlacklistMapper, Blacklist> {
             anMap.put("operOrg", UserUtils.getOperatorInfo().getOperOrg());
         }
 
+        // 处理入参:businStatus状态(0:未生效;1:已生效;)
+        Object anBusinStatus = anMap.get("businStatus");
+        if (null == anBusinStatus || anBusinStatus.toString().isEmpty()) {
+            anMap.put("businStatus", new String[] { BlacklistConstants.BLACKLIST_STATUS_INEFFECTIVE, BlacklistConstants.BLACKLIST_STATUS_EFFECTIVE });
+        }
+
         // 处理入参:custType类型(0:个人;1:机构;)
         Object anCreditType = anMap.get("custType");
         if (null == anCreditType || anCreditType.toString().isEmpty()) {

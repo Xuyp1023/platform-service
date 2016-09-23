@@ -389,6 +389,13 @@ public class CustOpenAccountTmp implements BetterjrEntity {
     @MetaData(value = "组织机构代码证", comments = "组织机构代码证")
     private String orgCode;
 
+    /**
+     * 核心企业列表
+     */
+    @Column(name = "C_CORELIST", columnDefinition = "VARCHAR")
+    @MetaData(value = "核心企业列表", comments = "核心企业列表")
+    private String coreList;
+
     private static final long serialVersionUID = 1468812783872L;
 
     public Long getId() {
@@ -799,6 +806,14 @@ public class CustOpenAccountTmp implements BetterjrEntity {
         auditTime = anAuditTime;
     }
 
+    public String getCoreList() {
+        return coreList;
+    }
+
+    public void setCoreList(String coreList) {
+        this.coreList = coreList;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -856,6 +871,7 @@ public class CustOpenAccountTmp implements BetterjrEntity {
         sb.append(", tmpType=").append(tmpType);
         sb.append(", tmpOperType=").append(tmpOperType);
         sb.append(", orgCode=").append(orgCode);
+        sb.append(", coreList=").append(coreList);
         sb.append(", serialVersionUID=").append(serialVersionUID);
         sb.append("]");
         return sb.toString();
@@ -925,7 +941,8 @@ public class CustOpenAccountTmp implements BetterjrEntity {
                 && (this.getOperOrg() == null ? other.getOperOrg() == null : this.getOperOrg().equals(other.getOperOrg()))
                 && (this.getTmpType() == null ? other.getTmpType() == null : this.getTmpType().equals(other.getTmpType()))
                 && (this.getTmpOperType() == null ? other.getTmpOperType() == null : this.getTmpOperType().equals(other.getTmpOperType()))
-                && (this.getOrgCode() == null ? other.getOrgCode() == null : this.getOrgCode().equals(other.getOrgCode()));
+                && (this.getOrgCode() == null ? other.getOrgCode() == null : this.getOrgCode().equals(other.getOrgCode()))
+                && (this.getCoreList() == null ? other.getCoreList() == null : this.getCoreList().equals(other.getCoreList()));
     }
 
     @Override
@@ -983,6 +1000,7 @@ public class CustOpenAccountTmp implements BetterjrEntity {
         result = prime * result + ((getTmpType() == null) ? 0 : getTmpType().hashCode());
         result = prime * result + ((getTmpOperType() == null) ? 0 : getTmpOperType().hashCode());
         result = prime * result + ((getOrgCode() == null) ? 0 : getOrgCode().hashCode());
+        result = prime * result + ((getCoreList() == null) ? 0 : getCoreList().hashCode());
         return result;
     }
 
