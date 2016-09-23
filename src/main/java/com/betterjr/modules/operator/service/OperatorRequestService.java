@@ -178,4 +178,42 @@ public class OperatorRequestService extends BaseService<CustOperatorInfoMapper, 
             throw new BytterTradeException(e.getMessage());
         }
     }
+    
+    /***
+     * 密码重置
+     * @param anOperId
+     * @param anPassword
+     * @param anOkPasswd
+     * @return
+     */
+    public boolean saveChangePassword(Long anOperId, String anPassword, String anOkPasswd) {
+        if (checkOperator(anOperId, null)) {
+            if (BetterStringUtils.isNotBlank(anPassword) && anPassword.equals(anOkPasswd)) {
+
+                return this.custPassService.saveChangePassword(anOperId, anPassword, CustPasswordType.ORG);
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * 检查管理员是否有权限修改操作员信息，只有同机构的管理员才能修改自己的操作员信息
+     * @param anOperId 操作员ID号
+     * @param anOperOrg 操作机构
+     * @return
+     */
+    protected boolean checkOperator(Long anOperId, String anOperOrg) {
+        CustOperatorInfo user = UserUtils.getOperatorInfo();
+        if (BetterStringUtils.isNotBlank(anOperOrg) && user.getOperOrg().equals(anOperOrg)) {
+
+            return true;
+        }
+        CustOperatorInfo tmpUser = this.selectByPrimaryKey(anOperId);
+        if (tmpUser != null){
+            
+            return tmpUser.getOperOrg().equals(user.getOperOrg());
+        }
+        
+        return false;
+    }
 }
