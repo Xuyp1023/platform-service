@@ -45,11 +45,11 @@ public class NotificationProfile implements BetterjrEntity {
     private String profileName;
 
     /**
-     * 模板类型  0:平台,1:保理公司,2:核心企业,3:供应商,4:经销商
+     * 模板类型  PLATFORM_USER:平台,FACTOR_USER:保理公司,CORE_USER:核心企业,SUPPLIER_USER:供应商,SELLER_USER:经销商
      */
-    @Column(name = "C_PROFILE_TYPE",  columnDefinition="CHAR" )
+    @Column(name = "C_PROFILE_RULE",  columnDefinition="VARCHAR" )
     @MetaData( value="模板类型  0:平台,1:保理公司,2:核心企业,3:供应商,4:经销商", comments = "模板类型  0:平台,1:保理公司,2:核心企业,3:供应商,4:经销商")
-    private String profileType;
+    private String profileRule;
 
     /**
      * 是否允许订阅 ：0不允许订阅，1允许订阅
@@ -201,12 +201,12 @@ public class NotificationProfile implements BetterjrEntity {
         this.profileName = profileName == null ? null : profileName.trim();
     }
 
-    public String getProfileType() {
-        return profileType;
+    public String getProfileRule() {
+        return profileRule;
     }
 
-    public void setProfileType(final String profileType) {
-        this.profileType = profileType == null ? null : profileType.trim();
+    public void setProfileRule(final String profileRule) {
+        this.profileRule = profileRule == null ? null : profileRule.trim();
     }
 
     public String getSubscribeEnable() {
@@ -354,7 +354,7 @@ public class NotificationProfile implements BetterjrEntity {
         sb.append(", id=").append(id);
         sb.append(", version=").append(version);
         sb.append(", profileName=").append(profileName);
-        sb.append(", profileType=").append(profileType);
+        sb.append(", profileRule=").append(profileRule);
         sb.append(", subscribeEnable=").append(subscribeEnable);
         sb.append(", subscribeRuleList=").append(subscribeRuleList);
         sb.append(", regOperId=").append(regOperId);
@@ -392,7 +392,7 @@ public class NotificationProfile implements BetterjrEntity {
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
                 && (this.getVersion() == null ? other.getVersion() == null : this.getVersion().equals(other.getVersion()))
                 && (this.getProfileName() == null ? other.getProfileName() == null : this.getProfileName().equals(other.getProfileName()))
-                && (this.getProfileType() == null ? other.getProfileType() == null : this.getProfileType().equals(other.getProfileType()))
+                && (this.getProfileRule() == null ? other.getProfileRule() == null : this.getProfileRule().equals(other.getProfileRule()))
                 && (this.getSubscribeEnable() == null ? other.getSubscribeEnable() == null : this.getSubscribeEnable().equals(other.getSubscribeEnable()))
                 && (this.getSubscribeRuleList() == null ? other.getSubscribeRuleList() == null : this.getSubscribeRuleList().equals(other.getSubscribeRuleList()))
                 && (this.getRegOperId() == null ? other.getRegOperId() == null : this.getRegOperId().equals(other.getRegOperId()))
@@ -419,7 +419,7 @@ public class NotificationProfile implements BetterjrEntity {
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
         result = prime * result + ((getVersion() == null) ? 0 : getVersion().hashCode());
         result = prime * result + ((getProfileName() == null) ? 0 : getProfileName().hashCode());
-        result = prime * result + ((getProfileType() == null) ? 0 : getProfileType().hashCode());
+        result = prime * result + ((getProfileRule() == null) ? 0 : getProfileRule().hashCode());
         result = prime * result + ((getSubscribeEnable() == null) ? 0 : getSubscribeEnable().hashCode());
         result = prime * result + ((getSubscribeRuleList() == null) ? 0 : getSubscribeRuleList().hashCode());
         result = prime * result + ((getRegOperId() == null) ? 0 : getRegOperId().hashCode());
@@ -467,7 +467,7 @@ public class NotificationProfile implements BetterjrEntity {
         this.subscribeEnable = anNotificationProfile.getSubscribeEnable();
         this.subscribeRuleList = anNotificationProfile.getSubscribeRuleList();
         this.profileName = anNotificationProfile.getProfileName();
-        this.profileType = anNotificationProfile.getProfileType();
+        this.profileRule = anNotificationProfile.getProfileRule();
         this.immediate = anNotificationProfile.getImmediate();
 
         this.custNo = anCustInfo.getCustNo();

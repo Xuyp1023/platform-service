@@ -66,7 +66,7 @@ public class NotificationChannelProfileService extends BaseService<NotificationC
      * @param anChannel
      * @return
      */
-    private NotificationChannelProfile findChannelProfileByProfileIdAndChannel(final Long anProfileId, final String anChannel) {
+    public NotificationChannelProfile findChannelProfileByProfileIdAndChannel(final Long anProfileId, final String anChannel) {
         final Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("profileId", anProfileId);
         conditionMap.put("channel", anChannel);

@@ -5,30 +5,30 @@ import java.util.List;
 
 public class ProfileSubscribeModel implements Serializable{
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 4406806777854305420L;
-    
-    private Long id;
+
+    private String profileRule;
     private String profileName;
     private Long custNo;
     private String custName;
-    
+
     private List<ChannelSubscribeModel> channels;
 
-    public Long getId() {
-        return id;
+    public String getProfileRule() {
+        return profileRule;
     }
 
-    public void setId(Long anId) {
-        id = anId;
+    public void setProfileRule(final String anProfileRule) {
+        profileRule = anProfileRule;
     }
 
     public String getProfileName() {
         return profileName;
     }
 
-    public void setProfileName(String anProfileName) {
+    public void setProfileName(final String anProfileName) {
         profileName = anProfileName;
     }
 
@@ -36,7 +36,7 @@ public class ProfileSubscribeModel implements Serializable{
         return custNo;
     }
 
-    public void setCustNo(Long anCustNo) {
+    public void setCustNo(final Long anCustNo) {
         custNo = anCustNo;
     }
 
@@ -44,7 +44,7 @@ public class ProfileSubscribeModel implements Serializable{
         return custName;
     }
 
-    public void setCustName(String anCustName) {
+    public void setCustName(final String anCustName) {
         custName = anCustName;
     }
 
@@ -52,7 +52,7 @@ public class ProfileSubscribeModel implements Serializable{
         return channels;
     }
 
-    public void setChannels(List<ChannelSubscribeModel> anChannels) {
+    public void setChannels(final List<ChannelSubscribeModel> anChannels) {
         channels = anChannels;
     }
 }
