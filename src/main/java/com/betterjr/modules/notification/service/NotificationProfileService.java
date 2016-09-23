@@ -48,6 +48,8 @@ public class NotificationProfileService extends BaseService<NotificationProfileM
         BTAssert.notNull(anProfileName, "模板名称不允许为空!");
         BTAssert.notNull(anCustNo, "客户编号不允许为空!");
 
+        BTAssert.isTrue(UserUtils.containsCustNo(anCustNo), "此操作员不具备访问此公司权限！");
+
         final Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("profileName", anProfileName);
         conditionMap.put("custNo", anCustNo);
@@ -64,6 +66,11 @@ public class NotificationProfileService extends BaseService<NotificationProfileM
     }
 
     public NotificationProfile findDefaultProfileByProfileNameAndCustNo(final String anProfileName, final Long anCustNo) {
+        BTAssert.notNull(anProfileName, "模板名称不允许为空!");
+        BTAssert.notNull(anCustNo, "客户编号不允许为空!");
+
+        BTAssert.isTrue(UserUtils.containsCustNo(anCustNo), "此操作员不具备访问此公司权限！");
+
         final List<String> rules = getCustRulesByCustNo(anCustNo); // 公司类型
 
         final Map<String, Object> conditionMap = new HashMap<>();
@@ -103,6 +110,8 @@ public class NotificationProfileService extends BaseService<NotificationProfileM
     public Page<NotificationProfile> queryNotificationProfile(final Long anCustNo, final int anFlag, final int anPageNum, final int anPageSize) {
         BTAssert.notNull(anCustNo, "客户编号不允许为空!");
 
+        BTAssert.isTrue(UserUtils.containsCustNo(anCustNo), "此操作员不具备访问此公司权限！");
+
         final List<String> rules = getCustRulesByCustNo(anCustNo);  // 公司类型
 
         final Map<String, Object> conditionMap = new HashMap<>();
@@ -126,6 +135,8 @@ public class NotificationProfileService extends BaseService<NotificationProfileM
     public NotificationProfile saveSetNotificationProfileStatus(final Long anProfileId, final Long anCustNo, final String anBusinStatus) {
         BTAssert.notNull(anProfileId, "模板编号不允许为空!");
         BTAssert.notNull(anBusinStatus, "状态不允许为空!");
+
+        BTAssert.isTrue(UserUtils.containsCustNo(anCustNo), "此操作员不具备访问此公司权限！");
 
         NotificationProfile tempProfile = this.selectByPrimaryKey(anProfileId);
         BTAssert.notNull(tempProfile, "没有找到对应的消息模板");
