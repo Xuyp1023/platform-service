@@ -121,4 +121,19 @@ public class OperatorDubboService implements IOperatorService {
             return AjaxObject.newError("密码修改失败").toJson();
         }
     }
+    
+    /***
+     * 密码重置
+     * @param id
+     * @param password
+     * @param okPasswd
+     * @return
+     */
+    public String webChangeUserPassword(Long anId, String anPassword, String anOkPasswd){
+        if(operatorRequestService.saveChangePassword(anId,anPassword,anOkPasswd)){
+            return AjaxObject.newOk("密码修改成功").toJson();
+        }else{
+            return AjaxObject.newError("密码修改失败").toJson();
+        }
+    }
 }
