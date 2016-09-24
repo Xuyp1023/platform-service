@@ -3,4 +3,17 @@
 <mappings xmlns="http://dozer.sourceforge.net" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://dozer.sourceforge.net http://dozer.sourceforge.net/schema/beanmapping.xsd">
 
+ <mapping wildcard="true" map-null="false" trim-strings="true" map-empty-string="false">
+  <class-a>java.util.Map</class-a>
+  <class-b>com.betterjr.modules.workflow.entity.CustFlowBase</class-b>
+  <field-exclude>
+   <a>regDate</a>
+   <b>regDate</b>
+  </field-exclude>
+  <field-exclude>
+   <a>modiDate</a>
+   <b>modiDate</b>
+  </field-exclude>
+ </mapping>
+ 
 </mappings>

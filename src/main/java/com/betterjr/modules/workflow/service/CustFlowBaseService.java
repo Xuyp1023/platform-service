@@ -127,7 +127,16 @@ public class CustFlowBaseService extends BaseService<CustFlowBaseMapper, CustFlo
     public void saveProcess(CustFlowBase base) {
         // base
         Long baseId=SerialGenerator.getLongValue(CustFlowBase.selectKey);
-        this.insertOrUpdateWithPkId(base, baseId);
+        baseId=(Long)this.insertOrUpdateWithPkId(base, baseId);
+        
+        List<CustFlowStep> oriStepList=this.stepService.selectByProperty("flowBaseId", baseId);
+        if(!Collections3.isEmpty(oriStepList)){
+            for(CustFlowStep oriStep:oriStepList){
+                this.stepAppService.deleteByProperty("stepId", oriStep.getId());
+            }
+            this.stepService.deleteByProperty("flowBaseId", baseId);
+        }
+        
         // steps --> approvers
         int stepIndex=1;
         if (!Collections3.isEmpty(base.getStepList())) {
@@ -135,13 +144,20 @@ public class CustFlowBaseService extends BaseService<CustFlowBaseMapper, CustFlo
                 Long stepId=SerialGenerator.getLongValue(CustFlowStep.selectKey);
                 step.setFlowBaseId(base.getId());
                 step.setOrderNum(stepIndex);
+                if(step.getId()==null){
+                    step.setId(stepId);
+                }
                 stepIndex++;
-                this.stepService.insertOrUpdateWithPkId(step, stepId);
+                this.stepService.insert(step);
                 
                 if (!Collections3.isEmpty(step.getStepApprovers())) {
                     for (CustFlowStepApprovers app : step.getStepApprovers()) {
+                        Long appId=SerialGenerator.getLongValue(CustFlowStepApprovers.selectKey);
                         app.setStepId(step.getId());
-                        this.stepAppService.insertOrUpdateWithPkId(app, SerialGenerator.getLongValue(CustFlowStepApprovers.selectKey));
+                        if(app.getId()==null){
+                            app.setId(appId);
+                        }
+                        this.stepAppService.insert(app);
                     }
                 }
             }
