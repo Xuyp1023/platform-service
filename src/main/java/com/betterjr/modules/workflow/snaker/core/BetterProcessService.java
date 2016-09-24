@@ -134,4 +134,16 @@ public class BetterProcessService extends ProcessService{
             }
         }
     }
+    
+    /**
+     * 保存process实体对象
+     */
+    public void saveProcess(Process process) {
+        Process ori=super.getProcessById(process.getId());
+        if(ori==null){
+            access().saveProcess(process);
+        }else{
+            access().updateProcess(process);
+        }
+    }
 }
