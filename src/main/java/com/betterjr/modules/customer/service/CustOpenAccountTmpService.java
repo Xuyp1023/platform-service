@@ -21,15 +21,16 @@ import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
-import com.betterjr.common.utils.IdcardUtils;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.common.utils.reflection.ReflectionUtils;
 import com.betterjr.mapper.pagehelper.Page;
+import com.betterjr.modules.account.entity.CustCertInfo;
 import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.betterjr.modules.account.entity.CustOperatorRelation;
 import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.account.service.CustAndOperatorRelaService;
+import com.betterjr.modules.account.service.CustCertService;
 import com.betterjr.modules.account.service.CustOperatorService;
 import com.betterjr.modules.blacklist.service.BlacklistService;
 import com.betterjr.modules.customer.constants.CustomerConstants;
@@ -46,6 +47,10 @@ import com.betterjr.modules.document.entity.CustFileItem;
 import com.betterjr.modules.document.service.CustFileAuditService;
 import com.betterjr.modules.document.service.CustFileItemService;
 import com.betterjr.modules.document.utils.CustFileUtils;
+import com.betterjr.modules.sys.entity.DictInfo;
+import com.betterjr.modules.sys.entity.DictItemInfo;
+import com.betterjr.modules.sys.service.DictItemService;
+import com.betterjr.modules.sys.service.DictService;
 import com.google.common.collect.Multimap;
 
 /**
@@ -91,6 +96,18 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
 
     @Autowired
     private CustOpenAccountAuditService custOpenAccountAuditService;
+
+    @Autowired
+    private CustRelationService custRelationService;
+
+    @Autowired
+    private DictService dictService;
+
+    @Autowired
+    private DictItemService dictItemService;
+
+    @Resource
+    private CustCertService custCertService;
 
     @Resource
     private RocketMQProducer betterProducer;
@@ -148,8 +165,10 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
 
     /**
      * 开户资料暂存
-     *
+     * 
      * @param anOpenAccountInfo
+     * @param anId
+     * @param anCoreList
      * @param anFileList
      * @return
      */
@@ -453,8 +472,40 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         // 数据存盘,当前操作员关联客户
         custAndOperatorRelaService.insert(new CustOperatorRelation(anOperId, custInfo.getCustNo(), anOperOrg));
 
+        // 与核心企业建立关系
+        addCustRelation(anOpenAccountInfo, custInfo, anOperOrg);
+
         // 回写客户编号
         anOpenAccountInfo.setCustNo(custInfo.getCustNo());
+    }
+
+    private void addCustRelation(CustOpenAccountTmp anOpenAccountInfo, CustInfo anCustInfo, String anOperOrg) {
+        if (!BetterStringUtils.isBlank(anOpenAccountInfo.getCoreList())) {
+            String[] anCoreList = BetterStringUtils.split(anOpenAccountInfo.getCoreList(), ",");
+            for (String anCoreNo : anCoreList) {
+                if (BetterStringUtils.isNotBlank(anCoreNo)) {
+                    Long anCoreCustNo = Long.valueOf(anCoreNo.trim());
+                    // 供应商开户与核心企业建立关系
+                    CustCertInfo anCustCertInfo = custCertService.findCertByOperOrg(anOperOrg);
+                    if (UserUtils.supplierCustomer(anCustCertInfo)) {
+                        custRelationService.addCustRelation(anCustInfo, anCoreCustNo, CustomerConstants.RELATE_TYPE_SUPPLIER_CORE,
+                                CustomerConstants.RELATE_STATUS_AUDIT);
+                    }
+                    // 经销商开户与核心企业建立关系
+                    if (UserUtils.sellerCustomer(anCustCertInfo)) {
+                        custRelationService.addCustRelation(anCustInfo, anCoreCustNo, CustomerConstants.RELATE_TYPE_SELLER_CORE,
+                                CustomerConstants.RELATE_STATUS_AUDIT);
+                    }
+                    // 核心企业开户写入字典表
+                    if (UserUtils.coreCustomer(anCustCertInfo)) {
+                        DictInfo anDictInfo = dictService.findByCode("ScfCoreGroup");
+                        DictItemInfo anDictItem = new DictItemInfo(String.valueOf(anCustInfo.getCustNo()), anCustInfo.getOperOrg(),
+                                anDictInfo.getId(), anCustInfo.getCustName());
+                        dictItemService.insert(anDictItem);
+                    }
+                }
+            }
+        }
     }
 
     private CustInfo addCustInfo(CustOpenAccountTmp anOpenAccountInfo, Long anOperId, String anOperName, String anOperOrg) {
@@ -508,8 +559,8 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         anCustMechLawInfo.setIdentType(anOpenAccountInfo.getLawIdentType());
         anCustMechLawInfo.setIdentNo(anOpenAccountInfo.getLawIdentNo());
         anCustMechLawInfo.setValidDate(anOpenAccountInfo.getLawValidDate());
-        anCustMechLawInfo.setSex(IdcardUtils.getGenderByIdCard(anOpenAccountInfo.getLawIdentNo(), anOpenAccountInfo.getLawIdentType()));
-        anCustMechLawInfo.setBirthdate(IdcardUtils.getBirthByIdCard(anOpenAccountInfo.getLawIdentNo()));
+        // anCustMechLawInfo.setSex(IdcardUtils.getGenderByIdCard(anOpenAccountInfo.getLawIdentNo(), anOpenAccountInfo.getLawIdentType()));
+        // anCustMechLawInfo.setBirthdate(IdcardUtils.getBirthByIdCard(anOpenAccountInfo.getLawIdentNo()));
         anCustMechLawInfo.setVersion(0l);
         // 附件：法人representIdFile
         Collection anCollection = anCustFileItem.get("representIdFile");
@@ -614,7 +665,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         anCustOperatorInfo.setValidDate(anOpenAccountInfo.getOperValiddate());
         anCustOperatorInfo.setStatus("1");
         anCustOperatorInfo.setLastStatus("1");
-        anCustOperatorInfo.setSex(IdcardUtils.getGenderByIdCard(anCustOperatorInfo.getIdentNo(), anCustOperatorInfo.getIdentType()));
+        // anCustOperatorInfo.setSex(IdcardUtils.getGenderByIdCard(anCustOperatorInfo.getIdentNo(), anCustOperatorInfo.getIdentType()));
         anCustOperatorInfo.setRegDate(BetterDateUtils.getNumDate());
         anCustOperatorInfo.setModiDate(BetterDateUtils.getNumDateTime());
         anCustOperatorInfo.setFaxNo(anOpenAccountInfo.getOperFaxNo());

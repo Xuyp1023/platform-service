@@ -484,7 +484,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         }
     }
 
-    private CustRelation addCustRelation(final CustInfo anCustInfo, final Long anRelateCustNo, final String anRelateType, final String anBusinStatus) {
+    public CustRelation addCustRelation(final CustInfo anCustInfo, final Long anRelateCustNo, final String anRelateType, final String anBusinStatus) {
         final CustRelation relation = new CustRelation();
         relation.initAddValue();
         relation.setCustNo(anCustInfo.getCustNo());
