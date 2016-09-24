@@ -485,16 +485,18 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
             for (String anCoreNo : anCoreList) {
                 if (BetterStringUtils.isNotBlank(anCoreNo)) {
                     Long anCoreCustNo = Long.valueOf(anCoreNo.trim());
-                    // 确认企业身份并建立关系
+                    // 供应商开户与核心企业建立关系
                     CustCertInfo anCustCertInfo = custCertService.findCertByOperOrg(anOperOrg);
                     if (UserUtils.supplierCustomer(anCustCertInfo)) {
                         custRelationService.addCustRelation(anCustInfo, anCoreCustNo, CustomerConstants.RELATE_TYPE_SUPPLIER_CORE,
                                 CustomerConstants.RELATE_STATUS_AUDIT);
                     }
+                    // 经销商开户与核心企业建立关系
                     if (UserUtils.sellerCustomer(anCustCertInfo)) {
                         custRelationService.addCustRelation(anCustInfo, anCoreCustNo, CustomerConstants.RELATE_TYPE_SELLER_CORE,
                                 CustomerConstants.RELATE_STATUS_AUDIT);
                     }
+                    // 核心企业开户写入字典表
                     if (UserUtils.coreCustomer(anCustCertInfo)) {
                         DictInfo anDictInfo = dictService.findByCode("ScfCoreGroup");
                         DictItemInfo anDictItem = new DictItemInfo(String.valueOf(anCustInfo.getCustNo()), anCustInfo.getOperOrg(),
