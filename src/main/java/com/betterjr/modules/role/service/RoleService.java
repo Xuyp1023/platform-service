@@ -13,7 +13,9 @@ import com.betterjr.common.exception.BytterDeclareException;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
+import com.betterjr.common.utils.UserUtils;
 import com.betterjr.mapper.pagehelper.Page;
+import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.betterjr.modules.operator.service.SysOperatorRoleRelationService;
 import com.betterjr.modules.role.dao.RoleMapper;
 import com.betterjr.modules.role.entity.Role;
@@ -37,7 +39,8 @@ public class RoleService extends BaseService<RoleMapper, Role> {
      * @return
      */
     public boolean addRole(String anRoleName,String anRoleType,String anBusinStatus){
-        Role anRole=new Role(anRoleName,anRoleType,anBusinStatus);
+        CustOperatorInfo custOperator = (CustOperatorInfo) UserUtils.getPrincipal().getUser();
+        Role anRole=new Role("",anRoleName,anRoleType,anBusinStatus,custOperator.getOperOrg());
         if(checkRoleName(anRole.getRoleName())){
             throw new BytterDeclareException("角色名称已存在");
         }
@@ -53,7 +56,8 @@ public class RoleService extends BaseService<RoleMapper, Role> {
         if(BetterStringUtils.isBlank(anRoleId)){
             throw new BytterDeclareException("要修改的角色ID不存在");
         }
-        Role anRole=new Role(anRoleId,anRoleName,anRoleType,anBusinStatus);
+        CustOperatorInfo custOperator = (CustOperatorInfo) UserUtils.getPrincipal().getUser();
+        Role anRole=new Role(anRoleId,anRoleName,anRoleType,anBusinStatus,custOperator.getOperOrg());
         return this.updateByPrimaryKey(anRole)==1;
     }
     
@@ -94,6 +98,8 @@ public class RoleService extends BaseService<RoleMapper, Role> {
         Map<String, Object> map=new HashMap<String, Object>();
         map.put("businStatus", "1");
         map.put("def", "1");
+        CustOperatorInfo custOperator = (CustOperatorInfo) UserUtils.getPrincipal().getUser();
+        map.put("operOrg", custOperator.getOperOrg());
         if(BetterStringUtils.isNotBlank((String)anMap.get("roleName"))){
             map.put("roleName", anMap.get("roleName"));
         }
@@ -109,6 +115,8 @@ public class RoleService extends BaseService<RoleMapper, Role> {
         Map<String, Object> roleMp=new HashMap<>();
         roleMp.put("businStatus", "1");
         roleMp.put("def", "1");
+        CustOperatorInfo custOperator = (CustOperatorInfo) UserUtils.getPrincipal().getUser();
+        roleMp.put("operOrg", custOperator.getOperOrg());
         return this.selectByProperty(roleMp);
     }
     
@@ -134,6 +142,8 @@ public class RoleService extends BaseService<RoleMapper, Role> {
         List<SimpleDataEntity> result = new ArrayList<SimpleDataEntity>();
         Map<String, Object> roleMp=new HashMap<>();
         roleMp.put("def", "0");
+        CustOperatorInfo custOperator = (CustOperatorInfo) UserUtils.getPrincipal().getUser();
+        roleMp.put("operOrg", custOperator.getOperOrg());
         for(Role role :this.selectByProperty(roleMp)){
             result.add(new SimpleDataEntity(role.getRoleName(), role.getRoleType()));
         }
