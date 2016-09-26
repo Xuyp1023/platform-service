@@ -585,6 +585,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
             }
         }
         return result;
+    }
 
     /**
      * 检查客户保理, 
