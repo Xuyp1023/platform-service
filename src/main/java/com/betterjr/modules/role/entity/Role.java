@@ -1,7 +1,9 @@
 package com.betterjr.modules.role.entity;
 
 import com.betterjr.common.entity.BetterjrEntity;
+import com.betterjr.common.exception.BytterSecurityException;
 import com.betterjr.common.selectkey.SerialGenerator;
+import com.betterjr.common.utils.BetterStringUtils;
 
 import javax.persistence.*;
 
@@ -120,19 +122,16 @@ public class Role implements BetterjrEntity {
         
     }
     
-    public Role(String roleName,String roleType,String businStatus){
-        this.id=SerialGenerator.getLongValue("Role.id");
+    public Role(String roleId,String roleName,String roleType,String businStatus,String operOrg){
+        if(BetterStringUtils.isBlank(roleId)){
+            this.id=SerialGenerator.getLongValue("Role.id");
+        }else{
+            this.id=Long.parseLong(roleId);
+        }
         this.roleName=roleName;
         this.roleType=roleType;
         this.businStatus=businStatus;
         this.def="1";
-    }
-    
-    public Role(String roleId,String roleName,String roleType,String businStatus){
-        this.id=Long.parseLong(roleId);
-        this.roleName=roleName;
-        this.roleType=roleType;
-        this.businStatus=businStatus;
-        this.def="1";
+        this.operOrg=operOrg;
     }
 }
