@@ -87,7 +87,6 @@ public class OperatorRequestService extends BaseService<CustOperatorInfoMapper, 
         }
         // 操作员角色信息绑定修改
         operatorRoleRelationService.saveSysOperatorRoleRelation(operator.getId(), operator.getRuleList());
-        operator.setRuleList("");
         this.updateByPrimaryKeySelective(operator);
         CustOptData workData = BeanMapper.map(operator, CustOptData.class);
         return workData;
@@ -112,6 +111,7 @@ public class OperatorRequestService extends BaseService<CustOperatorInfoMapper, 
         CustOperatorInfo custOperator = (CustOperatorInfo) UserUtils.getPrincipal().getUser();
         String operOrg = custOperator.getOperOrg();
         map.put("operOrg", operOrg);
+        map.put("status", "1");
         Page page = this.selectPropertyByPage(CustOperatorInfo.class, map, pageNum, pageSize, false);
         List list = page.getResult();
         List result = new ArrayList<>();

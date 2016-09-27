@@ -95,6 +95,8 @@ public class SysMenuManagerService {
      */
     public void addMenuRole(String anRoleId,String anRoleName,String anMenuIdArr){
         if(BetterStringUtils.isNotBlank(anMenuIdArr)){
+            // 先删除所有角色菜单
+            sysMenuRuleService.delMenuRole(Long.parseLong(anRoleId));
             String[] menuArr= BetterStringUtils.split(anMenuIdArr, ";|,");
             for(int i=0;i<menuArr.length;i++){
                 String menuId=menuArr[i];
