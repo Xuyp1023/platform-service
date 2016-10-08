@@ -189,6 +189,5 @@ public class NotificationChannelProfileService extends BaseService<NotificationC
 
             profileVariableService.saveCopyBaseDataToTargetData(channelProfile.getId(), tempChannelProfile.getId(), anCustInfo, anOperator);
         }
-        ;
     }
 }
