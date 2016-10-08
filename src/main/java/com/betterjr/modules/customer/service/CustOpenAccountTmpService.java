@@ -345,18 +345,18 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
      * 代录开户资料提交
      *
      * @param anOpenAccountInfo
-     * @param anInsteadId
+     * @param anInsteadRecordId
      * @param anFileList
      * @return
      */
-    public CustOpenAccountTmp saveOpenAccountInfoByInstead(CustOpenAccountTmp anOpenAccountInfo, Long anInsteadId, String anFileList) {
+    public CustOpenAccountTmp saveOpenAccountInfoByInstead(CustOpenAccountTmp anOpenAccountInfo, Long anInsteadRecordId, String anFileList) {
         logger.info("Begin to Save Open Account Infomation Instead");
         // 代录流水号不能为空
-        BTAssert.notNull(anInsteadId, "代录流水号不能为空");
+        BTAssert.notNull(anInsteadRecordId, "代录流水号不能为空");
         // 检查开户资料合法性
         checkAccountInfoValid(anOpenAccountInfo);
         // 检查是否已存在代录
-        CustInsteadRecord anInsteadRecord = custInsteadRecordService.selectByPrimaryKey(anInsteadId);
+        CustInsteadRecord anInsteadRecord = custInsteadRecordService.selectByPrimaryKey(anInsteadRecordId);
         BTAssert.notNull(anInsteadRecord, "无法获取代录信息");
         // 获取代录暂存的开户资料ID号
         String anTempId = anInsteadRecord.getTmpIds();
@@ -382,7 +382,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
             this.updateByPrimaryKeySelective(anOpenAccountInfo);
         }
         // 回写暂存流水号至代录申请表
-        custInsteadRecordService.saveInsteadRecord(anInsteadId, String.valueOf(anOpenAccountInfo.getId()));
+        custInsteadRecordService.saveInsteadRecord(anInsteadRecordId, String.valueOf(anOpenAccountInfo.getId()));
 
         return anOpenAccountInfo;
     }
