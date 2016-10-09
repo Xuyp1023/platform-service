@@ -35,7 +35,7 @@ public class CustMechBankAccountService extends BaseService<CustMechBankAccountM
      * @param anCustNo
      * @return
      */
-    public List<CustMechBankAccount> queryCustMechBankAccount(Long anCustNo) {
+    public List<CustMechBankAccount> queryCustMechBankAccount(final Long anCustNo) {
         BTAssert.notNull(anCustNo, "客户编号不允许为空！");
 
         return this.selectByProperty("custNo", anCustNo);
@@ -44,20 +44,20 @@ public class CustMechBankAccountService extends BaseService<CustMechBankAccountM
     /**
      * 查询银行账户信息
      */
-    public CustMechBankAccount findCustMechBankAccount(Long anId) {
+    public CustMechBankAccount findCustMechBankAccount(final Long anId) {
         BTAssert.notNull(anId, "银行账户编号不允许为空！");
 
-        CustMechBankAccount bankAccount = this.selectByPrimaryKey(anId);
+        final CustMechBankAccount bankAccount = this.selectByPrimaryKey(anId);
         return bankAccount;
     }
 
     /**
      * 添加银行账户信息
      */
-    public CustMechBankAccount addCustMechBankAccount(CustMechBankAccountTmp anBankAccountTmp) {
+    public CustMechBankAccount addCustMechBankAccount(final CustMechBankAccountTmp anBankAccountTmp) {
         BTAssert.notNull(anBankAccountTmp, "银行账户流水信息不允许为空！");
 
-        CustMechBankAccount bankAccount = new CustMechBankAccount();
+        final CustMechBankAccount bankAccount = new CustMechBankAccount();
         bankAccount.initAddValue(anBankAccountTmp);
 
         this.insert(bankAccount);
@@ -71,7 +71,7 @@ public class CustMechBankAccountService extends BaseService<CustMechBankAccountM
      * @param anBankAccount
      * @return
      */
-    public CustMechBankAccount addCustMechBankAccount(CustMechBankAccount anBankAccount, Long anCustNo) {
+    public CustMechBankAccount addCustMechBankAccount(final CustMechBankAccount anBankAccount, final Long anCustNo) {
         BTAssert.notNull(anBankAccount, "银行账户信息不允许为空！");
         BTAssert.notNull(anCustNo, "客户编号不允许为空！");
 
@@ -79,13 +79,15 @@ public class CustMechBankAccountService extends BaseService<CustMechBankAccountM
         anBankAccount.initAddValue(anCustNo, custInfo.getCustName(), custInfo.getRegOperId(), custInfo.getRegOperName(),
                 custInfo.getOperOrg());
         this.insert(anBankAccount);
+
+        bankAccountTmpService.addCustMechBankAccountTmp(anBankAccount);
         return anBankAccount;
     }
 
     /**
      * 保存银行账户信息
      */
-    public CustMechBankAccount saveCustMechBankAccount(CustMechBankAccount anBankAccount, Long anId) {
+    public CustMechBankAccount saveCustMechBankAccount(final CustMechBankAccount anBankAccount, final Long anId) {
         BTAssert.notNull(anId, "银行账户编号不允许为空！");
         BTAssert.notNull(anBankAccount, "银行账户信息不允许为空！");
 
@@ -100,7 +102,7 @@ public class CustMechBankAccountService extends BaseService<CustMechBankAccountM
     /**
      * 通过银行账户流水修改银行账户
      */
-    public CustMechBankAccount saveCustMechBankAccount(CustMechBankAccountTmp anBankAccountTmp) {
+    public CustMechBankAccount saveCustMechBankAccount(final CustMechBankAccountTmp anBankAccountTmp) {
         BTAssert.notNull(anBankAccountTmp, "银行账户流水编号不允许为空！");
 
         final CustMechBankAccount tempBankAccount = this.selectByPrimaryKey(anBankAccountTmp.getRefId());
@@ -115,10 +117,10 @@ public class CustMechBankAccountService extends BaseService<CustMechBankAccountM
      * @param anCustNo
      * @return
      */
-    public CustMechBankAccount findDefaultCustMechBankAccount(Long anCustNo) {
+    public CustMechBankAccount findDefaultCustMechBankAccount(final Long anCustNo) {
         BTAssert.notNull(anCustNo, "公司编号不允许为空！");
 
-        Map<String, Object> conditionMap = new HashMap<>();
+        final Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("custNo", anCustNo);
         conditionMap.put("isDefault", true);
         return Collections3.getFirst(this.selectByProperty(conditionMap));
