@@ -748,8 +748,8 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
 
         // 检查组织机构代码证是否存在
         if (checkCustExistsByIdentNo(anOpenAccountInfo.getOrgCode()) == true) {
-            logger.warn("证件号码已存在");
-            throw new BytterTradeException(40001, "证件号码已存在");
+            logger.warn("组织机构代码证已存在");
+            throw new BytterTradeException(40001, "组织机构代码证已存在");
         }
 
         // 检查营业执照号码是否存在
