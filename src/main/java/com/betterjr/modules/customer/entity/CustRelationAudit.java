@@ -76,6 +76,13 @@ public class CustRelationAudit implements BetterjrEntity {
     @Column(name = "C_TASK_NAME", columnDefinition = "VARCHAR")
     @MetaData(value = "任务名称", comments = "任务名称")
     private String taskName;
+    
+    /**
+     * 审批机构名称
+     */
+    @Column(name = "C_AUDIT_AGENCY", columnDefinition = "VARCHAR")
+    @MetaData(value = "审批机构名称", comments = "审批机构名称")
+    private String auditAgency;
 
     /**
      * 审核人(操作员)ID号
@@ -195,6 +202,14 @@ public class CustRelationAudit implements BetterjrEntity {
         this.taskName = taskName;
     }
 
+    public String getAuditAgency() {
+        return auditAgency;
+    }
+
+    public void setAuditAgency(String auditAgency) {
+        this.auditAgency = auditAgency;
+    }
+
     public Long getAuditOperId() {
         return auditOperId;
     }
@@ -265,6 +280,7 @@ public class CustRelationAudit implements BetterjrEntity {
         sb.append(", relateCustname=").append(relateCustname);
         sb.append(", relateType=").append(relateType);
         sb.append(", taskName=").append(taskName);
+        sb.append(", auditAgency=").append(auditAgency);
         sb.append(", auditOperId=").append(auditOperId);
         sb.append(", auditOperName=").append(auditOperName);
         sb.append(", auditDate=").append(auditDate);
@@ -297,6 +313,7 @@ public class CustRelationAudit implements BetterjrEntity {
                 && (this.getRelateCustname() == null ? other.getRelateCustname() == null : this.getRelateCustname().equals(other.getRelateCustname()))
                 && (this.getRelateType() == null ? other.getRelateType() == null : this.getRelateType().equals(other.getRelateType()))
                 && (this.getTaskName() == null ? other.getTaskName() == null : this.getTaskName().equals(other.getTaskName()))
+                && (this.getAuditAgency() == null ? other.getAuditAgency() == null : this.getAuditAgency().equals(other.getAuditAgency()))
                 && (this.getAuditOperId() == null ? other.getAuditOperId() == null : this.getAuditOperId().equals(other.getAuditOperId()))
                 && (this.getAuditOperName() == null ? other.getAuditOperName() == null : this.getAuditOperName().equals(other.getAuditOperName()))
                 && (this.getAuditDate() == null ? other.getAuditDate() == null : this.getAuditDate().equals(other.getAuditDate()))
@@ -318,6 +335,7 @@ public class CustRelationAudit implements BetterjrEntity {
         result = prime * result + ((getRelateCustname() == null) ? 0 : getRelateCustname().hashCode());
         result = prime * result + ((getRelateType() == null) ? 0 : getRelateType().hashCode());
         result = prime * result + ((getTaskName() == null) ? 0 : getTaskName().hashCode());
+        result = prime * result + ((getAuditAgency() == null) ? 0 : getAuditAgency().hashCode());
         result = prime * result + ((getAuditOperId() == null) ? 0 : getAuditOperId().hashCode());
         result = prime * result + ((getAuditOperName() == null) ? 0 : getAuditOperName().hashCode());
         result = prime * result + ((getAuditDate() == null) ? 0 : getAuditDate().hashCode());

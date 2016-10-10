@@ -334,7 +334,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         anCustRelation.setBusinStatus(CustomerConstants.RELATE_STATUS_ACCEPT);
         anCustRelation.setLastStatus(CustomerConstants.RELATE_STATUS_ACCEPT);
         this.updateByPrimaryKeySelective(anCustRelation);
-        custRelationAuditService.addAuditCustRelation(anCustRelation, anAuditOpinion, "开通保理融资业务受理");
+        custRelationAuditService.addAuditCustRelation(anCustRelation, anCustRelation.getRelateCustname(), anAuditOpinion, "保理公司受理");
         return anCustRelation;
     }
 
@@ -356,7 +356,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         anCustRelation.setBusinStatus(CustomerConstants.RELATE_STATUS_REFUSE);
         anCustRelation.setLastStatus(CustomerConstants.RELATE_STATUS_REFUSE);
         this.updateByPrimaryKeySelective(anCustRelation);
-        custRelationAuditService.addRefuseCustRelation(anCustRelation, anAuditOpinion, "开通保理融资业务受理");
+        custRelationAuditService.addRefuseCustRelation(anCustRelation, anCustRelation.getRelateCustname(), anAuditOpinion, "保理公司受理");
         return anCustRelation;
     }
 
@@ -404,7 +404,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         anCustRelation.setBusinStatus(CustomerConstants.RELATE_STATUS_AUDIT);
         anCustRelation.setLastStatus(CustomerConstants.RELATE_STATUS_AUDIT);
         this.updateByPrimaryKeySelective(anCustRelation);
-        custRelationAuditService.addAuditCustRelation(anCustRelation, anAuditOpinion, "开通保理融资业务审批");
+        custRelationAuditService.addAuditCustRelation(anCustRelation, anCustRelation.getRelateCustname(), anAuditOpinion, "保理公司审批");
         return anCustRelation;
     }
 
@@ -426,7 +426,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         anCustRelation.setBusinStatus(CustomerConstants.RELATE_STATUS_REFUSE);
         anCustRelation.setLastStatus(CustomerConstants.RELATE_STATUS_REFUSE);
         this.updateByPrimaryKeySelective(anCustRelation);
-        custRelationAuditService.addRefuseCustRelation(anCustRelation, anAuditOpinion, "开通保理融资业务审批");
+        custRelationAuditService.addRefuseCustRelation(anCustRelation, anCustRelation.getRelateCustname(), anAuditOpinion, "保理公司审批");
         return anCustRelation;
     }
 
@@ -483,14 +483,22 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
                 if (null == anTempCustRelation) {
                     final CustRelation anCustRelation = addCustRelation(anCustInfo, anRelateCustNo, anRelateType,
                             CustomerConstants.RELATE_STATUS_APPLY);
-                    custRelationAuditService.addAuditCustRelation(anCustRelation, anPostscript, "开通保理融资业务申请");
+                    String message = anPostscript;
+                    if (BetterStringUtils.isNotBlank(anPostscript)) {
+                        message = "申请对象：" + anCustRelation.getRelateCustname() + ", 附言：" + message;
+                    }
+                    custRelationAuditService.addAuditCustRelation(anCustRelation, anCustInfo.getCustName(), message, "企业开户申请");
                 }
                 else {
                     if (BetterStringUtils.equals(anTempCustRelation.getBusinStatus(), CustomerConstants.RELATE_STATUS_REFUSE) == true) {
                         anTempCustRelation.setBusinStatus(CustomerConstants.RELATE_STATUS_APPLY);
                         anTempCustRelation.setLastStatus(CustomerConstants.RELATE_STATUS_APPLY);
                         this.updateByPrimaryKeySelective(anTempCustRelation);
-                        custRelationAuditService.addAuditCustRelation(anTempCustRelation, anPostscript, "开通保理融资业务申请");
+                        String message = anPostscript;
+                        if (BetterStringUtils.isNotBlank(anPostscript)) {
+                            message = "申请对象：" + anTempCustRelation.getRelateCustname() + ", 附言：" + message;
+                        }
+                        custRelationAuditService.addAuditCustRelation(anTempCustRelation, anCustInfo.getCustName(), anPostscript, "企业开户申请");
                     }
                 }
             }
