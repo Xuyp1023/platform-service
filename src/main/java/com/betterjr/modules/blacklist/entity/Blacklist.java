@@ -9,12 +9,14 @@ import javax.persistence.Table;
 
 import com.betterjr.common.annotation.MetaData;
 import com.betterjr.common.entity.BetterjrEntity;
+import com.betterjr.common.mapper.CustDateJsonSerializer;
 import com.betterjr.common.selectkey.SerialGenerator;
 import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.modules.blacklist.constant.BlacklistConstants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @Access(AccessType.FIELD)
 @Entity
@@ -80,6 +82,7 @@ public class Blacklist implements BetterjrEntity {
     /**
      * 黑名单录入日期
      */
+    @JsonSerialize(using = CustDateJsonSerializer.class)
     @Column(name = "D_REG_DATE", columnDefinition = "VARCHAR")
     @MetaData(value = "黑名单录入日期", comments = "黑名单录入日期")
     private String regDate;
@@ -108,6 +111,7 @@ public class Blacklist implements BetterjrEntity {
     /**
      * 黑名单修改日期
      */
+    @JsonSerialize(using = CustDateJsonSerializer.class)
     @Column(name = "D_MODI_DATE", columnDefinition = "VARCHAR")
     @MetaData(value = "黑名单修改日期", comments = "黑名单修改日期")
     private String modiDate;
@@ -136,6 +140,7 @@ public class Blacklist implements BetterjrEntity {
     /**
      * 黑名单激活日期
      */
+    @JsonSerialize(using = CustDateJsonSerializer.class)
     @Column(name = "D_ACTIVATE_DATE", columnDefinition = "VARCHAR")
     @MetaData(value = "黑名单激活日期", comments = "黑名单激活日期")
     private String activateDate;
@@ -164,6 +169,7 @@ public class Blacklist implements BetterjrEntity {
     /**
      * 黑名单注销日期
      */
+    @JsonSerialize(using = CustDateJsonSerializer.class)
     @Column(name = "D_CANCEL_DATE", columnDefinition = "VARCHAR")
     @MetaData(value = "黑名单注销日期", comments = "黑名单注销日期")
     private String cancelDate;

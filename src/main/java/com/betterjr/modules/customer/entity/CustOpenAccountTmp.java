@@ -39,6 +39,7 @@ public class CustOpenAccountTmp implements BetterjrEntity {
     /**
      * 申请日期
      */
+    @JsonSerialize(using = CustDateJsonSerializer.class)
     @Column(name = "D_APPLY_DATE", columnDefinition = "VARCHAR")
     @MetaData(value = "申请日期", comments = "申请日期")
     private String applyDate;
@@ -53,6 +54,7 @@ public class CustOpenAccountTmp implements BetterjrEntity {
     /**
      * 审核日期
      */
+    @JsonSerialize(using = CustDateJsonSerializer.class)
     @Column(name = "D_AUDIT_DATE", columnDefinition = "VARCHAR")
     @MetaData(value = "审核日期", comments = "审核日期")
     private String auditDate;
