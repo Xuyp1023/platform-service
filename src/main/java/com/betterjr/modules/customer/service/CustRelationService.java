@@ -481,7 +481,8 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
                 // 检查是否已存在关联关系
                 final CustRelation anTempCustRelation = findCustRelation(anCustInfo.getCustNo(), anRelateCustNo, anRelateType);
                 if (null == anTempCustRelation) {
-                    final CustRelation anCustRelation = addCustRelation(anCustInfo, anRelateCustNo, anRelateType, CustomerConstants.RELATE_STATUS_APPLY);
+                    final CustRelation anCustRelation = addCustRelation(anCustInfo, anRelateCustNo, anRelateType,
+                            CustomerConstants.RELATE_STATUS_APPLY);
                     custRelationAuditService.addAuditCustRelation(anCustRelation, anPostscript, "开通保理融资业务申请");
                 }
                 else {
@@ -518,8 +519,6 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         anMap.put("relateType", anRelateType);
         return Collections3.getFirst(this.selectByProperty(anMap));
     }
-    
-    
 
     private Long findCustNoByOperator() {
         final Long operId = UserUtils.getOperatorInfo().getId();
@@ -540,22 +539,24 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         }
         return anRuleList;
     }
-    
 
     /****
      * 查询客户号根据类型返回关联关系信息
-     * @param anCustNo 关系客户号
-     * @param anCreditType 关系类型
+     * 
+     * @param anCustNo
+     *            关系客户号
+     * @param anCreditType
+     *            关系类型
      * @return 关系列表
      */
-    public List<CustRelationData> queryCustRelationData(Long anCustNo,String anCreditType){
-        List<CustRelationData> dataList=new ArrayList<CustRelationData>();
+    public List<CustRelationData> queryCustRelationData(Long anCustNo, String anCreditType) {
+        List<CustRelationData> dataList = new ArrayList<CustRelationData>();
         Map<String, Object> anMap = new HashMap<String, Object>();
         anMap.put("custNo", anCustNo);
         anMap.put("relateType", anCreditType);
         anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
-        for(CustRelation custRelation:this.selectByProperty(anMap)){
-            CustRelationData relationData=BeanMapper.map(custRelation,CustRelationData.class);
+        for (CustRelation custRelation : this.selectByProperty(anMap)) {
+            CustRelationData relationData = BeanMapper.map(custRelation, CustRelationData.class);
             dataList.add(relationData);
         }
         return dataList;
@@ -569,22 +570,21 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         if (null == anCustNo) {
             return result;
         }
+        final Map<String, Object> anMap = new HashMap<String, Object>();
+        anMap.put("custNo", anCustNo);
+        anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
+        String relateType = "";
         if (UserUtils.supplierUser()) {
-            final Map<String, Object> anMap = new HashMap<String, Object>();
-            anMap.put("custNo", anCustNo);
-            anMap.put("relateType", CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR);
-            anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
-
-            final List<CustRelation> relations = this.selectByProperty(anMap);
-            for (final CustRelation relation : relations) {
-                result.add(new SimpleDataEntity(relation.getRelateCustname(), String.valueOf(relation.getRelateCustno())));
-            }
-        } else if (UserUtils.coreUser()) {
-            final Map<String, Object> anMap = new HashMap<String, Object>();
-            anMap.put("custNo", anCustNo);
-            anMap.put("relateType", CustomerConstants.RELATE_TYPE_CORE_FACTOR);
-            anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
-
+            relateType = CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR;
+        }
+        else if (UserUtils.sellerUser()) {
+            relateType = CustomerConstants.RELATE_TYPE_SELLER_FACTOR;
+        }
+        else if (UserUtils.coreUser()) {
+            relateType = CustomerConstants.RELATE_TYPE_CORE_FACTOR;
+        }
+        if (BetterStringUtils.isNotBlank(relateType)) {
+            anMap.put("relateType", relateType);
             final List<CustRelation> relations = this.selectByProperty(anMap);
             for (final CustRelation relation : relations) {
                 result.add(new SimpleDataEntity(relation.getRelateCustname(), String.valueOf(relation.getRelateCustno())));
@@ -594,9 +594,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
     }
 
     /**
-     * 检查客户保理, 
-     * 客户只能是供应商|经销商|核心企业
-     * relateType为 ： 0,2,3
+     * 检查客户保理, 客户只能是供应商|经销商|核心企业 relateType为 ： 0,2,3
      * 
      * @param anCustNo
      *            客户号
@@ -606,17 +604,19 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
      *            客户在保理公司的客户号
      * @return
      */
-    public CustRelation findOneRelation(Long anCustNo, Long anRelateCustno,String anPartnerCustNo) {
-        String relateTypes="0,2,3";
-        List<CustRelation> dataList=this.mapper.findOneRelation(anCustNo, anRelateCustno, anPartnerCustNo, relateTypes);
+    public CustRelation findOneRelation(Long anCustNo, Long anRelateCustno, String anPartnerCustNo) {
+        String relateTypes = "0,2,3";
+        List<CustRelation> dataList = this.mapper.findOneRelation(anCustNo, anRelateCustno, anPartnerCustNo, relateTypes);
         if (!Collections3.isEmpty(dataList)) {
             return Collections3.getFirst(dataList);
-        }else{
-            logger.error("[Not exists record: anCustNo = " + anCustNo + ", anRelateCustno =" + anRelateCustno + ", anPartnerCustNo =" + anPartnerCustNo + ", relateTypes =" + relateTypes + "]");
+        }
+        else {
+            logger.error("[Not exists record: anCustNo = " + anCustNo + ", anRelateCustno =" + anRelateCustno + ", anPartnerCustNo ="
+                    + anPartnerCustNo + ", relateTypes =" + relateTypes + "]");
             throw new BytterWebServiceException(WebServiceErrorCode.E1006);
         }
     }
-    
+
     /**
      * 更新关联关系的状态
      * 
@@ -630,7 +630,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         if (factorRel != null) {
             factorRel.setBusinStatus(anStatus);
             factorRel.setModiDate(BetterDateUtils.getNumDate());
-//            factorRel.setLicenseDate(BetterDateUtils.getNumDate());
+            // factorRel.setLicenseDate(BetterDateUtils.getNumDate());
             return this.updateByPrimaryKey(factorRel) == 1;
         }
 
