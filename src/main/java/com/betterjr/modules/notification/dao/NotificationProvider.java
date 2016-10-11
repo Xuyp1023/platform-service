@@ -26,7 +26,7 @@ public class NotificationProvider {
      */
     @SuppressWarnings("unchecked")
     public String selectNotificationByConditionSql(final Map<String, Object> anParam) {
-        final StringBuilder sql = new StringBuilder("SELECT sn.* FROM t_sys_notifi sn, t_sys_notifi_cust snc "
+        final StringBuilder sql = new StringBuilder("SELECT sn.ID AS id, sn.C_CHANNEL AS channel, sn.D_SENT_DATE AS sentDate, sn.T_SENT_TIME AS sentTime, sn.C_SUBJECT AS subject, sn.L_CUSTNO AS custNo, sn.C_CUSTNAME AS custName FROM t_sys_notifi sn, t_sys_notifi_cust snc "
                 + "WHERE sn.ID = snc.L_NOTIFICATION_ID AND snc.L_OPERID = #{operId} AND snc.C_IS_READ = #{isRead} AND snc.C_IS_DELETED = '0' AND sn.C_CHANNEL='0' ");
         final Map<String, Object> param = (Map<String, Object>) anParam.get("param");
         final Optional<Object> custNo = Optional.ofNullable(param.get("custNo"));
