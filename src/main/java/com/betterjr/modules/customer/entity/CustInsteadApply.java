@@ -12,6 +12,7 @@ import javax.persistence.Transient;
 import com.betterjr.common.annotation.MetaData;
 import com.betterjr.common.entity.BetterjrEntity;
 import com.betterjr.common.mapper.CustDateJsonSerializer;
+import com.betterjr.common.mapper.CustTimeJsonSerializer;
 import com.betterjr.common.selectkey.SerialGenerator;
 import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.UserUtils;
@@ -79,7 +80,8 @@ public class CustInsteadApply implements BetterjrEntity {
     /**
      * 创建时间
      */
-    @JsonIgnore
+    @JsonSerialize(using = CustTimeJsonSerializer.class)
+    @OrderBy("DESC")
     @Column(name = "T_REG_TIME",  columnDefinition="VARCHAR" )
     @MetaData( value="创建时间", comments = "创建时间")
     private String regTime;
@@ -111,7 +113,7 @@ public class CustInsteadApply implements BetterjrEntity {
     /**
      * 修改时间
      */
-    @JsonIgnore
+    @JsonSerialize(using = CustTimeJsonSerializer.class)
     @Column(name = "T_MODI_TIME",  columnDefinition="VARCHAR" )
     @MetaData( value="修改时间", comments = "修改时间")
     private String modiTime;
@@ -123,6 +125,13 @@ public class CustInsteadApply implements BetterjrEntity {
     @Column(name = "C_OPERORG",  columnDefinition="VARCHAR" )
     @MetaData( value="操作机构", comments = "操作机构")
     private String operOrg;
+
+    /**
+     * 操作机构名称
+     */
+    @Column(name = "C_ORGNAME", columnDefinition = "VARCHAR")
+    @MetaData(value = "操作机构名称", comments = "操作机构名称")
+    private String orgName;
 
     /**
      * 状态：0未受理  1已审核待录入 2审核驳回 3已录入待复核 4已复核待确认 5复核驳回 6 确认通过 7 确认驳回 8 资料作废
@@ -151,14 +160,14 @@ public class CustInsteadApply implements BetterjrEntity {
 
     @Transient
     private String insteadItems;
-    
+
     private static final long serialVersionUID = 1468812783845L;
 
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -166,7 +175,7 @@ public class CustInsteadApply implements BetterjrEntity {
         return version;
     }
 
-    public void setVersion(Long version) {
+    public void setVersion(final Long version) {
         this.version = version;
     }
 
@@ -174,7 +183,7 @@ public class CustInsteadApply implements BetterjrEntity {
         return insteadType;
     }
 
-    public void setInsteadType(String insteadType) {
+    public void setInsteadType(final String insteadType) {
         this.insteadType = insteadType == null ? null : insteadType.trim();
     }
 
@@ -182,7 +191,7 @@ public class CustInsteadApply implements BetterjrEntity {
         return batchNo;
     }
 
-    public void setBatchNo(Long batchNo) {
+    public void setBatchNo(final Long batchNo) {
         this.batchNo = batchNo;
     }
 
@@ -190,7 +199,7 @@ public class CustInsteadApply implements BetterjrEntity {
         return regOperId;
     }
 
-    public void setRegOperId(Long regOperId) {
+    public void setRegOperId(final Long regOperId) {
         this.regOperId = regOperId;
     }
 
@@ -198,7 +207,7 @@ public class CustInsteadApply implements BetterjrEntity {
         return regOperName;
     }
 
-    public void setRegOperName(String regOperName) {
+    public void setRegOperName(final String regOperName) {
         this.regOperName = regOperName == null ? null : regOperName.trim();
     }
 
@@ -206,7 +215,7 @@ public class CustInsteadApply implements BetterjrEntity {
         return regDate;
     }
 
-    public void setRegDate(String regDate) {
+    public void setRegDate(final String regDate) {
         this.regDate = regDate == null ? null : regDate.trim();
     }
 
@@ -214,7 +223,7 @@ public class CustInsteadApply implements BetterjrEntity {
         return regTime;
     }
 
-    public void setRegTime(String regTime) {
+    public void setRegTime(final String regTime) {
         this.regTime = regTime == null ? null : regTime.trim();
     }
 
@@ -222,7 +231,7 @@ public class CustInsteadApply implements BetterjrEntity {
         return modiOperId;
     }
 
-    public void setModiOperId(Long modiOperId) {
+    public void setModiOperId(final Long modiOperId) {
         this.modiOperId = modiOperId;
     }
 
@@ -230,7 +239,7 @@ public class CustInsteadApply implements BetterjrEntity {
         return modiOperName;
     }
 
-    public void setModiOperName(String modiOperName) {
+    public void setModiOperName(final String modiOperName) {
         this.modiOperName = modiOperName == null ? null : modiOperName.trim();
     }
 
@@ -238,7 +247,7 @@ public class CustInsteadApply implements BetterjrEntity {
         return modiDate;
     }
 
-    public void setModiDate(String modiDate) {
+    public void setModiDate(final String modiDate) {
         this.modiDate = modiDate == null ? null : modiDate.trim();
     }
 
@@ -246,7 +255,7 @@ public class CustInsteadApply implements BetterjrEntity {
         return modiTime;
     }
 
-    public void setModiTime(String modiTime) {
+    public void setModiTime(final String modiTime) {
         this.modiTime = modiTime == null ? null : modiTime.trim();
     }
 
@@ -254,15 +263,24 @@ public class CustInsteadApply implements BetterjrEntity {
         return operOrg;
     }
 
-    public void setOperOrg(String operOrg) {
+    public void setOperOrg(final String operOrg) {
         this.operOrg = operOrg == null ? null : operOrg.trim();
+    }
+
+
+    public String getOrgName() {
+        return orgName;
+    }
+
+    public void setOrgName(final String anOrgName) {
+        orgName = anOrgName;
     }
 
     public String getBusinStatus() {
         return businStatus;
     }
 
-    public void setBusinStatus(String businStatus) {
+    public void setBusinStatus(final String businStatus) {
         this.businStatus = businStatus == null ? null : businStatus.trim();
     }
 
@@ -270,7 +288,7 @@ public class CustInsteadApply implements BetterjrEntity {
         return lastStatus;
     }
 
-    public void setLastStatus(String lastStatus) {
+    public void setLastStatus(final String lastStatus) {
         this.lastStatus = lastStatus == null ? null : lastStatus.trim();
     }
 
@@ -278,7 +296,7 @@ public class CustInsteadApply implements BetterjrEntity {
         return custNo;
     }
 
-    public void setCustNo(Long custNo) {
+    public void setCustNo(final Long custNo) {
         this.custNo = custNo;
     }
 
@@ -286,21 +304,21 @@ public class CustInsteadApply implements BetterjrEntity {
         return custName;
     }
 
-    public void setCustName(String custName) {
+    public void setCustName(final String custName) {
         this.custName = custName == null ? null : custName.trim();
     }
-    
+
     public String getInsteadItems() {
         return insteadItems;
     }
 
-    public void setInsteadItems(String anInsteadItems) {
+    public void setInsteadItems(final String anInsteadItems) {
         insteadItems = anInsteadItems;
     }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         sb.append(getClass().getSimpleName());
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
@@ -327,7 +345,7 @@ public class CustInsteadApply implements BetterjrEntity {
     }
 
     @Override
-    public boolean equals(Object that) {
+    public boolean equals(final Object that) {
         if (this == that) {
             return true;
         }
@@ -337,24 +355,24 @@ public class CustInsteadApply implements BetterjrEntity {
         if (getClass() != that.getClass()) {
             return false;
         }
-        CustInsteadApply other = (CustInsteadApply) that;
+        final CustInsteadApply other = (CustInsteadApply) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-            && (this.getVersion() == null ? other.getVersion() == null : this.getVersion().equals(other.getVersion()))
-            && (this.getInsteadType() == null ? other.getInsteadType() == null : this.getInsteadType().equals(other.getInsteadType()))
-            && (this.getBatchNo() == null ? other.getBatchNo() == null : this.getBatchNo().equals(other.getBatchNo()))
-            && (this.getRegOperId() == null ? other.getRegOperId() == null : this.getRegOperId().equals(other.getRegOperId()))
-            && (this.getRegOperName() == null ? other.getRegOperName() == null : this.getRegOperName().equals(other.getRegOperName()))
-            && (this.getRegDate() == null ? other.getRegDate() == null : this.getRegDate().equals(other.getRegDate()))
-            && (this.getRegTime() == null ? other.getRegTime() == null : this.getRegTime().equals(other.getRegTime()))
-            && (this.getModiOperId() == null ? other.getModiOperId() == null : this.getModiOperId().equals(other.getModiOperId()))
-            && (this.getModiOperName() == null ? other.getModiOperName() == null : this.getModiOperName().equals(other.getModiOperName()))
-            && (this.getModiDate() == null ? other.getModiDate() == null : this.getModiDate().equals(other.getModiDate()))
-            && (this.getModiTime() == null ? other.getModiTime() == null : this.getModiTime().equals(other.getModiTime()))
-            && (this.getOperOrg() == null ? other.getOperOrg() == null : this.getOperOrg().equals(other.getOperOrg()))
-            && (this.getBusinStatus() == null ? other.getBusinStatus() == null : this.getBusinStatus().equals(other.getBusinStatus()))
-            && (this.getLastStatus() == null ? other.getLastStatus() == null : this.getLastStatus().equals(other.getLastStatus()))
-            && (this.getCustNo() == null ? other.getCustNo() == null : this.getCustNo().equals(other.getCustNo()))
-            && (this.getCustName() == null ? other.getCustName() == null : this.getCustName().equals(other.getCustName()));
+                && (this.getVersion() == null ? other.getVersion() == null : this.getVersion().equals(other.getVersion()))
+                && (this.getInsteadType() == null ? other.getInsteadType() == null : this.getInsteadType().equals(other.getInsteadType()))
+                && (this.getBatchNo() == null ? other.getBatchNo() == null : this.getBatchNo().equals(other.getBatchNo()))
+                && (this.getRegOperId() == null ? other.getRegOperId() == null : this.getRegOperId().equals(other.getRegOperId()))
+                && (this.getRegOperName() == null ? other.getRegOperName() == null : this.getRegOperName().equals(other.getRegOperName()))
+                && (this.getRegDate() == null ? other.getRegDate() == null : this.getRegDate().equals(other.getRegDate()))
+                && (this.getRegTime() == null ? other.getRegTime() == null : this.getRegTime().equals(other.getRegTime()))
+                && (this.getModiOperId() == null ? other.getModiOperId() == null : this.getModiOperId().equals(other.getModiOperId()))
+                && (this.getModiOperName() == null ? other.getModiOperName() == null : this.getModiOperName().equals(other.getModiOperName()))
+                && (this.getModiDate() == null ? other.getModiDate() == null : this.getModiDate().equals(other.getModiDate()))
+                && (this.getModiTime() == null ? other.getModiTime() == null : this.getModiTime().equals(other.getModiTime()))
+                && (this.getOperOrg() == null ? other.getOperOrg() == null : this.getOperOrg().equals(other.getOperOrg()))
+                && (this.getBusinStatus() == null ? other.getBusinStatus() == null : this.getBusinStatus().equals(other.getBusinStatus()))
+                && (this.getLastStatus() == null ? other.getLastStatus() == null : this.getLastStatus().equals(other.getLastStatus()))
+                && (this.getCustNo() == null ? other.getCustNo() == null : this.getCustNo().equals(other.getCustNo()))
+                && (this.getCustName() == null ? other.getCustName() == null : this.getCustName().equals(other.getCustName()));
     }
 
     @Override
@@ -380,29 +398,30 @@ public class CustInsteadApply implements BetterjrEntity {
         result = prime * result + ((getCustName() == null) ? 0 : getCustName().hashCode());
         return result;
     }
-    
-    public void initAddValue(String anInsteadType, Long anCustNo, String anCustName) {
+
+    public void initAddValue(final String anInsteadType, final Long anCustNo, final String anCustName) {
         this.id = SerialGenerator.getLongValue("CustInsteadApply.id");
-        
+
         this.regOperId = UserUtils.getOperatorInfo().getId();
         this.regOperName = UserUtils.getOperatorInfo().getName();
         this.regDate = BetterDateUtils.getNumDate();
         this.regTime = BetterDateUtils.getNumTime();
-        
+
         this.modiOperId = UserUtils.getOperatorInfo().getId();
         this.modiOperName = UserUtils.getOperatorInfo().getName();
         this.modiDate = BetterDateUtils.getNumDate();
         this.modiTime = BetterDateUtils.getNumTime();
-        
+
         this.insteadType = anInsteadType;
         this.custNo = anCustNo;
         this.custName = anCustName;
-        
+
         this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
+        this.orgName = UserUtils.getOperatorContextInfo().getCertInfo().getCustName();
         this.businStatus = CustomerConstants.INSTEAD_APPLY_STATUS_NEW;
     }
 
-    public void initModifyValue(String anBusinStatus) {
+    public void initModifyValue(final String anBusinStatus) {
         this.modiOperId = UserUtils.getOperatorInfo().getId();
         this.modiOperName = UserUtils.getOperatorInfo().getName();
         this.modiDate = BetterDateUtils.getNumDate();
@@ -412,12 +431,12 @@ public class CustInsteadApply implements BetterjrEntity {
         this.businStatus = anBusinStatus;
     }
 
-    public void initModifyValue(CustInsteadApply anCustInsteadApply) {
+    public void initModifyValue(final CustInsteadApply anCustInsteadApply) {
         this.modiOperId = UserUtils.getOperatorInfo().getId();
         this.modiOperName = UserUtils.getOperatorInfo().getName();
         this.modiDate = BetterDateUtils.getNumDate();
-        this.modiTime = BetterDateUtils.getNumTime();  
-        
+        this.modiTime = BetterDateUtils.getNumTime();
+
         this.insteadType = anCustInsteadApply.getInsteadType();
     }
 }
