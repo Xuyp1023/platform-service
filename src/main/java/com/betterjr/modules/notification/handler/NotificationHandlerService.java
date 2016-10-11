@@ -179,8 +179,7 @@ public class NotificationHandlerService {
                         getSendNo(anNotification, tempOperator.getLeft()),
                         tempOperator.getLeft(),
                         tempOperator.getRight(),
-                        anSendOperator,
-                        anSendCustomer);
+                        anSendOperator);
                 //}
             }
         }
@@ -189,7 +188,7 @@ public class NotificationHandlerService {
         if (Collections3.isEmpty(emails) == false
                 && StringUtils.equals(NotificationConstants.CHANNEL_EMAIL, anNotification.getChannel())) {
             for (final String email : emails) {
-                addNotificationCustomer(anNotification, email, null, null, anSendOperator, anSendCustomer);
+                addNotificationCustomer(anNotification, email, null, null, anSendOperator);
             }
         }
 
@@ -197,7 +196,7 @@ public class NotificationHandlerService {
         if (Collections3.isEmpty(mobiles) == false
                 && StringUtils.equals(NotificationConstants.CHANNEL_SMS, anNotification.getChannel())) {
             for (final String mobile : mobiles) {
-                addNotificationCustomer(anNotification, mobile, null, null, anSendOperator, anSendCustomer);
+                addNotificationCustomer(anNotification, mobile, null, null, anSendOperator);
             }
         }
 
@@ -223,8 +222,7 @@ public class NotificationHandlerService {
             final String anSendNo,
             final CustOperatorInfo anOperator,
             final CustInfo anCustInfo,
-            final CustOperatorInfo anSendOperator,
-            final CustInfo anSendCustomer) {
+            final CustOperatorInfo anSendOperator) {
         final NotificationCustomer tempNotificationCustomer = new NotificationCustomer();
         tempNotificationCustomer.setChannel(anNotification.getChannel());
         tempNotificationCustomer.setNotificationId(anNotification.getId());
@@ -242,7 +240,7 @@ public class NotificationHandlerService {
         tempNotificationCustomer.setSendNo(anSendNo);
 
         final NotificationCustomer notificationCustomer = notificationCustomerService.addNotificationCustomer(tempNotificationCustomer,
-                anSendOperator, anSendCustomer);
+                anSendOperator);
         return notificationCustomer;
     }
 

@@ -48,7 +48,7 @@ public class NotificationProfileService extends BaseService<NotificationProfileM
         BTAssert.notNull(anProfileName, "模板名称不允许为空!");
         BTAssert.notNull(anCustNo, "客户编号不允许为空!");
 
-        BTAssert.isTrue(UserUtils.containsCustNo(anCustNo), "此操作员不具备访问此公司权限！");
+        //BTAssert.isTrue(UserUtils.containsCustNo(anCustNo), "此操作员不具备访问此公司权限！");
 
         final Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("profileName", anProfileName);
@@ -69,7 +69,7 @@ public class NotificationProfileService extends BaseService<NotificationProfileM
         BTAssert.notNull(anProfileName, "模板名称不允许为空!");
         BTAssert.notNull(anCustNo, "客户编号不允许为空!");
 
-        BTAssert.isTrue(UserUtils.containsCustNo(anCustNo), "此操作员不具备访问此公司权限！");
+        //BTAssert.isTrue(UserUtils.containsCustNo(anCustNo), "此操作员不具备访问此公司权限！");
 
         final List<String> rules = getCustRulesByCustNo(anCustNo); // 公司类型
 

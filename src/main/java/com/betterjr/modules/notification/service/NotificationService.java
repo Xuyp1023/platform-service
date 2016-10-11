@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.betterjr.common.data.NotificationAttachment;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
+import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.mapper.pagehelper.Page;
@@ -53,6 +54,11 @@ public class NotificationService extends BaseService<NotificationMapper, Notific
         final CustOperatorInfo operator = UserUtils.getOperatorInfo();
 
         PageHelper.startPage(anPageNum, anPageSize, anFlag == 1);
+        // 处理 LIKEsubject
+        final String LIKEsubject = (String) anParam.get("LIKEsubject");
+        if (BetterStringUtils.isNotBlank(LIKEsubject)) {
+            anParam.put("LIKEsubject", "%" + LIKEsubject + "%");
+        }
         return this.mapper.selectNotificationByCondition(operator.getId(), NotificationConstants.IS_READ_FALSE, anParam);
     }
 

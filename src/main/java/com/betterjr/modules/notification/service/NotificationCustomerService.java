@@ -21,11 +21,10 @@ public class NotificationCustomerService extends BaseService<NotificationCustome
     /**
      * 添加 NotificationCustomer
      */
-    public NotificationCustomer addNotificationCustomer(final NotificationCustomer anNotificationCustomer, final CustOperatorInfo anOperator,
-            final CustInfo anCustomer) {
+    public NotificationCustomer addNotificationCustomer(final NotificationCustomer anNotificationCustomer, final CustOperatorInfo anSendOperator) {
         BTAssert.notNull(anNotificationCustomer, "通知内容不允许为空!");
 
-        anNotificationCustomer.initAddValue(anOperator, anCustomer);
+        anNotificationCustomer.initAddValue(anSendOperator);
         this.insert(anNotificationCustomer);
 
         return anNotificationCustomer;

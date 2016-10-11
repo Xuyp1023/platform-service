@@ -460,23 +460,20 @@ public class NotificationCustomer implements BetterjrEntity {
         return result;
     }
     
-    public void initAddValue(CustOperatorInfo anOperator, CustInfo anCustomer) {
+    public void initAddValue(CustOperatorInfo anSendOperator) {
         this.id = SerialGenerator.getLongValue("NotificationCustomer.id");
 
-        this.regOperId = anOperator.getId();
-        this.regOperName = anOperator.getName();
-        this.operOrg = anOperator.getOperOrg();
+        this.regOperId = anSendOperator.getId();
+        this.regOperName = anSendOperator.getName();
+        this.operOrg = anSendOperator.getOperOrg();
 
         this.regDate = BetterDateUtils.getNumDate();
         this.regTime = BetterDateUtils.getNumTime();
 
-        this.modiOperId = anOperator.getId();
-        this.modiOperName = anOperator.getName();
+        this.modiOperId = anSendOperator.getId();
+        this.modiOperName = anSendOperator.getName();
         this.modiDate = BetterDateUtils.getNumDate();
         this.modiTime = BetterDateUtils.getNumTime();
-
-        this.custNo = anCustomer.getCustNo();
-        this.custName = anCustomer.getCustName();
 
         this.isDeleted = NotificationConstants.IS_DELETED_FALSE;
         this.isRead = NotificationConstants.IS_READ_FALSE;
