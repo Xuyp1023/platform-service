@@ -279,10 +279,10 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
             anRelateType = CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR;
         }
         if (BetterStringUtils.equals(anRelateType, "2")) {
-            anRelateType = CustomerConstants.RELATE_TYPE_CORE_FACTOR;
+            anRelateType = CustomerConstants.RELATE_TYPE_SELLER_FACTOR;
         }
         if (BetterStringUtils.equals(anRelateType, "3")) {
-            anRelateType = CustomerConstants.RELATE_TYPE_SELLER_FACTOR;
+            anRelateType = CustomerConstants.RELATE_TYPE_CORE_FACTOR;
         }
         anMap.put("relateType", anRelateType);
         anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
