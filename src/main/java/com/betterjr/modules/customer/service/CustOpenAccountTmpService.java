@@ -382,8 +382,12 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
             this.updateByPrimaryKeySelective(anOpenAccountInfo);
         }
         // 回写暂存流水号至代录申请表
-        custInsteadRecordService.saveInsteadRecord(anInsteadRecordId, String.valueOf(anOpenAccountInfo.getId()));
+        CustInsteadRecord insteadRecord = custInsteadRecordService.saveInsteadRecord(anInsteadRecordId, String.valueOf(anOpenAccountInfo.getId()));
 
+        // 回写 parentId by instead record id. add by Liuwl 2016-10-12
+        anOpenAccountInfo.setParentId(insteadRecord.getId());
+        this.updateByPrimaryKeySelective(anOpenAccountInfo);
+        
         return anOpenAccountInfo;
     }
 
