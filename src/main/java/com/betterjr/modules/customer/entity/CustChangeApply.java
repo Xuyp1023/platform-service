@@ -436,7 +436,7 @@ public class CustChangeApply implements BetterjrEntity {
         this.modiTime = BetterDateUtils.getNumTime();
 
         this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
-        this.orgName = UserUtils.getOperatorContextInfo().getCertInfo().getCustName();
+        this.orgName = UserUtils.getOrgName();
         this.businStatus = CustomerConstants.CHANGE_APPLY_STATUS_NEW;
 
         this.custNo = anCustNo;

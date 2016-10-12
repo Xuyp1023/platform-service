@@ -417,7 +417,7 @@ public class CustInsteadApply implements BetterjrEntity {
         this.custName = anCustName;
 
         this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
-        this.orgName = UserUtils.getOperatorContextInfo().getCertInfo().getCustName();
+        this.orgName = UserUtils.getOrgName();
         this.businStatus = CustomerConstants.INSTEAD_APPLY_STATUS_NEW;
     }
 
