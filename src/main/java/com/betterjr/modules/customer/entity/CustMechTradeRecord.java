@@ -1,11 +1,14 @@
 package com.betterjr.modules.customer.entity;
 
+import java.util.List;
+
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.betterjr.common.annotation.MetaData;
 import com.betterjr.common.entity.BetterjrEntity;
@@ -13,6 +16,7 @@ import com.betterjr.common.mapper.CustDateJsonSerializer;
 import com.betterjr.common.selectkey.SerialGenerator;
 import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.UserUtils;
+import com.betterjr.modules.document.entity.CustFileItem;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @Access(AccessType.FIELD)
@@ -139,6 +143,12 @@ public class CustMechTradeRecord implements BetterjrEntity {
     @Column(name = "L_CUSTNO",  columnDefinition="INTEGER" )
     @MetaData( value="客户编号", comments = "客户编号")
     private Long custNo;
+    
+    /**
+     * 附件列表
+     */
+    @Transient
+    private List<CustFileItem> fileList;
 
     private static final long serialVersionUID = 1468812783871L;
 
@@ -276,6 +286,14 @@ public class CustMechTradeRecord implements BetterjrEntity {
 
     public void setCustNo(Long custNo) {
         this.custNo = custNo;
+    }
+    
+    public List<CustFileItem> getFileList() {
+        return this.fileList;
+    }
+
+    public void setFileList(List<CustFileItem> anFileList) {
+        this.fileList = anFileList;
     }
 
     @Override

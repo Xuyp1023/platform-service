@@ -3,15 +3,15 @@ package com.betterjr.modules.customer.service;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.customer.dao.CustMechFinanceRecordMapper;
 import com.betterjr.modules.customer.entity.CustMechFinanceRecord;
+import com.betterjr.modules.document.ICustFileService;
 
 /**
  * 
@@ -20,7 +20,9 @@ import com.betterjr.modules.customer.entity.CustMechFinanceRecord;
  */
 @Service
 public class CustMechFinanceRecordService extends BaseService<CustMechFinanceRecordMapper, CustMechFinanceRecord> {
-    private static Logger logger = LoggerFactory.getLogger(CustMechFinanceRecordService.class);
+
+    @Reference(interfaceClass = ICustFileService.class)
+    private ICustFileService custFileService;
     
     /**
      * 财务上传记录列表
@@ -31,7 +33,12 @@ public class CustMechFinanceRecordService extends BaseService<CustMechFinanceRec
         BTAssert.notNull(anCustNo, "客户编号不允许为空！");
         Map<String, Object> anMap = new HashMap<String, Object>();
         anMap.put("custNo", anCustNo);
-        return this.selectPropertyByPage(anMap, anPageNum, anPageSize, "1".equals(anFlag));
+        Page<CustMechFinanceRecord> financeRecordList = selectPropertyByPage(anMap, anPageNum, anPageSize, "1".equals(anFlag));
+        //补充文件信息
+        for(CustMechFinanceRecord record : financeRecordList) {
+            record.setFileList(custFileService.findCustFiles(record.getBatchNo()));
+        }
+        return financeRecordList;
     }
     
     /**
