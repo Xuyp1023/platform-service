@@ -3,11 +3,14 @@ package com.betterjr.modules.customer.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.customer.dao.CustBankFlowRecordMapper;
 import com.betterjr.modules.customer.entity.CustBankFlowRecord;
+import com.betterjr.modules.customer.entity.CustMechTradeRecord;
+import com.betterjr.modules.document.ICustFileService;
 import com.betterjr.modules.document.service.CustFileItemService;
 
 /**
@@ -22,6 +25,9 @@ public class CustBankFlowRecordService extends BaseService<CustBankFlowRecordMap
     @Autowired
     private CustFileItemService fileItemService;
     
+    @Reference(interfaceClass = ICustFileService.class)
+    private ICustFileService custFileService;
+    
     /**
      * 查询银行流水上传记录列表
      * 
@@ -31,7 +37,12 @@ public class CustBankFlowRecordService extends BaseService<CustBankFlowRecordMap
     public Page<CustBankFlowRecord> queryCustBankFlowRecord(Long anCustNo, String anFlag, int anPageNum, int anPageSize) {
         BTAssert.notNull(anCustNo, "客户编号不允许为空！");
         
-        return this.selectPropertyByPage("custNo", anCustNo, anPageNum, anPageSize, "1".equals(anFlag));
+        Page<CustBankFlowRecord> recordList = this.selectPropertyByPage("custNo", anCustNo, anPageNum, anPageSize, "1".equals(anFlag));
+        //补充文件信息
+        for(CustBankFlowRecord record : recordList) {
+            record.setFileList(custFileService.findCustFiles(record.getBatchNo()));
+        }
+        return recordList;
     }
 
     /**

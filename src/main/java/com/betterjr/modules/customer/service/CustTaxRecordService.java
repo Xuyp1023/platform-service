@@ -6,11 +6,14 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.customer.dao.CustTaxRecordMapper;
+import com.betterjr.modules.customer.entity.CustMechFinanceRecord;
 import com.betterjr.modules.customer.entity.CustTaxRecord;
+import com.betterjr.modules.document.ICustFileService;
 
 /**
  * 纳税记录上传记录
@@ -19,6 +22,9 @@ import com.betterjr.modules.customer.entity.CustTaxRecord;
  */
 @Service
 public class CustTaxRecordService extends BaseService<CustTaxRecordMapper, CustTaxRecord> {
+    
+    @Reference(interfaceClass = ICustFileService.class)
+    private ICustFileService custFileService;
     
     /**
      * 纳税记录上传记录列表
@@ -47,7 +53,12 @@ public class CustTaxRecordService extends BaseService<CustTaxRecordMapper, CustT
         BTAssert.notNull(anCustNo, "客户编号不允许为空！");
         Map<String, Object> anMap = new HashMap<String, Object>();
         anMap.put("custNo", anCustNo);
-        return this.selectPropertyByPage(anMap, anPageNum, anPageSize, "1".equals(anFlag));
+        Page<CustTaxRecord> recordList = this.selectPropertyByPage(anMap, anPageNum, anPageSize, "1".equals(anFlag));
+        //补充文件信息
+        for(CustTaxRecord record : recordList) {
+            record.setFileList(custFileService.findCustFiles(record.getBatchNo()));
+        }
+        return recordList;
     }
     
     /**
