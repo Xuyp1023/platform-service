@@ -74,14 +74,7 @@ public class CustInsteadService {
      * 代录申请 - 修改申请
      */
     public CustInsteadApply saveInsteadApply(final Map<String, Object> anParam, final Long anApplyId, final String anFileList) {
-        BTAssert.notNull(anParam, "代录信息不允许为空！");
         BTAssert.notNull(anApplyId, "代录编号不允许为空！");
-
-        final String insteadType = (String) anParam.get("insteadType");
-        if ((insteadType.equals(CustomerConstants.INSTEAD_APPLY_TYPE_OPENACCOUNT)
-                || insteadType.equals(CustomerConstants.INSTEAD_APPLY_TYPE_CHANGE)) == false) {
-            throw new BytterTradeException(20040, "代录类型不正确");
-        }
 
         final CustInsteadApply tempCustInsteadApply = insteadApplyService.findCustInsteadApply(anApplyId);
         BTAssert.notNull(tempCustInsteadApply, "没有找到相应的代录申请!");
@@ -91,7 +84,7 @@ public class CustInsteadService {
 
         final String insteadItems = (String) anParam.get("insteadItems");
 
-        insteadRecordService.saveInsteadRecord(custInsteadApply, insteadType, insteadItems);
+        insteadRecordService.saveInsteadRecord(custInsteadApply, tempCustInsteadApply.getInsteadType(), insteadItems);
         return custInsteadApply;
     }
 
