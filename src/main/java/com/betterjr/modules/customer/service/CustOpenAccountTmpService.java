@@ -84,6 +84,9 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
 
     @Autowired
     private CustInsteadRecordService custInsteadRecordService;
+    
+    @Autowired
+    private CustInsteadApplyService custInsteadApplyService;
 
     @Autowired
     private CustAndOperatorRelaService custAndOperatorRelaService;
@@ -388,6 +391,8 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         anOpenAccountInfo.setParentId(insteadRecord.getId());
         this.updateByPrimaryKeySelective(anOpenAccountInfo);
         
+        custInsteadApplyService.saveCustInsteadApplyCustInfo(insteadRecord.getApplyId(), null, anOpenAccountInfo.getCustName());
+        
         return anOpenAccountInfo;
     }
 
@@ -424,6 +429,11 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
                 UserUtils.getOperatorInfo().getOperOrg());
         // 更新数据
         this.updateByPrimaryKeySelective(anOpenAccountInfo);
+        
+        // 回写暂存流水号至代录申请表
+        CustInsteadRecord insteadRecord = custInsteadRecordService.findInsteadRecord(anParentId);
+
+        custInsteadApplyService.saveCustInsteadApplyCustInfo(insteadRecord.getApplyId(), anOpenAccountInfo.getCustNo(), anOpenAccountInfo.getCustName());
     }
 
     @Override

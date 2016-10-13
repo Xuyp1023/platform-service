@@ -186,4 +186,26 @@ public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper,
         return this.selectPropertyByPage(CustInsteadApply.class, anParam, anPageNum, anPageSize, anFlag == 1);
     }
 
+    /**
+     * 回写 custNo, custName
+     * @param applyId
+     * @param custName
+     */
+    public CustInsteadApply saveCustInsteadApplyCustInfo(Long anId, Long anCustNo, String anCustName) {
+        final CustInsteadApply tempInsteadApply = this.selectByPrimaryKey(anId);
+        
+        BTAssert.notNull(tempInsteadApply, "没有找到对应的代录申请！");
+        
+        if (anCustNo != null) {
+            tempInsteadApply.setCustNo(anCustNo);
+        }
+        if (BetterStringUtils.isNotBlank(anCustName)) {
+            tempInsteadApply.setCustName(anCustName);
+        }
+        
+        this.updateByPrimaryKeySelective(tempInsteadApply);
+        
+        return tempInsteadApply;
+    }
+
 }
