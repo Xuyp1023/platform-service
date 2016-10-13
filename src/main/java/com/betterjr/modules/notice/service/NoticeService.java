@@ -22,7 +22,7 @@ import com.betterjr.mapper.pagehelper.PageHelper;
 import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.betterjr.modules.account.service.CustAccountService;
-import com.betterjr.modules.account.service.CustCertService;
+import com.betterjr.modules.cert.service.CustCertService;
 import com.betterjr.modules.customer.service.CustRelationService;
 import com.betterjr.modules.document.service.CustFileItemService;
 import com.betterjr.modules.notice.constants.NoticeConstants;
