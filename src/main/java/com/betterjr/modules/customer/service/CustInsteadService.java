@@ -59,9 +59,11 @@ public class CustInsteadService {
                 || insteadType.equals(CustomerConstants.INSTEAD_APPLY_TYPE_CHANGE)) == false) {
             throw new BytterTradeException(20040, "代录类型不正确");
         }
-
-        final String tempCustNo = (String) anParam.get("custNo");
-        final Long custNo = Long.valueOf(tempCustNo);
+        Long custNo = null;
+        if (insteadType.equals(CustomerConstants.INSTEAD_APPLY_TYPE_CHANGE) == true) { //变更代录才会有 custNo
+            final String tempCustNo = (String) anParam.get("custNo");
+            custNo = Long.valueOf(tempCustNo);
+        }
         final CustInsteadApply custInsteadApply = insteadApplyService.addCustInsteadApply(insteadType, custNo, anFileList);
 
         final String insteadItems = (String) anParam.get("insteadItems");
