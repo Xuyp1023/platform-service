@@ -128,18 +128,29 @@ public class CustRelationDubboService implements ICustRelationService {
 
         return AjaxObject.newOk("保理机构关系客户查询成功", custRelationService.queryFactorCustRelation(anFactorNo, anCreditType)).toJson();
     }
-    
-    /****
-     * 查询客户号根据类型返回关联关系信息
-     * @param anCustNo 关系客户号
-     * @param anCreditType 关系类型
-     * @return 关系列表
-     */
-    public List<CustRelationData> webQueryCustRelationData(Long anCustNo,String anCreditType){
-        return custRelationService.queryCustRelationData(anCustNo,anCreditType);
+
+    @Override
+    public String webQueryFactorAllCust(Long anFactorNo) {
+
+        return AjaxObject.newOk("保理机构关系客户查询成功", custRelationService.webQueryFactorAllCust(anFactorNo)).toJson();
     }
 
-    /* (non-Javadoc)
+    /****
+     * 查询客户号根据类型返回关联关系信息
+     * 
+     * @param anCustNo
+     *            关系客户号
+     * @param anCreditType
+     *            关系类型
+     * @return 关系列表
+     */
+    public List<CustRelationData> webQueryCustRelationData(Long anCustNo, String anCreditType) {
+        return custRelationService.queryCustRelationData(anCustNo, anCreditType);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.betterjr.modules.customer.ICustRelationService#webQueryFactorList()
      */
     @Override

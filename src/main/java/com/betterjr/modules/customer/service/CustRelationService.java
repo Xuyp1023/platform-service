@@ -297,6 +297,28 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
     }
 
     /**
+     * 查询保理结构所有关系客户
+     * 
+     * @param anFactorNo
+     * @return
+     */
+    public List<SimpleDataEntity> webQueryFactorAllCust(final Long anFactorNo) {
+        final List<SimpleDataEntity> result = new ArrayList<SimpleDataEntity>();
+        if (null == anFactorNo) {
+            return result;
+        }
+        final Map<String, Object> anMap = new HashMap<String, Object>();
+        anMap.put("relateCustno", anFactorNo);
+        anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
+        anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR, CustomerConstants.RELATE_TYPE_SELLER_FACTOR,
+                CustomerConstants.RELATE_TYPE_CORE_FACTOR });
+        for (final CustRelation relation : this.selectByProperty(anMap, "relateType, custNo")) {
+            result.add(new SimpleDataEntity(relation.getCustName(), String.valueOf(relation.getCustNo())));
+        }
+        return result;
+    }
+
+    /**
      * 客户白名单受理列表
      *
      * @param anBusinStatus
