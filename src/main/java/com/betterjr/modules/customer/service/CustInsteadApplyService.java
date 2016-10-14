@@ -23,7 +23,7 @@ import com.betterjr.modules.document.service.CustFileItemService;
 
 /**
  * 代录申请
- * 
+ *
  * @author liuwl
  *
  */
@@ -40,11 +40,11 @@ public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper,
 
     /**
      * 添加代录申请 检查是否已经有申请在进行中
-     * 
+     *
      * @param anCustInsteadApply
      * @return
      */
-    public CustInsteadApply addCustInsteadApply(String anInsteadType, Long anCustNo, String anFileList) {
+    public CustInsteadApply addCustInsteadApply(final String anInsteadType, final Long anCustNo, final String anFileList) {
         if (BetterStringUtils.isBlank(anInsteadType) == true) {
             throw new BytterTradeException(20061, "代录申请类型不允许为空！");
         }
@@ -63,7 +63,7 @@ public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper,
                 throw new BytterTradeException(20062, "所选客户有正在进行的代录申请！");
             }
 
-            String custName = accountService.queryCustName(anCustNo);
+            final String custName = accountService.queryCustName(anCustNo);
             custInsteadApply.initAddValue(anInsteadType, anCustNo, custName);
         }
 
@@ -74,22 +74,22 @@ public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper,
     }
 
     /**
-     * 
+     *
      * @param anCustNo
      * @return
      */
-    public Boolean checkExistActiveInsteadApply(Long anCustNo) {
-        Map<String, Object> conditionMap = new HashMap<>();
+    public Boolean checkExistActiveInsteadApply(final Long anCustNo) {
+        final Map<String, Object> conditionMap = new HashMap<>();
 
         conditionMap.put(CustomerConstants.CUST_NO, anCustNo);
         // INSTEAD_APPLY_STATUS_CONFIRM_PASS 这两种状态表明 此申请已经完成 或者 取消
         // INSTEAD_APPLY_STATUS_CANCEL
-        String[] businStatues = { 
-                CustomerConstants.INSTEAD_APPLY_STATUS_NEW, 
+        final String[] businStatues = {
+                CustomerConstants.INSTEAD_APPLY_STATUS_NEW,
                 CustomerConstants.INSTEAD_APPLY_STATUS_AUDIT_PASS,
-                CustomerConstants.INSTEAD_APPLY_STATUS_AUDIT_REJECT, 
+                CustomerConstants.INSTEAD_APPLY_STATUS_AUDIT_REJECT,
                 CustomerConstants.INSTEAD_APPLY_STATUS_TYPE_IN,
-                CustomerConstants.INSTEAD_APPLY_STATUS_REVIEW_PASS, 
+                CustomerConstants.INSTEAD_APPLY_STATUS_REVIEW_PASS,
                 CustomerConstants.INSTEAD_APPLY_STATUS_REVIEW_REJECT,
                 CustomerConstants.INSTEAD_APPLY_STATUS_CONFIRM_REJECT };
         conditionMap.put("businStatus", businStatues);
@@ -98,23 +98,23 @@ public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper,
 
     /**
      * 查询代录申请
-     * 
+     *
      * @param anId
      * @return
      */
-    public CustInsteadApply findCustInsteadApply(Long anId) {
+    public CustInsteadApply findCustInsteadApply(final Long anId) {
         BTAssert.notNull(anId, "编号不允许为空！");
 
-        CustInsteadApply insteadApply = this.selectByPrimaryKey(anId);
+        final CustInsteadApply insteadApply = this.selectByPrimaryKey(anId);
 
-        List<CustInsteadRecord> insteadRecords = insteadRecordService.queryInsteadRecord(insteadApply.getId());
+        final List<CustInsteadRecord> insteadRecords = insteadRecordService.queryInsteadRecord(insteadApply.getId());
         insteadApply.setInsteadItems(generateInsteadItems(insteadRecords));
 
         return insteadApply;
     }
 
-    private String generateInsteadItems(List<CustInsteadRecord> anInsteadRecords) {
-        StringBuilder sb = new StringBuilder();
+    private String generateInsteadItems(final List<CustInsteadRecord> anInsteadRecords) {
+        final StringBuilder sb = new StringBuilder();
         sb.append(getInsteadItem(anInsteadRecords, CustomerConstants.ITEM_BASE)).append(",");
         sb.append(getInsteadItem(anInsteadRecords, CustomerConstants.ITEM_LAW)).append(",");
         sb.append(getInsteadItem(anInsteadRecords, CustomerConstants.ITEM_SHAREHOLDER)).append(",");
@@ -125,9 +125,9 @@ public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper,
         return sb.toString();
     }
 
-    private String getInsteadItem(List<CustInsteadRecord> anInsteadRecords, String anItem) {
+    private String getInsteadItem(final List<CustInsteadRecord> anInsteadRecords, final String anItem) {
         boolean flag = false;
-        for (CustInsteadRecord insteadRecord : anInsteadRecords) {
+        for (final CustInsteadRecord insteadRecord : anInsteadRecords) {
             if (insteadRecord.getInsteadItem().equals(anItem) == true) {
                 flag = true;
                 break;
@@ -140,7 +140,7 @@ public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper,
     /**
      * 修改代录申请及文件列表
      */
-    public CustInsteadApply saveCustInsteadApply(CustInsteadApply anInsteadApply, String anFileList) {
+    public CustInsteadApply saveCustInsteadApply(final CustInsteadApply anInsteadApply, final String anFileList) {
         BTAssert.notNull(anInsteadApply, "代录申请不允许为空！");
 
         final CustInsteadApply tempInsteadApply = this.selectByPrimaryKey(anInsteadApply.getId());
@@ -148,13 +148,15 @@ public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper,
 
         tempInsteadApply.initModifyValue(anInsteadApply);
         tempInsteadApply.setBatchNo(fileItemService.updateCustFileItemInfo(anFileList, anInsteadApply.getBatchNo()));
+
+        this.updateByPrimaryKeySelective(tempInsteadApply);
         return tempInsteadApply;
     }
 
     /**
      * 修改代录申请状态
      */
-    public CustInsteadApply saveCustInsteadApplyStatus(Long anId, String anBusinStatus) {
+    public CustInsteadApply saveCustInsteadApplyStatus(final Long anId, final String anBusinStatus) {
         BTAssert.notNull(anId, "编号不允许为空！");
         BTAssert.notNull(anBusinStatus, "状态不允许为空！");
 
@@ -168,10 +170,10 @@ public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper,
 
     /**
      * 查询代表列表 平台使用
-     * 
+     *
      * @return
      */
-    public Page<CustInsteadApply> queryCustInsteadApply(Map<String, Object> anParam, int anFlag, int anPageNum, int anPageSize) {
+    public Page<CustInsteadApply> queryCustInsteadApply(final Map<String, Object> anParam, final int anFlag, final int anPageNum, final int anPageSize) {
         final Object custName = anParam.get("LIKEcustName");
         final Object businStatus = anParam.get("businStatus");
         if (custName == null || BetterStringUtils.isBlank((String) custName)) {
