@@ -85,15 +85,10 @@ public class NotificationSubscribeService extends BaseService<NotificationSubscr
 
         param.put("customers", custNoSet);
 
-        final String custName = accountService.queryCustName(anCustNo);
-
         PageHelper.startPage(anPageNum, anPageSize, anFlag == 1);
         final Page<ProfileSubscribeModel> profileSubscribes = this.mapper.selectProfileSubscribe(param);
 
         profileSubscribes.forEach(profileSubscribe -> {
-            profileSubscribe.setCustNo(anCustNo);
-            profileSubscribe.setCustName(custName);
-
             profileSubscribe.setChannels(queryChannelSubscribe(anCustNo, profileSubscribe.getCustNo(), profileSubscribe.getProfileName()));
         });
         return profileSubscribes;
