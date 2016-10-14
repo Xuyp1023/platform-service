@@ -81,6 +81,10 @@ public class CustInsteadService {
         final CustInsteadApply tempCustInsteadApply = insteadApplyService.findCustInsteadApply(anApplyId);
         BTAssert.notNull(tempCustInsteadApply, "没有找到相应的代录申请!");
 
+        if (BetterStringUtils.equals(tempCustInsteadApply.getBusinStatus(), CustomerConstants.INSTEAD_APPLY_STATUS_AUDIT_REJECT) == false) {
+            throw new BytterTradeException("代录申请状态不允许修改！");
+        }
+
         final CustInsteadApply custInsteadApply = insteadApplyService.saveCustInsteadApply(tempCustInsteadApply, anFileList);
         BTAssert.notNull(custInsteadApply, "保存代录申请发生错误!");
 
