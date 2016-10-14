@@ -113,6 +113,7 @@ public class NotificationProfileService extends BaseService<NotificationProfileM
         BTAssert.isTrue(UserUtils.containsCustNo(anCustNo), "此操作员不具备访问此公司权限！");
 
         final List<String> rules = getCustRulesByCustNo(anCustNo);  // 公司类型
+        final String custName = accountService.queryCustName(anCustNo);
 
         final Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("LTid", 0);
@@ -123,6 +124,8 @@ public class NotificationProfileService extends BaseService<NotificationProfileM
 
         for (final NotificationProfile profile: profilePage) {
             final NotificationProfile tempProfile = findProfileByProfileNameAndCustNo(profile.getProfileName(), anCustNo);
+            profile.setCustNo(anCustNo);
+            profile.setCustName(custName);
             profile.setBusinStatus(tempProfile.getBusinStatus());
         }
         return profilePage;
