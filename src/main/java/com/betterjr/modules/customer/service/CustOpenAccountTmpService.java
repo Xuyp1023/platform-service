@@ -84,7 +84,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
 
     @Autowired
     private CustInsteadRecordService custInsteadRecordService;
-    
+
     @Autowired
     private CustInsteadApplyService custInsteadApplyService;
 
@@ -192,6 +192,8 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
             BTAssert.notNull(anExitsOpenAccountInfo, "无法获取客户开户资料信息");
             // 初始化参数设置
             anOpenAccountInfo.initModifyValue(anExitsOpenAccountInfo);
+            // 营业执照
+            initIdentInfo(anOpenAccountInfo);
             // 处理附件
             anOpenAccountInfo.setBatchNo(custFileItemService.updateCustFileItemInfo(anFileList, anOpenAccountInfo.getBatchNo()));
             // 数据存盘,开户资料暂存
@@ -227,6 +229,8 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
             BTAssert.notNull(anExitsOpenAccountInfo, "无法获取客户开户资料信息");
             // 初始化参数设置
             anOpenAccountInfo.initModifyValue(anExitsOpenAccountInfo);
+            // 营业执照
+            initIdentInfo(anOpenAccountInfo);
             // 设置状态为使用中
             anOpenAccountInfo.setBusinStatus(CustomerConstants.TMP_STATUS_USEING);
             anOpenAccountInfo.setLastStatus(CustomerConstants.TMP_STATUS_USEING);
@@ -376,6 +380,8 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
             CustOpenAccountTmp anExitsOpenAccountInfo = this.selectByPrimaryKey(Long.valueOf(anTempId));
             // 初始化参数设置
             anOpenAccountInfo.initModifyValue(anExitsOpenAccountInfo);
+            // 营业执照
+            initIdentInfo(anOpenAccountInfo);
             // 设置状态为未使用
             anOpenAccountInfo.setBusinStatus(CustomerConstants.TMP_STATUS_NEW);
             anOpenAccountInfo.setLastStatus(CustomerConstants.TMP_STATUS_NEW);
@@ -390,9 +396,9 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         // 回写 parentId by instead record id. add by Liuwl 2016-10-12
         anOpenAccountInfo.setParentId(insteadRecord.getId());
         this.updateByPrimaryKeySelective(anOpenAccountInfo);
-        
+
         custInsteadApplyService.saveCustInsteadApplyCustInfo(insteadRecord.getApplyId(), null, anOpenAccountInfo.getCustName());
-        
+
         return anOpenAccountInfo;
     }
 
@@ -429,11 +435,12 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
                 UserUtils.getOperatorInfo().getOperOrg());
         // 更新数据
         this.updateByPrimaryKeySelective(anOpenAccountInfo);
-        
+
         // 回写暂存流水号至代录申请表
         CustInsteadRecord insteadRecord = custInsteadRecordService.findInsteadRecord(anParentId);
 
-        custInsteadApplyService.saveCustInsteadApplyCustInfo(insteadRecord.getApplyId(), anOpenAccountInfo.getCustNo(), anOpenAccountInfo.getCustName());
+        custInsteadApplyService.saveCustInsteadApplyCustInfo(insteadRecord.getApplyId(), anOpenAccountInfo.getCustNo(),
+                anOpenAccountInfo.getCustName());
     }
 
     @Override
@@ -456,6 +463,14 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         // 设置状态为使用中
         anOpenAccountInfo.setBusinStatus(anBusinStatus);
         anOpenAccountInfo.setLastStatus(anBusinStatus);
+        // 营业执照
+        initIdentInfo(anOpenAccountInfo);
+    }
+
+    private void initIdentInfo(CustOpenAccountTmp anOpenAccountInfo) {
+        anOpenAccountInfo.setIdentNo(anOpenAccountInfo.getBusinLicence());
+        anOpenAccountInfo.setIdentType("1");
+        anOpenAccountInfo.setValidDate(anOpenAccountInfo.getBusinLicenceValidDate());
     }
 
     private void createValidAccount(CustOpenAccountTmp anOpenAccountInfo, Long anOperId, String anOperName, String anOperOrg) {
