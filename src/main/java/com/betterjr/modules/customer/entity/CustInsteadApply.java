@@ -436,5 +436,8 @@ public class CustInsteadApply implements BetterjrEntity {
         this.modiOperName = UserUtils.getOperatorInfo().getName();
         this.modiDate = BetterDateUtils.getNumDate();
         this.modiTime = BetterDateUtils.getNumTime();
+
+        this.lastStatus = this.businStatus;
+        this.businStatus = CustomerConstants.INSTEAD_APPLY_STATUS_NEW;
     }
 }
