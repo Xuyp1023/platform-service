@@ -147,7 +147,10 @@ public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper,
         BTAssert.notNull(tempInsteadApply, "没有找到对应的代录申请！");
 
         tempInsteadApply.initModifyValue(anInsteadApply);
-        tempInsteadApply.setBatchNo(fileItemService.updateCustFileItemInfo(anFileList, anInsteadApply.getBatchNo()));
+
+        final Long batchNo = anInsteadApply.getBatchNo();
+
+        tempInsteadApply.setBatchNo(fileItemService.updateAndDelCustFileItemInfo(anFileList, anInsteadApply.getBatchNo()));
 
         this.updateByPrimaryKeySelective(tempInsteadApply);
         return tempInsteadApply;
@@ -193,20 +196,20 @@ public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper,
      * @param applyId
      * @param custName
      */
-    public CustInsteadApply saveCustInsteadApplyCustInfo(Long anId, Long anCustNo, String anCustName) {
+    public CustInsteadApply saveCustInsteadApplyCustInfo(final Long anId, final Long anCustNo, final String anCustName) {
         final CustInsteadApply tempInsteadApply = this.selectByPrimaryKey(anId);
-        
+
         BTAssert.notNull(tempInsteadApply, "没有找到对应的代录申请！");
-        
+
         if (anCustNo != null) {
             tempInsteadApply.setCustNo(anCustNo);
         }
         if (BetterStringUtils.isNotBlank(anCustName)) {
             tempInsteadApply.setCustName(anCustName);
         }
-        
+
         this.updateByPrimaryKeySelective(tempInsteadApply);
-        
+
         return tempInsteadApply;
     }
 
