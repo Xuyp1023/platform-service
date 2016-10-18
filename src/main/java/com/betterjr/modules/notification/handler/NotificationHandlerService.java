@@ -34,6 +34,7 @@ import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.account.service.CustOperatorService;
 import com.betterjr.modules.document.service.CustFileItemService;
 import com.betterjr.modules.notification.NotificationModel;
+import com.betterjr.modules.notification.NotificationModel.CustOperPair;
 import com.betterjr.modules.notification.constants.NotificationConstants;
 import com.betterjr.modules.notification.entity.Notification;
 import com.betterjr.modules.notification.entity.NotificationChannelProfile;
@@ -335,26 +336,32 @@ public class NotificationHandlerService {
      * 查询操作员与机构
      */
     private Collection<Pair<CustOperatorInfo, CustInfo>> queryOperatorInfo(final NotificationModel anNotificationModel) {
-        final List<Long> receiveOperators = anNotificationModel.getReceiveOperators();
-        final List<Long> receiveCustomers = anNotificationModel.getReceiveCustomers();
+        final List<CustOperPair> receivers = anNotificationModel.getReceivers();
 
         final Set<Pair<CustOperatorInfo, CustInfo>> operators = new HashSet<>();
 
-        receiveOperators.forEach(operId -> {
-            final CustOperatorInfo operator = findOperatorById(operId);
-            if (operator != null) {
+        receivers.forEach(custOper -> {
+            if (custOper.getOperator() != null && custOper.getCustomer() != null) {
+                final CustOperatorInfo operator = findOperatorById(custOper.getOperator());
+                final CustInfo custInfo = accountService.findCustInfo(custOper.getCustomer());
+
+                operators.add(new ImmutablePair<CustOperatorInfo, CustInfo>(operator, custInfo));
+            } else if (custOper.getOperator() != null && custOper.getCustomer() == null) {
+                final CustOperatorInfo operator = findOperatorById(custOper.getOperator());
+
                 operators.add(new ImmutablePair<CustOperatorInfo, CustInfo>(operator, null));
+            } else {
+                final Long custNo = custOper.getCustomer();
+                final Collection<CustOperatorInfo> tempOperators = queryOperatorByCustNo(custNo);
+                final CustInfo tempCustomer = accountService.findCustInfo(custNo);
+
+                tempOperators.forEach(operator -> {
+                    operators.add(new ImmutablePair<CustOperatorInfo, CustInfo>(operator, tempCustomer));
+                });
             }
+
         });
 
-        receiveCustomers.forEach(custNo -> {
-            final Collection<CustOperatorInfo> tempOperators = queryOperatorByCustNo(custNo);
-            final CustInfo tempCustomer = accountService.findCustInfo(custNo);
-
-            tempOperators.forEach(operator -> {
-                operators.add(new ImmutablePair<CustOperatorInfo, CustInfo>(operator, tempCustomer));
-            });
-        });
 
         return operators;
     }
