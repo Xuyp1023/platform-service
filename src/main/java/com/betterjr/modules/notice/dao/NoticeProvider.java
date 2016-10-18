@@ -1,6 +1,6 @@
 // Copyright (c) 2014-2016 Betty. All rights reserved.
 // ============================================================================
-// CURRENT VERSION 
+// CURRENT VERSION
 // ============================================================================
 // CHANGE LOG
 // V2.0 : 2016年9月7日, liuwl, creation
@@ -29,46 +29,38 @@ public class NoticeProvider {
         sql.append("LEFT JOIN t_sys_notice_cust snc ON sn.ID = snc.L_NOTICE_ID ");
         sql.append("LEFT JOIN t_sys_notice_oper sno ON sn.ID = sno.L_NOTICE_ID AND (sno.L_OPERID = #{operId} AND sno.L_CUSTNO = snc.L_CUSTNO) ");
         sql.append("WHERE sn.C_BUSIN_STATUS = '1' AND EXISTS (SELECT cor.* FROM t_cust_operator_relation cor WHERE cor.L_OPERNO = #{operId} AND snc.L_CUSTNO = cor.L_CUSTNO) AND sno.ID IS NULL ");
-        Map<String, Object> param = (Map<String, Object>) anParam.get("param");
-        Optional<Object> custNo = Optional.ofNullable(param.get("custNo"));
+        final Map<String, Object> param = (Map<String, Object>) anParam.get("param");
+        final Optional<Object> custNo = Optional.ofNullable(param.get("custNo"));
         custNo.ifPresent(data -> {
             final String tempCustNo = String.valueOf(data);
             if (BetterStringUtils.isBlank(tempCustNo) == false) {
-                sql.append(" AND snc.L_CUSTNO = ");
-                sql.append(tempCustNo);
-                sql.append(" ");
+                sql.append(" AND snc.L_CUSTNO = #{param.custNo} ");
             }
         });
-        Optional<Object> LIKEsubject = Optional.ofNullable(param.get("LIKEsubject"));
+        final Optional<Object> LIKEsubject = Optional.ofNullable(param.get("LIKEsubject"));
         LIKEsubject.ifPresent(data -> {
             final String subject = String.valueOf(data);
             if (BetterStringUtils.isBlank(subject) == false) {
-                sql.append(" AND sn.C_SUBJECT LIKE '%");
-                sql.append(subject);
-                sql.append("%' ");
+                sql.append(" AND sn.C_SUBJECT LIKE #{param.LIKEsubject} ");
             }
         });
-        Optional<Object> GTEpublishDate = Optional.ofNullable(param.get("GTEpublishDate"));
+        final Optional<Object> GTEpublishDate = Optional.ofNullable(param.get("GTEpublishDate"));
         GTEpublishDate.ifPresent(data -> {
             final String publishDate = String.valueOf(data);
             if (BetterStringUtils.isBlank(publishDate) == false) {
-                sql.append(" AND sn.D_PUBLISH_DATE >= ");
-                sql.append(publishDate);
-                sql.append(" ");
+                sql.append(" AND sn.D_PUBLISH_DATE >= #{param.GTEpublishDate} ");
             }
         });
-        Optional<Object> LTEpublishDate = Optional.ofNullable(param.get("LTEpublishDate"));
+        final Optional<Object> LTEpublishDate = Optional.ofNullable(param.get("LTEpublishDate"));
         LTEpublishDate.ifPresent(data -> {
             final String publishDate = String.valueOf(data);
             if (BetterStringUtils.isBlank(publishDate) == false) {
-                sql.append(" AND sn.D_PUBLISH_DATE <= ");
-                sql.append(publishDate);
-                sql.append(" ");
+                sql.append(" AND sn.D_PUBLISH_DATE <= #{param.LTEpublishDate} ");
             }
         });
         return sql.toString();
     }
-    
+
     /**
      * 查询已读公告
      * @param anParam
@@ -81,41 +73,33 @@ public class NoticeProvider {
         sql.append("LEFT JOIN t_sys_notice_cust snc ON sn.ID = snc.L_NOTICE_ID ");
         sql.append("LEFT JOIN t_sys_notice_oper sno ON sn.ID = sno.L_NOTICE_ID AND (sno.L_OPERID = #{operId} AND sno.L_CUSTNO = snc.L_CUSTNO) ");
         sql.append("WHERE sn.C_BUSIN_STATUS = '1' AND EXISTS (SELECT cor.* FROM t_cust_operator_relation cor WHERE cor.L_OPERNO = #{operId} AND snc.L_CUSTNO = cor.L_CUSTNO) AND sno.ID IS NOT NULL ");
-        Map<String, Object> param = (Map<String, Object>) anParam.get("param");
-        Optional<Object> custNo = Optional.ofNullable(param.get("custNo"));
+        final Map<String, Object> param = (Map<String, Object>) anParam.get("param");
+        final Optional<Object> custNo = Optional.ofNullable(param.get("custNo"));
         custNo.ifPresent(data -> {
             final String tempCustNo = String.valueOf(data);
             if (BetterStringUtils.isBlank(tempCustNo) == false) {
-                sql.append(" AND snc.L_CUSTNO = ");
-                sql.append(tempCustNo);
-                sql.append(" ");
+                sql.append(" AND snc.L_CUSTNO = #{param.custNo} ");
             }
         });
-        Optional<Object> LIKEsubject = Optional.ofNullable(param.get("LIKEsubject"));
+        final Optional<Object> LIKEsubject = Optional.ofNullable(param.get("LIKEsubject"));
         LIKEsubject.ifPresent(data -> {
             final String subject = String.valueOf(data);
             if (BetterStringUtils.isBlank(subject) == false) {
-                sql.append(" AND sn.C_SUBJECT LIKE '%");
-                sql.append(subject);
-                sql.append("%' ");
+                sql.append(" AND sn.C_SUBJECT LIKE #{param.LIKEsubject} ");
             }
         });
-        Optional<Object> GTEpublishDate = Optional.ofNullable(param.get("GTEpublishDate"));
+        final Optional<Object> GTEpublishDate = Optional.ofNullable(param.get("GTEpublishDate"));
         GTEpublishDate.ifPresent(data -> {
             final String publishDate = String.valueOf(data);
             if (BetterStringUtils.isBlank(publishDate) == false) {
-                sql.append(" AND sn.D_PUBLISH_DATE >= ");
-                sql.append(publishDate);
-                sql.append(" ");
+                sql.append(" AND sn.D_PUBLISH_DATE >= #{param.GTEpublishDate} ");
             }
         });
-        Optional<Object> LTEpublishDate = Optional.ofNullable(param.get("LTEpublishDate"));
+        final Optional<Object> LTEpublishDate = Optional.ofNullable(param.get("LTEpublishDate"));
         LTEpublishDate.ifPresent(data -> {
             final String publishDate = String.valueOf(data);
             if (BetterStringUtils.isBlank(publishDate) == false) {
-                sql.append(" AND sn.D_PUBLISH_DATE <= ");
-                sql.append(publishDate);
-                sql.append(" ");
+                sql.append(" AND sn.D_PUBLISH_DATE <= #{param.LTEpublishDate} ");
             }
         });
         return sql.toString();
