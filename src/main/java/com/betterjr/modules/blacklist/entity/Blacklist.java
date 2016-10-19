@@ -520,6 +520,25 @@ public class Blacklist implements BetterjrEntity {
         this.regDate = BetterDateUtils.getNumDate();
         this.regTime = BetterDateUtils.getNumTime();
         this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
+        // 设置黑名单注销状态(businStatus:0)
+        this.businStatus = BlacklistConstants.BLACKLIST_STATUS_INEFFECTIVE;
+    }
+
+    public void initActivateValue() {
+        this.activateOperId = UserUtils.getOperatorInfo().getId();
+        this.activateOperName = UserUtils.getOperatorInfo().getName();
+        this.activateDate = BetterDateUtils.getNumDate();
+        this.activateTime = BetterDateUtils.getNumTime();
+        // 设置黑名单激活状态(businStatus:1)
+        this.businStatus = BlacklistConstants.BLACKLIST_STATUS_EFFECTIVE;
+    }
+
+    public void initCancelValue() {
+        this.cancelOperId = UserUtils.getOperatorInfo().getId();
+        this.cancelOperName = UserUtils.getOperatorInfo().getName();
+        this.cancelDate = BetterDateUtils.getNumDate();
+        this.cancelTime = BetterDateUtils.getNumTime();
+        // 设置黑名单注销状态(businStatus:0)
         this.businStatus = BlacklistConstants.BLACKLIST_STATUS_INEFFECTIVE;
     }
 
