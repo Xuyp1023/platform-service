@@ -151,8 +151,8 @@ public class BlacklistService extends BaseService<BlacklistMapper, Blacklist> {
         // 不允许激活已生效(businStatus:1)的黑名单
         checkStatus(anBlacklist.getBusinStatus(), BlacklistConstants.BLACKLIST_TYPE_BRANCHES, true, "当前黑名单已激活");
 
-        // 设置黑名单激活状态(businStatus:1)
-        anBlacklist.setBusinStatus(BlacklistConstants.BLACKLIST_STATUS_EFFECTIVE);
+        //设置黑名单激活信息
+        anBlacklist.initActivateValue();
 
         // 数据存盘
         this.updateByPrimaryKey(anBlacklist);
@@ -179,8 +179,8 @@ public class BlacklistService extends BaseService<BlacklistMapper, Blacklist> {
         // 不允许注销未生效(businStatus:0)的黑名单
         checkStatus(anBlacklist.getBusinStatus(), BlacklistConstants.BLACKLIST_STATUS_INEFFECTIVE, true, "当前黑名单未生效,不需要注销");
 
-        // 设置黑名单注销状态(businStatus:0)
-        anBlacklist.setBusinStatus(BlacklistConstants.BLACKLIST_STATUS_INEFFECTIVE);
+        // 设置黑名单注销信息
+        anBlacklist.initCancelValue();
 
         // 数据存盘
         this.updateByPrimaryKey(anBlacklist);
