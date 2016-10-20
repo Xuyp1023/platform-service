@@ -101,6 +101,7 @@ public class CustChangeApply implements BetterjrEntity {
     /**
      * 创建时间
      */
+    @JsonSerialize(using = CustTimeJsonSerializer.class)
     @OrderBy("DESC")
     @Column(name = "T_REG_TIME", columnDefinition = "VARCHAR")
     @MetaData(value = "创建时间", comments = "创建时间")
