@@ -170,5 +170,10 @@ public class CustFileDubboService implements ICustFileService{
         // TODO Auto-generated method stub
         return SysConfigService.getString(ParamNames.OPENACCO_FILE_DOWNLOAD_PATH);
     }
+    
+    @Override
+    public Long updateAndDelCustFileItemInfo(String anFileList, Long anBatchNo) {
+        return this.custFileItemService.updateAndDelCustFileItemInfo(anFileList, anBatchNo);
+    }
 
 }
