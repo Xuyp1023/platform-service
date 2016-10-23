@@ -145,10 +145,10 @@ public class CustFileItemService extends BaseService<CustFileItemMapper, CustFil
      * @return 返回文件批次号
      */
     public Long updateAndDelCustFileItemInfo(final String anFileList, Long anBatchNo) {
-        if (BetterStringUtils.isBlank(anFileList)) {
+        /*if (BetterStringUtils.isBlank(anFileList)) {
 
             return anBatchNo;
-        }
+        }*/
 
         if (anBatchNo == null) {
             anBatchNo = CustFileUtils.findBatchNo();
