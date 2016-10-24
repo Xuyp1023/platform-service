@@ -35,6 +35,7 @@ public class NotificationWechatHandlerService {
     public void processNotification(final Object anMessage) {
         final MQMessage message = (MQMessage) anMessage;
         final Notification notification = (Notification) message.getObject();
+        logger.info("NOTIFICATION_WECHAT_TOPIC: subject=" + notification.getSubject());
 
         final List<NotificationCustomer> notificationCustomers = notificationCustomerService.queryNotifiCustomerByNotifiId(notification.getId());
 

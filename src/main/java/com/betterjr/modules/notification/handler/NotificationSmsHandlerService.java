@@ -47,6 +47,8 @@ public class NotificationSmsHandlerService {
     public void processNotification(final Object anMessage) {
         final MQMessage message = (MQMessage) anMessage;
         final Notification notification = (Notification) message.getObject();
+        logger.info("NOTIFICATION_SMS_TOPIC: subject=" + notification.getSubject());
+
 
         if (BetterStringUtils.equals(notification.getImmediate(), NotificationConstants.IMMEDIATE_TRUE) == true) {
             final List<NotificationCustomer> notificationCustomers = notificationCustomerService.queryNotifiCustomerByNotifiId(notification.getId());

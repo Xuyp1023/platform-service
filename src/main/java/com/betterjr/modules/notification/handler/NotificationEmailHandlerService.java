@@ -37,16 +37,17 @@ public class NotificationEmailHandlerService {
     @RocketMQListener(topic = "NOTIFICATION_EMAIL_TOPIC", consumer = "betterConsumer")
     public void processNotification(final Object anMessage) {
         final MQMessage message = (MQMessage) anMessage;
-        Notification notification = (Notification) message.getObject();
+        final Notification notification = (Notification) message.getObject();
 
-        Session session = MailUtils.createSession();
-        Long batchNo = notification.getBatchNo();
+        logger.info("NOTIFICATION_EMAIL_TOPIC: subject=" + notification.getSubject());
+        final Session session = MailUtils.createSession();
+        final Long batchNo = notification.getBatchNo();
 
-        List<NotificationAttachment> attachments = notificationService.buildAttachments(batchNo);
+        final List<NotificationAttachment> attachments = notificationService.buildAttachments(batchNo);
 
-        MimeMessage mimeMessage = MailUtils.createMessage(session, notification.getSubject(), notification.getContent(), attachments);
+        final MimeMessage mimeMessage = MailUtils.createMessage(session, notification.getSubject(), notification.getContent(), attachments);
 
-        List<NotificationCustomer> notificationCustomers = notificationCustomerService.queryNotifiCustomerByNotifiId(notification.getId());
+        final List<NotificationCustomer> notificationCustomers = notificationCustomerService.queryNotifiCustomerByNotifiId(notification.getId());
 
         notificationCustomers.forEach(notificationCustomer -> {
             sendMail(session, mimeMessage, notificationCustomer);
@@ -56,10 +57,10 @@ public class NotificationEmailHandlerService {
     }
 
     /**
-     * 发送邮件 
+     * 发送邮件
      */
-    private void sendMail(Session anSession, MimeMessage anMimeMessage, NotificationCustomer anNotificationCustomer) {
-        String email = anNotificationCustomer.getSendNo();
+    private void sendMail(final Session anSession, final MimeMessage anMimeMessage, final NotificationCustomer anNotificationCustomer) {
+        final String email = anNotificationCustomer.getSendNo();
         if (BetterStringUtils.isNotBlank(email) == true) {
             if (MailUtils.sendMail(anSession, anMimeMessage, email) == true) {
                 notificationCustomerService.saveNotificationCustomerStatus(anNotificationCustomer.getId(), NotificationConstants.SEND_STATUS_SUCCESS);
