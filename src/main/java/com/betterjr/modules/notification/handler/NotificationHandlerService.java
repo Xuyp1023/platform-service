@@ -101,6 +101,7 @@ public class NotificationHandlerService {
         final NotificationModel notificationModel = (NotificationModel) message.getObject();
 
         final String profileName = notificationModel.getProfileName();
+        logger.info("NOTIFICATION_TOPIC: profileName=" + profileName);
 
         final Long custNo = notificationModel.getSendCustomer().getCustNo();
         final NotificationProfile profile = profileService.findProfileByProfileNameAndCustNo(profileName, custNo);
