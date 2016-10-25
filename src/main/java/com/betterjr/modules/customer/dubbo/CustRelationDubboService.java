@@ -157,6 +157,11 @@ public class CustRelationDubboService implements ICustRelationService {
     public String webQueryFactorRelation(Long anCustNo) {
         return AjaxObject.newOk("客户与保理机构关系查询成功", custRelationService.queryFactorRelation(anCustNo)).toJson();
     }
+    
+    @Override
+    public String webQueryFactorRelation() {
+        return AjaxObject.newOk("客户与保理机构关系查询成功", custRelationService.queryFactorRelation()).toJson();
+    }
 
     @Override
     public CustRelation findOneRelation(Long anCustNo, Long anRelateCustno, String anPartnerCustNo) {
