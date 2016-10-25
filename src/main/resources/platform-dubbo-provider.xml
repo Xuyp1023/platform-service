@@ -9,8 +9,7 @@
     http://code.alibabatech.com/schema/dubbo        
     http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
 	<!-- 扫描dubbo注解 -->
-	<dubbo:annotation package="com.betterjr.modules.test,
-		com.betterjr.modules.blacklist,
+	<dubbo:annotation package="com.betterjr.modules.blacklist,
 		com.betterjr.modules.customer,
 		com.betterjr.modules.notification,
 		com.betterjr.modules.notice,

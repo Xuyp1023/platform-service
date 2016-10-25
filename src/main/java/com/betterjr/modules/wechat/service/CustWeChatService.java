@@ -1,6 +1,9 @@
 package com.betterjr.modules.wechat.service;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -11,11 +14,14 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.betterjr.common.config.ParamNames;
 import com.betterjr.common.data.CustPasswordType;
+import com.betterjr.common.data.KeyAndValueObject;
 import com.betterjr.common.exception.BytterTradeException;
 import com.betterjr.common.mapper.JsonMapper;
 import com.betterjr.common.service.BaseService;
@@ -24,6 +30,7 @@ import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.Cryptos;
 import com.betterjr.common.utils.DictUtils;
+import com.betterjr.common.utils.FileUtils;
 import com.betterjr.common.utils.JedisUtils;
 import com.betterjr.common.utils.QueryTermBuilder;
 import com.betterjr.common.utils.UserUtils;
@@ -32,6 +39,10 @@ import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.account.service.CustOperatorService;
+import com.betterjr.modules.document.entity.CustFileItem;
+import com.betterjr.modules.document.service.CustFileAuditService;
+import com.betterjr.modules.document.service.CustFileItemService;
+import com.betterjr.modules.document.utils.CustFileClientUtils;
 import com.betterjr.modules.notification.INotificationSendService;
 import com.betterjr.modules.notification.NotificationModel;
 import com.betterjr.modules.notification.NotificationModel.Builder;
@@ -65,6 +76,12 @@ public class CustWeChatService extends BaseService<CustWeChatInfoMapper, CustWeC
 
     @Reference(interfaceClass = ICustTradePassService.class)
     public ICustTradePassService tradePassService;
+
+    @Autowired
+    private CustFileItemService fileItemService;
+
+    @Autowired
+    private CustFileAuditService custFileAuditService;
 
     public MPAccount getMpAccount() {
         return this.mpAccount;
@@ -103,8 +120,6 @@ public class CustWeChatService extends BaseService<CustWeChatInfoMapper, CustWeC
 
     /**
      * 验证微信登录信息
-     *
-     * @param anToken
      */
     public CustOperatorInfo saveLogin(final AccessToken anToken, final String[] anReturn) {
         String msg = null;
@@ -156,10 +171,6 @@ public class CustWeChatService extends BaseService<CustWeChatInfoMapper, CustWeC
 
     /**
      * 扫描绑定时，保存操作员和微信账户的关系。
-     *
-     * @param anCustOperator
-     * @param anOpenId
-     * @return
      */
     public CustWeChatInfo saveBindingWeChatInfo(final CustOperatorInfo anCustOperator, final String anOpenId) {
         if (checkBindStatus()) {
@@ -464,11 +475,45 @@ public class CustWeChatService extends BaseService<CustWeChatInfoMapper, CustWeC
     }
 
     /**
-     * @param anOpenId
-     * @return
+     * 通过 OpenId 查找 WechatUser
      */
     public CustWeChatInfo findWechatUserByOpenId(final String anOpenId) {
         return Collections3.getFirst(this.selectByProperty("openId", anOpenId));
     }
 
+    /**
+     * @param anFileList
+     * @param anFileMediaId
+     */
+    public CustFileItem fileUpload(final String anFileTypeName, final String anFileMediaId) {
+
+        return saveWechatFile(anFileTypeName, anFileMediaId);
+    }
+
+    public CustFileItem saveWechatFile(final String anFileTypeName, final String anMediaId) {
+        try {
+            final WechatAPIImpl wechatApi = WechatAPIImpl.create(mpAccount);
+            final File file = wechatApi.dlMedia(anMediaId);
+            try (InputStream inputStream = new FileInputStream(file)) {
+                final KeyAndValueObject tmpFileInfo = FileUtils.findFilePathWithParent(ParamNames.CONTRACT_PATH);
+                if (CustFileClientUtils.saveFileStream(tmpFileInfo, inputStream)) {
+                    final CustFileItem fileItem = CustFileClientUtils.createUploadFileItem(tmpFileInfo, anFileTypeName, anFileTypeName + ".jpg");
+
+                    if (fileItemService.saveAndUpdateFileItem(fileItem)) {
+                        return fileItem;
+                    }
+                }
+            }
+        } catch (final Exception e) {
+            logger.error("上传文件发生错误", e);
+        }
+        return null;
+    }
+
+    /**
+     * 获取APP ID
+     */
+    public String getAppId() {
+        return mpAccount.getAppId();
+    }
 }
