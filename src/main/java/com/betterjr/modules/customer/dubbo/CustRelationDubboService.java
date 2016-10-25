@@ -157,7 +157,7 @@ public class CustRelationDubboService implements ICustRelationService {
     public String webQueryFactorRelation(Long anCustNo) {
         return AjaxObject.newOk("客户与保理机构关系查询成功", custRelationService.queryFactorRelation(anCustNo)).toJson();
     }
-    
+
     @Override
     public String webQueryFactorRelation() {
         return AjaxObject.newOk("客户与保理机构关系查询成功", custRelationService.queryFactorRelation()).toJson();
@@ -173,6 +173,12 @@ public class CustRelationDubboService implements ICustRelationService {
     public boolean saveFactorRelationStatus(Long anCustNo, String anScfId, String anStatus, String anFactorNo) {
         // TODO Auto-generated method stub
         return this.custRelationService.saveFactorRelationStatus(anCustNo, anScfId, anStatus, anFactorNo);
+    }
+
+    @Override
+    public Long findCustNoByBankInfo(String anBankAccountName, String anBankAccount) {
+        // TODO Auto-generated method stub
+        return this.custRelationService.findCustNoByBankInfo(anBankAccountName, anBankAccount);
     }
 
 }
