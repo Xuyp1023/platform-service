@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.service.BaseService;
+import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.UserUtils;
@@ -321,6 +322,25 @@ public class CustFileItemService extends BaseService<CustFileItemMapper, CustFil
         item.initModifyValue(operator);
         final int result = this.updateByPrimaryKeySelective(item);
         logger.debug("update result:" + result);
+        return true;
+    }
+
+    /**
+     * 保存文件信息，如果存在就更新，不存在就增加
+     * @param anFileItem
+     * @return
+     */
+    public boolean saveAndUpdateFileItem(final CustFileItem anFileItem) {
+        final CustFileItem tmpFileItem = this.selectByPrimaryKey(anFileItem.getId());
+        anFileItem.setRegDate(BetterDateUtils.getNumDate());
+        anFileItem.setRegTime(BetterDateUtils.getNumTime());
+        if (tmpFileItem == null) {
+            this.insert(anFileItem);
+        }
+        else {
+            this.updateByPrimaryKey(anFileItem);
+        }
+
         return true;
     }
 
