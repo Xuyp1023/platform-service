@@ -695,4 +695,20 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
 
     }
 
+    /**
+     * 按银行账户信息查询供应商与核心企业关系
+     * 
+     * @param anBankAccountName
+     * @param anBankAccount
+     * @return
+     */
+    public Long findCustNoByBankInfo(String anBankAccountName, String anBankAccount) {
+        final Map<String, Object> anMap = new HashMap<String, Object>();
+        anMap.put("bankAcco", anBankAccount);
+        anMap.put("bankAccoName", anBankAccountName);
+        anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
+        anMap.put("relateType", CustomerConstants.RELATE_TYPE_SUPPLIER_CORE);
+        return Collections3.getFirst(this.selectByProperty(anMap)).getCustNo();
+    }
+
 }
