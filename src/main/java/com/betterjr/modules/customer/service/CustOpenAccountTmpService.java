@@ -41,6 +41,7 @@ import com.betterjr.modules.customer.entity.CustMechBase;
 import com.betterjr.modules.customer.entity.CustMechBusinLicence;
 import com.betterjr.modules.customer.entity.CustMechLaw;
 import com.betterjr.modules.customer.entity.CustOpenAccountTmp;
+import com.betterjr.modules.customer.entity.CustRelation;
 import com.betterjr.modules.customer.helper.IFormalDataService;
 import com.betterjr.modules.document.entity.CustFileAduit;
 import com.betterjr.modules.document.entity.CustFileItem;
@@ -517,8 +518,12 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
                     // 供应商开户与核心企业建立关系
                     CustCertInfo anCustCertInfo = custCertService.findCertByOperOrg(anOperOrg);
                     if (UserUtils.supplierCustomer(anCustCertInfo)) {
-                        custRelationService.addCustRelation(anCustInfo, anCoreCustNo, CustomerConstants.RELATE_TYPE_SUPPLIER_CORE,
-                                CustomerConstants.RELATE_STATUS_AUDIT);
+                        CustRelation custRelation = custRelationService.addCustRelation(anCustInfo, anCoreCustNo,
+                                CustomerConstants.RELATE_TYPE_SUPPLIER_CORE, CustomerConstants.RELATE_STATUS_AUDIT);
+                        // 写入银行账户信息
+                        custRelation.setBankAcco(anOpenAccountInfo.getBankAcco());
+                        custRelation.setBankAccoName(anOpenAccountInfo.getBankAccoName());
+                        custRelationService.updateByPrimaryKeySelective(custRelation);
                     }
                     // 经销商开户与核心企业建立关系
                     if (UserUtils.sellerCustomer(anCustCertInfo)) {
