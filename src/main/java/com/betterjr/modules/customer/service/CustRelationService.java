@@ -628,6 +628,29 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
     }
 
     /**
+     * 微信端,获取当前客户的保理公司
+     * 
+     * @return
+     */
+    public List<SimpleDataEntity> queryFactorRelation() {
+        final List<SimpleDataEntity> result = new ArrayList<SimpleDataEntity>();
+        final Map<String, Object> anMap = new HashMap<String, Object>();
+        Long custNo = UserUtils.getDefCustInfo().getCustNo();
+        if (null == custNo) {
+            return result;
+        }
+        anMap.put("custNo", custNo);
+        anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
+        anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR, CustomerConstants.RELATE_TYPE_SELLER_FACTOR,
+                CustomerConstants.RELATE_TYPE_CORE_FACTOR });
+        final List<CustRelation> relations = this.selectByProperty(anMap);
+        for (final CustRelation relation : relations) {
+            result.add(new SimpleDataEntity(relation.getRelateCustname(), String.valueOf(relation.getRelateCustno())));
+        }
+        return result;
+    }
+
+    /**
      * 检查客户保理, 客户只能是供应商|经销商|核心企业 relateType为 ： 0,2,3
      * 
      * @param anCustNo
