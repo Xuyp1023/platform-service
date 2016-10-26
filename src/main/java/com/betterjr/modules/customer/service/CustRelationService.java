@@ -24,9 +24,12 @@ import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.DictUtils;
+import com.betterjr.common.utils.MathExtend;
+import com.betterjr.common.utils.QueryTermBuilder;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.account.entity.CustInfo;
+import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.account.service.CustAndOperatorRelaService;
 import com.betterjr.modules.cert.service.CustCertService;
@@ -711,4 +714,66 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         return Collections3.getFirst(this.selectByProperty(anMap)).getCustNo();
     }
 
+    /**
+     * 根据从核心企业上传的客户信息，保存客户与核心企业的关系；数据来自对象 CoreSupplierInfo <BR>
+     * 处理逻辑：检查核心企业编码加上其余的熟悉 先检查客户号是否存在，如果存在，根据核心企业编码和客户号来检查，<BR>
+     * 如果记录存在，则更新核心企业的内部编码 如果不存在，则根据核心企业内部编码来检查，如果存在则忽略；如果不存在，<BR>
+     * 则根据企业名称来检查，如果都不存在，则增加记录
+     * 
+     * @param anValues 上传来的数据
+     * @param anCoreCustName 核心企业名称
+     * @param anCoreCustNo 核心企业编码
+     * @return
+     */
+    public boolean saveAndCheckCust(Map<String, Object> anValues, String anCoreCustName, Long anCoreCustNo) {
+        Map<String, Object> termMap = QueryTermBuilder.newInstance().put("coreCustNo", anCoreCustNo)
+                .put("relateType", CustomerConstants.RELATE_TYPE_SUPPLIER_CORE).build();
+        String btNo = (String) anValues.get("btNo");
+        Long custNo = (Long) anValues.get("custNo");
+        boolean isok = false;
+        Object dataValue;
+        for (String tmpKey : new String[] { "custNo", "btNo", "custName" }) {
+            isok = false;
+            dataValue = anValues.get(tmpKey);
+            if ("custNo".equals(tmpKey)) {
+                isok = (MathExtend.smallValue((Long) dataValue) == false);
+            }
+            else {
+                isok = BetterStringUtils.isNotBlank((String) dataValue);
+            }
+
+            if (isok) {
+                termMap.put(tmpKey, dataValue);
+                if (saveUploadModifyValue(termMap, btNo, custNo)) {
+                    return true;
+                }
+                else {
+                    termMap.remove(tmpKey);
+                }
+            }
+        }
+        CustRelation custRelation = BeanMapper.map(anValues, CustRelation.class);
+        custRelation.initUploadInfo(anCoreCustName, anCoreCustNo);
+        this.insert(custRelation);
+        return true;
+    }
+
+    private boolean saveUploadModifyValue(Map anTermMap, String anBtNo, Long anCustNo) {
+        CustRelation custRelation = null;
+        custRelation = Collections3.getFirst(this.selectByProperty(anTermMap));
+        if (custRelation != null) {
+            if (BetterStringUtils.isNotBlank(anBtNo)) {
+                custRelation.setBtNo(anBtNo);
+            }
+            if (MathExtend.smallValue(anCustNo) == false) {
+                custRelation.setCustNo(anCustNo);
+            }
+            custRelation.modifyValue((CustOperatorInfo) null);
+            custRelation.setLastStatus(custRelation.getBusinStatus());
+            custRelation.setBusinStatus(CustomerConstants.RELATE_STATUS_AUDIT);
+            this.updateByPrimaryKey(custRelation);
+            return true;
+        }
+        return false;
+    }
 }
