@@ -379,6 +379,9 @@ public class CustWeChatService extends BaseService<CustWeChatInfoMapper, CustWeC
     public boolean checkFristLogin(final Long anOperId) {
         final CustWeChatInfo wechatInfo = Collections3.getFirst(this.selectByProperty("operId", anOperId));
         BTAssert.notNull(wechatInfo, "没有找到相应的微信绑定信息！");
+        if (wechatInfo.getFirstLogin() == null) {
+            return Boolean.FALSE;
+        }
         return wechatInfo.getFirstLogin();
     }
 

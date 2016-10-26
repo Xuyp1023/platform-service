@@ -146,4 +146,12 @@ public class CustWeChatDubboService implements ICustWeChatService {
     public CustWeChatInfo saveNewWeChatInfo(final String anAppId, final String anOpenId, final int anSubscribeStatus) {
         return wechatService.saveNewWeChatInfo(anAppId, anOpenId, anSubscribeStatus);
     }
+
+    /* (non-Javadoc)
+     * @see com.betterjr.modules.wechat.ICustWeChatService#fileUpload(java.lang.String, java.lang.String)
+     */
+    @Override
+    public Object fileUpload(final String anFileTypeName, final String anFileMediaId) {
+        return wechatService.fileUpload(anFileTypeName, anFileMediaId);
+    }
 }
