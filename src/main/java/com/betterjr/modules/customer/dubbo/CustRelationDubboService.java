@@ -1,6 +1,7 @@
 package com.betterjr.modules.customer.dubbo;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -179,6 +180,12 @@ public class CustRelationDubboService implements ICustRelationService {
     public Long findCustNoByBankInfo(String anBankAccountName, String anBankAccount) {
         // TODO Auto-generated method stub
         return this.custRelationService.findCustNoByBankInfo(anBankAccountName, anBankAccount);
+    }
+
+    @Override
+    public boolean saveAndCheckCust(Map<String, Object> anValues, String anCoreCustName, Long anCoreCustNo) {
+
+        return custRelationService.saveAndCheckCust(anValues, anCoreCustName, anCoreCustNo);
     }
 
 }
