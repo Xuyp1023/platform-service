@@ -1,7 +1,6 @@
 package com.betterjr.modules.wechat.service;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +47,6 @@ import com.betterjr.modules.document.entity.CustFileItem;
 import com.betterjr.modules.document.service.CustFileAuditService;
 import com.betterjr.modules.document.service.CustFileItemService;
 import com.betterjr.modules.document.utils.CustFileClientUtils;
-import com.betterjr.modules.document.utils.CustFileUtils;
 import com.betterjr.modules.sys.entity.DictItemInfo;
 import com.betterjr.modules.wechat.dao.CustTempEnrollInfoMapper;
 import com.betterjr.modules.wechat.entity.CustTempEnrollInfo;
@@ -144,16 +142,16 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         anCustEnrollInfo.initWeChatAddValue();
 
         // 生成开户流水
-        CustOpenAccountTmp anTempAccountData = addCustOpenAccountTmp(anCustEnrollInfo, anFileList);
+        final CustOpenAccountTmp anTempAccountData = addCustOpenAccountTmp(anCustEnrollInfo, anFileList);
 
         // 开户生效操作
-        CustOpenAccountTmp anValidAccountData = custOpenAccountTmpService.addWeChatAccount(anTempAccountData.getId());
+        final CustOpenAccountTmp anValidAccountData = addWeChatAccount(anTempAccountData.getId());
 
         // 获取客户信息
-        CustInfo custInfo = custAccountService.selectByPrimaryKey(anValidAccountData.getCustNo());
+        final CustInfo custInfo = custAccountService.selectByPrimaryKey(anValidAccountData.getCustNo());
 
         // 获取操作员信息
-        CustOperatorInfo operator = Collections3.getFirst(custOperatorService.queryOperatorInfoByCustNo(custInfo.getCustNo()));
+        final CustOperatorInfo operator = Collections3.getFirst(custOperatorService.queryOperatorInfoByCustNo(custInfo.getCustNo()));
 
         // 创建客户与核心企业关系
         addCustAndCoreRelation(anCustEnrollInfo, custInfo, operator);
@@ -172,7 +170,7 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         addCusrEnrollInfo(anCustEnrollInfo, custInfo);
 
         // 处理附件,写入文件认证信息表中
-        addFileAudit(anCustEnrollInfo, new String[] { "bizLicenseFile", "representIdFile" });
+        //addFileAudit(anCustEnrollInfo, new String[] { "bizLicenseFile", "representIdFile" });
 
         // 初始化数字证书信息
         initCustCertinfo(anCustEnrollInfo, operator);
@@ -374,8 +372,8 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
     }
     // =========================================================================================================
 
-    private void initCustCertinfo(CustTempEnrollInfo anCustEnrollInfo, CustOperatorInfo anOperator) {
-        CustCertInfo certInfo = new CustCertInfo();
+    private void initCustCertinfo(final CustTempEnrollInfo anCustEnrollInfo, final CustOperatorInfo anOperator) {
+        final CustCertInfo certInfo = new CustCertInfo();
         certInfo.setSerialNo(Long.toUnsignedString(System.currentTimeMillis() * 10000 + SerialGenerator.randomInt(10000)));
         certInfo.setCustNo(anCustEnrollInfo.getCustNo());
         certInfo.setCustName(anCustEnrollInfo.getCustName());
@@ -410,7 +408,7 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         custCertService.addCustCertInfo(certInfo);
     }
 
-    private CustOpenAccountTmp addCustOpenAccountTmp(final CustTempEnrollInfo anCustEnrollInfo, String anFileList) {
+    private CustOpenAccountTmp addCustOpenAccountTmp(final CustTempEnrollInfo anCustEnrollInfo, final String anFileList) {
         final CustOpenAccountTmp anOpenAccountInfo = new CustOpenAccountTmp();
         anOpenAccountInfo.setParentId(0l);
         anOpenAccountInfo.setApplyDate(BetterDateUtils.getNumDate());
