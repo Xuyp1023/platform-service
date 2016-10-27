@@ -34,7 +34,6 @@ public class CustWeChatDubboService implements ICustWeChatService {
     @Inject
     private CustWeChatService wechatService;
 
-
     /*
      * (non-Javadoc)
      *
@@ -154,4 +153,6 @@ public class CustWeChatDubboService implements ICustWeChatService {
     public Object fileUpload(final String anFileTypeName, final String anFileMediaId) {
         return wechatService.fileUpload(anFileTypeName, anFileMediaId);
     }
+
+
 }

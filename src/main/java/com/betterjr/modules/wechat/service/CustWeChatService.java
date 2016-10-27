@@ -86,7 +86,9 @@ public class CustWeChatService extends BaseService<CustWeChatInfoMapper, CustWeC
     public MPAccount getMpAccount() {
         return this.mpAccount;
     }
-
+    public static void main(final String[] args) {
+        System.out.println(Cryptos.aesEncrypt("{\"AppId\":\"wxa79cca7dac8c27a9\",\"AppSecret\":\"b964af0afa8f8a87edce1b83b0d97830\",\"Token\":\"fd22f35935294b5fb7f38a011106a5\",\"AESKey\":\"c0X0w3KIonikEyW57M9IbM8HVanOtFTaH5RPTuVR81O\",\"MpId\":\"gh_76558e8b69ee\",\"wechatUrl\":\"http://atest.qiejf.com/better/\"}"));
+    }
     @PostConstruct
     public synchronized void init() {
         // 修改为实际的公众号信息,可以在开发者栏目中查看
@@ -104,18 +106,21 @@ public class CustWeChatService extends BaseService<CustWeChatInfoMapper, CustWeC
         final String token = (String) wechatConfigMap.get("Token");
         final String aesKey = (String) wechatConfigMap.get("AESKey");
         final String mpId = (String) wechatConfigMap.get("MpId");
+        final String wechatUrl = (String) wechatConfigMap.get("wechatUrl");
 
         BTAssert.isTrue(StringUtils.isNotBlank(appId), "微信参数初始化失败！");
         BTAssert.isTrue(StringUtils.isNotBlank(appSecret), "微信参数初始化失败！");
         BTAssert.isTrue(StringUtils.isNotBlank(token), "微信参数初始化失败！");
         BTAssert.isTrue(StringUtils.isNotBlank(aesKey), "微信参数初始化失败！");
         BTAssert.isTrue(StringUtils.isNotBlank(mpId), "微信参数初始化失败！");
+        BTAssert.isTrue(StringUtils.isNotBlank(wechatUrl), "微信参数初始化失败！");
 
         mpAccount.setAppId(appId);
         mpAccount.setAppSecret(appSecret);
         mpAccount.setToken(token);
         mpAccount.setAESKey(aesKey);
         mpAccount.setMpId(mpId);
+        mpAccount.setWechatUrl(wechatUrl);
     }
 
     /**
