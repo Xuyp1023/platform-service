@@ -118,7 +118,7 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         CustOpenAccountTmp anOpenAccountInfo = addCustOpenAccountTmp(anCustEnrollInfo);
 
         // 开户生效操作
-        custOpenAccountTmpService.saveAuditOpenAccountApply(anOpenAccountInfo.getId(), "微信端开户,自动生效!");
+        custOpenAccountTmpService.createWeChatAccount(anOpenAccountInfo.getId(), "微信端开户,自动生效!");
 
         // 获取客户信息
         CustInfo custInfo = custAccountService.selectByPrimaryKey(anOpenAccountInfo.getCustNo());
@@ -126,7 +126,7 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         // 获取操作员信息
         CustOperatorInfo operator = findCustOperator(custInfo.getCustNo());
 
-        // 创建客户与核心企业关系(兼容1.0版本数据结构,汇票池匹配时需要使用该信息)
+        // 创建客户与核心企业关系
         addCustAndCoreRelation(anCustEnrollInfo, custInfo, operator);
 
         // 建立客户与保理公司关系(临时过渡方案)
@@ -219,7 +219,10 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
      * 增加客户与核心企业关系
      */
     private void addCustAndCoreRelation(final CustTempEnrollInfo anCustEnrollInfo, final CustInfo anCustInfo, final CustOperatorInfo anOperator) {
-        // 写入T_SCF_RELATION
+        // 写入T_CUST_RELATION
+        custRelationService.addWeChatCustAndCoreRelation(anCustInfo, anCustEnrollInfo.getCoreCustNo(), anOperator);
+        
+        // 写入T_SCF_RELATION(兼容1.0版本数据结构,汇票池匹配时需要使用该信息)
         final ScfRelation relation = new ScfRelation();
         relation.initWeChatValue();
         relation.setCustNo(anCustInfo.getCustNo());

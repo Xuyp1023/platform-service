@@ -264,6 +264,37 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
 
         return this.selectPropertyByPage(CustOpenAccountTmp.class, anMap, anPageNum, anPageSize, "1".equals(anFlag));
     }
+    
+    /**
+     * 微信开户审核生效
+     * 
+     * @param anId
+     * @param anOpenId
+     * @param anAuditOpinion
+     * @return
+     */
+    public CustOpenAccountTmp createWeChatAccount(Long anId, String anAuditOpinion) {
+        // 获取客户开户资料
+        CustOpenAccountTmp anOpenAccountInfo = this.selectByPrimaryKey(anId);
+        BTAssert.notNull(anOpenAccountInfo, "无法获取客户开户资料信息");
+        // 检查开户资料合法性
+        checkAccountInfoValid(anOpenAccountInfo);
+        // 生成开户数据
+        createWeChatValidAccount(anOpenAccountInfo, anOpenAccountInfo.getRegOperId(), anOpenAccountInfo.getRegOperName(), anOpenAccountInfo.getOperOrg());
+        // 设置状态为已使用
+        anOpenAccountInfo.setBusinStatus(CustomerConstants.TMP_STATUS_USED);
+        anOpenAccountInfo.setLastStatus(CustomerConstants.TMP_STATUS_USED);
+        // 审核日期
+        anOpenAccountInfo.setAuditDate(BetterDateUtils.getNumDate());
+        // 审核时间
+        anOpenAccountInfo.setAuditTime(BetterDateUtils.getNumTime());
+        // 更新数据
+        this.updateByPrimaryKeySelective(anOpenAccountInfo);
+        // 写入开户日志
+        custOpenAccountAuditService.addAuditOpenAccountApplyLog(anOpenAccountInfo.getId(), anAuditOpinion, "开户审核");
+        
+        return anOpenAccountInfo;
+    }
 
     /**
      * 开户审核生效
@@ -472,6 +503,38 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         anOpenAccountInfo.setIdentNo(anOpenAccountInfo.getBusinLicence());
         anOpenAccountInfo.setIdentType("1");
         anOpenAccountInfo.setValidDate(anOpenAccountInfo.getBusinLicenceValidDate());
+    }
+    
+    private void createWeChatValidAccount(CustOpenAccountTmp anOpenAccountInfo, Long anOperId, String anOperName, String anOperOrg) {
+        // 开户资料附件
+        Long anBatchNo = anOpenAccountInfo.getBatchNo();
+        
+        // 开户资料附件信息
+        Multimap<String, Object> anCustFileItem = ReflectionUtils.listConvertToMuiltMap(custFileItemService.findCustFiles(anBatchNo), "fileInfoType");
+        
+        // 数据存盘,客户资料
+        CustInfo custInfo = addCustInfo(anOpenAccountInfo, anOperId, anOperName, anOperOrg);
+        
+        // 数据存盘,基本信息
+        addCustMechBase(anOpenAccountInfo, custInfo.getCustNo(), anOperId, anOperName, anOperOrg);
+        
+        // 数据存盘,法人信息
+        addCustMechLaw(anOpenAccountInfo, anCustFileItem, custInfo.getCustNo(), anOperId, anOperName, anOperOrg);
+        
+        // 数据存盘,营业执照
+        addCustMechBusinLicence(anOpenAccountInfo, anCustFileItem, custInfo.getCustNo(), anOperId, anOperName, anOperOrg);
+        
+        // 数据存盘,银行账户
+        addCustMechBankAccount(anOpenAccountInfo, anCustFileItem, custInfo.getCustNo(), anOperId, anOperName, anOperOrg);
+        
+        // 数据存盘,经办人信息
+        addCustOperatorInfo(anOpenAccountInfo, anCustFileItem, custInfo.getCustNo(), anOperId, anOperName, anOperOrg);
+        
+        // 数据存盘,当前操作员关联客户
+        custAndOperatorRelaService.insert(new CustOperatorRelation(anOperId, custInfo.getCustNo(), anOperOrg));
+        
+        // 回写客户编号
+        anOpenAccountInfo.setCustNo(custInfo.getCustNo());
     }
 
     private void createValidAccount(CustOpenAccountTmp anOpenAccountInfo, Long anOperId, String anOperName, String anOperOrg) {
