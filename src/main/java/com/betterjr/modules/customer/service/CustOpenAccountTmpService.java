@@ -871,7 +871,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         custFileAuditService.insert(anFileAudit);
     }
 
-    private void checkAccountInfoValid(final CustOpenAccountTmp anOpenAccountInfo) {
+    public void checkAccountInfoValid(final CustOpenAccountTmp anOpenAccountInfo) {
         // 检查开户资料入参
         checkAccountInfoParams(anOpenAccountInfo);
 

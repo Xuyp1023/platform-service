@@ -1,6 +1,7 @@
 package com.betterjr.modules.wechat.service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,17 +19,28 @@ import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.DictUtils;
 import com.betterjr.common.utils.UserUtils;
+import com.betterjr.common.utils.reflection.ReflectionUtils;
 import com.betterjr.modules.account.entity.CustContactInfo;
 import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
+import com.betterjr.modules.account.entity.CustOperatorRelation;
 import com.betterjr.modules.account.service.CustAccountService;
+import com.betterjr.modules.account.service.CustAndOperatorRelaService;
 import com.betterjr.modules.account.service.CustContactService;
 import com.betterjr.modules.account.service.CustOperatorService;
 import com.betterjr.modules.cert.entity.CustCertInfo;
 import com.betterjr.modules.cert.service.CustCertService;
 import com.betterjr.modules.customer.constants.CustomerConstants;
+import com.betterjr.modules.customer.entity.CustMechBankAccount;
+import com.betterjr.modules.customer.entity.CustMechBase;
+import com.betterjr.modules.customer.entity.CustMechBusinLicence;
+import com.betterjr.modules.customer.entity.CustMechLaw;
 import com.betterjr.modules.customer.entity.CustOpenAccountTmp;
 import com.betterjr.modules.customer.entity.CustRelation;
+import com.betterjr.modules.customer.service.CustMechBankAccountService;
+import com.betterjr.modules.customer.service.CustMechBaseService;
+import com.betterjr.modules.customer.service.CustMechBusinLicenceService;
+import com.betterjr.modules.customer.service.CustMechLawService;
 import com.betterjr.modules.customer.service.CustOpenAccountTmpService;
 import com.betterjr.modules.customer.service.CustRelationService;
 import com.betterjr.modules.document.entity.CustFileAduit;
@@ -36,6 +48,7 @@ import com.betterjr.modules.document.entity.CustFileItem;
 import com.betterjr.modules.document.service.CustFileAuditService;
 import com.betterjr.modules.document.service.CustFileItemService;
 import com.betterjr.modules.document.utils.CustFileClientUtils;
+import com.betterjr.modules.document.utils.CustFileUtils;
 import com.betterjr.modules.sys.entity.DictItemInfo;
 import com.betterjr.modules.wechat.dao.CustTempEnrollInfoMapper;
 import com.betterjr.modules.wechat.entity.CustTempEnrollInfo;
@@ -43,6 +56,7 @@ import com.betterjr.modules.wechat.entity.CustWeChatInfo;
 import com.betterjr.modules.wechat.entity.SaleAccoBankInfo;
 import com.betterjr.modules.wechat.entity.ScfRelation;
 import com.betterjr.modules.wechat.entity.ScfSupplierBank;
+import com.google.common.collect.Multimap;
 
 @Service
 public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMapper, CustTempEnrollInfo> {
@@ -82,6 +96,21 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
 
     @Autowired
     private CustCertService custCertService;
+
+    @Autowired
+    private CustAndOperatorRelaService custAndOperatorRelaService;
+
+    @Autowired
+    private CustMechBankAccountService custMechBankAccountService;
+
+    @Autowired
+    private CustMechBaseService custMechBaseService;
+
+    @Autowired
+    private CustMechLawService custMechLawService;
+
+    @Autowired
+    private CustMechBusinLicenceService custMechBusinLicenceService;
 
     /**
      * 获取当前微信用户开户信息
@@ -153,6 +182,197 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
 
         return anCustEnrollInfo;
     }
+
+    // =========================================================================================================
+    public CustOpenAccountTmp addWeChatAccount(final Long anId) {
+        // 获取客户开户资料
+        final CustOpenAccountTmp anOpenAccountInfo = custOpenAccountTmpService.selectByPrimaryKey(anId);
+        BTAssert.notNull(anOpenAccountInfo, "无法获取客户开户资料信息");
+        // 检查开户资料合法性
+        custOpenAccountTmpService.checkAccountInfoValid(anOpenAccountInfo);
+        // 生成开户数据
+        createWeChatValidAccount(anOpenAccountInfo, anOpenAccountInfo.getRegOperId(), anOpenAccountInfo.getRegOperName(),
+                anOpenAccountInfo.getOperOrg());
+        // 设置状态为已使用
+        anOpenAccountInfo.setBusinStatus(CustomerConstants.TMP_STATUS_USED);
+        anOpenAccountInfo.setLastStatus(CustomerConstants.TMP_STATUS_USED);
+        // 审核日期
+        anOpenAccountInfo.setAuditDate(BetterDateUtils.getNumDate());
+        // 审核时间
+        anOpenAccountInfo.setAuditTime(BetterDateUtils.getNumTime());
+        // 更新数据
+        custOpenAccountTmpService.updateByPrimaryKeySelective(anOpenAccountInfo);
+
+        return anOpenAccountInfo;
+    }
+
+    private void createWeChatValidAccount(final CustOpenAccountTmp anOpenAccountInfo, final Long anOperId, final String anOperName,
+            final String anOperOrg) {
+        // 开户资料附件
+        final Long anBatchNo = anOpenAccountInfo.getBatchNo();
+
+        // 开户资料附件信息
+        final Multimap<String, Object> anCustFileItem = ReflectionUtils.listConvertToMuiltMap(custFileItemService.findCustFiles(anBatchNo),
+                "fileInfoType");
+
+        // 数据存盘,客户资料
+        final CustInfo custInfo = addCustInfo(anOpenAccountInfo, anOperId, anOperName, anOperOrg);
+
+        // 数据存盘,基本信息
+        addCustMechBase(anOpenAccountInfo, custInfo.getCustNo(), anOperId, anOperName, anOperOrg);
+
+        // 数据存盘,法人信息
+        addCustMechLaw(anOpenAccountInfo, anCustFileItem, custInfo.getCustNo(), anOperId, anOperName, anOperOrg);
+
+        // 数据存盘,营业执照
+        addCustMechBusinLicence(anOpenAccountInfo, anCustFileItem, custInfo.getCustNo(), anOperId, anOperName, anOperOrg);
+
+        // 数据存盘,银行账户
+        addCustMechBankAccount(anOpenAccountInfo, anCustFileItem, custInfo.getCustNo(), anOperId, anOperName, anOperOrg);
+
+        // 数据存盘,经办人信息
+        addWeChatCustOperatorInfo(anOpenAccountInfo, anCustFileItem, custInfo.getCustNo(), anOperId, anOperName, anOperOrg);
+
+        // 数据存盘,当前操作员关联客户
+        custAndOperatorRelaService.insert(new CustOperatorRelation(anOperId, custInfo.getCustNo(), anOperOrg));
+
+        // 回写客户编号
+        anOpenAccountInfo.setCustNo(custInfo.getCustNo());
+    }
+
+    private CustInfo addCustInfo(final CustOpenAccountTmp anOpenAccountInfo, final Long anOperId, final String anOperName, final String anOperOrg) {
+        final CustInfo anCustInfo = new CustInfo();
+        anCustInfo.setRegOperId(anOperId);
+        anCustInfo.setRegOperName(anOperName);
+        anCustInfo.setOperOrg(anOperOrg);
+        anCustInfo.setCustNo(SerialGenerator.getCustNo());
+        anCustInfo.setIdentValid(true);
+        anCustInfo.setCustType(CustomerConstants.CUSTOMER_TYPE_ENTERPRISE);// 客户类型:0-机构;1-个人;
+        anCustInfo.setCustName(anOpenAccountInfo.getCustName());
+        anCustInfo.setIdentType("1");
+        anCustInfo.setIdentNo(anOpenAccountInfo.getBusinLicence());
+        anCustInfo.setValidDate(anOpenAccountInfo.getBusinLicenceValidDate());
+        anCustInfo.setRegDate(BetterDateUtils.getNumDate());
+        anCustInfo.setRegTime(BetterDateUtils.getNumTime());
+        anCustInfo.setBusinStatus("0");
+        anCustInfo.setLastStatus("0");
+        anCustInfo.setVersion(0l);
+
+        custAccountService.insert(anCustInfo);
+
+        return anCustInfo;
+    }
+
+    private void addCustMechBase(final CustOpenAccountTmp anOpenAccountInfo, final Long anCustNo, final Long anOperId, final String anOperName,
+            final String anOperOrg) {
+        final CustMechBase anCustMechBaseInfo = new CustMechBase();
+        anCustMechBaseInfo.setRegOperId(anOperId);
+        anCustMechBaseInfo.setRegOperName(anOperName);
+        anCustMechBaseInfo.setOperOrg(anOperOrg);
+        anCustMechBaseInfo.setLawName(anOpenAccountInfo.getLawName());
+        anCustMechBaseInfo.setLawIdentType(anOpenAccountInfo.getLawIdentType());
+        anCustMechBaseInfo.setLawIdentNo(anOpenAccountInfo.getLawIdentNo());
+        anCustMechBaseInfo.setLawValidDate(anOpenAccountInfo.getLawValidDate());
+        anCustMechBaseInfo.setOrgCode(anOpenAccountInfo.getOrgCode());
+        anCustMechBaseInfo.setBusinLicence(anOpenAccountInfo.getBusinLicence());
+        anCustMechBaseInfo.setAddress(anOpenAccountInfo.getAddress());
+        anCustMechBaseInfo.setPhone(anOpenAccountInfo.getPhone());
+        anCustMechBaseInfo.setFax(anOpenAccountInfo.getFax());
+        anCustMechBaseInfo.setVersion(0l);
+
+        custMechBaseService.addCustMechBase(anCustMechBaseInfo, anCustNo);
+    }
+
+    private void addCustMechLaw(final CustOpenAccountTmp anOpenAccountInfo, final Multimap<String, Object> anCustFileItem, final Long anCustNo,
+            final Long anOperId, final String anOperName, final String anOperOrg) {
+        final CustMechLaw anCustMechLawInfo = new CustMechLaw();
+        anCustMechLawInfo.setCustNo(anCustNo);
+        anCustMechLawInfo.setRegOperId(anOperId);
+        anCustMechLawInfo.setRegOperName(anOperName);
+        anCustMechLawInfo.setOperOrg(anOperOrg);
+        anCustMechLawInfo.setName(anOpenAccountInfo.getLawName());
+        anCustMechLawInfo.setIdentType(anOpenAccountInfo.getLawIdentType());
+        anCustMechLawInfo.setIdentNo(anOpenAccountInfo.getLawIdentNo());
+        anCustMechLawInfo.setValidDate(anOpenAccountInfo.getLawValidDate());
+        // anCustMechLawInfo.setSex(IdcardUtils.getGenderByIdCard(anOpenAccountInfo.getLawIdentNo(), anOpenAccountInfo.getLawIdentType()));
+        // anCustMechLawInfo.setBirthdate(IdcardUtils.getBirthByIdCard(anOpenAccountInfo.getLawIdentNo()));
+        anCustMechLawInfo.setVersion(0l);
+
+        custMechLawService.addCustMechLaw(anCustMechLawInfo, anCustNo);
+    }
+
+    private void addCustMechBankAccount(final CustOpenAccountTmp anOpenAccountInfo, final Multimap<String, Object> anCustFileItem,
+            final Long anCustNo, final Long anOperId, final String anOperName, final String anOperOrg) {
+        final CustMechBankAccount anCustMechBankAccountInfo = new CustMechBankAccount();
+        anCustMechBankAccountInfo.setCustNo(anCustNo);
+        anCustMechBankAccountInfo.setRegOperId(anOperId);
+        anCustMechBankAccountInfo.setRegOperName(anOperName);
+        anCustMechBankAccountInfo.setOperOrg(anOperOrg);
+        anCustMechBankAccountInfo.setIsDefault(true);
+        anCustMechBankAccountInfo.setTradeAcco("");
+        anCustMechBankAccountInfo.setBankNo(anOpenAccountInfo.getBankNo());
+        anCustMechBankAccountInfo.setBankName(anOpenAccountInfo.getBankName());
+        anCustMechBankAccountInfo.setBankAcco(anOpenAccountInfo.getBankAcco());
+        anCustMechBankAccountInfo.setBankAccoName(anOpenAccountInfo.getBankAccoName());
+        anCustMechBankAccountInfo.setBankBranch("");
+        anCustMechBankAccountInfo.setNetNo("");
+        anCustMechBankAccountInfo.setPayCenter("");
+        anCustMechBankAccountInfo.setAuthStatus("0");
+        anCustMechBankAccountInfo.setSignStatus("0");
+        anCustMechBankAccountInfo.setIdentType(anOpenAccountInfo.getIdentType());
+        anCustMechBankAccountInfo.setIdentNo(anOpenAccountInfo.getIdentNo());
+        anCustMechBankAccountInfo.setFlag("");
+        anCustMechBankAccountInfo.setBakupAcco("");
+        anCustMechBankAccountInfo.setCountyName("");
+        anCustMechBankAccountInfo.setCityNo(anOpenAccountInfo.getBankCityno());
+        anCustMechBankAccountInfo.setCityName("");
+        anCustMechBankAccountInfo.setAccoStatus("0");
+        anCustMechBankAccountInfo.setVersion(0l);
+
+        custMechBankAccountService.addCustMechBankAccount(anCustMechBankAccountInfo, anCustNo);
+    }
+
+    private void addCustMechBusinLicence(final CustOpenAccountTmp anOpenAccountInfo, final Multimap<String, Object> anCustFileItem,
+            final Long anCustNo, final Long anOperId, final String anOperName, final String anOperOrg) {
+        final CustMechBusinLicence anCustMechBusinLicenceInfo = new CustMechBusinLicence();
+        anCustMechBusinLicenceInfo.setCustNo(anCustNo);
+        anCustMechBusinLicenceInfo.setRegOperId(anOperId);
+        anCustMechBusinLicenceInfo.setRegOperName(anOperName);
+        anCustMechBusinLicenceInfo.setOperOrg(anOperOrg);
+        anCustMechBusinLicenceInfo.setRegNo(anOpenAccountInfo.getBusinLicence());
+        anCustMechBusinLicenceInfo.setCertifiedDate(anOpenAccountInfo.getBusinLicenceRegDate());
+        anCustMechBusinLicenceInfo.setOrgCode(anOpenAccountInfo.getOrgCode());
+        anCustMechBusinLicenceInfo.setLawName(anOpenAccountInfo.getLawName());
+        anCustMechBusinLicenceInfo.setEndDate(anOpenAccountInfo.getBusinLicenceValidDate());
+
+        custMechBusinLicenceService.addBusinLicence(anCustMechBusinLicenceInfo, anCustNo);
+    }
+
+    private void addWeChatCustOperatorInfo(final CustOpenAccountTmp anOpenAccountInfo, final Multimap<String, Object> anCustFileItem,
+            final Long anCustNo, final Long anOperId, final String anOperName, final String anOperOrg) {
+        final CustOperatorInfo anCustOperatorInfo = new CustOperatorInfo();
+        anCustOperatorInfo.setOperOrg(anOperOrg);
+        anCustOperatorInfo.setId(anOperId);
+        anCustOperatorInfo.setName(anOperName);
+        anCustOperatorInfo.setIdentType(anOpenAccountInfo.getOperIdenttype());
+        anCustOperatorInfo.setIdentNo(anOpenAccountInfo.getOperIdentno());
+        anCustOperatorInfo.setMobileNo(anOpenAccountInfo.getOperMobile());
+        anCustOperatorInfo.setPhone(anOpenAccountInfo.getOperPhone());
+        anCustOperatorInfo.setIdentClass(anOpenAccountInfo.getOperIdenttype());
+        anCustOperatorInfo.setValidDate(anOpenAccountInfo.getOperValiddate());
+        anCustOperatorInfo.setStatus("1");
+        anCustOperatorInfo.setLastStatus("1");
+        // anCustOperatorInfo.setSex(IdcardUtils.getGenderByIdCard(anCustOperatorInfo.getIdentNo(), anCustOperatorInfo.getIdentType()));
+        anCustOperatorInfo.setRegDate(BetterDateUtils.getNumDate());
+        anCustOperatorInfo.setModiDate(BetterDateUtils.getNumDateTime());
+        anCustOperatorInfo.setFaxNo(anOpenAccountInfo.getOperFaxNo());
+        anCustOperatorInfo.setAddress(anOpenAccountInfo.getAddress());
+        anCustOperatorInfo.setEmail(anOpenAccountInfo.getOperEmail());
+        anCustOperatorInfo.setZipCode(anOpenAccountInfo.getZipCode());
+
+        custOperatorService.insert(anCustOperatorInfo);
+    }
+    // =========================================================================================================
 
     private void initCustCertinfo(CustTempEnrollInfo anCustEnrollInfo, CustOperatorInfo anOperator) {
         CustCertInfo certInfo = new CustCertInfo();
