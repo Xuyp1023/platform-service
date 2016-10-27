@@ -1,5 +1,6 @@
 package com.betterjr.modules.wechat.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,21 +17,26 @@ import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.DictUtils;
+import com.betterjr.common.utils.QueryTermBuilder;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.modules.account.entity.CustContactInfo;
 import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
-import com.betterjr.modules.account.entity.CustOperatorRelation;
 import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.account.service.CustAndOperatorRelaService;
 import com.betterjr.modules.account.service.CustContactService;
 import com.betterjr.modules.account.service.CustOperatorService;
+import com.betterjr.modules.customer.constants.CustomerConstants;
+import com.betterjr.modules.customer.entity.CustOpenAccountTmp;
+import com.betterjr.modules.customer.entity.CustRelation;
+import com.betterjr.modules.customer.service.CustOpenAccountTmpService;
 import com.betterjr.modules.customer.service.CustRelationService;
 import com.betterjr.modules.document.entity.CustFileAduit;
 import com.betterjr.modules.document.entity.CustFileItem;
 import com.betterjr.modules.document.service.CustFileAuditService;
 import com.betterjr.modules.document.service.CustFileItemService;
 import com.betterjr.modules.document.utils.CustFileClientUtils;
+import com.betterjr.modules.sys.entity.DictItemInfo;
 import com.betterjr.modules.wechat.dao.CustTempEnrollInfoMapper;
 import com.betterjr.modules.wechat.entity.CustTempEnrollInfo;
 import com.betterjr.modules.wechat.entity.CustWeChatInfo;
@@ -74,6 +80,9 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
     @Autowired
     private CustAndOperatorRelaService custAndOperatorRelaService;
 
+    @Autowired
+    private CustOpenAccountTmpService custOpenAccountTmpService;
+
     /**
      * 获取当前微信用户开户信息
      */
@@ -96,40 +105,35 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
      * @param anFileList
      * @return
      */
-    public CustTempEnrollInfo addCustEnroll(CustTempEnrollInfo anCustEnrollInfo, final String anCoreCustNo, final String anOpenId,
-            final String anFileList) {
+    public CustTempEnrollInfo addCustEnroll(CustTempEnrollInfo anCustEnrollInfo, final String anOpenId, final String anFileList) {
         // 检查入参
         checkParameter(anOpenId, "请关注微信公众号[qiejftest]后再进行开户!");
-        checkParameter(anCoreCustNo, "请选择核心企业!");
         checkParameter(anFileList, "请上传附件!");
 
         // 客户注册信息
         checkEnrollInfo(anCustEnrollInfo);
         anCustEnrollInfo.initWeChatAddValue();
 
-        // 转换核心企业编号
-        final String coreCustNoValue = DictUtils.getDictCode("FactorCoreCustInfo", anCoreCustNo);
-        checkParameter(coreCustNoValue, "请选择核心企业!");
-        anCustEnrollInfo.setCoreCustNo(Long.valueOf(coreCustNoValue));
+        // 生成开户流水
+        CustOpenAccountTmp anOpenAccountInfo = addCustOpenAccountTmp(anCustEnrollInfo);
 
-        // 生成OperOrg:客户名称+10位随机数
-        final String operOrg = anCustEnrollInfo.getCustName() + SerialGenerator.randomBase62(10);
+        // 开户生效操作
+        custOpenAccountTmpService.saveAuditOpenAccountApply(anOpenAccountInfo.getId(), "微信端开户,自动生效!");
 
-        // 创建客户操作员
-        final CustOperatorInfo operator = addCustOperator(anCustEnrollInfo, operOrg);
+        // 获取客户信息
+        CustInfo custInfo = custAccountService.selectByPrimaryKey(anOpenAccountInfo.getCustNo());
 
-        // 生成客户信息
-        final CustInfo custInfo = addCustInfo(anCustEnrollInfo, operator);
+        // 获取操作员信息
+        CustOperatorInfo operator = findCustOperator(custInfo.getCustNo());
 
-        // 创建客户与操作员关系
-        addCustAndOperatorRelation(custInfo, operator);
-
-        // 创建客户与核心企业关系
+        // 创建客户与核心企业关系(兼容1.0版本数据结构,汇票池匹配时需要使用该信息)
         addCustAndCoreRelation(anCustEnrollInfo, custInfo, operator);
 
+        // 建立客户与保理公司关系(临时过渡方案)
+        addCustAndFactorRelation(anCustEnrollInfo, custInfo, operator);
+
         // 生成银行账户信息
-        addSaleAccoBank(anCustEnrollInfo, custInfo);
-        final ScfSupplierBank bankAccount = addScfSupplierBank(anCustEnrollInfo, custInfo);
+        addBankAccount(anCustEnrollInfo, custInfo);
 
         // 生成客户联系信息
         addCustContact(anCustEnrollInfo, custInfo);
@@ -143,83 +147,78 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         // 经办人与当前微信绑定,openId从Session中获取
         addBindWeChat(custInfo, operator, anOpenId);
 
-        // 开户信息发送给百乐润
-//        sendOpenAccountInfo(custInfo, operator, bankAccount);
-
         return anCustEnrollInfo;
     }
 
-    private ScfSupplierBank addScfSupplierBank(CustTempEnrollInfo anCustEnrollInfo, CustInfo anCustInfo) {
-        ScfSupplierBank bankAccount = new ScfSupplierBank();
-        bankAccount.fillDefaultValue();
-        bankAccount.setCustNo(anCustInfo.getCustNo());
-        bankAccount.setCustName(anCustInfo.getCustName());
-        bankAccount.setCoreCustNo(anCustEnrollInfo.getCoreCustNo());
-        bankAccount.setBankAccount(anCustEnrollInfo.getBankAccount());
-        bankAccount.setBankAccountName(anCustEnrollInfo.getCustName());
-        bankAccount.setBankName(anCustEnrollInfo.getBankName());
-        bankAccount.setOperOrg(anCustInfo.getOperOrg());
-        scfSupplierBankService.insert(bankAccount);
-        return bankAccount;
+    private CustOperatorInfo findCustOperator(final Long anCustNo) {
+        // 构建查询条件
+        Map<String, Object> anMap = QueryTermBuilder.newInstance().put("custNo", anCustNo).build();
+        Long operatorId = Collections3.getFirst(custAndOperatorRelaService.selectByProperty(anMap)).getId();
+        return custOperatorService.selectByPrimaryKey(operatorId);
     }
 
-    /**
-     * 增加操作员
-     */
-    private CustOperatorInfo addCustOperator(final CustTempEnrollInfo anCustEnrollInfo, final String anOperOrg) {
-        final CustOperatorInfo anCustOperatorInfo = new CustOperatorInfo();
-        anCustOperatorInfo.setOperOrg(anOperOrg);
-        anCustOperatorInfo.setId(SerialGenerator.getLongValue(SerialGenerator.OPERATOR_ID));
-        anCustOperatorInfo.setName(anCustEnrollInfo.getContName());
-        anCustOperatorInfo.setMobileNo(anCustEnrollInfo.getContMobileNo());
-        anCustOperatorInfo.setPhone(anCustEnrollInfo.getContPhone());
-        anCustOperatorInfo.setEmail(anCustEnrollInfo.getContEmail());
-        anCustOperatorInfo.setIdentType("0");
-        anCustOperatorInfo.setIdentClass("4");// 经办人识别方式(1-书面委托 2-印鉴 3-密码 4-证件)
-        anCustOperatorInfo.setStatus("1");
-        anCustOperatorInfo.setLastStatus("1");
-        anCustOperatorInfo.setRegDate(BetterDateUtils.getNumDate());
-        anCustOperatorInfo.setModiDate(BetterDateUtils.getNumDateTime());
-        custOperatorService.insert(anCustOperatorInfo);
-        return anCustOperatorInfo;
-    }
+    private CustOpenAccountTmp addCustOpenAccountTmp(CustTempEnrollInfo anCustEnrollInfo) {
+        final CustOpenAccountTmp anOpenAccountInfo = new CustOpenAccountTmp();
+        anOpenAccountInfo.setParentId(0l);
+        anOpenAccountInfo.setApplyDate(BetterDateUtils.getNumDate());
+        anOpenAccountInfo.setApplyTime(BetterDateUtils.getNumTime());
+        anOpenAccountInfo.setAuditDate(BetterDateUtils.getNumDate());
+        anOpenAccountInfo.setAuditTime(BetterDateUtils.getNumTime());
+        anOpenAccountInfo.setCustNo(0l);
+        anOpenAccountInfo.setCustName(anCustEnrollInfo.getCustName());
+        anOpenAccountInfo.setIdentNo(anCustEnrollInfo.getIdentNo());
+        anOpenAccountInfo.setIdentType(anCustEnrollInfo.getIdentType());
+        anOpenAccountInfo.setValidDate("");
+        anOpenAccountInfo.setBusinLicence(anCustEnrollInfo.getIdentNo());
+        anOpenAccountInfo.setBusinLicenceRegDate("");
+        anOpenAccountInfo.setBusinLicenceValidDate("");
+        anOpenAccountInfo.setAddress(anCustEnrollInfo.getPremisesAddress());
+        anOpenAccountInfo.setZipCode("518000");
+        anOpenAccountInfo.setPhone("");
+        anOpenAccountInfo.setFax("");
+        anOpenAccountInfo.setEmail(anCustEnrollInfo.getContEmail());
+        anOpenAccountInfo.setBankAcco(anCustEnrollInfo.getBankAccount());
+        anOpenAccountInfo.setBankAccoName(anCustEnrollInfo.getCustName());
+        anOpenAccountInfo.setBankNo("");
+        anOpenAccountInfo.setBankName(anCustEnrollInfo.getBankName());
+        anOpenAccountInfo.setBankCityno("");
+        anOpenAccountInfo.setOperName(anCustEnrollInfo.getContName());
+        anOpenAccountInfo.setOperIdenttype("0");
+        anOpenAccountInfo.setOperIdentno("");
+        anOpenAccountInfo.setOperValiddate("");
+        anOpenAccountInfo.setOperMobile(anCustEnrollInfo.getContMobileNo());
+        anOpenAccountInfo.setOperEmail(anCustEnrollInfo.getContEmail());
+        anOpenAccountInfo.setOperPhone("");
+        anOpenAccountInfo.setOperFaxNo("");
+        anOpenAccountInfo.setLawName("");
+        anOpenAccountInfo.setLawIdentType("0");
+        anOpenAccountInfo.setLawIdentNo("");
+        anOpenAccountInfo.setLawValidDate("");
+        anOpenAccountInfo.setBatchNo(anCustEnrollInfo.getBatchNo());
+        anOpenAccountInfo.setBusinStatus(CustomerConstants.TMP_STATUS_USED);
+        anOpenAccountInfo.setLastStatus(CustomerConstants.TMP_STATUS_USED);
+        anOpenAccountInfo.setTmpType(CustomerConstants.TMP_TYPE_TEMPSTORE);
+        anOpenAccountInfo.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_ADD);
+        anOpenAccountInfo.setOrgCode("");
+        anOpenAccountInfo.setCoreList(String.valueOf(anCustEnrollInfo.getCoreCustNo()));
 
-    /**
-     * 增加客户信息
-     */
-    private CustInfo addCustInfo(final CustTempEnrollInfo anCustEnrollInfo, final CustOperatorInfo anOperator) {
-        final CustInfo custInfo = new CustInfo();
-        custInfo.setRegOperId(anOperator.getId());
-        custInfo.setRegOperName(anOperator.getName());
-        custInfo.setOperOrg(anOperator.getOperOrg());
-        custInfo.setCustNo(SerialGenerator.getCustNo());
-        custInfo.setIdentValid(true);
-        custInfo.setCustType(anCustEnrollInfo.getCustType());// 客户类型:0-机构;1-个人;
-        custInfo.setCustName(anCustEnrollInfo.getCustName());
-        custInfo.setIdentType(anCustEnrollInfo.getIdentType());
-        custInfo.setIdentNo(anCustEnrollInfo.getIdentNo());
-        custInfo.setRegDate(BetterDateUtils.getNumDate());
-        custInfo.setRegTime(BetterDateUtils.getNumTime());
-        custInfo.setBusinStatus("0");
-        custInfo.setLastStatus("0");
-        custInfo.setVersion(0L);
-        custAccountService.insert(custInfo);
-        return custInfo;
-    }
+        anOpenAccountInfo.setId(SerialGenerator.getLongValue("CustOpenAccountTmp.id"));
+        anOpenAccountInfo.setRegOperId(SerialGenerator.getLongValue(SerialGenerator.OPERATOR_ID));
+        anOpenAccountInfo.setRegOperName(anCustEnrollInfo.getContName());
+        anOpenAccountInfo.setRegDate(BetterDateUtils.getNumDate());
+        anOpenAccountInfo.setRegTime(BetterDateUtils.getNumTime());
+        // 生成OperOrg:客户名称+10位随机数
+        anOpenAccountInfo.setOperOrg(anCustEnrollInfo.getCustName() + SerialGenerator.randomBase62(10));
 
-    /**
-     * 增加客户与操作员关系
-     */
-    private void addCustAndOperatorRelation(final CustInfo anCustInfo, final CustOperatorInfo anOperator) {
-        custAndOperatorRelaService.insert(new CustOperatorRelation(anOperator.getId(), anCustInfo.getCustNo(), anOperator.getOperOrg()));
+        custOpenAccountTmpService.insert(anOpenAccountInfo);
+
+        return anOpenAccountInfo;
     }
 
     /**
      * 增加客户与核心企业关系
      */
     private void addCustAndCoreRelation(final CustTempEnrollInfo anCustEnrollInfo, final CustInfo anCustInfo, final CustOperatorInfo anOperator) {
-        // 写入T_CUST_RELATION
-        custRelationService.addWeChatCustAndCoreRelation(anCustInfo, anCustEnrollInfo.getCoreCustNo(), anOperator);
         // 写入T_SCF_RELATION
         final ScfRelation relation = new ScfRelation();
         relation.initWeChatValue();
@@ -235,9 +234,40 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
     }
 
     /**
-     * 生成银行账户信息
+     * 建立客户与保理公司关系(临时过渡方案)
+     * 
+     * @param anCustEnrollInfo
+     * @param anCustInfo
+     * @param anOperator
      */
-    private void addSaleAccoBank(final CustTempEnrollInfo anCustEnrollInfo, final CustInfo anCustInfo) {
+    private void addCustAndFactorRelation(final CustTempEnrollInfo anCustEnrollInfo, final CustInfo anCustInfo, final CustOperatorInfo anOperator) {
+        // 从字典表获取保理公司
+        List<Long> factorList = new ArrayList<Long>();
+        final List<DictItemInfo> factorDictItems = DictUtils.getDictList("ScfFactorGroup");
+        for (DictItemInfo factorItem : factorDictItems) {
+            Long factorNo = Long.valueOf(factorItem.getItemValue());
+            if (!factorList.contains(factorNo)) {
+                factorList.add(factorNo);
+            }
+        }
+
+        // 建立客户与保理公司关系
+        for (Long relateCustNo : factorList) {
+            final CustRelation relation = new CustRelation();
+            relation.initWeChatValue(anOperator);
+            relation.setCustNo(anCustInfo.getCustNo());
+            relation.setCustName(anCustInfo.getCustName());
+            relation.setCustType(anCustInfo.getCustType());
+            relation.setRelateCustno(relateCustNo);
+            relation.setRelateCustname(custAccountService.queryCustName(relateCustNo));
+            relation.setRelateType("1");
+            relation.setBusinStatus("3");
+            relation.setLastStatus(relation.getBusinStatus());
+            custRelationService.insert(relation);
+        }
+    }
+
+    private void addBankAccount(final CustTempEnrollInfo anCustEnrollInfo, final CustInfo anCustInfo) {
         final SaleAccoBankInfo saleBankAccount = new SaleAccoBankInfo();
         saleBankAccount.setMoneyAccount(SerialGenerator.getMoneyAccountID());
         saleBankAccount.setCustNo(anCustInfo.getCustNo());
@@ -257,6 +287,17 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         saleBankAccount.setSignStatus(Boolean.TRUE);
         saleBankAccount.setFlag("0");
         saleAccoBankService.insert(saleBankAccount);
+
+        ScfSupplierBank bankAccount = new ScfSupplierBank();
+        bankAccount.fillDefaultValue();
+        bankAccount.setCustNo(anCustInfo.getCustNo());
+        bankAccount.setCustName(anCustInfo.getCustName());
+        bankAccount.setCoreCustNo(anCustEnrollInfo.getCoreCustNo());
+        bankAccount.setBankAccount(anCustEnrollInfo.getBankAccount());
+        bankAccount.setBankAccountName(anCustEnrollInfo.getCustName());
+        bankAccount.setBankName(anCustEnrollInfo.getBankName());
+        bankAccount.setOperOrg(anCustInfo.getOperOrg());
+        scfSupplierBankService.insert(bankAccount);
     }
 
     /**
@@ -288,7 +329,7 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
             }
         }
     }
-    
+
     private void addCustFileItem(CustFileItem anCustFileItem, Long anBatchNo) {
         CustFileItem fileItem = new CustFileItem();
         BeanMapper.copy(anCustFileItem, fileItem);
@@ -327,25 +368,6 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
             }
         }
     }
-
-    /**
-     * 开户信息发送给百乐润
-     */
-/*    private void sendOpenAccountInfo(final CustInfo anCustInfo, final CustOperatorInfo anOperator, final ScfSupplierBank anBankAccount) {
-        final SaleAccoRequestInfo request = new SaleAccoRequestInfo();
-        // 发送内容
-        request.setBusinFlag("08");
-        request.setCustNo(anCustInfo.getCustNo());// 拜特客户号
-        request.setCustType("1");// 客户类型：1:供应商开户;2:核心企业开户;
-        request.setCustName(anCustInfo.getCustName());// 单位名称
-        request.setContName(anOperator.getName());// 经办人
-        request.setContMobileNo(anOperator.getMobileNo());// 经办人联系电话
-        request.setBankName(anBankAccount.getBankName());// 开户行
-        request.setBankAccount(anBankAccount.getBankAccount());// 银行账号
-        request.setAgencyNo("yqr");
-        // 调用接口
-        saleRemoteHelper.dealAccoRequest(request, anOperator);
-    }*/
 
     private void addCustFileAduit(final Long anCustNo, final Long anBatchNo, final int anFileCount, final String anFileInfoType,
             final String anOperCode) {
