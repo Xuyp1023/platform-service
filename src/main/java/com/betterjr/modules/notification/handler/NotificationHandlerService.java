@@ -232,6 +232,7 @@ public class NotificationHandlerService {
         if (anOperator != null) {
             tempNotificationCustomer.setOperId(anOperator.getId());
             tempNotificationCustomer.setOperName(anOperator.getName());
+            tempNotificationCustomer.setOperOrg(anOperator.getOperOrg());
         }
 
         if (anCustInfo != null) {
