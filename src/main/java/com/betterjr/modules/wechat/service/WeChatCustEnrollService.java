@@ -24,6 +24,8 @@ import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.account.service.CustContactService;
 import com.betterjr.modules.account.service.CustOperatorService;
+import com.betterjr.modules.cert.entity.CustCertInfo;
+import com.betterjr.modules.cert.service.CustCertService;
 import com.betterjr.modules.customer.constants.CustomerConstants;
 import com.betterjr.modules.customer.entity.CustOpenAccountTmp;
 import com.betterjr.modules.customer.entity.CustRelation;
@@ -77,6 +79,9 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
 
     @Autowired
     private CustOpenAccountTmpService custOpenAccountTmpService;
+
+    @Autowired
+    private CustCertService custCertService;
 
     /**
      * 获取当前微信用户开户信息
@@ -140,10 +145,49 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         // 处理附件,写入文件认证信息表中
         addFileAudit(anCustEnrollInfo, new String[] { "bizLicenseFile", "representIdFile" });
 
+        // 初始化数字证书信息
+        initCustCertinfo(anCustEnrollInfo, operator);
+
         // 经办人与当前微信绑定,openId从Session中获取
         addBindWeChat(custInfo, operator, anOpenId);
 
         return anCustEnrollInfo;
+    }
+
+    private void initCustCertinfo(CustTempEnrollInfo anCustEnrollInfo, CustOperatorInfo anOperator) {
+        CustCertInfo certInfo = new CustCertInfo();
+        certInfo.setSerialNo(Long.toUnsignedString(System.currentTimeMillis() * 10000 + SerialGenerator.randomInt(10000)));
+        certInfo.setCustNo(anCustEnrollInfo.getCustNo());
+        certInfo.setCustName(anCustEnrollInfo.getCustName());
+        certInfo.setIdentNo(anCustEnrollInfo.getIdentNo());
+        certInfo.setContName(anCustEnrollInfo.getContName());
+        certInfo.setContIdentType("0");
+        certInfo.setContIdentNo("");
+        certInfo.setContPhone(anCustEnrollInfo.getContMobileNo());
+        certInfo.setStatus("9");
+        certInfo.setVersionUid("wechat");
+        certInfo.setSubject("wechat");
+        certInfo.setOperNo("-1");
+        certInfo.setCertInfo("wechat");
+        certInfo.setValidDate(BetterDateUtils.getNumDate());
+        certInfo.setCreateDate(BetterDateUtils.getNumDate());
+        certInfo.setToken("wechat");
+        certInfo.setOperOrg(anOperator.getOperOrg());
+        certInfo.setRuleList("SUPPLIER_USER");
+        certInfo.setCertId(-1l);
+        certInfo.setRegOperId(anOperator.getId());
+        certInfo.setRegOperName(anOperator.getName());
+        certInfo.setRegDate(BetterDateUtils.getNumDate());
+        certInfo.setRegTime(BetterDateUtils.getNumTime());
+        certInfo.setModiOperId(anOperator.getId());
+        certInfo.setModiOperName(anOperator.getName());
+        certInfo.setModiDate(BetterDateUtils.getNumDate());
+        certInfo.setModiTime(BetterDateUtils.getNumTime());
+        certInfo.setPublishDate(BetterDateUtils.getNumDate());
+        certInfo.setPublishMode(BetterDateUtils.getNumTime());
+        certInfo.setDescription("wechat");
+        certInfo.setEmail(anCustEnrollInfo.getContEmail());
+        custCertService.addCustCertInfo(certInfo);
     }
 
     private CustOpenAccountTmp addCustOpenAccountTmp(final CustTempEnrollInfo anCustEnrollInfo, String anFileList) {
@@ -255,7 +299,7 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
             relation.setCustType(anCustInfo.getCustType());
             relation.setRelateCustno(relateCustNo);
             relation.setRelateCustname(custAccountService.queryCustName(relateCustNo));
-            relation.setRelateType("1");
+            relation.setRelateType(CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR);
             relation.setBusinStatus("3");
             relation.setLastStatus(relation.getBusinStatus());
             custRelationService.insert(relation);

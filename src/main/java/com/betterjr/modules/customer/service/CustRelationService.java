@@ -785,7 +785,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         relation.setCustType(anCustInfo.getCustType());
         relation.setRelateCustno(anRelateCustNo);
         relation.setRelateCustname(custAccountService.queryCustName(anRelateCustNo));
-        relation.setRelateType("1");
+        relation.setRelateType(CustomerConstants.RELATE_TYPE_SUPPLIER_CORE);
         relation.setBusinStatus("3");
         relation.setLastStatus(relation.getBusinStatus());
         this.insert(relation);
