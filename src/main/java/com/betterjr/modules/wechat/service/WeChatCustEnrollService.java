@@ -22,7 +22,6 @@ import com.betterjr.modules.account.entity.CustContactInfo;
 import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.betterjr.modules.account.service.CustAccountService;
-import com.betterjr.modules.account.service.CustAndOperatorRelaService;
 import com.betterjr.modules.account.service.CustContactService;
 import com.betterjr.modules.account.service.CustOperatorService;
 import com.betterjr.modules.customer.constants.CustomerConstants;
@@ -77,9 +76,6 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
     private ScfSupplierBankService scfSupplierBankService;
 
     @Autowired
-    private CustAndOperatorRelaService custAndOperatorRelaService;
-
-    @Autowired
     private CustOpenAccountTmpService custOpenAccountTmpService;
 
     /**
@@ -114,16 +110,16 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         anCustEnrollInfo.initWeChatAddValue();
 
         // 生成开户流水
-        CustOpenAccountTmp anOpenAccountInfo = addCustOpenAccountTmp(anCustEnrollInfo);
+        CustOpenAccountTmp anTempAccountData = addCustOpenAccountTmp(anCustEnrollInfo, anFileList);
 
         // 开户生效操作
-        anOpenAccountInfo = custOpenAccountTmpService.addWeChatAccount(anOpenAccountInfo.getId(), "微信端开户,自动生效!");
+        CustOpenAccountTmp anValidAccountData = custOpenAccountTmpService.addWeChatAccount(anTempAccountData.getId());
 
         // 获取客户信息
-        final CustInfo custInfo = custAccountService.selectByPrimaryKey(anOpenAccountInfo.getCustNo());
+        CustInfo custInfo = custAccountService.selectByPrimaryKey(anValidAccountData.getCustNo());
 
         // 获取操作员信息
-        final CustOperatorInfo operator = Collections3.getFirst(custOperatorService.queryOperatorInfoByCustNo(custInfo.getCustNo()));
+        CustOperatorInfo operator = Collections3.getFirst(custOperatorService.queryOperatorInfoByCustNo(custInfo.getCustNo()));
 
         // 创建客户与核心企业关系
         addCustAndCoreRelation(anCustEnrollInfo, custInfo, operator);
@@ -138,10 +134,11 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         addCustContact(anCustEnrollInfo, custInfo);
 
         // 保存客户注册信息
-        addCusrEnrollInfo(anCustEnrollInfo, custInfo, anFileList);
+        anCustEnrollInfo.setBatchNo(anValidAccountData.getBatchNo());
+        addCusrEnrollInfo(anCustEnrollInfo, custInfo);
 
         // 处理附件,写入文件认证信息表中
-        //        addFileAudit(anCustEnrollInfo, new String[] { "bizLicenseFile", "representIdFile" });
+        addFileAudit(anCustEnrollInfo, new String[] { "bizLicenseFile", "representIdFile" });
 
         // 经办人与当前微信绑定,openId从Session中获取
         addBindWeChat(custInfo, operator, anOpenId);
@@ -149,8 +146,7 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         return anCustEnrollInfo;
     }
 
-
-    private CustOpenAccountTmp addCustOpenAccountTmp(final CustTempEnrollInfo anCustEnrollInfo) {
+    private CustOpenAccountTmp addCustOpenAccountTmp(final CustTempEnrollInfo anCustEnrollInfo, String anFileList) {
         final CustOpenAccountTmp anOpenAccountInfo = new CustOpenAccountTmp();
         anOpenAccountInfo.setParentId(0l);
         anOpenAccountInfo.setApplyDate(BetterDateUtils.getNumDate());
@@ -202,6 +198,9 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         anOpenAccountInfo.setRegTime(BetterDateUtils.getNumTime());
         // 生成OperOrg:客户名称+10位随机数
         anOpenAccountInfo.setOperOrg(anCustEnrollInfo.getCustName() + SerialGenerator.randomBase62(10));
+
+        // 处理附件
+        anOpenAccountInfo.setBatchNo(custFileItemService.updateCustFileItemInfo(anFileList, anOpenAccountInfo.getBatchNo()));
 
         custOpenAccountTmpService.insert(anOpenAccountInfo);
 
@@ -338,10 +337,9 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
     /**
      * 保存客户注册信息
      */
-    private void addCusrEnrollInfo(final CustTempEnrollInfo anCustEnrollInfo, final CustInfo anCustInfo, final String anFileList) {
+    private void addCusrEnrollInfo(final CustTempEnrollInfo anCustEnrollInfo, final CustInfo anCustInfo) {
         anCustEnrollInfo.setCustNo(anCustInfo.getCustNo());
         anCustEnrollInfo.setOperOrg(anCustInfo.getOperOrg());
-        anCustEnrollInfo.setBatchNo(custFileItemService.updateCustFileItemInfo(anFileList, anCustEnrollInfo.getBatchNo()));
         this.insert(anCustEnrollInfo);
     }
 
