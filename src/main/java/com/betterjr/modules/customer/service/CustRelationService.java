@@ -27,6 +27,7 @@ import com.betterjr.common.utils.DictUtils;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.account.entity.CustInfo;
+import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.account.service.CustAndOperatorRelaService;
 import com.betterjr.modules.cert.service.CustCertService;
@@ -711,4 +712,18 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         return Collections3.getFirst(this.selectByProperty(anMap)).getCustNo();
     }
 
+    public CustRelation addWeChatCustAndCoreRelation(final CustInfo anCustInfo, final Long anRelateCustNo, final CustOperatorInfo anOperator) {
+        final CustRelation relation = new CustRelation();
+        relation.initWeChatValue(anOperator);
+        relation.setCustNo(anCustInfo.getCustNo());
+        relation.setCustName(anCustInfo.getCustName());
+        relation.setCustType(anCustInfo.getCustType());
+        relation.setRelateCustno(anRelateCustNo);
+        relation.setRelateCustname(custAccountService.queryCustName(anRelateCustNo));
+        relation.setRelateType("1");
+        relation.setBusinStatus("3");
+        relation.setLastStatus(relation.getBusinStatus());
+        this.insert(relation);
+        return relation;
+    }
 }
