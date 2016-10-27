@@ -23,9 +23,11 @@ public class WeChatCustEnrollDubboService implements IWeChatCustEnrollService {
     }
 
     @Override
-    public String webAddCustEnroll(Map<String, Object> anMap, String anCoreCustNo, String anOpenId, String anFileList) {
+    public String webAddCustEnroll(Map<String, Object> anMap, String anOpenId, String anFileList) {
+        
         CustTempEnrollInfo anCustTempEnrollInfo = (CustTempEnrollInfo) RuleServiceDubboFilterInvoker.getInputObj();
-        return AjaxObject.newOk("开户成功", weChatCustEnrollService.addCustEnroll(anCustTempEnrollInfo, anCoreCustNo, anOpenId, anFileList)).toJson();
+        
+        return AjaxObject.newOk("开户成功", weChatCustEnrollService.addCustEnroll(anCustTempEnrollInfo, anOpenId, anFileList)).toJson();
     }
 
 }
