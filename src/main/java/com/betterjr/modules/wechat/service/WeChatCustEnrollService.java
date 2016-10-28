@@ -113,14 +113,14 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
     /**
      * 获取当前微信用户开户信息
      */
-    public CustTempEnrollInfo findCustEnroll(String anOpenId) {
+    public CustTempEnrollInfo findCustEnroll(final String anOpenId) {
         final CustWeChatInfo weChatInfo = custWeChatService.selectByPrimaryKey(anOpenId);
         final Long custNo = weChatInfo.getCustNo();
-        CustTempEnrollInfo custEnrollInfo = new CustTempEnrollInfo();
+        final CustTempEnrollInfo custEnrollInfo = new CustTempEnrollInfo();
         // 构架核心企业查询条件
-        Map<String, Object> coreMap = QueryTermBuilder.newInstance().put("custNo", custNo)
+        final Map<String, Object> coreMap = QueryTermBuilder.newInstance().put("custNo", custNo)
                 .put("relateType", CustomerConstants.RELATE_TYPE_SUPPLIER_CORE).put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT).build();
-        CustRelation coreRelation = Collections3.getFirst(custRelationService.selectByProperty(coreMap));
+        final CustRelation coreRelation = Collections3.getFirst(custRelationService.selectByProperty(coreMap));
         // 核心企业编号
         custEnrollInfo.setCoreCustNo(coreRelation.getRelateCustno());
         // 核心企业名称
@@ -130,11 +130,11 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         // 开户企业名称
         custEnrollInfo.setCustName(custAccountService.queryCustName(custNo));
         // 营业执照
-        Map<String, Object> custMap = QueryTermBuilder.newInstance().put("custNo", custNo).build();
-        CustMechBusinLicence licence = Collections3.getFirst(custMechBusinLicenceService.selectByProperty(custMap));
+        final Map<String, Object> custMap = QueryTermBuilder.newInstance().put("custNo", custNo).build();
+        final CustMechBusinLicence licence = Collections3.getFirst(custMechBusinLicenceService.selectByProperty(custMap));
         custEnrollInfo.setIdentNo(licence.getRegNo());
         // 获取银行账户信息
-        CustMechBankAccount bankAccount = Collections3.getFirst(custMechBankAccountService.selectByProperty(custMap));
+        final CustMechBankAccount bankAccount = Collections3.getFirst(custMechBankAccountService.selectByProperty(custMap));
         // 银行账号
         custEnrollInfo.setBankAccount(bankAccount.getBankAcco());
         // 开户银行名称
@@ -416,12 +416,12 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         certInfo.setContPhone(anCustEnrollInfo.getContMobileNo());
         certInfo.setStatus("9");
         certInfo.setVersionUid("wechat");
-        certInfo.setSubject("wechat");
+        certInfo.setSubject("wechat" + anCustEnrollInfo.getCustNo());
         certInfo.setOperNo("-1");
-        certInfo.setCertInfo("wechat");
+        certInfo.setCertInfo("wechat" + anCustEnrollInfo.getCustNo());
         certInfo.setValidDate(BetterDateUtils.getNumDate());
         certInfo.setCreateDate(BetterDateUtils.getNumDate());
-        certInfo.setToken("wechat");
+        certInfo.setToken("wechat" + anCustEnrollInfo.getCustNo());
         certInfo.setOperOrg(anOperator.getOperOrg());
         certInfo.setRuleList("SUPPLIER_USER");
         certInfo.setCertId(-1l);
@@ -435,7 +435,7 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         certInfo.setModiTime(BetterDateUtils.getNumTime());
         certInfo.setPublishDate(BetterDateUtils.getNumDate());
         certInfo.setPublishMode(BetterDateUtils.getNumTime());
-        certInfo.setDescription("wechat");
+        certInfo.setDescription("wechat" + anCustEnrollInfo.getCustNo());
         certInfo.setEmail(anCustEnrollInfo.getContEmail());
         custCertService.addCustCertInfo(certInfo);
     }
@@ -588,6 +588,8 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         bankAccount.setBankName(anCustEnrollInfo.getBankName());
         bankAccount.setOperOrg(anCustInfo.getOperOrg());
         scfSupplierBankService.insert(bankAccount);
+
+        // TODO 银行账号信息  CustMechBankAccount
     }
 
     /**
@@ -641,21 +643,19 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
      * 经办人与当前微信绑定
      */
     private void addBindWeChat(final CustInfo anCustInfo, final CustOperatorInfo anOperator, final String anOpenId) {
-        if (BetterStringUtils.isNotBlank(anOpenId)) {
-            final CustWeChatInfo weChatInfo = custWeChatService.selectByPrimaryKey(anOpenId);
-            if (weChatInfo != null) {
-                weChatInfo.setOperId(anOperator.getId());
-                weChatInfo.setOperName(anOperator.getName());
-                weChatInfo.setOperOrg(anOperator.getOperOrg());
-                weChatInfo.setModiDate(BetterDateUtils.getNumDate());
-                weChatInfo.setModiTime(BetterDateUtils.getNumTime());
-                weChatInfo.setModiOperId(anOperator.getId());
-                weChatInfo.setModiOperName(anOperator.getName());
-                weChatInfo.setCustNo(anCustInfo.getCustNo());
-                weChatInfo.setBusinStatus("1");// 开户结束后设置为已完成状态;
-                custWeChatService.updateByPrimaryKeySelective(weChatInfo);
-            }
-        }
+        BTAssert.isTrue(BetterStringUtils.isNotBlank(anOpenId), "openid 不允许为空");
+        final CustWeChatInfo weChatInfo = custWeChatService.selectByPrimaryKey(anOpenId);
+        BTAssert.notNull(weChatInfo, "没有找到微信用户信息！");
+        weChatInfo.setOperId(anOperator.getId());
+        weChatInfo.setOperName(anOperator.getName());
+        weChatInfo.setOperOrg(anOperator.getOperOrg());
+        weChatInfo.setModiDate(BetterDateUtils.getNumDate());
+        weChatInfo.setModiTime(BetterDateUtils.getNumTime());
+        weChatInfo.setModiOperId(anOperator.getId());
+        weChatInfo.setModiOperName(anOperator.getName());
+        weChatInfo.setCustNo(anCustInfo.getCustNo());
+        weChatInfo.setBusinStatus("1");// 开户结束后设置为已完成状态;
+        custWeChatService.updateByPrimaryKeySelective(weChatInfo);
     }
 
     private void addCustFileAduit(final Long anCustNo, final Long anBatchNo, final int anFileCount, final String anFileInfoType,
