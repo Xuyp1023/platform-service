@@ -57,7 +57,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
 
     /**
      * 微信端查询当前客户信息
-     * 
+     *
      * @return
      */
     public CustInfo findWechatCurrentCustInfo() {
@@ -313,7 +313,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
 
     /**
      * 查询保理结构所有关系客户
-     * 
+     *
      * @param anFactorNo
      * @return
      */
@@ -504,7 +504,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
 
     /**
      * 微信端开通保理融资业务申请
-     * 
+     *
      * @param anCustNo
      * @param anFactorCustList
      * @return
@@ -520,14 +520,14 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
             }
 
             // 获取电子合同服务商信息
-            StringBuffer provider = new StringBuffer();
+            final StringBuffer provider = new StringBuffer();
             final List<DictItemInfo> anProviderDict = DictUtils.getDictList("ScfElecAgreementGroup");
             for (final DictItemInfo anDictItem : anProviderDict) {
                 provider.append(anDictItem.getItemValue());
                 provider.append(",");
             }
-            
-            String anProviderCustList = provider.toString();
+
+            final String anProviderCustList = provider.toString();
             saveProviderRelation(anCustInfo, anProviderCustList.substring(0, anProviderCustList.length() - 1));
             saveFactorRelation(anCustInfo, anFactorCustList, "微信端申请开通融资保理业务");
         }
@@ -628,21 +628,21 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
 
     /****
      * 查询客户号根据类型返回关联关系信息
-     * 
+     *
      * @param anCustNo
      *            关系客户号
      * @param anCreditType
      *            关系类型
      * @return 关系列表
      */
-    public List<CustRelationData> queryCustRelationData(Long anCustNo, String anCreditType) {
-        List<CustRelationData> dataList = new ArrayList<CustRelationData>();
-        Map<String, Object> anMap = new HashMap<String, Object>();
+    public List<CustRelationData> queryCustRelationData(final Long anCustNo, final String anCreditType) {
+        final List<CustRelationData> dataList = new ArrayList<CustRelationData>();
+        final Map<String, Object> anMap = new HashMap<String, Object>();
         anMap.put("custNo", anCustNo);
         anMap.put("relateType", anCreditType);
         anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
-        for (CustRelation custRelation : this.selectByProperty(anMap)) {
-            CustRelationData relationData = BeanMapper.map(custRelation, CustRelationData.class);
+        for (final CustRelation custRelation : this.selectByProperty(anMap)) {
+            final CustRelationData relationData = BeanMapper.map(custRelation, CustRelationData.class);
             dataList.add(relationData);
         }
         return dataList;
@@ -680,14 +680,41 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
     }
 
     /**
+     * @return
+     */
+    public List<CustRelation> queryOpenedFactor(final Long anCustNo) {
+        if (null == anCustNo) {
+            return null;
+        }
+        final Map<String, Object> anMap = new HashMap<String, Object>();
+        anMap.put("custNo", anCustNo);
+        String relateType = "";
+        if (UserUtils.supplierUser()) {
+            relateType = CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR;
+        }
+        else if (UserUtils.sellerUser()) {
+            relateType = CustomerConstants.RELATE_TYPE_SELLER_FACTOR;
+        }
+        else if (UserUtils.coreUser()) {
+            relateType = CustomerConstants.RELATE_TYPE_CORE_FACTOR;
+        }
+        if (BetterStringUtils.isNotBlank(relateType)) {
+            anMap.put("relateType", relateType);
+            final List<CustRelation> relations = this.selectByProperty(anMap);
+            return relations;
+        }
+        return null;
+    }
+
+    /**
      * 微信端,获取当前客户的保理公司
-     * 
+     *
      * @return
      */
     public List<SimpleDataEntity> queryFactorRelation() {
         final List<SimpleDataEntity> result = new ArrayList<SimpleDataEntity>();
         final Map<String, Object> anMap = new HashMap<String, Object>();
-        Long custNo = UserUtils.getDefCustInfo().getCustNo();
+        final Long custNo = UserUtils.getDefCustInfo().getCustNo();
         if (null == custNo) {
             return result;
         }
@@ -704,7 +731,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
 
     /**
      * 检查客户保理, 客户只能是供应商|经销商|核心企业 relateType为 ： 0,2,3
-     * 
+     *
      * @param anCustNo
      *            客户号
      * @param anRelateCustno
@@ -713,9 +740,9 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
      *            客户在保理公司的客户号
      * @return
      */
-    public CustRelation findOneRelation(Long anCustNo, Long anRelateCustno, String anPartnerCustNo) {
-        String relateTypes = "0,2,3";
-        List<CustRelation> dataList = this.mapper.findOneRelation(anCustNo, anRelateCustno, anPartnerCustNo, relateTypes);
+    public CustRelation findOneRelation(final Long anCustNo, final Long anRelateCustno, final String anPartnerCustNo) {
+        final String relateTypes = "0,2,3";
+        final List<CustRelation> dataList = this.mapper.findOneRelation(anCustNo, anRelateCustno, anPartnerCustNo, relateTypes);
         if (!Collections3.isEmpty(dataList)) {
             return Collections3.getFirst(dataList);
         }
@@ -728,14 +755,14 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
 
     /**
      * 更新关联关系的状态
-     * 
+     *
      * @param anCustNo
      * @param anScfId
      * @param anStatus
      * @param anFactorNo
      */
-    public boolean saveFactorRelationStatus(Long anCustNo, String anScfId, String anStatus, String anFactorNo) {
-        CustRelation factorRel = findOneRelation(anCustNo, Long.parseLong(anFactorNo), anScfId);
+    public boolean saveFactorRelationStatus(final Long anCustNo, final String anScfId, final String anStatus, final String anFactorNo) {
+        final CustRelation factorRel = findOneRelation(anCustNo, Long.parseLong(anFactorNo), anScfId);
         if (factorRel != null) {
             factorRel.setBusinStatus(anStatus);
             factorRel.setModiDate(BetterDateUtils.getNumDate());
@@ -749,18 +776,18 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
 
     /**
      * 按银行账户信息查询供应商与核心企业关系
-     * 
+     *
      * @param anBankAccountName
      * @param anBankAccount
      * @return
      */
-    public Long findCustNoByBankInfo(String anBankAccountName, String anBankAccount) {
+    public Long findCustNoByBankInfo(final String anBankAccountName, final String anBankAccount) {
         final Map<String, Object> anMap = new HashMap<String, Object>();
         anMap.put("bankAcco", anBankAccount);
         anMap.put("bankAccoName", anBankAccountName);
         anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
         anMap.put("relateType", CustomerConstants.RELATE_TYPE_SUPPLIER_CORE);
-        CustRelation custRelation = Collections3.getFirst(this.selectByProperty(anMap));
+        final CustRelation custRelation = Collections3.getFirst(this.selectByProperty(anMap));
         if (custRelation != null) {
             return custRelation.getCustNo();
         }
@@ -774,7 +801,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
      * 处理逻辑：检查核心企业编码加上其余的熟悉 先检查客户号是否存在，如果存在，根据核心企业编码和客户号来检查，<BR>
      * 如果记录存在，则更新核心企业的内部编码 如果不存在，则根据核心企业内部编码来检查，如果存在则忽略；如果不存在，<BR>
      * 则根据企业名称来检查，如果都不存在，则增加记录
-     * 
+     *
      * @param anValues
      *            上传来的数据
      * @param anCoreCustName
@@ -783,14 +810,14 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
      *            核心企业编码
      * @return
      */
-    public boolean saveAndCheckCust(Map<String, Object> anValues, String anCoreCustName, Long anCoreCustNo) {
-        Map<String, Object> termMap = QueryTermBuilder.newInstance().put("coreCustNo", anCoreCustNo)
+    public boolean saveAndCheckCust(final Map<String, Object> anValues, final String anCoreCustName, final Long anCoreCustNo) {
+        final Map<String, Object> termMap = QueryTermBuilder.newInstance().put("coreCustNo", anCoreCustNo)
                 .put("relateType", CustomerConstants.RELATE_TYPE_SUPPLIER_CORE).build();
-        String btNo = (String) anValues.get("btNo");
-        Long custNo = (Long) anValues.get("custNo");
+        final String btNo = (String) anValues.get("btNo");
+        final Long custNo = (Long) anValues.get("custNo");
         boolean isok = false;
         Object dataValue;
-        for (String tmpKey : new String[] { "custNo", "btNo", "custName" }) {
+        for (final String tmpKey : new String[] { "custNo", "btNo", "custName" }) {
             isok = false;
             dataValue = anValues.get(tmpKey);
             if ("custNo".equals(tmpKey)) {
@@ -810,15 +837,15 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
                 }
             }
         }
-        CustRelation custRelation = BeanMapper.map(anValues, CustRelation.class);
+        final CustRelation custRelation = BeanMapper.map(anValues, CustRelation.class);
         custRelation.initUploadInfo(anCoreCustName, anCoreCustNo);
         this.insert(custRelation);
         return true;
     }
 
-    private boolean saveUploadModifyValue(Map anTermMap, String anBtNo, Long anCustNo) {
-        List<CustRelation> tmpList = this.selectByProperty(anTermMap);
-        CustRelation custRelation = Collections3.getFirst(tmpList);
+    private boolean saveUploadModifyValue(final Map anTermMap, final String anBtNo, final Long anCustNo) {
+        final List<CustRelation> tmpList = this.selectByProperty(anTermMap);
+        final CustRelation custRelation = Collections3.getFirst(tmpList);
         if (custRelation != null) {
             if (BetterStringUtils.isNotBlank(anBtNo)) {
                 custRelation.setBtNo(anBtNo);
@@ -853,17 +880,17 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
 
     /**
      * 保存保理公司与企业之间的关系
-     * 
+     *
      * @param anRelation
      */
-    public void saveOrUpdateCustFactor(CustRelation anRelation) {
-        Map termMap = QueryTermBuilder.newInstance().put("custNo", anRelation.getCustNo()).put("relateCustCorp", anRelation.getRelateCustCorp())
+    public void saveOrUpdateCustFactor(final CustRelation anRelation) {
+        final Map termMap = QueryTermBuilder.newInstance().put("custNo", anRelation.getCustNo()).put("relateCustCorp", anRelation.getRelateCustCorp())
                 .put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR, CustomerConstants.RELATE_TYPE_CORE_FACTOR,
                         CustomerConstants.RELATE_TYPE_SELLER_FACTOR })
                 .build();
-        CustRelation tmpRelation = Collections3.getFirst(this.selectByProperty(termMap));
+        final CustRelation tmpRelation = Collections3.getFirst(this.selectByProperty(termMap));
         anRelation.setRelateType(CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR);
-        PlatformAgencyInfo agencyInfo = agencyService.findSaleAgency(anRelation.getRelateCustCorp());
+        final PlatformAgencyInfo agencyInfo = agencyService.findSaleAgency(anRelation.getRelateCustCorp());
         if (agencyInfo != null) {
             anRelation.setRelateCustname(agencyInfo.getName());
             if (BetterStringUtils.isNotBlank(agencyInfo.getRelaCustNo())) {
@@ -884,19 +911,19 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
 
     /**
      * 根据保理公司客户号，查找系统中的客户号
-     * 
+     *
      * @param anScfId
      *            保理公司客户号
      * @param anAgencyNo
      *            保理公司编码
      * @return
      */
-    public Long findCustNoByScfId(String anScfId, String anAgencyNo) {
-        Map workCondition = new HashMap();
+    public Long findCustNoByScfId(final String anScfId, final String anAgencyNo) {
+        final Map workCondition = new HashMap();
         workCondition.put("partnerCustNo", anScfId);
         workCondition.put("relateCustCorp", anAgencyNo);
         logger.info("findCustNoByScfId parameter: scfId= " + anScfId + ", factorNo=" + anAgencyNo);
-        List<CustRelation> workScfFactorList = this.selectByProperty(workCondition);
+        final List<CustRelation> workScfFactorList = this.selectByProperty(workCondition);
         if (Collections3.isEmpty(workScfFactorList)) {
             logger.info("not find CustNoByScfId");
             return 0L;
@@ -912,14 +939,14 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
      * @param anAgencyNo 保理公司编码
      * @return
      */
-    public String findScfIdByCustNo(Long anCustNo, String anAgencyNo) {
-        Map termMap = new HashMap();
+    public String findScfIdByCustNo(final Long anCustNo, final String anAgencyNo) {
+        final Map termMap = new HashMap();
         termMap.put("custNo", anCustNo);
         termMap.put("relateCustCorp", anAgencyNo);
         termMap.put("businStatus", new String[]{"0", "1", "2"});
         logger.info("findCustNoByScfId parameter: custNo= " + anCustNo + ", factorNo=" + anAgencyNo);
-        List<CustRelation> tmpList = this.selectByProperty(termMap);
-        CustRelation workCustRelation = Collections3.getFirst(tmpList);
+        final List<CustRelation> tmpList = this.selectByProperty(termMap);
+        final CustRelation workCustRelation = Collections3.getFirst(tmpList);
         if (workCustRelation == null) {
             logger.info("not find findScfIdByCustNo");
             return " ";
@@ -929,8 +956,8 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         }
     }
 
-    public List<CustRelation> findFactorRelaByCoreCustNo(String anAgencyNo) {
-        Map workCondition = new HashMap();
+    public List<CustRelation> findFactorRelaByCoreCustNo(final String anAgencyNo) {
+        final Map workCondition = new HashMap();
         workCondition.put("custNo",  DictUtils.findCoreCustNoList());
         workCondition.put("relateCustCorp", anAgencyNo);
 
@@ -939,15 +966,15 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
 
     /**
      * 查询状态为处理中的业务，包括1：已申请和5：取消中的关联关系
-     * 
+     *
      * @return
      */
-    public List<CustRelation> findFactorRelaByRough(String anAgencyNo) {
-        Map workCondition = new HashMap();
+    public List<CustRelation> findFactorRelaByRough(final String anAgencyNo) {
+        final Map workCondition = new HashMap();
         workCondition.put("businStatus", new String[] { "1", "5" });
         workCondition.put("relateCustCorp", anAgencyNo);
 
         return this.selectByProperty(workCondition);
     }
-    
+
 }

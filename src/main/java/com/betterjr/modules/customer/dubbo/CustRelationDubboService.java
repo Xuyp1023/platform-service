@@ -23,126 +23,127 @@ public class CustRelationDubboService implements ICustRelationService {
     private CustRelationAuditService custRelationAuditService;
 
     @Override
-    public String webFindFactorStatus(Long anCustNo) {
+    public String webFindFactorStatus(final Long anCustNo) {
 
         return AjaxObject.newOk("开通保理业务状态查询成功", custRelationService.findFactorStatus(anCustNo)).toJson();
     }
 
     @Override
-    public String webSaveCustRelation(Long anCustNo, String anProviderCustList, String anFactorCustList, String anPostscript) {
+    public String webSaveCustRelation(final Long anCustNo, final String anProviderCustList, final String anFactorCustList, final String anPostscript) {
 
         return AjaxObject.newOk("开通保理融资业务申请成功", custRelationService.saveCustRelation(anCustNo, anProviderCustList, anFactorCustList, anPostscript))
                 .toJson();
     }
 
     @Override
-    public String webQueryAuditWorkflow(Long anCustNo) {
+    public String webQueryAuditWorkflow(final Long anCustNo) {
 
         return AjaxObject.newOk("开通保理融资业务审批流程查询成功", custRelationAuditService.queryAuditWorkflow(anCustNo)).toJson();
     }
 
     @Override
-    public String webQueryRelationAccept(String anBusinStatus, String anFlag, int anPageNum, int anPageSize) {
+    public String webQueryRelationAccept(final String anBusinStatus, final String anFlag, final int anPageNum, final int anPageSize) {
 
         return AjaxObject.newOkWithPage("客户白名单受理列表查询成功", custRelationService.queryRelationAccept(anBusinStatus, anFlag, anPageNum, anPageSize))
                 .toJson();
     }
 
     @Override
-    public String webQueryRelationAudit(String anBusinStatus, String anFlag, int anPageNum, int anPageSize) {
+    public String webQueryRelationAudit(final String anBusinStatus, final String anFlag, final int anPageNum, final int anPageSize) {
 
         return AjaxObject.newOkWithPage("客户白名单审批列表查询成功", custRelationService.queryRelationAudit(anBusinStatus, anFlag, anPageNum, anPageSize))
                 .toJson();
     }
 
     @Override
-    public String webSaveRelationAccept(Long anId, String anAuditOpinion) {
+    public String webSaveRelationAccept(final Long anId, final String anAuditOpinion) {
 
         return AjaxObject.newOk("客户白名单受理成功", custRelationService.saveRelationAccept(anId, anAuditOpinion)).toJson();
     }
 
     @Override
-    public String webSaveRelationAudit(Long anId, String anAuditOpinion) {
+    public String webSaveRelationAudit(final Long anId, final String anAuditOpinion) {
 
         return AjaxObject.newOk("客户白名单审批成功", custRelationService.saveRelationAudit(anId, anAuditOpinion)).toJson();
     }
 
     @Override
-    public String webSaveRefuseAcceptRelation(Long anId, String anAuditOpinion) {
+    public String webSaveRefuseAcceptRelation(final Long anId, final String anAuditOpinion) {
 
         return AjaxObject.newOk("客户白名单受理驳回成功", custRelationService.saveRefuseAcceptRelation(anId, anAuditOpinion)).toJson();
     }
 
     @Override
-    public String webSaveRefuseAuditRelation(Long anId, String anAuditOpinion) {
+    public String webSaveRefuseAuditRelation(final Long anId, final String anAuditOpinion) {
 
         return AjaxObject.newOk("客户白名单审批驳回成功", custRelationService.saveRefuseAuditRelation(anId, anAuditOpinion)).toJson();
     }
 
     @Override
-    public String webQueryCoreKeyAndValue(Long anCustNo) {
+    public String webQueryCoreKeyAndValue(final Long anCustNo) {
 
         return AjaxObject.newOk("核心企业下拉列表查询成功", custRelationService.queryCoreKeyAndValue(anCustNo)).toJson();
     }
 
     @Override
-    public String webQuerySupplierByCore(Long anCoreCustNo) {
+    public String webQuerySupplierByCore(final Long anCoreCustNo) {
 
         return AjaxObject.newOk("供应商下拉列表查询成功", custRelationService.querySupplierByCore(anCoreCustNo)).toJson();
     }
 
     @Override
-    public String webQuerySellerByCore(Long anCoreCustNo) {
+    public String webQuerySellerByCore(final Long anCoreCustNo) {
 
         return AjaxObject.newOk("经销商下拉列表查询成功", custRelationService.querySellerByCore(anCoreCustNo)).toJson();
     }
 
     @Override
-    public String webQueryFactorKeyAndValue(Long anCustNo) {
+    public String webQueryFactorKeyAndValue(final Long anCustNo) {
 
         return AjaxObject.newOk("保理机构下拉列表查询成功", custRelationService.queryFactorKeyAndValue(anCustNo)).toJson();
     }
 
     @Override
-    public String webQueryProviderRelation(Long anCustNo) {
+    public String webQueryProviderRelation(final Long anCustNo) {
 
         return AjaxObject.newOk("客户与电子合同服务商关系查询成功", custRelationService.queryProviderRelation(anCustNo)).toJson();
     }
 
     @Override
-    public String webQueryCustRelation(Long anCustNo) {
+    public String webQueryCustRelation(final Long anCustNo) {
 
         return AjaxObject.newOk("客户关系查询成功", custRelationService.queryCustRelation(anCustNo)).toJson();
     }
 
     @Override
-    public String webQueryFacotrCoreRelation(Long anFactorNo) {
+    public String webQueryFacotrCoreRelation(final Long anFactorNo) {
 
         return AjaxObject.newOk("保理机构与核心企业关系查询成功", custRelationService.queryFactorCoreRelation(anFactorNo)).toJson();
     }
 
     @Override
-    public String webQueryFactorCustRelation(Long anFactorNo, String anCreditType) {
+    public String webQueryFactorCustRelation(final Long anFactorNo, final String anCreditType) {
 
         return AjaxObject.newOk("保理机构关系客户查询成功", custRelationService.queryFactorCustRelation(anFactorNo, anCreditType)).toJson();
     }
 
     @Override
-    public String webQueryFactorAllCust(Long anFactorNo) {
+    public String webQueryFactorAllCust(final Long anFactorNo) {
 
         return AjaxObject.newOk("保理机构关系客户查询成功", custRelationService.webQueryFactorAllCust(anFactorNo)).toJson();
     }
 
     /****
      * 查询客户号根据类型返回关联关系信息
-     * 
+     *
      * @param anCustNo
      *            关系客户号
      * @param anCreditType
      *            关系类型
      * @return 关系列表
      */
-    public List<CustRelationData> webQueryCustRelationData(Long anCustNo, String anCreditType) {
+    @Override
+    public List<CustRelationData> webQueryCustRelationData(final Long anCustNo, final String anCreditType) {
         return custRelationService.queryCustRelationData(anCustNo, anCreditType);
     }
 
@@ -152,32 +153,37 @@ public class CustRelationDubboService implements ICustRelationService {
     }
 
     @Override
-    public CustRelation findOneRelation(Long anCustNo, Long anRelateCustno, String anPartnerCustNo) {
+    public CustRelation findOneRelation(final Long anCustNo, final Long anRelateCustno, final String anPartnerCustNo) {
         // TODO Auto-generated method stub
         return custRelationService.findOneRelation(anCustNo, anRelateCustno, anPartnerCustNo);
     }
 
     @Override
-    public boolean saveFactorRelationStatus(Long anCustNo, String anScfId, String anStatus, String anFactorNo) {
+    public boolean saveFactorRelationStatus(final Long anCustNo, final String anScfId, final String anStatus, final String anFactorNo) {
         // TODO Auto-generated method stub
         return this.custRelationService.saveFactorRelationStatus(anCustNo, anScfId, anStatus, anFactorNo);
     }
 
     @Override
-    public Long findCustNoByBankInfo(String anBankAccountName, String anBankAccount) {
+    public Long findCustNoByBankInfo(final String anBankAccountName, final String anBankAccount) {
         // TODO Auto-generated method stub
         return this.custRelationService.findCustNoByBankInfo(anBankAccountName, anBankAccount);
     }
 
     @Override
-    public boolean saveAndCheckCust(Map<String, Object> anValues, String anCoreCustName, Long anCoreCustNo) {
+    public boolean saveAndCheckCust(final Map<String, Object> anValues, final String anCoreCustName, final Long anCoreCustNo) {
 
         return custRelationService.saveAndCheckCust(anValues, anCoreCustName, anCoreCustNo);
     }
 
     @Override
-    public String webQueryFactorRelation(Long anCustNo) {
+    public String webQueryFactorRelation(final Long anCustNo) {
         return AjaxObject.newOk("客户与保理机构关系查询成功", custRelationService.queryFactorRelation(anCustNo)).toJson();
+    }
+
+    @Override
+    public String webQueryOpenedFactor(final Long anCustNo) {
+        return AjaxObject.newOk("客户与保理机构关系查询成功", custRelationService.queryOpenedFactor(anCustNo)).toJson();
     }
 
     @Override
@@ -187,7 +193,7 @@ public class CustRelationDubboService implements ICustRelationService {
     }
 
     @Override
-    public String webSaveCustRelation(Long anCustNo, String anFactorCustList) {
+    public String webSaveCustRelation(final Long anCustNo, final String anFactorCustList) {
         // TODO Auto-generated method stub
         return AjaxObject.newOk("微信客户申请开通保理融资业务成功", custRelationService.saveCustRelation(anCustNo, anFactorCustList)).toJson();
     }

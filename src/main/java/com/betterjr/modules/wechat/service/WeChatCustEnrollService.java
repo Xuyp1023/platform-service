@@ -189,7 +189,7 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         addCustAndCoreRelation(anCustEnrollInfo, custInfo, operator);
 
         // 建立客户与保理公司关系(临时过渡方案)
-        addCustAndFactorRelation(anCustEnrollInfo, custInfo, operator);
+        //addCustAndFactorRelation(anCustEnrollInfo, custInfo, operator);
 
         // 生成银行账户信息
         addBankAccount(anCustEnrollInfo, custInfo);
