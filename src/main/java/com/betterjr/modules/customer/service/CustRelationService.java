@@ -13,11 +13,8 @@ import org.springframework.stereotype.Service;
 import com.betterjr.common.data.SimpleDataEntity;
 import com.betterjr.common.data.WebServiceErrorCode;
 import com.betterjr.common.exception.BytterTradeException;
-
-import com.betterjr.common.mapper.BeanMapper;
-
 import com.betterjr.common.exception.BytterWebServiceException;
-
+import com.betterjr.common.mapper.BeanMapper;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterDateUtils;
@@ -57,6 +54,17 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
 
     @Autowired
     private PlatformAgencyService agencyService;
+
+    /**
+     * 微信端查询当前客户信息
+     * 
+     * @return
+     */
+    public CustInfo findWechatCurrentCustInfo() {
+        final Long custNo = Collections3.getFirst(UserUtils.findCustNoList());
+
+        return custAccountService.selectByPrimaryKey(custNo);
+    }
 
     /**
      * 开通保理融资业务状态
@@ -494,6 +502,42 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         return CustomerConstants.FACTOR_STATUS_SUCCESS;
     }
 
+    /**
+     * 微信端开通保理融资业务申请
+     * 
+     * @param anCustNo
+     * @param anFactorCustList
+     * @return
+     */
+    public String saveCustRelation(final Long anCustNo, final String anFactorCustList) {
+        try {
+            BTAssert.notNull(anCustNo, "请选择操作机构");
+            BTAssert.notNull(anFactorCustList, "请选择保理机构");
+            final CustInfo anCustInfo = custAccountService.selectByPrimaryKey(anCustNo);
+            if (anCustInfo.getIdentValid() == false) {
+                logger.warn("您未进行实名认证,不允许认证");
+                throw new BytterTradeException(40001, "您未进行实名认证,不允许认证");
+            }
+
+            // 获取电子合同服务商信息
+            StringBuffer provider = new StringBuffer();
+            final List<DictItemInfo> anProviderDict = DictUtils.getDictList("ScfElecAgreementGroup");
+            for (final DictItemInfo anDictItem : anProviderDict) {
+                provider.append(anDictItem.getItemValue());
+                provider.append(",");
+            }
+            
+            String anProviderCustList = provider.toString();
+            saveProviderRelation(anCustInfo, anProviderCustList.substring(0, anProviderCustList.length() - 1));
+            saveFactorRelation(anCustInfo, anFactorCustList, "微信端申请开通融资保理业务");
+        }
+        catch (final Exception e) {
+            logger.error("开通保理融资业务申请", e);
+            return CustomerConstants.FACTOR_STATUS_FAILD;
+        }
+        return CustomerConstants.FACTOR_STATUS_SUCCESS;
+    }
+
     private void saveProviderRelation(final CustInfo anCustInfo, final String anProviderCustList) {
         final String[] anProviderCustNoList = anProviderCustList.split(",");
         for (final String anProviderCustNo : anProviderCustNoList) {
@@ -791,7 +835,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
 
         return false;
     }
-	
+
     public CustRelation addWeChatCustAndCoreRelation(final CustInfo anCustInfo, final Long anRelateCustNo, final CustOperatorInfo anOperator) {
         final CustRelation relation = new CustRelation();
         relation.initWeChatValue(anOperator);
@@ -807,28 +851,27 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         return relation;
     }
 
-
     /**
      * 保存保理公司与企业之间的关系
      * 
      * @param anRelation
      */
-    public void saveOrUpdateCustFactor(CustRelation anRelation){
+    public void saveOrUpdateCustFactor(CustRelation anRelation) {
         Map termMap = QueryTermBuilder.newInstance().put("custNo", anRelation.getCustNo()).put("relateCustCorp", anRelation.getRelateCustCorp())
                 .put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR, CustomerConstants.RELATE_TYPE_CORE_FACTOR,
                         CustomerConstants.RELATE_TYPE_SELLER_FACTOR })
                 .build();
         CustRelation tmpRelation = Collections3.getFirst(this.selectByProperty(termMap));
-        anRelation.setRelateType( CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR );
+        anRelation.setRelateType(CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR);
         PlatformAgencyInfo agencyInfo = agencyService.findSaleAgency(anRelation.getRelateCustCorp());
-        if (agencyInfo != null){
-            anRelation.setRelateCustname( agencyInfo.getName() );
-            if (BetterStringUtils.isNotBlank(agencyInfo.getRelaCustNo())){
-                anRelation.setRelateCustno( Long.parseLong( agencyInfo.getRelaCustNo()));
+        if (agencyInfo != null) {
+            anRelation.setRelateCustname(agencyInfo.getName());
+            if (BetterStringUtils.isNotBlank(agencyInfo.getRelaCustNo())) {
+                anRelation.setRelateCustno(Long.parseLong(agencyInfo.getRelaCustNo()));
             }
         }
-        
-        if (tmpRelation != null){
+
+        if (tmpRelation != null) {
             anRelation.initModifyValue(tmpRelation);
             this.updateByPrimaryKey(anRelation);
         }
@@ -854,7 +897,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         workCondition.put("relateCustCorp", anAgencyNo);
         logger.info("findCustNoByScfId parameter: scfId= " + anScfId + ", factorNo=" + anAgencyNo);
         List<CustRelation> workScfFactorList = this.selectByProperty(workCondition);
-        if (Collections3.isEmpty(workScfFactorList)){
+        if (Collections3.isEmpty(workScfFactorList)) {
             logger.info("not find CustNoByScfId");
             return 0L;
         }

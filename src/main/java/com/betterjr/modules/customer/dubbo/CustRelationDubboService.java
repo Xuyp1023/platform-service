@@ -8,11 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.betterjr.common.web.AjaxObject;
 import com.betterjr.modules.customer.ICustRelationService;
-
 import com.betterjr.modules.customer.data.CustRelationData;
-
 import com.betterjr.modules.customer.entity.CustRelation;
-
 import com.betterjr.modules.customer.service.CustRelationAuditService;
 import com.betterjr.modules.customer.service.CustRelationService;
 
@@ -149,16 +146,6 @@ public class CustRelationDubboService implements ICustRelationService {
         return custRelationService.queryCustRelationData(anCustNo, anCreditType);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.betterjr.modules.customer.ICustRelationService#webQueryFactorList()
-     */
-    @Override
-    public String webQueryFactorRelation(Long anCustNo) {
-        return AjaxObject.newOk("客户与保理机构关系查询成功", custRelationService.queryFactorRelation(anCustNo)).toJson();
-    }
-
     @Override
     public String webQueryFactorRelation() {
         return AjaxObject.newOk("客户与保理机构关系查询成功", custRelationService.queryFactorRelation()).toJson();
@@ -186,6 +173,23 @@ public class CustRelationDubboService implements ICustRelationService {
     public boolean saveAndCheckCust(Map<String, Object> anValues, String anCoreCustName, Long anCoreCustNo) {
 
         return custRelationService.saveAndCheckCust(anValues, anCoreCustName, anCoreCustNo);
+    }
+
+    @Override
+    public String webQueryFactorRelation(Long anCustNo) {
+        return AjaxObject.newOk("客户与保理机构关系查询成功", custRelationService.queryFactorRelation(anCustNo)).toJson();
+    }
+
+    @Override
+    public String webFindWechatCurrentCustInfo() {
+        // TODO Auto-generated method stub
+        return AjaxObject.newOk("微信客户信息查询", custRelationService.findWechatCurrentCustInfo()).toJson();
+    }
+
+    @Override
+    public String webSaveCustRelation(Long anCustNo, String anFactorCustList) {
+        // TODO Auto-generated method stub
+        return AjaxObject.newOk("微信客户申请开通保理融资业务成功", custRelationService.saveCustRelation(anCustNo, anFactorCustList)).toJson();
     }
 
 }
