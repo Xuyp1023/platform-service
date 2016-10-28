@@ -863,4 +863,47 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         }
     }
 
+    /**
+     * 根据客户号获得在保理公司的关联号
+     * @param anCustNo 我方系统客户号
+     * @param anAgencyNo 保理公司编码
+     * @return
+     */
+    public String findScfIdByCustNo(Long anCustNo, String anAgencyNo) {
+        Map termMap = new HashMap();
+        termMap.put("custNo", anCustNo);
+        termMap.put("relateCustCorp", anAgencyNo);
+        termMap.put("businStatus", new String[]{"0", "1", "2"});
+        logger.info("findCustNoByScfId parameter: custNo= " + anCustNo + ", factorNo=" + anAgencyNo);
+        CustRelation workCustRelation = Collections3.getFirst( this.selectByProperty(termMap));
+        if (workCustRelation == null) {
+            logger.info("not find findScfIdByCustNo");
+            return " ";
+        }
+        else {
+            return workCustRelation.getPartnerCustNo();
+        }
+    }
+
+    public List<CustRelation> findFactorRelaByCoreCustNo(String anAgencyNo) {
+        Map workCondition = new HashMap();
+        workCondition.put("custNo",  DictUtils.findCoreCustNoList());
+        workCondition.put("relateCustCorp", anAgencyNo);
+
+        return this.selectByProperty(workCondition);
+    }
+
+    /**
+     * 查询状态为处理中的业务，包括1：已申请和5：取消中的关联关系
+     * 
+     * @return
+     */
+    public List<CustRelation> findFactorRelaByRough(String anAgencyNo) {
+        Map workCondition = new HashMap();
+        workCondition.put("businStatus", new String[] { "1", "5" });
+        workCondition.put("relateCustCorp", anAgencyNo);
+
+        return this.selectByProperty(workCondition);
+    }
+    
 }
