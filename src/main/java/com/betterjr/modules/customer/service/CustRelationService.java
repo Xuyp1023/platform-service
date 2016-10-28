@@ -773,8 +773,8 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
     }
 
     private boolean saveUploadModifyValue(Map anTermMap, String anBtNo, Long anCustNo) {
-        CustRelation custRelation = null;
-        custRelation = Collections3.getFirst(this.selectByProperty(anTermMap));
+        List<CustRelation> tmpList = this.selectByProperty(anTermMap);
+        CustRelation custRelation = Collections3.getFirst(tmpList);
         if (custRelation != null) {
             if (BetterStringUtils.isNotBlank(anBtNo)) {
                 custRelation.setBtNo(anBtNo);
@@ -818,7 +818,8 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
                 .put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR, CustomerConstants.RELATE_TYPE_CORE_FACTOR,
                         CustomerConstants.RELATE_TYPE_SELLER_FACTOR })
                 .build();
-        CustRelation tmpRelation = Collections3.getFirst(this.selectByProperty(termMap));
+        List<CustRelation> tmpList = this.selectByProperty(termMap);
+        CustRelation tmpRelation = Collections3.getFirst(tmpList);
         anRelation.setRelateType( CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR );
         PlatformAgencyInfo agencyInfo = agencyService.findSaleAgency(anRelation.getRelateCustCorp());
         if (agencyInfo != null){
@@ -875,7 +876,8 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         termMap.put("relateCustCorp", anAgencyNo);
         termMap.put("businStatus", new String[]{"0", "1", "2"});
         logger.info("findCustNoByScfId parameter: custNo= " + anCustNo + ", factorNo=" + anAgencyNo);
-        CustRelation workCustRelation = Collections3.getFirst( this.selectByProperty(termMap));
+        List<CustRelation> tmpList = this.selectByProperty(termMap);
+        CustRelation workCustRelation = Collections3.getFirst(tmpList);
         if (workCustRelation == null) {
             logger.info("not find findScfIdByCustNo");
             return " ";
