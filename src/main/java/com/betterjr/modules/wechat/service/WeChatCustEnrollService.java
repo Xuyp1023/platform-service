@@ -17,7 +17,7 @@ import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.DictUtils;
-import com.betterjr.common.utils.UserUtils;
+import com.betterjr.common.utils.QueryTermBuilder;
 import com.betterjr.common.utils.reflection.ReflectionUtils;
 import com.betterjr.modules.account.entity.CustContactInfo;
 import com.betterjr.modules.account.entity.CustInfo;
@@ -113,13 +113,45 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
     /**
      * 获取当前微信用户开户信息
      */
-    public CustTempEnrollInfo findCustEnroll() {
-        final Long custNo = Collections3.getFirst(UserUtils.findCustNoList());
-        final CustTempEnrollInfo custEnrollInfo = Collections3.getFirst(this.selectByProperty("custNo", custNo));
-        final Long coreCustNo = custEnrollInfo.getCoreCustNo();
-        if (null != coreCustNo) {
-            custEnrollInfo.setCoreCustName(custAccountService.queryCustName(coreCustNo));
-        }
+    public CustTempEnrollInfo findCustEnroll(String anOpenId) {
+        final CustWeChatInfo weChatInfo = custWeChatService.selectByPrimaryKey(anOpenId);
+        final Long custNo = weChatInfo.getCustNo();
+        CustTempEnrollInfo custEnrollInfo = new CustTempEnrollInfo();
+        // 构架核心企业查询条件
+        Map<String, Object> coreMap = QueryTermBuilder.newInstance().put("custNo", custNo)
+                .put("relateType", CustomerConstants.RELATE_TYPE_SUPPLIER_CORE).put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT).build();
+        CustRelation coreRelation = Collections3.getFirst(custRelationService.selectByProperty(coreMap));
+        // 核心企业编号
+        custEnrollInfo.setCoreCustNo(coreRelation.getRelateCustno());
+        // 核心企业名称
+        custEnrollInfo.setCoreCustName(custAccountService.queryCustName(coreRelation.getRelateCustno()));
+        // 开户企业编号
+        custEnrollInfo.setCustNo(custNo);
+        // 开户企业名称
+        custEnrollInfo.setCustName(custAccountService.queryCustName(custNo));
+        // 营业执照
+        Map<String, Object> custMap = QueryTermBuilder.newInstance().put("custNo", custNo).build();
+        CustMechBusinLicence licence = Collections3.getFirst(custMechBusinLicenceService.selectByProperty(custMap));
+        custEnrollInfo.setIdentNo(licence.getRegNo());
+        // 获取银行账户信息
+        CustMechBankAccount bankAccount = Collections3.getFirst(custMechBankAccountService.selectByProperty(custMap));
+        // 银行账号
+        custEnrollInfo.setBankAccount(bankAccount.getBankAcco());
+        // 开户银行名称
+        custEnrollInfo.setBankName(bankAccount.getBankName());
+        // 获取操作员信息
+        final CustOperatorInfo operator = custOperatorService.selectByPrimaryKey(weChatInfo.getOperId());
+        // 经办人
+        custEnrollInfo.setContName(operator.getName());
+        // 经办人手机
+        custEnrollInfo.setContMobileNo(operator.getMobileNo());
+        // 经办人邮箱
+        custEnrollInfo.setContEmail(operator.getEmail());
+        // 实际经营地址
+        custEnrollInfo.setPremisesAddress(custContactService.selectByPrimaryKey(custNo).getAddress());
+        // 附件信息
+        custEnrollInfo.setBatchNo(Collections3.getFirst(custOpenAccountTmpService.selectByProperty(custMap)).getBatchNo());
+
         return custEnrollInfo;
     }
 
@@ -170,7 +202,7 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         addCusrEnrollInfo(anCustEnrollInfo, custInfo);
 
         // 处理附件,写入文件认证信息表中
-        //addFileAudit(anCustEnrollInfo, new String[] { "bizLicenseFile", "representIdFile" });
+        // addFileAudit(anCustEnrollInfo, new String[] { "bizLicenseFile", "representIdFile" });
 
         // 初始化数字证书信息
         initCustCertinfo(anCustEnrollInfo, operator);

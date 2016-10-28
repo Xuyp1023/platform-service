@@ -18,8 +18,8 @@ public class WeChatCustEnrollDubboService implements IWeChatCustEnrollService {
     private WeChatCustEnrollService weChatCustEnrollService;
 
     @Override
-    public String webFindCustEnroll() {
-        return AjaxObject.newOk("查询用户开户信息成功", weChatCustEnrollService.findCustEnroll()).toJson();
+    public String webFindCustEnroll(String anOpenId) {
+        return AjaxObject.newOk("查询用户开户信息成功", weChatCustEnrollService.findCustEnroll(anOpenId)).toJson();
     }
 
     @Override
