@@ -309,6 +309,7 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         anCustMechBaseInfo.setPhone(anOpenAccountInfo.getPhone());
         anCustMechBaseInfo.setFax(anOpenAccountInfo.getFax());
         anCustMechBaseInfo.setVersion(0l);
+        anCustMechBaseInfo.setZipCode("000000");
 
         custMechBaseService.addCustMechBase(anCustMechBaseInfo, anCustNo);
     }
@@ -414,7 +415,7 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         certInfo.setContIdentType("0");
         certInfo.setContIdentNo("");
         certInfo.setContPhone(anCustEnrollInfo.getContMobileNo());
-        certInfo.setStatus("9");
+        certInfo.setStatus("8"); //微信端开户
         certInfo.setVersionUid("wechat");
         certInfo.setSubject("wechat" + anCustEnrollInfo.getCustNo());
         certInfo.setOperNo("-1");
@@ -456,7 +457,7 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         anOpenAccountInfo.setBusinLicenceRegDate("");
         anOpenAccountInfo.setBusinLicenceValidDate("");
         anOpenAccountInfo.setAddress(anCustEnrollInfo.getPremisesAddress());
-        anOpenAccountInfo.setZipCode("518000");
+        anOpenAccountInfo.setZipCode("000000");
         anOpenAccountInfo.setPhone("");
         anOpenAccountInfo.setFax("");
         anOpenAccountInfo.setEmail(anCustEnrollInfo.getContEmail());
