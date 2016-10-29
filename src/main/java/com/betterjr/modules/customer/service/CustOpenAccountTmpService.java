@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.beanutils.BeanMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -766,6 +767,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         anCustOperatorInfo.setValidDate(anOpenAccountInfo.getOperValiddate());
         anCustOperatorInfo.setStatus("1");
         anCustOperatorInfo.setLastStatus("1");
+        anCustOperatorInfo.setClerkMan("2");
         // anCustOperatorInfo.setSex(IdcardUtils.getGenderByIdCard(anCustOperatorInfo.getIdentNo(), anCustOperatorInfo.getIdentType()));
         anCustOperatorInfo.setRegDate(BetterDateUtils.getNumDate());
         anCustOperatorInfo.setModiDate(BetterDateUtils.getNumDateTime());
@@ -958,5 +960,22 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         BTAssert.notNull(anOpenAccountInfo.getLawIdentNo(), "法人证件号码不能为空");
         BTAssert.notNull(anOpenAccountInfo.getLawValidDate(), "法人证件有效期不能为空");
     }
-
+ 
+    /**
+     *读取开户的临时文件信息，用于远程开通业务
+     * @param anCustNo 客户编号
+     * @return
+     */
+    public Map<String, Object> findOpenTempAccountInfo(Long anCustNo){
+        Map<String, Object> result = null;
+        if(anCustNo != null && anCustNo.longValue() > 10){
+           List<CustOpenAccountTmp> tmpList = this.selectByProperty("custNo", anCustNo);
+           if (Collections3.isEmpty(tmpList) == false){
+              CustOpenAccountTmp tmpAccount = Collections3.getFirst(tmpList);
+              return  BeanMapper.map(tmpAccount, HashMap.class);
+           }
+        }
+        
+        return new HashMap();
+    }
 }

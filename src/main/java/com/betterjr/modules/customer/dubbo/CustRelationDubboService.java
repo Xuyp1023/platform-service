@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.betterjr.common.data.SimpleDataEntity;
 import com.betterjr.common.web.AjaxObject;
 import com.betterjr.modules.customer.ICustRelationService;
 
@@ -186,6 +187,66 @@ public class CustRelationDubboService implements ICustRelationService {
     public boolean saveAndCheckCust(Map<String, Object> anValues, String anCoreCustName, Long anCoreCustNo) {
 
         return custRelationService.saveAndCheckCust(anValues, anCoreCustName, anCoreCustNo);
+    }
+
+    @Override
+    public Long findCustNoByScfId(String anScfId, String anAgencyNo) {
+
+        return custRelationService.findCustNoByScfId(anScfId, anAgencyNo);
+    }
+
+    @Override
+    public String findScfIdByCustNo(Long anCustNo, String anAgencyNo) {
+
+        return this.custRelationService.findScfIdByCustNo(anCustNo, anAgencyNo);
+    }
+
+    @Override
+    public List<CustRelation> findFactorRelaByCoreCustNo(String anAgencyNo) {
+
+        return custRelationService.findFactorRelaByCoreCustNo(anAgencyNo);
+    }
+
+    @Override
+    public List<CustRelation> findFactorRelaByRough(String anAgencyNo) {
+
+        return custRelationService.findFactorRelaByRough(anAgencyNo);
+    }
+
+    @Override
+    public void saveOrUpdateCustFactor(CustRelation anRelation) {
+
+        custRelationService.saveOrUpdateCustFactor(anRelation);
+    }
+
+    @Override
+    public List<CustRelation> findAppAccountRequest() {
+
+        return custRelationService.findAppAccountRequest();
+    }
+
+    @Override
+    public CustRelation findByRelationId(Long anRelationId) {
+
+        return custRelationService.findByRelationId(anRelationId);
+    }
+
+    @Override
+    public String checkCoreCustomer(Long anCustNo, String anAgencyNo) {
+
+        return custRelationService.checkCoreCustomer(anCustNo, anAgencyNo);
+    }
+
+    @Override
+    public void saveFactorRelationInfo(Long anId, String anScfId, String anStatus) {
+
+        custRelationService.saveFactorRelationInfo(anId, anScfId, anStatus);
+    }
+
+    @Override
+    public String webQuerySimpleDataByFactorAndCore(Long anCoreCustNo){
+
+        return AjaxObject.newOk("查询开通保理业务对应核心企业成功", custRelationService.querySimpleDataByFactorAndCore(anCoreCustNo)).toJson();
     }
 
 }

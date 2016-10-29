@@ -100,4 +100,9 @@ public class CustOpenAccountDubboService implements ICustOpenAccountService {
         return AjaxObject.newOk("开户审批流程查询成功", custOpenAccountAuditService.queryAuditWorkflowById(anOpenAccountId)).toJson();
     }
 
+    @Override
+    public Map<String, Object> findOpenTempAccountInfo(Long anCustNo){
+
+        return custOpenAccountTmpService.findOpenTempAccountInfo(anCustNo);
+    }
 }
