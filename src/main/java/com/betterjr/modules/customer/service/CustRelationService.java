@@ -199,8 +199,11 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
      * @param anFactorNo
      * @return
      */
-    public List<SimpleDataEntity> queryFactorCoreRelation(final Long anFactorNo) {
+    public List<SimpleDataEntity> queryFactorCoreRelation(  Long anFactorNo) {
         final List<SimpleDataEntity> result = new ArrayList<SimpleDataEntity>();
+        if (MathExtend.smallValue(anFactorNo)){
+            anFactorNo = Collections3.getFirst(UserUtils.findCustNoList());
+        }
         if (null == anFactorNo) {
             return result;
         }
@@ -213,6 +216,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         }
         return result;
     }
+
 
     /**
      * 保理机构下拉列表查询,适用于供应商/经销商/核心企业相关查询
