@@ -2,17 +2,26 @@ package com.betterjr.modules.customer.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.rocketmq.client.producer.SendResult;
+import com.alibaba.rocketmq.client.producer.SendStatus;
 import com.betterjr.common.data.SimpleDataEntity;
 import com.betterjr.common.data.WebServiceErrorCode;
 import com.betterjr.common.exception.BytterTradeException;
+
+import com.betterjr.common.mapper.BeanMapper;
+import com.betterjr.common.mq.codec.MQCodecType;
+import com.betterjr.common.mq.core.RocketMQProducer;
+import com.betterjr.common.mq.message.MQMessage;
 import com.betterjr.common.exception.BytterWebServiceException;
 import com.betterjr.common.mapper.BeanMapper;
 import com.betterjr.common.service.BaseService;
@@ -35,6 +44,8 @@ import com.betterjr.modules.customer.dao.CustRelationMapper;
 import com.betterjr.modules.customer.data.CustRelationData;
 import com.betterjr.modules.customer.entity.CustRelation;
 import com.betterjr.modules.customer.entity.PlatformAgencyInfo;
+import com.betterjr.modules.notification.constants.NotificationConstants;
+import com.betterjr.modules.notification.entity.Notification;
 import com.betterjr.modules.sys.entity.DictItemInfo;
 
 @Service
@@ -54,6 +65,9 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
 
     @Autowired
     private PlatformAgencyService agencyService;
+
+    @Resource(name = "betterProducer")
+    private RocketMQProducer betterProducer;
 
     /**
      * 微信端查询当前客户信息
@@ -771,7 +785,6 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         }
 
         return false;
-
     }
 
     /**
@@ -883,14 +896,15 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
      *
      * @param anRelation
      */
-    public void saveOrUpdateCustFactor(final CustRelation anRelation) {
-        final Map termMap = QueryTermBuilder.newInstance().put("custNo", anRelation.getCustNo()).put("relateCustCorp", anRelation.getRelateCustCorp())
+    public void saveOrUpdateCustFactor(CustRelation anRelation) {
+        Map termMap = QueryTermBuilder.newInstance().put("custNo", anRelation.getCustNo()).put("relateCustCorp", anRelation.getRelateCustCorp())
                 .put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR, CustomerConstants.RELATE_TYPE_CORE_FACTOR,
                         CustomerConstants.RELATE_TYPE_SELLER_FACTOR })
                 .build();
-        final CustRelation tmpRelation = Collections3.getFirst(this.selectByProperty(termMap));
+        List<CustRelation> tmpList = this.selectByProperty(termMap);
+        CustRelation tmpRelation = Collections3.getFirst(tmpList);
         anRelation.setRelateType(CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR);
-        final PlatformAgencyInfo agencyInfo = agencyService.findSaleAgency(anRelation.getRelateCustCorp());
+        PlatformAgencyInfo agencyInfo = agencyService.findSaleAgency(anRelation.getRelateCustCorp());
         if (agencyInfo != null) {
             anRelation.setRelateCustname(agencyInfo.getName());
             if (BetterStringUtils.isNotBlank(agencyInfo.getRelaCustNo())) {
@@ -923,7 +937,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         workCondition.put("partnerCustNo", anScfId);
         workCondition.put("relateCustCorp", anAgencyNo);
         logger.info("findCustNoByScfId parameter: scfId= " + anScfId + ", factorNo=" + anAgencyNo);
-        final List<CustRelation> workScfFactorList = this.selectByProperty(workCondition);
+        List<CustRelation> workScfFactorList = this.selectByProperty(workCondition);
         if (Collections3.isEmpty(workScfFactorList)) {
             logger.info("not find CustNoByScfId");
             return 0L;
@@ -935,15 +949,18 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
 
     /**
      * 根据客户号获得在保理公司的关联号
-     * @param anCustNo 我方系统客户号
-     * @param anAgencyNo 保理公司编码
+     * 
+     * @param anCustNo
+     *            我方系统客户号
+     * @param anAgencyNo
+     *            保理公司编码
      * @return
      */
     public String findScfIdByCustNo(final Long anCustNo, final String anAgencyNo) {
         final Map termMap = new HashMap();
         termMap.put("custNo", anCustNo);
         termMap.put("relateCustCorp", anAgencyNo);
-        termMap.put("businStatus", new String[]{"0", "1", "2"});
+        termMap.put("businStatus", new String[] { "0", "1", "2" });
         logger.info("findCustNoByScfId parameter: custNo= " + anCustNo + ", factorNo=" + anAgencyNo);
         final List<CustRelation> tmpList = this.selectByProperty(termMap);
         final CustRelation workCustRelation = Collections3.getFirst(tmpList);
@@ -956,9 +973,15 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         }
     }
 
-    public List<CustRelation> findFactorRelaByCoreCustNo(final String anAgencyNo) {
-        final Map workCondition = new HashMap();
-        workCondition.put("custNo",  DictUtils.findCoreCustNoList());
+    /**
+     * 查询核心企业关联的保理机构，用于获取核心企业额度信息
+     * 
+     * @param anAgencyNo
+     * @return
+     */
+    public List<CustRelation> findFactorRelaByCoreCustNo(String anAgencyNo) {
+        Map workCondition = new HashMap();
+        workCondition.put("custNo", DictUtils.findCoreCustNoList());
         workCondition.put("relateCustCorp", anAgencyNo);
 
         return this.selectByProperty(workCondition);
@@ -969,12 +992,149 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
      *
      * @return
      */
-    public List<CustRelation> findFactorRelaByRough(final String anAgencyNo) {
-        final Map workCondition = new HashMap();
-        workCondition.put("businStatus", new String[] { "1", "5" });
+    public List<CustRelation> findFactorRelaByRough(String anAgencyNo) {
+        Map workCondition = new HashMap();
+        workCondition.put("businStatus", new String[] { "2", "5" });
         workCondition.put("relateCustCorp", anAgencyNo);
 
         return this.selectByProperty(workCondition);
     }
 
+    /**
+     * 查询需要调用远程开户接口的信息
+     * 
+     * @return
+     */
+    public List<CustRelation> findAppAccountRequest() {
+        Map termMap = QueryTermBuilder.newInstance().put("businStatus", "1").put("relateType", new String[] { "0", "1", "2" }).build();
+
+        return selectByProperty(termMap);
+    }
+
+    /**
+     * 根据ID，查找单个关联信息
+     * 
+     * @param anRelationId
+     * @return
+     */
+    public CustRelation findByRelationId(Long anRelationId) {
+
+        return this.selectByPrimaryKey(anRelationId);
+    }
+
+    private void processOpenScf(final CustRelation anCustRelation) {
+        final MQMessage message = new MQMessage(CustomerConstants.CUSTOMER_OPEN_SCF_ACCOUNT, MQCodecType.FST);
+        message.setObject(anCustRelation);
+        try {
+            final SendResult sendResult = betterProducer.sendMessage(message);
+
+            if (sendResult.getSendStatus().equals(SendStatus.SEND_OK) == false) {
+                logger.warn("消息通知发送失败 SendResult=" + sendResult.toString());
+            }
+        }
+        catch (final Exception e) {
+            logger.error("消息通知发送错误", e);
+        }
+    }
+
+    /**
+     * 查找企业对应在资金方核心企业开户的信息
+     * 
+     * @param anCustNo
+     * @param anAgencyNo
+     * @return
+     */
+    public String findCustCoreNoByCustNo(Long anCustNo, String anAgencyNo) {
+        Map termMap = QueryTermBuilder.newInstance().put("custNo", anCustNo)
+                .put("businStatus",
+                        new String[] { CustomerConstants.RELATE_STATUS_APPLY, CustomerConstants.RELATE_STATUS_ACCEPT,
+                                CustomerConstants.RELATE_STATUS_AUDIT })
+                .put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_CORE, CustomerConstants.RELATE_TYPE_SELLER_CORE }).build();
+        List<CustRelation> tmpList = this.selectByProperty(termMap);
+        Set<Long> tmpCustNoSet = new HashSet<>();
+        for (CustRelation tmpRelation : tmpList) {
+            tmpCustNoSet.add(tmpRelation.getRelateCustno());
+        }
+        if (Collections3.isEmpty(tmpCustNoSet)) {
+            return "";
+        }
+        termMap = QueryTermBuilder.newInstance().put("custNo", tmpCustNoSet)
+                .put("relateCustCorp", anAgencyNo).put("businStatus", new String[] { CustomerConstants.RELATE_STATUS_APPLY,
+                        CustomerConstants.RELATE_STATUS_ACCEPT, CustomerConstants.RELATE_STATUS_AUDIT })
+                .put("relateType", CustomerConstants.RELATE_TYPE_CORE_FACTOR).build();
+        tmpList = this.selectByProperty(termMap);
+        StringBuilder sb = new StringBuilder();
+        for (CustRelation tmpRelation : tmpList) {
+            sb.append(String.valueOf(tmpRelation.getCustNo())).append(",");
+        }
+        if (sb.length() > 1) {
+            sb.setLength(sb.length() - 1);
+        }
+        return sb.toString();
+    }
+
+    /**
+     * 判断开户的是否是核心企业；客户类型：1 供应商开户 2 核心企业开户
+     * 
+     * @param anCustNo
+     *            企业编码
+     * @param anAgencyNo
+     *            合作机构代码
+     * @return
+     */
+    public String checkCoreCustomer(Long anCustNo, String anAgencyNo) {
+        Map termMap = QueryTermBuilder.newInstance().put("relateCustCorp", anAgencyNo).put("custNo", anCustNo)
+                .put("relateType", CustomerConstants.RELATE_TYPE_CORE_FACTOR).build();
+        List tmpList = this.selectByProperty(termMap);
+        if (Collections3.isEmpty(tmpList)) {
+            return "1";
+        }
+        else {
+            return "2";
+        }
+    }
+
+    /**
+     * 保存远程调用的接口信息
+     * 
+     * @param anId
+     *            关系ID
+     * @param anScfId
+     *            远端的客户信息
+     * @param anStatus
+     *            处理状态
+     */
+    public void saveFactorRelationInfo(Long anId, String anScfId, String anStatus) {
+        CustRelation custRelation = this.selectByPrimaryKey(anId);
+        if (custRelation != null) {
+            custRelation.setPartnerCustNo(anScfId);
+            custRelation.setBusinStatus(anStatus);
+            custRelation.modifyValue((CustOperatorInfo) null);
+            this.updateByPrimaryKey(custRelation);
+        }
+    }
+
+    /**
+     * 保理机构客户查询,适用于根据核心企业，查询关联保理机构的供应商或经销商
+     *
+     * @param anCoreCustNo
+     * @return
+     */
+    public List<SimpleDataEntity> querySimpleDataByFactorAndCore(final Long anCoreCustNo) {
+        List<SimpleDataEntity> result = new ArrayList<SimpleDataEntity>();
+        if (null == anCoreCustNo) {
+            return result;
+        }
+        List<Long> custNoList = UserUtils.findCustNoList();
+        String tmpFactorNo = "-1";
+        if (Collections3.isEmpty(custNoList) == false) {
+            tmpFactorNo = BetterStringUtils.join(custNoList.toArray(), ",");
+        }
+        for (CustRelation relation : mapper.findDataByFactorAndCore(anCoreCustNo, tmpFactorNo)) {
+            result.add(new SimpleDataEntity(relation.getCustName(), String.valueOf(relation.getCustNo())));
+        }
+        return result;
+    }
+
 }
+
