@@ -16,7 +16,6 @@ import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.QueryTermBuilder;
-import com.betterjr.common.utils.reflection.ReflectionUtils;
 import com.betterjr.modules.account.entity.CustContactInfo;
 import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
@@ -51,7 +50,6 @@ import com.betterjr.modules.wechat.entity.CustWeChatInfo;
 import com.betterjr.modules.wechat.entity.SaleAccoBankInfo;
 import com.betterjr.modules.wechat.entity.ScfRelation;
 import com.betterjr.modules.wechat.entity.ScfSupplierBank;
-import com.google.common.collect.Multimap;
 
 @Service
 public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMapper, CustTempEnrollInfo> {
