@@ -8,7 +8,6 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.apache.commons.beanutils.BeanMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -647,6 +646,8 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         anCustMechBaseInfo.setPhone(anOpenAccountInfo.getPhone());
         anCustMechBaseInfo.setFax(anOpenAccountInfo.getFax());
         anCustMechBaseInfo.setVersion(0l);
+        anCustMechBaseInfo.setZipCode(anCustMechBaseInfo.getZipCode());
+        
         custMechBaseService.addCustMechBase(anCustMechBaseInfo, anCustNo);
     }
 
