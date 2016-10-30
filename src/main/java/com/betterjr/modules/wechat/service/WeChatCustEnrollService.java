@@ -209,18 +209,20 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         BTAssert.notNull(anOpenAccountInfo, "无法获取客户开户资料信息");
         // 检查开户资料合法性
         custOpenAccountTmpService.checkAccountInfoValid(anOpenAccountInfo);
-        // 生成开户数据
-        createWeChatValidAccount(anOpenAccountInfo, anOpenAccountInfo.getRegOperId(), anOpenAccountInfo.getRegOperName(),
-                anOpenAccountInfo.getOperOrg(), anFileList);
-        // 设置状态为已使用
-        anOpenAccountInfo.setBusinStatus(CustomerConstants.TMP_STATUS_USED);
-        anOpenAccountInfo.setLastStatus(CustomerConstants.TMP_STATUS_USED);
-        // 审核日期
-        anOpenAccountInfo.setAuditDate(BetterDateUtils.getNumDate());
-        // 审核时间
-        anOpenAccountInfo.setAuditTime(BetterDateUtils.getNumTime());
-        // 更新数据
-        custOpenAccountTmpService.updateByPrimaryKeySelective(anOpenAccountInfo);
+        if(BetterStringUtils.equals(anOpenAccountInfo.getBusinStatus(), CustomerConstants.TMP_STATUS_USEING)){
+            // 生成开户数据
+            createWeChatValidAccount(anOpenAccountInfo, anOpenAccountInfo.getRegOperId(), anOpenAccountInfo.getRegOperName(),
+                    anOpenAccountInfo.getOperOrg(), anFileList);
+            // 设置状态为已使用
+            anOpenAccountInfo.setBusinStatus(CustomerConstants.TMP_STATUS_USED);
+            anOpenAccountInfo.setLastStatus(CustomerConstants.TMP_STATUS_USED);
+            // 审核日期
+            anOpenAccountInfo.setAuditDate(BetterDateUtils.getNumDate());
+            // 审核时间
+            anOpenAccountInfo.setAuditTime(BetterDateUtils.getNumTime());
+            // 更新数据
+            custOpenAccountTmpService.updateByPrimaryKeySelective(anOpenAccountInfo);
+        }
 
         return anOpenAccountInfo;
     }
@@ -476,8 +478,8 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         anOpenAccountInfo.setLawIdentNo("");
         anOpenAccountInfo.setLawValidDate("");
         anOpenAccountInfo.setBatchNo(anCustEnrollInfo.getBatchNo());
-        anOpenAccountInfo.setBusinStatus(CustomerConstants.TMP_STATUS_USED);
-        anOpenAccountInfo.setLastStatus(CustomerConstants.TMP_STATUS_USED);
+        anOpenAccountInfo.setBusinStatus(CustomerConstants.TMP_STATUS_USEING);
+        anOpenAccountInfo.setLastStatus(CustomerConstants.TMP_STATUS_USEING);
         anOpenAccountInfo.setTmpType(CustomerConstants.TMP_TYPE_TEMPSTORE);
         anOpenAccountInfo.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_ADD);
         anOpenAccountInfo.setOrgCode("");
@@ -574,7 +576,7 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         List<CustFileItem> licenseList = new ArrayList<CustFileItem>();
         List<CustFileItem> representList = new ArrayList<CustFileItem>();
         for (String fileId : anFileList.split(",")) {
-            CustFileItem fileItem = custFileItemService.selectByPrimaryKey(fileId);
+            CustFileItem fileItem = custFileItemService.selectByPrimaryKey(Long.valueOf(fileId));
             String fileInfoType = fileItem.getFileInfoType();
             // 企业营业执照
             if (BetterStringUtils.equals(fileInfoType, "bizLicenseFile")) {
