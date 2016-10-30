@@ -576,7 +576,7 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         List<CustFileItem> licenseList = new ArrayList<CustFileItem>();
         List<CustFileItem> representList = new ArrayList<CustFileItem>();
         for (String fileId : anFileList.split(",")) {
-            CustFileItem fileItem = custFileItemService.selectByPrimaryKey(Long.valueOf(fileId));
+            CustFileItem fileItem = custFileItemService.selectByPrimaryKey(Long.valueOf(fileId.trim()));
             String fileInfoType = fileItem.getFileInfoType();
             // 企业营业执照
             if (BetterStringUtils.equals(fileInfoType, "bizLicenseFile")) {
