@@ -209,7 +209,7 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         BTAssert.notNull(anOpenAccountInfo, "无法获取客户开户资料信息");
         // 检查开户资料合法性
         custOpenAccountTmpService.checkAccountInfoValid(anOpenAccountInfo);
-        if(BetterStringUtils.equals(anOpenAccountInfo.getBusinStatus(), CustomerConstants.TMP_STATUS_USEING)){
+        if (BetterStringUtils.equals(anOpenAccountInfo.getBusinStatus(), CustomerConstants.TMP_STATUS_USEING)) {
             // 生成开户数据
             createWeChatValidAccount(anOpenAccountInfo, anOpenAccountInfo.getRegOperId(), anOpenAccountInfo.getRegOperName(),
                     anOpenAccountInfo.getOperOrg(), anFileList);
@@ -603,9 +603,23 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
 
     private void addCustFileItem(final CustFileItem anCustFileItem, final Long anBatchNo) {
         final CustFileItem fileItem = new CustFileItem();
-        BeanMapper.copy(anCustFileItem, fileItem);
-        fileItem.setBatchNo(anBatchNo);
         fileItem.setId(SerialGenerator.getLongValue("CustFileItem.id"));
+        fileItem.setBatchNo(anBatchNo);
+        fileItem.setFileName(anCustFileItem.getFileName());
+        fileItem.setFileType(anCustFileItem.getFileType());
+        fileItem.setFileNo(anCustFileItem.getFileNo());
+        fileItem.setFilePath(anCustFileItem.getFilePath());
+        fileItem.setFileLength(anCustFileItem.getFileLength());
+        fileItem.setRegDate(anCustFileItem.getRegDate());
+        fileItem.setRegTime(anCustFileItem.getRegTime());
+        fileItem.setFileInfoType(anCustFileItem.getFileInfoType());
+        fileItem.setRegOperId(anCustFileItem.getRegOperId());
+        fileItem.setRegOperName(anCustFileItem.getRegOperName());
+        fileItem.setModiOperId(anCustFileItem.getModiOperId());
+        fileItem.setModiOperName(anCustFileItem.getModiOperName());
+        fileItem.setModiDate(anCustFileItem.getModiDate());
+        fileItem.setModiTime(anCustFileItem.getModiTime());
+        fileItem.setOperOrg(anCustFileItem.getOperOrg());
         custFileItemService.insert(fileItem);
     }
 
