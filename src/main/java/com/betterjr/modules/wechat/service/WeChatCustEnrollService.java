@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.exception.BytterTradeException;
-import com.betterjr.common.mapper.BeanMapper;
 import com.betterjr.common.selectkey.SerialGenerator;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
@@ -47,7 +46,6 @@ import com.betterjr.modules.document.utils.CustFileClientUtils;
 import com.betterjr.modules.wechat.dao.CustTempEnrollInfoMapper;
 import com.betterjr.modules.wechat.entity.CustTempEnrollInfo;
 import com.betterjr.modules.wechat.entity.CustWeChatInfo;
-import com.betterjr.modules.wechat.entity.SaleAccoBankInfo;
 import com.betterjr.modules.wechat.entity.ScfRelation;
 import com.betterjr.modules.wechat.entity.ScfSupplierBank;
 
@@ -65,9 +63,6 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
 
     @Autowired
     private CustContactService custContactService;
-
-    @Autowired
-    private SaleAccoBankService saleAccoBankService;
 
     @Autowired
     private CustRelationService custRelationService;
@@ -523,27 +518,6 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
     }
 
     private void addBankAccount(final CustTempEnrollInfo anCustEnrollInfo, final CustInfo anCustInfo) {
-        final SaleAccoBankInfo saleBankAccount = new SaleAccoBankInfo();
-        saleBankAccount.setMoneyAccount(SerialGenerator.getMoneyAccountID());
-        saleBankAccount.setCustNo(anCustInfo.getCustNo());
-        saleBankAccount.setTradeAccount("");
-        saleBankAccount.setBankName(anCustEnrollInfo.getBankName());
-        saleBankAccount.setBankAccount(anCustEnrollInfo.getBankAccount());
-        saleBankAccount.setBankAcountName(anCustEnrollInfo.getCustName());
-        saleBankAccount.setBranchBank("");
-        saleBankAccount.setBankNo("0");
-        saleBankAccount.setNetNo("");
-        saleBankAccount.setIdentType("1");
-        saleBankAccount.setIdentNo("");
-        saleBankAccount.setRegDate(BetterDateUtils.getNumDate());
-        saleBankAccount.setModiDate(BetterDateUtils.getNumDate());
-        saleBankAccount.setStatus("4");
-        saleBankAccount.setLastStatus("0");
-        saleBankAccount.setAuthStatus("1");
-        saleBankAccount.setSignStatus(Boolean.TRUE);
-        saleBankAccount.setFlag("0");
-        saleAccoBankService.insert(saleBankAccount);
-
         final ScfSupplierBank bankAccount = new ScfSupplierBank();
         bankAccount.fillDefaultValue();
         bankAccount.setCustNo(anCustInfo.getCustNo());
@@ -554,8 +528,6 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         bankAccount.setBankName(anCustEnrollInfo.getBankName());
         bankAccount.setOperOrg(anCustInfo.getOperOrg());
         scfSupplierBankService.insert(bankAccount);
-
-        // TODO 银行账号信息 CustMechBankAccount
     }
 
     /**
