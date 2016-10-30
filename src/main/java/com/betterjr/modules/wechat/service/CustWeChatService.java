@@ -187,6 +187,7 @@ public class CustWeChatService extends BaseService<CustWeChatInfoMapper, CustWeC
                 wechatInfo.setOperId(anCustOperator.getId());
                 wechatInfo.setOperName(anCustOperator.getName());
                 wechatInfo.setOperOrg(anCustOperator.getOperOrg());
+                wechatInfo.setCustNo(UserUtils.getDefCustInfo().getCustNo());
                 wechatInfo.setBusinStatus("1");
                 wechatInfo.modifyValue(anCustOperator);
                 this.updateByPrimaryKey(wechatInfo);
