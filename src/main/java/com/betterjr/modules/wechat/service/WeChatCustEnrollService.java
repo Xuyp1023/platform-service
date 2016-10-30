@@ -568,8 +568,8 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         }
         // 处理法人身份证附件,写入认证表
         final Long representBatchNo = CustFileClientUtils.findBatchNo();
-        addCustFileAduit(anCustInfo.getCustNo(), representBatchNo, licenseList.size(), "representIdFile", anCustInfo.getOperOrg());
-        for (CustFileItem fileItem : licenseList) {
+        addCustFileAduit(anCustInfo.getCustNo(), representBatchNo, representList.size(), "representIdFile", anCustInfo.getOperOrg());
+        for (CustFileItem fileItem : representList) {
             addCustFileItem(fileItem, representBatchNo);
         }
     }
