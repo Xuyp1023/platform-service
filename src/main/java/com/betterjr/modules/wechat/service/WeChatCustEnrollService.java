@@ -15,6 +15,7 @@ import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.QueryTermBuilder;
+import com.betterjr.common.utils.UserUtils;
 import com.betterjr.modules.account.entity.CustContactInfo;
 import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
@@ -105,7 +106,7 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
      */
     public CustTempEnrollInfo findCustEnroll(final String anOpenId) {
         final CustWeChatInfo weChatInfo = custWeChatService.selectByPrimaryKey(anOpenId);
-        final Long custNo = weChatInfo.getCustNo();
+        final Long custNo = UserUtils.getDefCustInfo().getCustNo();
         final CustTempEnrollInfo custEnrollInfo = new CustTempEnrollInfo();
         // 构架核心企业查询条件
         final Map<String, Object> coreMap = QueryTermBuilder.newInstance().put("custNo", custNo)
