@@ -277,18 +277,20 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         BTAssert.notNull(anOpenAccountInfo, "无法获取客户开户资料信息");
         // 检查开户资料合法性
         checkAccountInfoValid(anOpenAccountInfo);
-        // 生成开户数据
-        createWeChatValidAccount(anOpenAccountInfo, anOpenAccountInfo.getRegOperId(), anOpenAccountInfo.getRegOperName(),
-                anOpenAccountInfo.getOperOrg());
-        // 设置状态为已使用
-        anOpenAccountInfo.setBusinStatus(CustomerConstants.TMP_STATUS_USED);
-        anOpenAccountInfo.setLastStatus(CustomerConstants.TMP_STATUS_USED);
-        // 审核日期
-        anOpenAccountInfo.setAuditDate(BetterDateUtils.getNumDate());
-        // 审核时间
-        anOpenAccountInfo.setAuditTime(BetterDateUtils.getNumTime());
-        // 更新数据
-        this.updateByPrimaryKeySelective(anOpenAccountInfo);
+        if (BetterStringUtils.equals(anOpenAccountInfo.getBusinStatus(), CustomerConstants.TMP_STATUS_USEING)) {
+            // 生成开户数据
+            createWeChatValidAccount(anOpenAccountInfo, anOpenAccountInfo.getRegOperId(), anOpenAccountInfo.getRegOperName(),
+                    anOpenAccountInfo.getOperOrg());
+            // 设置状态为已使用
+            anOpenAccountInfo.setBusinStatus(CustomerConstants.TMP_STATUS_USED);
+            anOpenAccountInfo.setLastStatus(CustomerConstants.TMP_STATUS_USED);
+            // 审核日期
+            anOpenAccountInfo.setAuditDate(BetterDateUtils.getNumDate());
+            // 审核时间
+            anOpenAccountInfo.setAuditTime(BetterDateUtils.getNumTime());
+            // 更新数据
+            this.updateByPrimaryKeySelective(anOpenAccountInfo);
+        }
 
         return anOpenAccountInfo;
     }
@@ -308,34 +310,63 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         BTAssert.notNull(anOpenAccountInfo, "无法获取客户开户资料信息");
         // 检查开户资料合法性
         checkAccountInfoValid(anOpenAccountInfo);
-        // 生成开户数据
-        createValidAccount(anOpenAccountInfo, anOpenAccountInfo.getRegOperId(), anOpenAccountInfo.getRegOperName(), anOpenAccountInfo.getOperOrg());
-        // 设置状态为已使用
-        anOpenAccountInfo.setBusinStatus(CustomerConstants.TMP_STATUS_USED);
-        anOpenAccountInfo.setLastStatus(CustomerConstants.TMP_STATUS_USED);
-        // 审核日期
-        anOpenAccountInfo.setAuditDate(BetterDateUtils.getNumDate());
-        // 审核时间
-        anOpenAccountInfo.setAuditTime(BetterDateUtils.getNumTime());
-        // 更新数据
-        this.updateByPrimaryKeySelective(anOpenAccountInfo);
-        // 写入开户日志
-        custOpenAccountAuditService.addAuditOpenAccountApplyLog(anOpenAccountInfo.getId(), anAuditOpinion, "开户审核");
+        if (BetterStringUtils.equals(anOpenAccountInfo.getBusinStatus(), CustomerConstants.TMP_STATUS_USEING)) {
+            // 生成开户数据
+            createValidAccount(anOpenAccountInfo, anOpenAccountInfo.getRegOperId(), anOpenAccountInfo.getRegOperName(),
+                    anOpenAccountInfo.getOperOrg());
+            // 设置状态为已使用
+            anOpenAccountInfo.setBusinStatus(CustomerConstants.TMP_STATUS_USED);
+            anOpenAccountInfo.setLastStatus(CustomerConstants.TMP_STATUS_USED);
+            // 审核日期
+            anOpenAccountInfo.setAuditDate(BetterDateUtils.getNumDate());
+            // 审核时间
+            anOpenAccountInfo.setAuditTime(BetterDateUtils.getNumTime());
+            // 更新数据
+            this.updateByPrimaryKeySelective(anOpenAccountInfo);
+            // 写入开户日志
+            custOpenAccountAuditService.addAuditOpenAccountApplyLog(anOpenAccountInfo.getId(), anAuditOpinion, "开户审核");
 
-        // 发消息
-        final MQMessage anMessage = new MQMessage("CUSTOMER_OPENACCOUNT_TOPIC");
-        try {
-            anMessage.setObject(anOpenAccountInfo);
-            anMessage.addHead("type", "1");// 开户成功
-            anMessage.addHead("operator", UserUtils.getOperatorInfo());
-            betterProducer.sendMessage(anMessage);
-        }
-        catch (final Exception e) {
-            logger.error("异步消息发送失败！", e);
+            // 发消息
+            final MQMessage anMessage = new MQMessage("CUSTOMER_OPENACCOUNT_TOPIC");
+            try {
+                anMessage.setObject(anOpenAccountInfo);
+                anMessage.addHead("type", "1");// 开户成功
+                anMessage.addHead("operator", UserUtils.getOperatorInfo());
+                betterProducer.sendMessage(anMessage);
+            }
+            catch (final Exception e) {
+                logger.error("异步消息发送失败！", e);
+            }
         }
         return anOpenAccountInfo;
     }
 
+    /**
+     * 客户确认开户
+     */
+    @Override
+    public void saveFormalData(final Long anParentId) {
+        BTAssert.notNull(anParentId, "代录记录流水号不允许为空！");
+        // 获取客户开户资料信息
+        final CustOpenAccountTmp anOpenAccountInfo = Collections3.getFirst(this.selectByProperty("parentId", anParentId));
+        BTAssert.notNull(anOpenAccountInfo, "无法获取客户开户资料信息");
+        // 检查开户资料合法性
+        checkAccountInfoValid(anOpenAccountInfo);
+        if (BetterStringUtils.equals(anOpenAccountInfo.getBusinStatus(), CustomerConstants.TMP_STATUS_USEING)) {
+            // 生成开户数据
+            createValidAccount(anOpenAccountInfo, UserUtils.getOperatorInfo().getId(), UserUtils.getOperatorInfo().getName(),
+                    UserUtils.getOperatorInfo().getOperOrg());
+            // 更新数据
+            this.updateByPrimaryKeySelective(anOpenAccountInfo);
+
+            // 回写暂存流水号至代录申请表
+            final CustInsteadRecord insteadRecord = custInsteadRecordService.findInsteadRecord(anParentId);
+
+            custInsteadApplyService.saveCustInsteadApplyCustInfo(insteadRecord.getApplyId(), anOpenAccountInfo.getCustNo(),
+                    anOpenAccountInfo.getCustName());
+        }
+    }
+    
     /**
      * 开户申请驳回
      *
@@ -448,30 +479,6 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         BTAssert.notNull(anTempId, "无法获取客户开户资料信息");
 
         return this.selectByPrimaryKey(Long.valueOf(anTempId));
-    }
-
-    /**
-     * 客户确认开户
-     */
-    @Override
-    public void saveFormalData(final Long anParentId) {
-        BTAssert.notNull(anParentId, "代录记录流水号不允许为空！");
-        // 获取客户开户资料信息
-        final CustOpenAccountTmp anOpenAccountInfo = Collections3.getFirst(this.selectByProperty("parentId", anParentId));
-        BTAssert.notNull(anOpenAccountInfo, "无法获取客户开户资料信息");
-        // 检查开户资料合法性
-        checkAccountInfoValid(anOpenAccountInfo);
-        // 生成开户数据
-        createValidAccount(anOpenAccountInfo, UserUtils.getOperatorInfo().getId(), UserUtils.getOperatorInfo().getName(),
-                UserUtils.getOperatorInfo().getOperOrg());
-        // 更新数据
-        this.updateByPrimaryKeySelective(anOpenAccountInfo);
-
-        // 回写暂存流水号至代录申请表
-        final CustInsteadRecord insteadRecord = custInsteadRecordService.findInsteadRecord(anParentId);
-
-        custInsteadApplyService.saveCustInsteadApplyCustInfo(insteadRecord.getApplyId(), anOpenAccountInfo.getCustNo(),
-                anOpenAccountInfo.getCustName());
     }
 
     @Override
@@ -647,7 +654,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         anCustMechBaseInfo.setFax(anOpenAccountInfo.getFax());
         anCustMechBaseInfo.setVersion(0l);
         anCustMechBaseInfo.setZipCode(anCustMechBaseInfo.getZipCode());
-        
+
         custMechBaseService.addCustMechBase(anCustMechBaseInfo, anCustNo);
     }
 
@@ -961,22 +968,24 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         BTAssert.notNull(anOpenAccountInfo.getLawIdentNo(), "法人证件号码不能为空");
         BTAssert.notNull(anOpenAccountInfo.getLawValidDate(), "法人证件有效期不能为空");
     }
- 
+
     /**
-     *读取开户的临时文件信息，用于远程开通业务
-     * @param anCustNo 客户编号
+     * 读取开户的临时文件信息，用于远程开通业务
+     * 
+     * @param anCustNo
+     *            客户编号
      * @return
      */
-    public Map<String, Object> findOpenTempAccountInfo(Long anCustNo){
+    public Map<String, Object> findOpenTempAccountInfo(Long anCustNo) {
         Map<String, Object> result = null;
-        if(anCustNo != null && anCustNo.longValue() > 10){
-           List<CustOpenAccountTmp> tmpList = this.selectByProperty("custNo", anCustNo);
-           if (Collections3.isEmpty(tmpList) == false){
-              CustOpenAccountTmp tmpAccount = Collections3.getFirst(tmpList);
-              return  BeanMapper.map(tmpAccount, HashMap.class);
-           }
+        if (anCustNo != null && anCustNo.longValue() > 10) {
+            List<CustOpenAccountTmp> tmpList = this.selectByProperty("custNo", anCustNo);
+            if (Collections3.isEmpty(tmpList) == false) {
+                CustOpenAccountTmp tmpAccount = Collections3.getFirst(tmpList);
+                return BeanMapper.map(tmpAccount, HashMap.class);
+            }
         }
-        
+
         return new HashMap();
     }
 }
