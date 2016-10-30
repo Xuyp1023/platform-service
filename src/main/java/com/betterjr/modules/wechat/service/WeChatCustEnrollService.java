@@ -139,7 +139,7 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         // 经办人邮箱
         custEnrollInfo.setContEmail(operator.getEmail());
         // 实际经营地址
-        custEnrollInfo.setPremisesAddress(custContactService.selectByPrimaryKey(custNo).getAddress());
+        custEnrollInfo.setPremisesAddress(custMechBaseService.selectByPrimaryKey(custNo).getAddress());
         // 附件信息
         custEnrollInfo.setBatchNo(Collections3.getFirst(custOpenAccountTmpService.selectByProperty(custMap)).getBatchNo());
 
