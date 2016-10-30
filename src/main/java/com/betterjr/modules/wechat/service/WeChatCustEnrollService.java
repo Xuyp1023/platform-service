@@ -502,8 +502,11 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
      */
     private void addCustAndCoreRelation(final CustTempEnrollInfo anCustEnrollInfo, final CustInfo anCustInfo, final CustOperatorInfo anOperator) {
         // 写入T_CUST_RELATION
-        custRelationService.addWeChatCustAndCoreRelation(anCustInfo, anCustEnrollInfo.getCoreCustNo(), anOperator);
-
+        CustRelation custRelation = custRelationService.addWeChatCustAndCoreRelation(anCustInfo, anCustEnrollInfo.getCoreCustNo(), anOperator);
+        custRelation.setBankAcco(anCustEnrollInfo.getBankAccount());
+        custRelation.setBankAccoName(anCustEnrollInfo.getCustName());
+        custRelationService.updateByPrimaryKeySelective(custRelation);
+        
         // 写入T_SCF_RELATION(兼容1.0版本数据结构,汇票池匹配时需要使用该信息)
         final ScfRelation relation = new ScfRelation();
         relation.initWeChatValue();
