@@ -113,9 +113,9 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
                 .put("relateType", CustomerConstants.RELATE_TYPE_SUPPLIER_CORE).put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT).build();
         final CustRelation coreRelation = Collections3.getFirst(custRelationService.selectByProperty(coreMap));
         // 核心企业编号
-        custEnrollInfo.setCoreCustNo(coreRelation.getRelateCustno());
+        custEnrollInfo.setCoreCustNo(coreRelation == null ? null : coreRelation.getRelateCustno());
         // 核心企业名称
-        custEnrollInfo.setCoreCustName(custAccountService.queryCustName(coreRelation.getRelateCustno()));
+        custEnrollInfo.setCoreCustName(coreRelation == null ? null : custAccountService.queryCustName(coreRelation.getRelateCustno()));
         // 开户企业编号
         custEnrollInfo.setCustNo(custNo);
         // 开户企业名称
@@ -312,7 +312,7 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         // anCustMechLawInfo.setBirthdate(IdcardUtils.getBirthByIdCard(anOpenAccountInfo.getLawIdentNo()));
         anCustMechLawInfo.setVersion(0l);
 
-        List<CustFileAduit> custFile = custFileAuditService
+        final List<CustFileAduit> custFile = custFileAuditService
                 .selectByProperty(QueryTermBuilder.newInstance().put("custNo", anCustNo).put("workType", "representIdFile").build());
         if (Collections3.isEmpty(custFile) == false) {
             anCustMechLawInfo.setBatchNo(Collections3.getFirst(custFile).getId());
@@ -365,7 +365,7 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         anCustMechBusinLicenceInfo.setLawName(anOpenAccountInfo.getLawName());
         anCustMechBusinLicenceInfo.setEndDate(anOpenAccountInfo.getBusinLicenceValidDate());
 
-        List<CustFileAduit> custFile = custFileAuditService
+        final List<CustFileAduit> custFile = custFileAuditService
                 .selectByProperty(QueryTermBuilder.newInstance().put("custNo", anCustNo).put("workType", "bizLicenseFile").build());
         if (Collections3.isEmpty(custFile) == false) {
             anCustMechBusinLicenceInfo.setBatchNo(Collections3.getFirst(custFile).getId());
@@ -503,7 +503,7 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
      */
     private void addCustAndCoreRelation(final CustTempEnrollInfo anCustEnrollInfo, final CustInfo anCustInfo, final CustOperatorInfo anOperator) {
         // 写入T_CUST_RELATION
-        CustRelation custRelation = custRelationService.addWeChatCustAndCoreRelation(anCustInfo, anCustEnrollInfo.getCoreCustNo(), anOperator);
+        final CustRelation custRelation = custRelationService.addWeChatCustAndCoreRelation(anCustInfo, anCustEnrollInfo.getCoreCustNo(), anOperator);
         custRelation.setBankAcco(anCustEnrollInfo.getBankAccount());
         custRelation.setBankAccoName(anCustEnrollInfo.getCustName());
         custRelationService.updateByPrimaryKeySelective(custRelation);
@@ -550,11 +550,11 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
      * 处理附件,写入文件认证信息表中
      */
     private void addFileAudit(final CustInfo anCustInfo, final String anFileList) {
-        List<CustFileItem> licenseList = new ArrayList<CustFileItem>();
-        List<CustFileItem> representList = new ArrayList<CustFileItem>();
-        for (String fileId : anFileList.split(",")) {
-            CustFileItem fileItem = custFileItemService.selectByPrimaryKey(Long.valueOf(fileId.trim()));
-            String fileInfoType = fileItem.getFileInfoType();
+        final List<CustFileItem> licenseList = new ArrayList<CustFileItem>();
+        final List<CustFileItem> representList = new ArrayList<CustFileItem>();
+        for (final String fileId : anFileList.split(",")) {
+            final CustFileItem fileItem = custFileItemService.selectByPrimaryKey(Long.valueOf(fileId.trim()));
+            final String fileInfoType = fileItem.getFileInfoType();
             // 企业营业执照
             if (BetterStringUtils.equals(fileInfoType, "bizLicenseFile")) {
                 licenseList.add(fileItem);
@@ -567,13 +567,13 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         // 处理企业营业执照附件,写入认证表
         final Long licenseBatchNo = CustFileClientUtils.findBatchNo();
         addCustFileAduit(anCustInfo.getCustNo(), licenseBatchNo, licenseList.size(), "bizLicenseFile", anCustInfo.getOperOrg());
-        for (CustFileItem fileItem : licenseList) {
+        for (final CustFileItem fileItem : licenseList) {
             addCustFileItem(fileItem, licenseBatchNo);
         }
         // 处理法人身份证附件,写入认证表
         final Long representBatchNo = CustFileClientUtils.findBatchNo();
         addCustFileAduit(anCustInfo.getCustNo(), representBatchNo, representList.size(), "representIdFile", anCustInfo.getOperOrg());
-        for (CustFileItem fileItem : representList) {
+        for (final CustFileItem fileItem : representList) {
             addCustFileItem(fileItem, representBatchNo);
         }
     }

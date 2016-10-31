@@ -342,7 +342,7 @@ public class NotificationHandlerService {
 
         final Set<Pair<CustOperatorInfo, CustInfo>> operators = new HashSet<>();
 
-        receivers.forEach(custOper -> {
+        for (final CustOperPair custOper: receivers) {
             if (custOper.getOperator() != null && custOper.getCustomer() != null) {
                 final CustOperatorInfo operator = findOperatorById(custOper.getOperator());
                 final CustInfo custInfo = accountService.findCustInfo(custOper.getCustomer());
@@ -361,9 +361,7 @@ public class NotificationHandlerService {
                     operators.add(new ImmutablePair<CustOperatorInfo, CustInfo>(operator, tempCustomer));
                 });
             }
-
-        });
-
+        }
 
         return operators;
     }
