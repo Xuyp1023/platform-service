@@ -212,6 +212,8 @@ public class CustWeChatService extends BaseService<CustWeChatInfoMapper, CustWeC
         // 发送微信绑定消息
         final Builder builder = NotificationModel.newBuilder("微信账号绑定状态通知", platformCustomer, platformOperator);
         builder.setEntity(anWechatInfo);
+        builder.addParam("wechatUrl", getMpAccount().getWechatUrl());
+        builder.addParam("appId", getMpAccount().getAppId());
         builder.addReceiver(null, anOperator.getId()); // 接收人
         notificationSendService.sendNotification(builder.build());
     }
