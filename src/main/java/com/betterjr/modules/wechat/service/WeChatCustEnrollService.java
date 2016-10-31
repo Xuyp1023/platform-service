@@ -312,10 +312,11 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         // anCustMechLawInfo.setBirthdate(IdcardUtils.getBirthByIdCard(anOpenAccountInfo.getLawIdentNo()));
         anCustMechLawInfo.setVersion(0l);
 
-        anCustMechLawInfo.setBatchNo(Collections3
-                .getFirst(custFileAuditService
-                        .selectByProperty(QueryTermBuilder.newInstance().put("custNo", anCustNo).put("workType", "representIdFile").build()))
-                .getId());
+        List<CustFileAduit> custFile = custFileAuditService
+                .selectByProperty(QueryTermBuilder.newInstance().put("custNo", anCustNo).put("workType", "representIdFile").build());
+        if (Collections3.isEmpty(custFile) == false) {
+            anCustMechLawInfo.setBatchNo(Collections3.getFirst(custFile).getId());
+        }
 
         custMechLawService.addCustMechLaw(anCustMechLawInfo, anCustNo);
     }
@@ -364,11 +365,11 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         anCustMechBusinLicenceInfo.setLawName(anOpenAccountInfo.getLawName());
         anCustMechBusinLicenceInfo.setEndDate(anOpenAccountInfo.getBusinLicenceValidDate());
 
-        anCustMechBusinLicenceInfo
-                .setBatchNo(Collections3
-                        .getFirst(custFileAuditService
-                                .selectByProperty(QueryTermBuilder.newInstance().put("custNo", anCustNo).put("workType", "bizLicenseFile").build()))
-                        .getId());
+        List<CustFileAduit> custFile = custFileAuditService
+                .selectByProperty(QueryTermBuilder.newInstance().put("custNo", anCustNo).put("workType", "bizLicenseFile").build());
+        if (Collections3.isEmpty(custFile) == false) {
+            anCustMechBusinLicenceInfo.setBatchNo(Collections3.getFirst(custFile).getId());
+        }
 
         custMechBusinLicenceService.addBusinLicence(anCustMechBusinLicenceInfo, anCustNo);
     }
@@ -506,7 +507,7 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         custRelation.setBankAcco(anCustEnrollInfo.getBankAccount());
         custRelation.setBankAccoName(anCustEnrollInfo.getCustName());
         custRelationService.updateByPrimaryKeySelective(custRelation);
-        
+
         // 写入T_SCF_RELATION(兼容1.0版本数据结构,汇票池匹配时需要使用该信息)
         final ScfRelation relation = new ScfRelation();
         relation.initWeChatValue();
