@@ -653,7 +653,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         anCustMechBaseInfo.setPhone(anOpenAccountInfo.getPhone());
         anCustMechBaseInfo.setFax(anOpenAccountInfo.getFax());
         anCustMechBaseInfo.setVersion(0l);
-        anCustMechBaseInfo.setZipCode(anCustMechBaseInfo.getZipCode());
+        anCustMechBaseInfo.setZipCode(anOpenAccountInfo.getZipCode());
 
         custMechBaseService.addCustMechBase(anCustMechBaseInfo, anCustNo);
     }
