@@ -64,7 +64,7 @@ public class NotificationEmailJob extends AbstractSimpleElasticJob {
      * 单条发送
      */
     private boolean sendMail(final NotificationCustomer anCustomer) {
-        final Notification notification = notificationService.findNotification(anCustomer.getNotificationId(), anCustomer.getOperId(), NotificationConstants.CHANNEL_EMAIL);
+        final Notification notification = notificationService.findNotification(anCustomer.getNotificationId());
 
         final Long batchNo = notification.getBatchNo();
 
