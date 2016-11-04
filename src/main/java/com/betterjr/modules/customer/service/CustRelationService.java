@@ -1140,5 +1140,28 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         return result;
     }
 
+    /**
+     * 查询核心企业下面所有供应商、经销商
+     *
+     * @param anCoreCustNo
+     * @return
+     */
+    public List<SimpleDataEntity> queryCoreCust(final Long anCoreCustNo) {
+        final List<SimpleDataEntity> result = new ArrayList<SimpleDataEntity>();
+        if (null == anCoreCustNo) {
+            return result;
+        }
+        Map<String, Object> anMap = new HashMap<String, Object>();
+        anMap.put("relateCustno", anCoreCustNo);
+        anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
+        anMap.put("relateType", new String[]{CustomerConstants.RELATE_TYPE_SUPPLIER_CORE, CustomerConstants.RELATE_TYPE_SELLER_CORE});
+        for (final CustRelation relation : this.selectByProperty(anMap)) {
+            final SimpleDataEntity entity = new SimpleDataEntity(relation.getRelateCustname(), String.valueOf(relation.getRelateCustno()));
+            if (!result.contains(entity)) {
+                result.add(entity);
+            }
+        }
+        return result;
+    }
 }
 

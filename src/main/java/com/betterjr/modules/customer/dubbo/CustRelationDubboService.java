@@ -260,4 +260,9 @@ public class CustRelationDubboService implements ICustRelationService {
 
     }
 
+    @Override
+    public String webQueryCoreCust(Long anCoreCustNo) {
+        return AjaxObject.newOk("查询核心企业下所有客户成功", custRelationService.queryCoreCust(anCoreCustNo)).toJson();
+    }
+
 }
