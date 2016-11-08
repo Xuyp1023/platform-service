@@ -1156,7 +1156,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
         anMap.put("relateType", new String[]{CustomerConstants.RELATE_TYPE_SUPPLIER_CORE, CustomerConstants.RELATE_TYPE_SELLER_CORE});
         for (final CustRelation relation : this.selectByProperty(anMap)) {
-            final SimpleDataEntity entity = new SimpleDataEntity(relation.getRelateCustname(), String.valueOf(relation.getRelateCustno()));
+            final SimpleDataEntity entity = new SimpleDataEntity(relation.getCustName(), String.valueOf(relation.getCustNo()));
             if (!result.contains(entity)) {
                 result.add(entity);
             }
