@@ -430,7 +430,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         final String anTempId = anInsteadRecord.getTmpIds();
         if (null == anTempId) {
             // 初始化参数设置
-            initAddValue(anOpenAccountInfo, CustomerConstants.TMP_TYPE_INSTEADSTORE, CustomerConstants.TMP_STATUS_NEW);
+            initAddValue(anOpenAccountInfo, CustomerConstants.TMP_TYPE_INSTEADSTORE, CustomerConstants.TMP_STATUS_USEING);
             // 处理附件
             anOpenAccountInfo.setBatchNo(custFileItemService.updateCustFileItemInfo(anFileList, anOpenAccountInfo.getBatchNo()));
             // 数据存盘,开户资料暂存
@@ -444,8 +444,8 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
             // 营业执照
             initIdentInfo(anOpenAccountInfo);
             // 设置状态为未使用
-            anOpenAccountInfo.setBusinStatus(CustomerConstants.TMP_STATUS_NEW);
-            anOpenAccountInfo.setLastStatus(CustomerConstants.TMP_STATUS_NEW);
+            anOpenAccountInfo.setBusinStatus(CustomerConstants.TMP_STATUS_USEING);
+            anOpenAccountInfo.setLastStatus(CustomerConstants.TMP_STATUS_USEING);
             // 处理附件
             anOpenAccountInfo.setBatchNo(custFileItemService.updateCustFileItemInfo(anFileList, anOpenAccountInfo.getBatchNo()));
             // 数据存盘,开户资料暂存
