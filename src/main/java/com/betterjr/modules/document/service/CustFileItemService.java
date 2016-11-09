@@ -273,12 +273,12 @@ public class CustFileItemService extends BaseService<CustFileItemMapper, CustFil
      */
     public boolean saveAndUpdateFileItem(final CustFileItem anFileItem, final CustOperatorInfo anOperator) {
         final CustFileItem tmpFileItem = this.selectByPrimaryKey(anFileItem.getId());
-        if (tmpFileItem == null) {
+        if (tmpFileItem == null){
             anFileItem.initAddValue(anOperator);
             this.insert(anFileItem);
         }
         else {
-            tmpFileItem.initModifyValue(anOperator);
+            anFileItem.initModifyValue(anOperator);
             this.updateByPrimaryKey(anFileItem);
         }
 

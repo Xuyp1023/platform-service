@@ -43,7 +43,7 @@ import com.betterjr.modules.document.entity.CustFileAduit;
 import com.betterjr.modules.document.entity.CustFileItem;
 import com.betterjr.modules.document.service.CustFileAuditService;
 import com.betterjr.modules.document.service.CustFileItemService;
-import com.betterjr.modules.document.utils.CustFileClientUtils;
+import com.betterjr.modules.document.utils.CustFileUtils;
 import com.betterjr.modules.wechat.dao.CustTempEnrollInfoMapper;
 import com.betterjr.modules.wechat.entity.CustTempEnrollInfo;
 import com.betterjr.modules.wechat.entity.CustWeChatInfo;
@@ -565,13 +565,13 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
             }
         }
         // 处理企业营业执照附件,写入认证表
-        final Long licenseBatchNo = CustFileClientUtils.findBatchNo();
+        final Long licenseBatchNo = CustFileUtils.findBatchNo();
         addCustFileAduit(anCustInfo.getCustNo(), licenseBatchNo, licenseList.size(), "bizLicenseFile", anCustInfo.getOperOrg());
         for (final CustFileItem fileItem : licenseList) {
             addCustFileItem(fileItem, licenseBatchNo);
         }
         // 处理法人身份证附件,写入认证表
-        final Long representBatchNo = CustFileClientUtils.findBatchNo();
+        final Long representBatchNo = CustFileUtils.findBatchNo();
         addCustFileAduit(anCustInfo.getCustNo(), representBatchNo, representList.size(), "representIdFile", anCustInfo.getOperOrg());
         for (final CustFileItem fileItem : representList) {
             addCustFileItem(fileItem, representBatchNo);

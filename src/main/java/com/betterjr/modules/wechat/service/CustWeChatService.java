@@ -42,7 +42,8 @@ import com.betterjr.modules.account.service.CustOperatorService;
 import com.betterjr.modules.document.entity.CustFileItem;
 import com.betterjr.modules.document.service.CustFileAuditService;
 import com.betterjr.modules.document.service.CustFileItemService;
-import com.betterjr.modules.document.utils.CustFileClientUtils;
+import com.betterjr.modules.document.service.DataStoreService;
+import com.betterjr.modules.document.utils.CustFileUtils;
 import com.betterjr.modules.notification.INotificationSendService;
 import com.betterjr.modules.notification.NotificationModel;
 import com.betterjr.modules.notification.NotificationModel.Builder;
@@ -82,6 +83,9 @@ public class CustWeChatService extends BaseService<CustWeChatInfoMapper, CustWeC
 
     @Autowired
     private CustFileAuditService custFileAuditService;
+
+    @Autowired
+    private DataStoreService dataStoreService;
 
     public MPAccount getMpAccount() {
         return this.mpAccount;
@@ -505,17 +509,12 @@ public class CustWeChatService extends BaseService<CustWeChatInfoMapper, CustWeC
         try {
             final WechatAPIImpl wechatApi = WechatAPIImpl.create(mpAccount);
             final File file = wechatApi.dlMedia(anMediaId);
-            try (InputStream inputStream = new FileInputStream(file)) {
-                final KeyAndValueObject tmpFileInfo = FileUtils.findFilePathWithParent(ParamNames.CONTRACT_PATH);
-                if (CustFileClientUtils.saveFileStream(tmpFileInfo, inputStream)) {
-                    final CustFileItem fileItem = CustFileClientUtils.createUploadFileItem(tmpFileInfo, anFileTypeName, anFileTypeName + ".jpg");
-
-                    if (fileItemService.saveAndUpdateFileItem(fileItem)) {
-                        return fileItem;
-                    }
-                }
+            final CustFileItem fileItem = dataStoreService.saveFileToStore(file, anFileTypeName, anFileTypeName + ".jpg");
+            if ((fileItem != null) && fileItemService.saveAndUpdateFileItem(fileItem)) {
+                return fileItem;
             }
-        } catch (final Exception e) {
+        }
+        catch (final Exception e) {
             logger.error("上传文件发生错误", e);
         }
         return null;
