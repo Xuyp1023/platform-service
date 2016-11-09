@@ -13,8 +13,11 @@ import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
+import com.betterjr.common.utils.UserUtils;
 import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.account.service.CustAccountService;
+import com.betterjr.modules.cert.entity.CustCertInfo;
+import com.betterjr.modules.cert.service.CustCertService;
 import com.betterjr.modules.customer.constants.CustomerConstants;
 import com.betterjr.modules.customer.dao.CustInsteadApplyMapper;
 import com.betterjr.modules.customer.entity.CustInsteadApply;
@@ -31,6 +34,9 @@ import com.betterjr.modules.document.service.CustFileItemService;
 public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper, CustInsteadApply> {
     @Resource
     private CustAccountService accountService;
+
+    @Resource
+    private CustCertService custCertService;
 
     @Resource
     private CustInsteadRecordService insteadRecordService;
@@ -65,6 +71,11 @@ public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper,
 
             final String custName = accountService.queryCustName(anCustNo);
             custInsteadApply.initAddValue(anInsteadType, anCustNo, custName);
+            final CustCertInfo certInfo = custCertService.findCertByOperOrg(UserUtils.getOperatorInfo().getOperOrg());
+
+            BTAssert.notNull(certInfo, "证书信息不允许为空!");
+
+            custInsteadApply.setOrgName(certInfo.getCustName());
         }
 
         custInsteadApply.setBatchNo(fileItemService.updateCustFileItemInfo(anFileList, custInsteadApply.getBatchNo()));
