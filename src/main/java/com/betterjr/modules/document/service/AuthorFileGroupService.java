@@ -53,20 +53,8 @@ public class AuthorFileGroupService extends BaseService<AuthorFileGroupMapper, A
      * @return
      */
     public FileStoreType findFileStoreType(String anFileInfoType) {
-        AuthorFileGroup fileGroup = null;
-        if (BetterStringUtils.isNotBlank(anFileInfoType)) {
-
-            fileGroup = this.selectByPrimaryKey(anFileInfoType);
-        }
-        String tmpStoreType;
-        if (fileGroup == null) {
-            tmpStoreType = SpringPropertyResourceReader.getProperty("fileStoreType", "0");
-        }
-        else {
-            tmpStoreType = fileGroup.getStoreType();
-        }
-
-        return FileStoreType.checking(tmpStoreType);
+        AuthorFileGroup fileGroup = findAuthFileGroup(anFileInfoType);
+        return FileStoreType.checking(fileGroup.getStoreType());
     }
 
     /**
@@ -74,7 +62,7 @@ public class AuthorFileGroupService extends BaseService<AuthorFileGroupMapper, A
      * 
      * @return
      */
-     public OSSConfigInfo findOSSConfigInfo() {
+    public OSSConfigInfo findOSSConfigInfo() {
         OSSConfigInfo configInfo = null;
         String tmpStr = SysConfigService.getString(OSS_CONFIG);
         try {
@@ -82,11 +70,21 @@ public class AuthorFileGroupService extends BaseService<AuthorFileGroupMapper, A
         }
         catch (Exception ex) {
             String saveData = Cryptos.aesEncrypt(tmpStr);
-            //SysConfigService.saveParamValue(OSS_CONFIG, saveData);
+            // SysConfigService.saveParamValue(OSS_CONFIG, saveData);
         }
         configInfo = (OSSConfigInfo) JsonMapper.fromJsonString(tmpStr, OSSConfigInfo.class);
 
         return configInfo;
+    }
+
+    private AuthorFileGroup findAuthFileGroup(String anFileInfoType) {        
+        AuthorFileGroup fileGroup = this.selectByPrimaryKey(anFileInfoType);
+        if (fileGroup == null) {
+            fileGroup = new AuthorFileGroup("00", anFileInfoType);
+            fileGroup.setStoreType(SpringPropertyResourceReader.getProperty("fileStoreType", "0"));
+        }
+        
+        return fileGroup;
     }
 
     /**
@@ -99,10 +97,7 @@ public class AuthorFileGroupService extends BaseService<AuthorFileGroupMapper, A
      * @return
      */
     public String findCreateFilePath(String anFileInfoType) {
-        AuthorFileGroup fileGroup = this.selectByPrimaryKey(anFileInfoType);
-        if (fileGroup == null) {
-            fileGroup = new AuthorFileGroup("00", anFileInfoType);
-        }
+        AuthorFileGroup fileGroup = findAuthFileGroup(anFileInfoType);
         FileStoreType storeType = FileStoreType.checking(fileGroup.getStoreType());
         return fileGroup.findCreateFilePath(storeType);
     }
