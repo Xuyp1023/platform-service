@@ -71,12 +71,13 @@ public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper,
 
             final String custName = accountService.queryCustName(anCustNo);
             custInsteadApply.initAddValue(anInsteadType, anCustNo, custName);
-            final CustCertInfo certInfo = custCertService.findCertByOperOrg(UserUtils.getOperatorInfo().getOperOrg());
-
-            BTAssert.notNull(certInfo, "证书信息不允许为空!");
-
-            custInsteadApply.setOrgName(certInfo.getCustName());
         }
+
+        final CustCertInfo certInfo = custCertService.findCertByOperOrg(UserUtils.getOperatorInfo().getOperOrg());
+
+        BTAssert.notNull(certInfo, "证书信息不允许为空!");
+
+        custInsteadApply.setOrgName(certInfo.getCustName());
 
         custInsteadApply.setBatchNo(fileItemService.updateCustFileItemInfo(anFileList, custInsteadApply.getBatchNo()));
 
