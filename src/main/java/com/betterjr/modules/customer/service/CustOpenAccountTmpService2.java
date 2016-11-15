@@ -6,14 +6,17 @@ import com.betterjr.common.exception.BytterTradeException;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterStringUtils;
+import com.betterjr.common.utils.UserUtils;
 import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.account.service.CustOperatorService;
 import com.betterjr.modules.blacklist.service.BlacklistService;
+import com.betterjr.modules.customer.constants.CustomerConstants;
 import com.betterjr.modules.customer.dao.CustOpenAccountTmpMapper;
 import com.betterjr.modules.customer.entity.CustOpenAccountTmp;
 import com.betterjr.modules.customer.helper.IFormalDataService;
 import com.betterjr.modules.customer.service.CustMechBankAccountService;
 import com.betterjr.modules.customer.service.CustMechBaseService;
+import com.betterjr.modules.document.service.CustFileItemService;
 
 public class CustOpenAccountTmpService2 extends BaseService<CustOpenAccountTmpMapper, CustOpenAccountTmp> implements IFormalDataService {
     
@@ -27,6 +30,8 @@ public class CustOpenAccountTmpService2 extends BaseService<CustOpenAccountTmpMa
     private CustOperatorService custOperatorService;
     @Autowired
     private BlacklistService blacklistService;
+    @Autowired
+    private CustFileItemService custFileItemService;
 
     /**
      * 开户申请提交
@@ -35,7 +40,12 @@ public class CustOpenAccountTmpService2 extends BaseService<CustOpenAccountTmpMa
         logger.info("Begin to Commit Open Account Apply");
         // 检查开户资料合法性
         checkAccountInfoValid(anOpenAccountInfo);
-        
+        // 初始化参数设置
+        initAddValue(anOpenAccountInfo, CustomerConstants.TMP_TYPE_TEMPSTORE, CustomerConstants.TMP_STATUS_NEW);
+        // 处理附件
+        anOpenAccountInfo.setBatchNo(custFileItemService.updateCustFileItemInfo(anFileList, anOpenAccountInfo.getBatchNo()));
+        // 数据存盘,开户资料暂存
+        this.insert(anOpenAccountInfo);
         return anOpenAccountInfo;
     }
     
@@ -170,6 +180,13 @@ public class CustOpenAccountTmpService2 extends BaseService<CustOpenAccountTmpMa
         return custOperatorService.selectByProperty("mobileNo", anMobileNo).size() > 0;
     }
 
+    private void checkPlatformUser() {
+        if (UserUtils.platformUser() == false) {
+            logger.warn("当前操作员不能执行该操作");
+            throw new BytterTradeException(40001, "当前操作员不能执行该操作");
+        }
+    }
+    
     @Override
     public void saveFormalData(Long anParentId) {
         // TODO Auto-generated method stub
@@ -180,5 +197,32 @@ public class CustOpenAccountTmpService2 extends BaseService<CustOpenAccountTmpMa
     public void saveCancelData(Long anParentId) {
         // TODO Auto-generated method stub
 
+    }
+
+    /**
+     *  开户信息修改保存
+     */
+    public CustOpenAccountTmp saveModifyOpenAccount(CustOpenAccountTmp anOpenAccountInfo, Long anId, String anFileList) {
+        this.checkPlatformUser();
+        final CustOpenAccountTmp anExitsOpenAccountInfo = this.selectByPrimaryKey(anId);
+        BTAssert.notNull(anExitsOpenAccountInfo, "无法获取客户开户资料信息");
+        // 初始化参数设置
+        anOpenAccountInfo.initModifyValue(anExitsOpenAccountInfo);
+        // 营业执照
+        initIdentInfo(anOpenAccountInfo);
+        // 处理附件
+        anOpenAccountInfo.setBatchNo(custFileItemService.updateCustFileItemInfo(anFileList, anOpenAccountInfo.getBatchNo()));
+        // 数据存盘,开户资料暂存
+        this.updateByPrimaryKeySelective(anOpenAccountInfo);
+        return anOpenAccountInfo;
+    }
+    
+    /**
+     * 开户信息保存并审核
+     */
+    public CustOpenAccountTmp saveModifyAndAuditOpenAccount(final Long anId, CustOpenAccountTmp anOpenAccountInfo, String anFileList) {
+        //保存修改内容
+        this.saveModifyOpenAccount(anOpenAccountInfo, anId, anFileList);
+        
     }
 }
