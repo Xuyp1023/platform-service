@@ -1,6 +1,7 @@
 package com.betterjr.modules.customer.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.betterjr.common.exception.BytterTradeException;
 import com.betterjr.common.service.BaseService;
@@ -18,6 +19,7 @@ import com.betterjr.modules.customer.service.CustMechBankAccountService;
 import com.betterjr.modules.customer.service.CustMechBaseService;
 import com.betterjr.modules.document.service.CustFileItemService;
 
+@Service
 public class CustOpenAccountTmpService2 extends BaseService<CustOpenAccountTmpMapper, CustOpenAccountTmp> implements IFormalDataService {
     
     @Autowired
@@ -60,8 +62,12 @@ public class CustOpenAccountTmpService2 extends BaseService<CustOpenAccountTmpMa
         initIdentInfo(anOpenAccountInfo);
     }
 
+    /**
+     * 生成营业执照
+     */
     private void initIdentInfo(final CustOpenAccountTmp anOpenAccountInfo) {
         anOpenAccountInfo.setIdentNo(anOpenAccountInfo.getBusinLicence());
+        //证件类型
         anOpenAccountInfo.setIdentType("1");
         anOpenAccountInfo.setValidDate(anOpenAccountInfo.getBusinLicenceValidDate());
     }
@@ -223,6 +229,6 @@ public class CustOpenAccountTmpService2 extends BaseService<CustOpenAccountTmpMa
     public CustOpenAccountTmp saveModifyAndAuditOpenAccount(final Long anId, CustOpenAccountTmp anOpenAccountInfo, String anFileList) {
         //保存修改内容
         this.saveModifyOpenAccount(anOpenAccountInfo, anId, anFileList);
-        
+        return null;
     }
 }
