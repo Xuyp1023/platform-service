@@ -396,6 +396,18 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         }
         return this.selectPropertyByPage(CustRelation.class, anMap, anPageNum, anPageSize, "1".equals(anFlag));
     }
+    
+    /***
+     * 根据map 的参数分页查询
+     * @param anMap
+     * @param anFlag
+     * @param anPageNum
+     * @param anPageSize
+     * @return
+     */
+    public Page<CustRelation> queryCustRelationInfo(Map<String,Object> anMap,final String anFlag, final int anPageNum, final int anPageSize){
+        return this.selectPropertyByPage(CustRelation.class, anMap, anPageNum, anPageSize, "1".equals(anFlag));
+    }
 
     /**
      * 客户白名单受理
@@ -638,7 +650,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         return relation;
     }
 
-    private CustRelation findCustRelation(final Long anCustNo, final Long relateCustno, final String anRelateType) {
+    public CustRelation findCustRelation(final Long anCustNo, final Long relateCustno, final String anRelateType) {
         final Map<String, Object> anMap = new HashMap<String, Object>();
         anMap.put("custNo", anCustNo);
         anMap.put("relateCustno", relateCustno);
