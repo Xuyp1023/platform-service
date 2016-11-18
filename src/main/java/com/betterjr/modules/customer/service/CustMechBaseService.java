@@ -37,6 +37,12 @@ public class CustMechBaseService extends BaseService<CustMechBaseMapper, CustMec
     @Resource
     private CustAndOperatorRelaService custAndOpService;
 
+    @Resource
+    private CustMechBusinLicenceService businLicenceService;
+
+    @Resource
+    private CustRelationService custRelationService;
+
     /**
      * 公司基本信息-查询详情
      *
@@ -72,6 +78,11 @@ public class CustMechBaseService extends BaseService<CustMechBaseMapper, CustMec
         custInfo.setCustName(tempCustMechBase.getCustName());
 
         accountService.updateByPrimaryKeySelective(custInfo);
+
+        // 将所有关系均需要修改
+        custRelationService.saveUpdateCustName(custNo, custInfo.getCustName());
+
+        businLicenceService.saveUpdateCustName(custNo, custInfo.getCustName());
 
         return tempCustMechBase;
     }
