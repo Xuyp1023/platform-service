@@ -4,8 +4,6 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.service.BaseService;
@@ -19,7 +17,7 @@ import com.betterjr.modules.customer.entity.CustMechBusinLicence;
 import com.betterjr.modules.customer.entity.CustMechBusinLicenceTmp;
 
 /**
- * 
+ *
  * @author liuwl
  *
  */
@@ -27,17 +25,29 @@ import com.betterjr.modules.customer.entity.CustMechBusinLicenceTmp;
 public class CustMechBusinLicenceService extends BaseService<CustMechBusinLicenceMapper, CustMechBusinLicence> {
     @Resource
     private CustAccountService accountService;
-    
+
     @Resource
     private CustMechBusinLicenceTmpService businLicenceTmpService;
-    
+
+    /**
+     * 更新公司名称
+     * @param anCustNo
+     * @param anCustName
+     */
+    public void saveUpdateCustName(final Long anCustNo, final String anCustName) {
+        final CustMechBusinLicence businLicence= findBusinLicenceByCustNo(anCustNo);
+        BTAssert.notNull(businLicence, "没有找到相应的营业执照！");
+        businLicence.setCustName(anCustName);
+        this.updateByPrimaryKeySelective(businLicence);
+    }
+
     /**
      * 营业执照信息-查询详情
-     * 
+     *
      * @param anCustNo
      * @return
      */
-    public CustMechBusinLicence findBusinLicenceByCustNo(Long anCustNo) {
+    public CustMechBusinLicence findBusinLicenceByCustNo(final Long anCustNo) {
         BTAssert.notNull(anCustNo, "客户编号不允许为空！");
 
         final List<CustMechBusinLicence> businLicences = this.selectByProperty(CustomerConstants.CUST_NO, anCustNo);
@@ -46,11 +56,11 @@ public class CustMechBusinLicenceService extends BaseService<CustMechBusinLicenc
 
     /**
      * 营业执照信息-查询详情
-     * 
+     *
      * @param anCustNo
      * @return
      */
-    public CustMechBusinLicence findBusinLicence(Long anId) {
+    public CustMechBusinLicence findBusinLicence(final Long anId) {
         BTAssert.notNull(anId, "客户编号不允许为空！");
 
         final CustMechBusinLicence businLicence = this.selectByPrimaryKey(anId);
@@ -61,15 +71,15 @@ public class CustMechBusinLicenceService extends BaseService<CustMechBusinLicenc
 
     /**
      * 营业执照信息-修改 代录/变更
-     * 
+     *
      * @param anCustMechBusinLicence
      * @return
      */
-    public CustMechBusinLicence saveBusinLicence(CustMechBusinLicenceTmp anBusinLicenceTmp) {
+    public CustMechBusinLicence saveBusinLicence(final CustMechBusinLicenceTmp anBusinLicenceTmp) {
         BTAssert.notNull(anBusinLicenceTmp, "营业执照流水信息不允许为空！");
 
-        Long custNo = anBusinLicenceTmp.getRefId();
-        CustMechBusinLicence tempCustMechBusinLicence = this.findBusinLicenceByCustNo(custNo);
+        final Long custNo = anBusinLicenceTmp.getRefId();
+        final CustMechBusinLicence tempCustMechBusinLicence = this.findBusinLicenceByCustNo(custNo);
         BTAssert.notNull(tempCustMechBusinLicence, "没有找到营业执照信息!");
 
         tempCustMechBusinLicence.initModifyValue(anBusinLicenceTmp);
@@ -80,20 +90,20 @@ public class CustMechBusinLicenceService extends BaseService<CustMechBusinLicenc
 
     /**
      * 营业执照信息-添加
-     * 
+     *
      * @param anBusinLicence
      * @return
      */
-    public CustMechBusinLicence addBusinLicence(CustMechBusinLicence anBusinLicence, Long anCustNo) {
+    public CustMechBusinLicence addBusinLicence(final CustMechBusinLicence anBusinLicence, final Long anCustNo) {
         BTAssert.notNull(anBusinLicence, "营业执照信息不允许为空！");
 
         final CustInfo custInfo = accountService.selectByPrimaryKey(anCustNo);
         anBusinLicence.initAddValue(anCustNo, custInfo.getCustName(), custInfo.getRegOperId(), custInfo.getRegOperName(), custInfo.getOperOrg());
         this.insert(anBusinLicence);
-        
+
         // 建立初始流水记录
         businLicenceTmpService.addBusinLicenceTmp(anBusinLicence);
-        
+
         return anBusinLicence;
     }
 
