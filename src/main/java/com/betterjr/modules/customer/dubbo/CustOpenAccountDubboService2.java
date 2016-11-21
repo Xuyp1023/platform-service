@@ -8,55 +8,70 @@ import com.alibaba.dubbo.config.annotation.Service;
 import com.betterjr.common.web.AjaxObject;
 import com.betterjr.modules.customer.ICustOpenAccountService2;
 import com.betterjr.modules.customer.entity.CustOpenAccountTmp;
-import com.betterjr.modules.customer.service.CustOpenAccountTmpService2;
+import com.betterjr.modules.customer.service.CustOpenAccountTmp2Service;
 import com.betterjr.modules.rule.service.RuleServiceDubboFilterInvoker;
 
 @Service(interfaceClass = ICustOpenAccountService2.class)
 public class CustOpenAccountDubboService2 implements ICustOpenAccountService2{
     
     @Autowired
-    private CustOpenAccountTmpService2 custOpenAccountTmpService2;
+    private CustOpenAccountTmp2Service custOpenAccountTmpService;
 
     @Override
     public String webSaveOpenAccountApply(Map<String, Object> anMap, String anFileList) {
         CustOpenAccountTmp anOpenAccountInfo = (CustOpenAccountTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return AjaxObject.newOk("开户申请提交成功", custOpenAccountTmpService2.saveOpenAccountApply(anOpenAccountInfo, anFileList)).toJson();
+        return AjaxObject.newOk("开户申请提交成功", custOpenAccountTmpService.saveOpenAccountApply(anOpenAccountInfo, anFileList)).toJson();
     }
     
     @Override
     public String webCheckCustExistsByCustName(String anCustName) {
-        return AjaxObject.newOk("检查申请机构名称是否存在成功", custOpenAccountTmpService2.checkCustExistsByCustName(anCustName)? "1" : "0").toJson();
+        return AjaxObject.newOk("检查申请机构名称是否存在成功", custOpenAccountTmpService.checkCustExistsByCustName(anCustName)? "1" : "0").toJson();
     }
 
     @Override
     public String webCheckCustExistsByIdentNo(String anIdentNo) {
-       return AjaxObject.newOk("检查组织机构代码证是否存在", custOpenAccountTmpService2.checkCustExistsByIdentNo(anIdentNo)? "1" : "0").toJson();
+       return AjaxObject.newOk("检查组织机构代码证是否存在", custOpenAccountTmpService.checkCustExistsByIdentNo(anIdentNo)? "1" : "0").toJson();
     }
 
     @Override
     public String webCheckCustExistsByBusinLicence(String anBusinLicence) {
-        return AjaxObject.newOk("检查营业执照号码是否存在", custOpenAccountTmpService2.checkCustExistsByBusinLicence(anBusinLicence)? "1" : "0").toJson();
+        return AjaxObject.newOk("检查营业执照号码是否存在", custOpenAccountTmpService.checkCustExistsByBusinLicence(anBusinLicence)? "1" : "0").toJson();
     }
 
     @Override
     public String webCheckCustExistsByBankAccount(String anBankAccount) {
-        return AjaxObject.newOk("检查银行账号是否存在", custOpenAccountTmpService2.checkCustExistsByBankAccount(anBankAccount)? "1" : "0").toJson();
+        return AjaxObject.newOk("检查银行账号是否存在", custOpenAccountTmpService.checkCustExistsByBankAccount(anBankAccount)? "1" : "0").toJson();
     }
     
     @Override
     public String webCheckCustExistsByEmail(String anEmail) {
-        return AjaxObject.newOk("检查电子邮箱是否存在", custOpenAccountTmpService2.checkCustExistsByEmail(anEmail)? "1" : "0").toJson();
+        return AjaxObject.newOk("检查电子邮箱是否存在", custOpenAccountTmpService.checkCustExistsByEmail(anEmail)? "1" : "0").toJson();
     }
     
     @Override
     public String webCheckCustExistsByMobileNo(String anMobileNo) {
-        return AjaxObject.newOk("检查手机号码是否存在", custOpenAccountTmpService2.checkCustExistsByMobileNo(anMobileNo)? "1" : "0").toJson();
+        return AjaxObject.newOk("检查手机号码是否存在", custOpenAccountTmpService.checkCustExistsByMobileNo(anMobileNo)? "1" : "0").toJson();
     }
 
     @Override
     public String webSaveModifyOpenAccount(Map<String, Object> anAnMap, Long anId, String anFileList) {
         CustOpenAccountTmp anOpenAccountInfo = (CustOpenAccountTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return AjaxObject.newOk("开户信息修改成功", custOpenAccountTmpService2.saveModifyOpenAccount(anOpenAccountInfo, anId, anFileList)).toJson();
+        return AjaxObject.newOk("开户信息修改成功", custOpenAccountTmpService.saveModifyOpenAccount(anOpenAccountInfo, anId, anFileList)).toJson();
+    }
+
+    @Override
+    public String webSaveOpenAccountInfoByInstead(Map<String, Object> anMap, Long anInsteadRecordId, String anFileList) {
+        CustOpenAccountTmp anOpenAccountInfo = (CustOpenAccountTmp) RuleServiceDubboFilterInvoker.getInputObj();
+        return AjaxObject.newOk("代录开户资料提交成功", custOpenAccountTmpService.saveOpenAccountInfoByInstead(anOpenAccountInfo, anInsteadRecordId, anFileList))
+                .toJson();
+    }
+    
+    @Override
+    public String webSaveOpenAccountInfo(Map<String, Object> anMap, Long anId, String anFileList) {
+
+        CustOpenAccountTmp anOpenAccountInfo = (CustOpenAccountTmp) RuleServiceDubboFilterInvoker.getInputObj();
+
+        return AjaxObject.newOk("开户资料暂存成功", custOpenAccountTmpService.saveOpenAccountInfo(anOpenAccountInfo, anId, anFileList)).toJson();
     }
 
 }
