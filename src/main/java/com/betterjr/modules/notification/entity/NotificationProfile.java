@@ -473,6 +473,8 @@ public class NotificationProfile implements BetterjrEntity {
         this.custNo = anCustInfo.getCustNo();
         this.custName = anCustInfo.getCustName();
 
+        this.businStatus = anNotificationProfile.getBusinStatus();
+
         this.custom = NotificationConstants.PROFILE_CUSTOM; // 用户自定义
     }
 }
