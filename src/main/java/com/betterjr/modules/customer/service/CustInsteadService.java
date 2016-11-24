@@ -71,6 +71,19 @@ public class CustInsteadService {
 
         return custInsteadApply;
     }
+    
+    /**
+     * 微信代录申请
+     */
+    public CustInsteadApply addWeChatInsteadApply(final Map<String, Object> anParam,final String anCustName, final String anFileList) {
+        BTAssert.notNull(anParam, "代录信息不允许为空！");
+        final String insteadType = (String) anParam.get("insteadType");
+        final CustInsteadApply custInsteadApply = insteadApplyService.addWeChatCustInsteadApply(insteadType, anCustName, anFileList);
+        final String insteadItems = (String) anParam.get("insteadItems");
+        insteadRecordService.addInsteadRecord(custInsteadApply, insteadType, insteadItems);
+
+        return custInsteadApply;
+    }
 
     /**
      * 代录申请 - 修改申请
