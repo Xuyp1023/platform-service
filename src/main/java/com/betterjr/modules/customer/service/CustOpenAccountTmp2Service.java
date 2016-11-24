@@ -2,13 +2,17 @@ package com.betterjr.modules.customer.service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.taglibs.standard.lang.jstl.AndOperator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.betterjr.common.exception.BytterTradeException;
 import com.betterjr.common.mapper.BeanMapper;
 import com.betterjr.common.mq.core.RocketMQProducer;
@@ -39,6 +43,7 @@ import com.betterjr.modules.customer.entity.CustMechBusinLicence;
 import com.betterjr.modules.customer.entity.CustMechLaw;
 import com.betterjr.modules.customer.entity.CustOpenAccountTmp;
 import com.betterjr.modules.customer.helper.IFormalDataService;
+import com.betterjr.modules.document.ICustFileService;
 import com.betterjr.modules.document.entity.CustFileAduit;
 import com.betterjr.modules.document.entity.CustFileItem;
 import com.betterjr.modules.document.service.CustFileAuditService;
@@ -87,6 +92,10 @@ public class CustOpenAccountTmp2Service extends BaseService<CustOpenAccountTmpMa
     private CustCertService custCertService;
     @Autowired
     private CustWeChatService custWeChatService;
+    
+    @Reference(interfaceClass = ICustFileService.class)
+    private ICustFileService custFileItemService2;
+
 
     /**
      * 开户申请提交
@@ -816,8 +825,8 @@ public class CustOpenAccountTmp2Service extends BaseService<CustOpenAccountTmpMa
      */
     public CustOpenAccountTmp saveOpenAccountInfo(final CustOpenAccountTmp anOpenAccountInfo, final Long anId, final String anFileList) {
         logger.info("Begin to Save Open Account Infomation");
-        // 检查开户资料合法性,暂存无需检查
-//        checkAccountInfoValid(anOpenAccountInfo);
+        // 检查开户资料合法性,部分检查
+        wechatCheckAccountInfoValid(anOpenAccountInfo);
         if (null == anId) {
             // 初始化参数设置
             initAddValue(anOpenAccountInfo, CustomerConstants.TMP_TYPE_TEMPSTORE, CustomerConstants.TMP_STATUS_NEW);
@@ -841,6 +850,37 @@ public class CustOpenAccountTmp2Service extends BaseService<CustOpenAccountTmpMa
 
         return anOpenAccountInfo;
     }
+    
+    /**
+     * 微信检查入参
+     */
+    private void wechatCheckAccountInfoValid(CustOpenAccountTmp anOpenAccountInfo) {
+        BTAssert.notNull(anOpenAccountInfo.getCustName(), "企业名称不能为空");
+        BTAssert.notNull(anOpenAccountInfo.getOperName(), "经办人姓名不能为空");
+        BTAssert.notNull(anOpenAccountInfo.getOperMobile(), "经办人手机号码不能为空");
+        BTAssert.notNull(anOpenAccountInfo.getOperEmail(), "经办人邮箱不能为空");
+        
+        // 检查申请机构名称是否存在
+        if (checkCustExistsByCustName(anOpenAccountInfo.getCustName()) == true) {
+            logger.warn("申请机构名称已存在");
+            throw new BytterTradeException(40001, "申请机构名称已存在");
+        }
+        if (checkCustExistsByEmail(anOpenAccountInfo.getOperEmail())== true) {
+            logger.warn("经办人邮箱已存在");
+            throw new BytterTradeException(40001, "经办人邮箱已存在");
+        }
+        if (checkCustExistsByEmail(anOpenAccountInfo.getOperEmail())== true) {
+            logger.warn("经办人邮箱已存在");
+            throw new BytterTradeException(40001, "经办人邮箱已存在");
+        }
+        
+        if (checkCustExistsByMobileNo(anOpenAccountInfo.getOperMobile())== true) {
+            logger.warn("经办人手机号已存在");
+            throw new BytterTradeException(40001, "经办人手机号已存在");
+        }
+        
+        
+    }
 
     /**
      * 通过微信唯一标识查询开户信息
@@ -862,13 +902,35 @@ public class CustOpenAccountTmp2Service extends BaseService<CustOpenAccountTmpMa
     /**
      * 根据开户id和文件id保存附件
      */
-    public boolean saveSingleFileLink(Long anId, String anFileTypeName, String anFileMediaId) {
+    public CustFileItem saveSingleFileLink(Long anId, String anFileTypeName, String anFileMediaId) {
         CustOpenAccountTmp custOpenInfo = this.selectByPrimaryKey(anId);
         BTAssert.notNull(custOpenInfo, "无法获取开户信息");
-        CustFileItem fileItem = custWeChatService.fileUpload(anFileTypeName, anFileMediaId);
-        custOpenInfo.setBatchNo(custFileItemService.updateCustFileItemInfo( fileItem.getId().toString(),custOpenInfo.getBatchNo()));
-        
-        return this.updateByPrimaryKey(custOpenInfo) ==1; 
+        CustFileItem fileItem = custWeChatService.saveWechatFile(anFileTypeName, anFileMediaId);
+        System.out.println(fileItem);
+        System.out.println(anId);
+        custOpenInfo.setBatchNo(custFileItemService2.updateCustFileItemInfo( fileItem.getId().toString(),custOpenInfo.getBatchNo()));
+        this.updateByPrimaryKey(custOpenInfo);
+        return fileItem;
     }
-    
+
+    /**
+     * 根据batchNo生成对应文件类型Map Json对象(微信使用)
+     */
+    public Map<String, Object> findAccountFileByBatChNo(Long anBatchNo) {
+        Map<String, Object> fileMap = new HashMap<String, Object>();
+        List<CustFileItem> fileList = custFileItemService.findCustFiles(anBatchNo);
+        String[] fileInfoTypes = {"CustBizLicenseFile", "CustOrgCodeFile", "CustTaxRegistFile", "CustCreditCodeFile", "CustBankOpenLicenseFile", "BrokerIdHeadFile", "BrokerIdNationFile", "BrokerIdHoldFile", "RepresentIdHeadFile", "RepresentIdNationFile", "RepresentIdHoldFile", "CustOpenAccountFilePack"};
+        for (String anFileInfoType : fileInfoTypes) {
+            //默认数据
+            CustFileItem defaultFile = new CustFileItem();
+            defaultFile.setFileInfoType(anFileInfoType);
+            //遍历文件，若存在则放入
+            for (CustFileItem anFile : fileList) {
+                if (BetterStringUtils.equals(anFileInfoType, anFile.getFileInfoType())) {
+                    fileMap.put(anFileInfoType, anFile);
+                }
+            }
+        }
+        return fileMap;
+    }
 }
