@@ -14,6 +14,7 @@ import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.mapper.pagehelper.Page;
+import com.betterjr.mapper.pagehelper.PageHelper;
 import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.cert.entity.CustCertInfo;
@@ -103,15 +104,18 @@ public class CustRelationConfigService {
     public Page<CustRelation> queryCustRelationInfo(final Long anCustNo,final String anRelationType,final String anFlag, final int anPageNum, final int anPageSize) {
         BTAssert.notNull(anCustNo, "查询的客户号不能为空");
         Map<String, Object> anMap = new HashMap<String, Object>();
-        if(UserUtils.coreUser()){
-            anMap.put("relateCustno", anCustNo);
-        }else{
-            anMap.put("custNo", anCustNo);
-        }
+        anMap.put("custNo", anCustNo);
         if(BetterStringUtils.isNotBlank(anRelationType)){
             anMap.put("relateType", anRelationType);
         }
-        return custRelationService.queryCustRelationInfo(anMap,anFlag,anPageNum,anPageSize);
+        
+        if(UserUtils.coreUser()){// 如果是核心企业，还要查出以核心企业没条件的保理公司和电子合同信息
+            PageHelper.startPage(anPageNum, anPageSize, Integer.parseInt(anFlag) == 1);
+            return custRelationService.findCustRelationInfo(anCustNo,anRelationType);
+        }else{
+            Page<CustRelation> page= custRelationService.queryCustRelationInfo(anMap,anFlag,anPageNum,anPageSize);
+            return page;
+        }
     }
     
     
@@ -158,7 +162,7 @@ public class CustRelationConfigService {
         custRelation.setRelateCustno(anCustRelationNo);
         custRelation.setRelateCustname(custAccountService.queryCustName(anCustRelationNo));
         custRelation.setCustType("0");
-        custRelation.setBusinStatus("1");
+        custRelation.setBusinStatus("3");
         custRelation.setLastStatus("1");
         if(UserUtils.supplierUser() && BetterStringUtils.equalsIgnoreCase(anCustType,PlatformBaseRuleType.CORE_USER.toString())){ // 供应商与核心企业的关系
             custRelation.setRelateType(CustomerConstants.RELATE_TYPE_SUPPLIER_CORE);

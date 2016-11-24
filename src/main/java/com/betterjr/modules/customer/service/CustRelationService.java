@@ -408,7 +408,14 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
     public Page<CustRelation> queryCustRelationInfo(Map<String,Object> anMap,final String anFlag, final int anPageNum, final int anPageSize){
         return this.selectPropertyByPage(CustRelation.class, anMap, anPageNum, anPageSize, "1".equals(anFlag));
     }
-
+    
+    public Page<CustRelation> findCustRelationInfo(Long anCustNo,String anRelateType){
+        if(BetterStringUtils.isNotBlank(anRelateType)){
+            return mapper.findCustRelationListByRelateType(anCustNo,anRelateType);
+        }else{
+            return mapper.findCustRelationList(anCustNo);
+        }
+    }
     /**
      * 客户白名单受理
      *
