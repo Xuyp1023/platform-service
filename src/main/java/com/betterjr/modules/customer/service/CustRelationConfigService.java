@@ -103,7 +103,11 @@ public class CustRelationConfigService {
     public Page<CustRelation> queryCustRelationInfo(final Long anCustNo,final String anRelationType,final String anFlag, final int anPageNum, final int anPageSize) {
         BTAssert.notNull(anCustNo, "查询的客户号不能为空");
         Map<String, Object> anMap = new HashMap<String, Object>();
-        anMap.put("custNo", anCustNo);
+        if(UserUtils.coreUser()){
+            anMap.put("relateCustno", anCustNo);
+        }else{
+            anMap.put("custNo", anCustNo);
+        }
         if(BetterStringUtils.isNotBlank(anRelationType)){
             anMap.put("relateType", anRelationType);
         }
