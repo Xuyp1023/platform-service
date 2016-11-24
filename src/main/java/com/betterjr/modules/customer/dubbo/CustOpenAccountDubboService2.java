@@ -84,4 +84,8 @@ public class CustOpenAccountDubboService2 implements ICustOpenAccountService2{
         return AjaxObject.newOk("开户资料附件保存成功", custOpenAccountTmpService.saveSingleFileLink(anId, anFileTypeName, anFileMediaId)).toJson();
     }
 
+    @Override
+    public String webFindAccountFileByBatChNo(Long anBatchNo) {
+        return AjaxObject.newOk("开户信息附件查询成功", custOpenAccountTmpService.findAccountFileByBatChNo(anBatchNo)).toJson();
+    }
 }
