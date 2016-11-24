@@ -56,19 +56,27 @@ public class CustInstead2Service {
     
     /**
      * 微信端代录申请
+     * !!-- 在此处生成operId、OperName、OperOrg --!!
      */
     public CustInsteadApply wechatAddInsteadApply(String anCustName, Long anId, String anFileList) {
         final String insteadType = CustomerConstants.INSTEAD_APPLY_TYPE_OPENACCOUNT;
         final String insteadItems = "0,0,0,0,0,0,0";
         Map<String, Object> anMap = QueryTermBuilder.newInstance().put("insteadType", insteadType).put("insteadItems", insteadItems).build();
-        CustInsteadApply custInsteadApply = custInsteadService.addInsteadApply(anMap, anFileList);
-        //更新custName
+        CustInsteadApply custInsteadApply = custInsteadService.addWeChatInsteadApply(anMap,anCustName, anFileList);
+        
+        //更新custName,生成相应微信不存在信息
         custInsteadApply.setCustName(anCustName);
+        custInsteadApply.setRegOperId(SerialGenerator.getLongValue(SerialGenerator.OPERATOR_ID));
+        custInsteadApply.setRegOperName(anCustName);
         insteadApplyService.updateByPrimaryKeySelective(custInsteadApply);
+        
         //生成operOrg
         CustOpenAccountTmp anOpenAccountInfo = custOpenaccountTmpService.selectByPrimaryKey(anId);
         anOpenAccountInfo.setOperOrg(anOpenAccountInfo.getCustName() + SerialGenerator.randomBase62(10));
+        anOpenAccountInfo.setRegOperId(custInsteadApply.getRegOperId());
+        anOpenAccountInfo.setRegOperName(custInsteadApply.getRegOperName());
         custOpenaccountTmpService.updateByPrimaryKey(anOpenAccountInfo);
+        
         // 保存用户选择信息：客户名称、经办人信息
         fillInsteadRecordByAccountTmp(custInsteadApply.getId(), anOpenAccountInfo.getId());
 
