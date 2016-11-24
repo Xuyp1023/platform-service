@@ -9,6 +9,7 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.exception.BytterTradeException;
+import com.betterjr.common.selectkey.SerialGenerator;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterStringUtils;
@@ -75,15 +76,44 @@ public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper,
 
         final CustCertInfo certInfo = custCertService.findCertByOperOrg(UserUtils.getOperatorInfo().getOperOrg());
 
-        BTAssert.notNull(certInfo, "证书信息不允许为空!");
+//        BTAssert.notNull(certInfo, "证书信息不允许为空!");
 
-        custInsteadApply.setOrgName(certInfo.getCustName());
+//        custInsteadApply.setOrgName(certInfo.getCustName());
+        //微信
+        if(null != certInfo) {
+            custInsteadApply.setOrgName(certInfo.getCustName());
+        }
 
         custInsteadApply.setBatchNo(fileItemService.updateCustFileItemInfo(anFileList, custInsteadApply.getBatchNo()));
 
         this.insert(custInsteadApply);
         return custInsteadApply;
     }
+    
+    /**
+     * 微信端代录申请,无证书
+     */
+    public CustInsteadApply addWeChatCustInsteadApply(final String anInsteadType, final String anCustName, final String anFileList) {
+        if (BetterStringUtils.isBlank(anInsteadType) == true) {
+            throw new BytterTradeException(20061, "代录申请类型不允许为空！");
+        }
+
+        final CustInsteadApply custInsteadApply = new CustInsteadApply();
+        if (anInsteadType.equals(CustomerConstants.INSTEAD_APPLY_TYPE_OPENACCOUNT) == true) {
+            custInsteadApply.initAddValue(anInsteadType, null, null);
+        }
+        //代入CustName
+        custInsteadApply.setCustName(anCustName);
+        custInsteadApply.setBatchNo(fileItemService.updateCustFileItemInfo(anFileList, custInsteadApply.getBatchNo()));
+        
+        //微信生成默认operOrg和operName
+        custInsteadApply.setOperOrg(custInsteadApply.getCustName() + SerialGenerator.randomBase62(10));
+        custInsteadApply.setOrgName(custInsteadApply.getCustName());
+
+        this.insert(custInsteadApply);
+        return custInsteadApply;
+    }
+    
 
     /**
      *
