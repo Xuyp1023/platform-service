@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -111,7 +112,15 @@ public class CustRelationConfigService {
         
         if(UserUtils.coreUser()){// 如果是核心企业，还要查出以核心企业没条件的保理公司和电子合同信息
             PageHelper.startPage(anPageNum, anPageSize, Integer.parseInt(anFlag) == 1);
-            return custRelationService.findCustRelationInfo(anCustNo,anRelationType);
+            Page<CustRelation> page=custRelationService.findCustRelationInfo(anCustNo,anRelationType);
+            for (CustRelation custRelation:page) {
+                if(StringUtils.equalsIgnoreCase(CustomerConstants.RELATE_TYPE_CORE_FACTOR, custRelation.getRelateType()) || StringUtils.equalsIgnoreCase(CustomerConstants.RELATE_TYPE_ELEC_CONTRACT, custRelation.getRelateType())){
+                    String custName=custRelation.getCustName();
+                    custRelation.setCustName(custRelation.getRelateCustname());
+                    custRelation.setRelateCustname(custName);
+                }
+            }
+            return page;
         }else{
             Page<CustRelation> page= custRelationService.queryCustRelationInfo(anMap,anFlag,anPageNum,anPageSize);
             return page;
