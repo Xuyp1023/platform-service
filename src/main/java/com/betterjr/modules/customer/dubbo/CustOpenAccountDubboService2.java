@@ -18,9 +18,9 @@ public class CustOpenAccountDubboService2 implements ICustOpenAccountService2{
     private CustOpenAccountTmp2Service custOpenAccountTmpService;
 
     @Override
-    public String webSaveOpenAccountApply(Map<String, Object> anMap, String anFileList) {
+    public String webSaveOpenAccountApply(Map<String, Object> anMap, Long anOperId, String anFileList) {
         CustOpenAccountTmp anOpenAccountInfo = (CustOpenAccountTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return AjaxObject.newOk("开户申请提交成功", custOpenAccountTmpService.saveOpenAccountApply(anOpenAccountInfo, anFileList)).toJson();
+        return AjaxObject.newOk("开户申请提交成功", custOpenAccountTmpService.saveOpenAccountApply(anOpenAccountInfo, anOperId, anFileList)).toJson();
     }
     
     @Override
@@ -72,6 +72,16 @@ public class CustOpenAccountDubboService2 implements ICustOpenAccountService2{
         CustOpenAccountTmp anOpenAccountInfo = (CustOpenAccountTmp) RuleServiceDubboFilterInvoker.getInputObj();
 
         return AjaxObject.newOk("开户资料暂存成功", custOpenAccountTmpService.saveOpenAccountInfo(anOpenAccountInfo, anId, anFileList)).toJson();
+    }
+
+    @Override
+    public String webFindAccountTmpInfo(String anOpenId) {
+        return AjaxObject.newOk("开户资料查询成功", custOpenAccountTmpService.findAccountTmpInfo(anOpenId)).toJson();
+    }
+
+    @Override
+    public String webSaveSingleFileLink(Long anId,  String anFileTypeName, String anFileMediaId) {
+        return AjaxObject.newOk("开户资料附件保存成功", custOpenAccountTmpService.saveSingleFileLink(anId, anFileTypeName, anFileMediaId)).toJson();
     }
 
 }

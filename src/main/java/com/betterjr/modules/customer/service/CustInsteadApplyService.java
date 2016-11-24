@@ -224,5 +224,14 @@ public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper,
 
         return tempInsteadApply;
     }
+    
+    /**
+     * 根据开户信息tmp id 查询开户申请
+     */
+    public CustInsteadApply findInsteadApplyByAccountTmpId(Long anId) {
+        CustInsteadRecord anRecord = Collections3.getFirst(insteadRecordService.selectByProperty("tmpIds", anId));
+        CustInsteadApply custApply = this.selectByPrimaryKey(anRecord.getApplyId());
+        return custApply;
+    }
 
 }

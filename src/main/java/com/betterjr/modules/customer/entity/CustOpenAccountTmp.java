@@ -319,6 +319,14 @@ public class CustOpenAccountTmp implements BetterjrEntity {
     @MetaData(value = "创建时间", comments = "创建时间")
     private String regTime;
 
+    
+    /**
+     * 税务登记证号
+     */
+    @Column(name = "C_TAX_NO",  columnDefinition="VARCHAR" )
+    @MetaData( value="税务登记证号", comments = "税务登记证号")
+    private String taxNo;
+
     /**
      * 修改人(操作员)ID号
      */
@@ -397,6 +405,34 @@ public class CustOpenAccountTmp implements BetterjrEntity {
     @Column(name = "C_CORELIST", columnDefinition = "VARCHAR")
     @MetaData(value = "核心企业列表", comments = "核心企业列表")
     private String coreList;
+    
+    /**
+     * 开户许可证核准号
+     */
+    @Column(name = "C_OPEN_LICENSE", columnDefinition = "CHAR")
+    @MetaData(value = "开户许可证核准号", comments = "开户许可证核准号")
+    private Long openLicense;
+    
+    /**
+     * 微信用户标识
+     */
+    @Column(name = "C_WECHAT_OPENID", columnDefinition = "VARCHAR")
+    @MetaData(value = "微信用户标识", comments = "微信用户标识")
+    private String wechatOpenId;
+    
+    /**
+     * 交易密码(仅微信有)
+     */
+    @Column(name = "C_DEAL_PASSWORD", columnDefinition = "VARCHAR")
+    @MetaData(value = "交易密码(仅微信有)", comments = "交易密码(仅微信有)")
+    private String dealPassword;
+    
+    /**
+     * 角色：供应商、经销商
+     */
+    @Column(name = "C_ROLE", columnDefinition = "VARCHAR")
+    @MetaData(value = "角色：供应商、经销商", comments = "角色：供应商、经销商")
+    private String role;
 
     private static final long serialVersionUID = 1468812783872L;
 
@@ -816,6 +852,46 @@ public class CustOpenAccountTmp implements BetterjrEntity {
         this.coreList = coreList;
     }
 
+    public Long getOpenLicense() {
+        return this.openLicense;
+    }
+
+    public void setOpenLicense(Long anOpenLicense) {
+        this.openLicense = anOpenLicense;
+    }
+
+    public String getTaxNo() {
+        return this.taxNo;
+    }
+
+    public void setTaxNo(String anTaxNo) {
+        this.taxNo = anTaxNo;
+    }
+
+    public String getWechatOpenId() {
+        return this.wechatOpenId;
+    }
+
+    public void setWechatOpenId(String anWechatOpenId) {
+        this.wechatOpenId = anWechatOpenId;
+    }
+
+    public String getDealPassword() {
+        return this.dealPassword;
+    }
+
+    public void setDealPassword(String anDealPassword) {
+        this.dealPassword = anDealPassword;
+    }
+
+    public String getRole() {
+        return this.role;
+    }
+
+    public void setRole(String anRole) {
+        this.role = anRole;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -874,6 +950,11 @@ public class CustOpenAccountTmp implements BetterjrEntity {
         sb.append(", tmpOperType=").append(tmpOperType);
         sb.append(", orgCode=").append(orgCode);
         sb.append(", coreList=").append(coreList);
+        sb.append(", openLicense=").append(openLicense);
+        sb.append(", taxNo=").append(taxNo);
+        sb.append(", wechatOpenId=").append(wechatOpenId);
+        sb.append(", dealPassword=").append(dealPassword);
+        sb.append(", role=").append(role);
         sb.append(", serialVersionUID=").append(serialVersionUID);
         sb.append("]");
         return sb.toString();
@@ -944,6 +1025,11 @@ public class CustOpenAccountTmp implements BetterjrEntity {
                 && (this.getTmpType() == null ? other.getTmpType() == null : this.getTmpType().equals(other.getTmpType()))
                 && (this.getTmpOperType() == null ? other.getTmpOperType() == null : this.getTmpOperType().equals(other.getTmpOperType()))
                 && (this.getOrgCode() == null ? other.getOrgCode() == null : this.getOrgCode().equals(other.getOrgCode()))
+                && (this.getOpenLicense() == null ? other.getOpenLicense() == null : this.getOpenLicense().equals(other.getOpenLicense()))
+                && (this.getTaxNo() == null ? other.getTaxNo() == null : this.getTaxNo().equals(other.getTaxNo()))
+                && (this.getWechatOpenId() == null ? other.getWechatOpenId() == null : this.getWechatOpenId().equals(other.getWechatOpenId()))
+                && (this.getDealPassword() == null ? other.getDealPassword() == null : this.getDealPassword().equals(other.getDealPassword()))
+                && (this.getRole() == null ? other.getRole() == null : this.getRole().equals(other.getRole()))
                 && (this.getCoreList() == null ? other.getCoreList() == null : this.getCoreList().equals(other.getCoreList()));
     }
 
@@ -1002,6 +1088,11 @@ public class CustOpenAccountTmp implements BetterjrEntity {
         result = prime * result + ((getTmpType() == null) ? 0 : getTmpType().hashCode());
         result = prime * result + ((getTmpOperType() == null) ? 0 : getTmpOperType().hashCode());
         result = prime * result + ((getOrgCode() == null) ? 0 : getOrgCode().hashCode());
+        result = prime * result + ((getOpenLicense() == null) ? 0 : getOpenLicense().hashCode());
+        result = prime * result + ((getTaxNo() == null) ? 0 : getTaxNo().hashCode());
+        result = prime * result + ((getWechatOpenId() == null) ? 0 : getWechatOpenId().hashCode());
+        result = prime * result + ((getDealPassword() == null) ? 0 : getDealPassword().hashCode());
+        result = prime * result + ((getRole() == null) ? 0 : getRole().hashCode());
         result = prime * result + ((getCoreList() == null) ? 0 : getCoreList().hashCode());
         return result;
     }

@@ -418,9 +418,9 @@ public class CustInsteadApply implements BetterjrEntity {
 
         this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
         this.orgName = UserUtils.getOrgName();
-//        this.businStatus = CustomerConstants.INSTEAD_APPLY_STATUS_NEW;
+        this.businStatus = CustomerConstants.INSTEAD_APPLY_STATUS_NEW;
         //直接跳过第一步代录审核，直接进入代录操作
-        this.businStatus = CustomerConstants.INSTEAD_APPLY_STATUS_AUDIT_PASS;
+//        this.businStatus = CustomerConstants.INSTEAD_APPLY_STATUS_AUDIT_PASS;
     }
 
     public void initModifyValue(final String anBusinStatus) {
