@@ -88,4 +88,9 @@ public class CustOpenAccountDubboService2 implements ICustOpenAccountService2{
     public String webFindAccountFileByBatChNo(Long anBatchNo) {
         return AjaxObject.newOk("开户信息附件查询成功", custOpenAccountTmpService.findAccountFileByBatChNo(anBatchNo)).toJson();
     }
+    
+    @Override
+    public String findOpenAccountStatus(String anOpenId) {
+        return custOpenAccountTmpService.findOpenAccountStatus(anOpenId);
+    }
 }

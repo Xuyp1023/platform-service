@@ -260,6 +260,9 @@ public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper,
      */
     public CustInsteadApply findInsteadApplyByAccountTmpId(Long anId) {
         CustInsteadRecord anRecord = Collections3.getFirst(insteadRecordService.selectByProperty("tmpIds", anId));
+        if (anRecord == null) {
+            return null;
+        }
         CustInsteadApply custApply = this.selectByPrimaryKey(anRecord.getApplyId());
         return custApply;
     }
