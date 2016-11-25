@@ -52,6 +52,10 @@ import com.betterjr.modules.sys.entity.DictInfo;
 import com.betterjr.modules.sys.entity.DictItemInfo;
 import com.betterjr.modules.sys.service.DictItemService;
 import com.betterjr.modules.sys.service.DictService;
+import com.betterjr.modules.wechat.entity.CustTempEnrollInfo;
+import com.betterjr.modules.wechat.entity.CustWeChatInfo;
+import com.betterjr.modules.wechat.service.CustWeChatService;
+import com.betterjr.modules.wechat.service.WeChatCustEnrollService;
 import com.google.common.collect.Multimap;
 
 /**
@@ -115,6 +119,12 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
 
     @Resource
     private RocketMQProducer betterProducer;
+    
+    @Autowired
+    private CustWeChatService custWeChatService;
+    
+    @Autowired
+    private WeChatCustEnrollService custEnrollService;
 
     /**
      * 开户资料读取
@@ -353,9 +363,14 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         // 检查开户资料合法性
         checkAccountInfoValid(anOpenAccountInfo);
         if (BetterStringUtils.equals(anOpenAccountInfo.getBusinStatus(), CustomerConstants.TMP_STATUS_USEING)) {
-            // 生成开户数据
-            createValidAccount(anOpenAccountInfo, UserUtils.getOperatorInfo().getId(), UserUtils.getOperatorInfo().getName(),
-                    UserUtils.getOperatorInfo().getOperOrg());
+            // 生成开户数据，区分微信和PC
+            if(!BetterStringUtils.isEmpty(anOpenAccountInfo.getWechatOpenId())) {
+                createValidAccount(anOpenAccountInfo, anOpenAccountInfo.getRegOperId(), anOpenAccountInfo.getRegOperName(),
+                        anOpenAccountInfo.getOperOrg());
+            }else {
+                createValidAccount(anOpenAccountInfo, UserUtils.getOperatorInfo().getId(), UserUtils.getOperatorInfo().getName(),
+                        UserUtils.getOperatorInfo().getOperOrg());
+            }
             // 更新数据
             this.updateByPrimaryKeySelective(anOpenAccountInfo);
 
@@ -547,39 +562,118 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
 
     private void createValidAccount(final CustOpenAccountTmp anOpenAccountInfo, final Long anOperId, final String anOperName,
             final String anOperOrg) {
-        // 开户资料附件
-        final Long anBatchNo = anOpenAccountInfo.getBatchNo();
-
-        // 开户资料附件信息
-        final Multimap<String, Object> anCustFileItem = ReflectionUtils.listConvertToMuiltMap(custFileItemService.findCustFiles(anBatchNo),
-                "fileInfoType");
-
+     // 开户资料附件信息
+        final Multimap<String, Object> anCustFileItem = ReflectionUtils
+                .listConvertToMuiltMap(custFileItemService.findCustFiles(anOpenAccountInfo.getBatchNo()), "fileInfoType");
         // 数据存盘,客户资料
         final CustInfo custInfo = addCustInfo(anOpenAccountInfo, anOperId, anOperName, anOperOrg);
-
+        // 新增经办人、操作员
+        addCustOperatorInfo(anOpenAccountInfo, anCustFileItem, custInfo.getCustNo(), anOperId, anOperName, anOperOrg);
+        //回写客户编号
+        anOpenAccountInfo.setCustNo(custInfo.getCustNo());
         // 数据存盘,基本信息
         addCustMechBase(anOpenAccountInfo, custInfo.getCustNo(), anOperId, anOperName, anOperOrg);
-
         // 数据存盘,法人信息
         addCustMechLaw(anOpenAccountInfo, anCustFileItem, custInfo.getCustNo(), anOperId, anOperName, anOperOrg);
-
         // 数据存盘,营业执照
         addCustMechBusinLicence(anOpenAccountInfo, anCustFileItem, custInfo.getCustNo(), anOperId, anOperName, anOperOrg);
-
         // 数据存盘,银行账户
         addCustMechBankAccount(anOpenAccountInfo, anCustFileItem, custInfo.getCustNo(), anOperId, anOperName, anOperOrg);
-
-        // 数据存盘,经办人信息
-        addCustOperatorInfo(anOpenAccountInfo, anCustFileItem, custInfo.getCustNo(), anOperId, anOperName, anOperOrg);
-
         // 数据存盘,当前操作员关联客户
         custAndOperatorRelaService.insert(new CustOperatorRelation(anOperId, custInfo.getCustNo(), anOperOrg));
-
-        // 与核心企业建立关系
-        addCustRelation(anOpenAccountInfo, custInfo, anOperOrg);
-
-        // 回写客户编号
-        anOpenAccountInfo.setCustNo(custInfo.getCustNo());
+        // 写入T_TEMP_CUST_ENROLL表
+        addCustEnroll(anOpenAccountInfo, anOperOrg);
+        
+        //若为微信开户
+        if(!BetterStringUtils.isEmpty(anOpenAccountInfo.getWechatOpenId())) {
+           //生成证书信息
+           initCustCertinfo(anOpenAccountInfo, anOperOrg, anOperId, anOperName);
+           //绑定微信
+           addBindWeChat(custInfo, anOperId, anOperOrg, anOperName, anOpenAccountInfo.getWechatOpenId());
+        }
+    }
+    
+    /**
+     * 经办人与当前微信绑定
+     */
+    private void addBindWeChat(final CustInfo anCustInfo,Long anOperId, String anOperOrg, String anOperName, final String anOpenId) {
+        BTAssert.isTrue(BetterStringUtils.isNotBlank(anOpenId), "openid 不允许为空");
+        final CustWeChatInfo weChatInfo = custWeChatService.selectByPrimaryKey(anOpenId);
+        BTAssert.notNull(weChatInfo, "没有找到微信用户信息！");
+        weChatInfo.setOperId(anOperId);
+        weChatInfo.setOperName(anOperName);
+        weChatInfo.setOperOrg(anOperOrg);
+        weChatInfo.setModiDate(BetterDateUtils.getNumDate());
+        weChatInfo.setModiTime(BetterDateUtils.getNumTime());
+        weChatInfo.setModiOperId(anOperId);
+        weChatInfo.setModiOperName(anOperName);
+        weChatInfo.setCustNo(anCustInfo.getCustNo());
+        weChatInfo.setBusinStatus("1");// 开户结束后设置为已完成状态;
+        custWeChatService.updateByPrimaryKeySelective(weChatInfo);
+    }
+    
+    /**
+     * 生成证书信息
+     */
+    private void initCustCertinfo(final CustOpenAccountTmp anOpenAccountInfo, String anOperOrg, Long anOperId, String anOperName) {
+        final CustCertInfo certInfo = new CustCertInfo();
+        certInfo.setSerialNo(Long.toUnsignedString(System.currentTimeMillis() * 10000 + SerialGenerator.randomInt(10000)));
+        certInfo.setCustNo(anOpenAccountInfo.getCustNo());
+        certInfo.setCustName(anOpenAccountInfo.getCustName());
+        certInfo.setIdentNo(anOpenAccountInfo.getIdentNo());
+        certInfo.setContName(anOpenAccountInfo.getOperName());
+        certInfo.setContIdentType("0");
+        certInfo.setContIdentNo("");
+        certInfo.setContPhone(anOpenAccountInfo.getOperPhone());
+        certInfo.setStatus("8"); // 微信端开户
+        certInfo.setVersionUid("wechat");
+        certInfo.setSubject("wechat" + anOpenAccountInfo.getCustNo());
+        certInfo.setOperNo("-1");
+        certInfo.setCertInfo("wechat" + anOpenAccountInfo.getCustNo());
+        certInfo.setValidDate(BetterDateUtils.getNumDate());
+        certInfo.setCreateDate(BetterDateUtils.getNumDate());
+        certInfo.setToken("wechat" + anOpenAccountInfo.getCustNo());
+        certInfo.setOperOrg(anOperOrg);
+        certInfo.setRuleList(anOpenAccountInfo.getRole());
+        certInfo.setCertId(-1l);
+        certInfo.setRegOperId(anOperId);
+        certInfo.setRegOperName(anOperName);
+        certInfo.setRegDate(BetterDateUtils.getNumDate());
+        certInfo.setRegTime(BetterDateUtils.getNumTime());
+        certInfo.setModiOperId(anOperId);
+        certInfo.setModiOperName(anOperName);
+        certInfo.setModiDate(BetterDateUtils.getNumDate());
+        certInfo.setModiTime(BetterDateUtils.getNumTime());
+        certInfo.setPublishDate(BetterDateUtils.getNumDate());
+        certInfo.setPublishMode(BetterDateUtils.getNumTime());
+        certInfo.setDescription("wechat" + anOpenAccountInfo.getCustNo());
+        certInfo.setEmail(anOpenAccountInfo.getOperEmail());
+        custCertService.addCustCertInfo(certInfo);
+    }
+    
+    /**
+     * 写入T_TEMP_CUST_ENROLL表
+     */
+    private CustTempEnrollInfo addCustEnroll(final CustOpenAccountTmp anOpenAccountInfo, String anOperOrg) {
+        final CustTempEnrollInfo custEnrollInfo = new CustTempEnrollInfo();
+        custEnrollInfo.initWeChatAddValue();
+        custEnrollInfo.setCustName(anOpenAccountInfo.getCustName());
+        custEnrollInfo.setIdentType(anOpenAccountInfo.getIdentType());
+        custEnrollInfo.setIdentNo(anOpenAccountInfo.getIdentNo());
+        custEnrollInfo.setCustNo(anOpenAccountInfo.getCustNo());
+        custEnrollInfo.setContName(anOpenAccountInfo.getOperName());
+        custEnrollInfo.setContIdentType(anOpenAccountInfo.getOperIdenttype());
+        custEnrollInfo.setContIdentNo(anOpenAccountInfo.getOperIdentno());
+        custEnrollInfo.setContPhone(anOpenAccountInfo.getOperPhone());
+        custEnrollInfo.setContMobileNo(anOpenAccountInfo.getOperMobile());
+        custEnrollInfo.setContEmail(anOpenAccountInfo.getOperEmail());
+        custEnrollInfo.setStatus("1");
+        custEnrollInfo.setOperOrg(anOperOrg);
+        custEnrollInfo.setBankAccount(anOpenAccountInfo.getBankAcco());
+        custEnrollInfo.setBankAcountName(anOpenAccountInfo.getBankAccoName());
+        custEnrollInfo.setBankName(anOpenAccountInfo.getBankName());
+        custEnrollService.insert(custEnrollInfo);
+        return custEnrollInfo;
     }
 
     private void addCustRelation(final CustOpenAccountTmp anOpenAccountInfo, final CustInfo anCustInfo, final String anOperOrg) {
@@ -620,6 +714,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         anCustInfo.setRegOperId(anOperId);
         anCustInfo.setRegOperName(anOperName);
         anCustInfo.setOperOrg(anOperOrg);
+        //生成客户号
         anCustInfo.setCustNo(SerialGenerator.getCustNo());
         anCustInfo.setIdentValid(true);
         anCustInfo.setCustType(CustomerConstants.CUSTOMER_TYPE_ENTERPRISE);// 客户类型:0-机构;1-个人;
@@ -629,14 +724,17 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         anCustInfo.setValidDate(anOpenAccountInfo.getBusinLicenceValidDate());
         anCustInfo.setRegDate(BetterDateUtils.getNumDate());
         anCustInfo.setRegTime(BetterDateUtils.getNumTime());
+        //客户状态；0正常，1冻结，9销户
         anCustInfo.setBusinStatus("0");
         anCustInfo.setLastStatus("0");
         anCustInfo.setVersion(0l);
         custAccountService.insert(anCustInfo);
-
         return anCustInfo;
     }
 
+    /**
+     * 保存客户基本信息
+     */
     private void addCustMechBase(final CustOpenAccountTmp anOpenAccountInfo, final Long anCustNo, final Long anOperId, final String anOperName,
             final String anOperOrg) {
         final CustMechBase anCustMechBaseInfo = new CustMechBase();
@@ -654,10 +752,12 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         anCustMechBaseInfo.setFax(anOpenAccountInfo.getFax());
         anCustMechBaseInfo.setVersion(0l);
         anCustMechBaseInfo.setZipCode(anOpenAccountInfo.getZipCode());
-
         custMechBaseService.addCustMechBase(anCustMechBaseInfo, anCustNo);
     }
 
+    /**
+     * 保存客户法人信息
+     */
     private void addCustMechLaw(final CustOpenAccountTmp anOpenAccountInfo, final Multimap<String, Object> anCustFileItem, final Long anCustNo,
             final Long anOperId, final String anOperName, final String anOperOrg) {
         final CustMechLaw anCustMechLawInfo = new CustMechLaw();
@@ -672,19 +772,26 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         // anCustMechLawInfo.setSex(IdcardUtils.getGenderByIdCard(anOpenAccountInfo.getLawIdentNo(), anOpenAccountInfo.getLawIdentType()));
         // anCustMechLawInfo.setBirthdate(IdcardUtils.getBirthByIdCard(anOpenAccountInfo.getLawIdentNo()));
         anCustMechLawInfo.setVersion(0l);
-        // 附件：法人representIdFile
-        final Collection anCollection = anCustFileItem.get("representIdFile");
-        final List<CustFileItem> anFileItemList = new ArrayList(anCollection);
-        if (anFileItemList.size() > 0) {
-            final Long anNewBatchNo = CustFileUtils.findBatchNo();
-            // 更新文件信息,同时写入文件认证信息
-            saveCustFileItem(anFileItemList, "representIdFile", anCustNo, anNewBatchNo, anOperId);
-            // 更新附件批次号
-            anCustMechLawInfo.setBatchNo(anNewBatchNo);
+        //法人身份证-头像面-RepresentIdHeadFile,法人身份证-国徽面-RepresentIdNationFile,法人身份证-手持证件-RepresentIdHoldFile
+        final String[] fileTypes = {"RepresentIdHeadFile", "RepresentIdNationFile", "RepresentIdHoldFile"};
+        //由协定附件类型写入文件认证部分
+        for (String anFileType : fileTypes) {
+            final Collection anCollection = anCustFileItem.get(anFileType);
+            final List<CustFileItem> anFileItemList = new ArrayList(anCollection);
+            if (anFileItemList.size() > 0) {
+                final Long anNewBatchNo = CustFileUtils.findBatchNo();
+                // 更新文件信息,同时写入文件认证信息
+                saveCustFileItem(anFileItemList, anFileType, anCustNo, anNewBatchNo, anOperId);
+                // 更新附件批次号
+                anCustMechLawInfo.setBatchNo(anNewBatchNo);
+            }
+            custMechLawService.addCustMechLaw(anCustMechLawInfo, anCustNo);
         }
-        custMechLawService.addCustMechLaw(anCustMechLawInfo, anCustNo);
     }
 
+    /**
+     * 保存营业执照
+     */
     private void addCustMechBusinLicence(final CustOpenAccountTmp anOpenAccountInfo, final Multimap<String, Object> anCustFileItem,
             final Long anCustNo, final Long anOperId, final String anOperName, final String anOperOrg) {
         final CustMechBusinLicence anCustMechBusinLicenceInfo = new CustMechBusinLicence();
@@ -697,24 +804,26 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         anCustMechBusinLicenceInfo.setOrgCode(anOpenAccountInfo.getOrgCode());
         anCustMechBusinLicenceInfo.setLawName(anOpenAccountInfo.getLawName());
         anCustMechBusinLicenceInfo.setEndDate(anOpenAccountInfo.getBusinLicenceValidDate());
+        //税务登记证号
+        anCustMechBusinLicenceInfo.setTaxNo(anOpenAccountInfo.getTaxNo());
         // 附件：组织机构代码证orgCodeFile
-        final Collection anOrgCodeCollection = anCustFileItem.get("orgCodeFile");
+        final Collection anOrgCodeCollection = anCustFileItem.get("CustOrgCodeFile");
         final List<CustFileItem> anOrgCodeFileItemList = new ArrayList(anOrgCodeCollection);
         // 附件：税务登记证taxRegistFile
-        final Collection anTaxRegistollection = anCustFileItem.get("orgCodeFile");
+        final Collection anTaxRegistollection = anCustFileItem.get("CustTaxRegistFile");
         final List<CustFileItem> anTaxRegistFileItemList = new ArrayList(anTaxRegistollection);
         // 附件：营业执照bizLicenseFile
-        final Collection anBizLicenseCollection = anCustFileItem.get("orgCodeFile");
+        final Collection anBizLicenseCollection = anCustFileItem.get("CustBizLicenseFile");
         final List<CustFileItem> anBizLicenseFileItemList = new ArrayList(anBizLicenseCollection);
         // 企业三证附件信息同时处理
         if (anOrgCodeFileItemList.size() > 0 || anTaxRegistFileItemList.size() > 0 || anBizLicenseFileItemList.size() > 0) {
             final Long anNewBatchNo = CustFileUtils.findBatchNo();
             // 附件：组织机构代码证orgCodeFile,更新文件信息,同时写入文件认证信息
-            saveCustFileItem(anOrgCodeFileItemList, "orgCodeFile", anCustNo, anNewBatchNo, anOperId);
+            saveCustFileItem(anOrgCodeFileItemList, "CustOrgCodeFile", anCustNo, anNewBatchNo, anOperId);
             // 附件：税务登记证taxRegistFile,更新文件信息,同时写入文件认证信息
-            saveCustFileItem(anTaxRegistFileItemList, "taxRegistFile", anCustNo, anNewBatchNo, anOperId);
+            saveCustFileItem(anTaxRegistFileItemList, "CustTaxRegistFile", anCustNo, anNewBatchNo, anOperId);
             // 附件：营业执照bizLicenseFile,更新文件信息,同时写入文件认证信息
-            saveCustFileItem(anTaxRegistFileItemList, "bizLicenseFile", anCustNo, anNewBatchNo, anOperId);
+            saveCustFileItem(anTaxRegistFileItemList, "CustBizLicenseFile", anCustNo, anNewBatchNo, anOperId);
             // 更新附件批次号
             anCustMechBusinLicenceInfo.setBatchNo(anNewBatchNo);
         }
@@ -794,35 +903,45 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         }
     }
 
+    /**
+     * 新增经办人信息或补充经办人附件
+     */
     private void addCustOperatorInfo(final CustOpenAccountTmp anOpenAccountInfo, final Multimap<String, Object> anCustFileItem, final Long anCustNo,
             final Long anOperId, final String anOperName, final String anOperOrg) {
-        final CustOperatorInfo anCustOperatorInfo = new CustOperatorInfo();
-        anCustOperatorInfo.setOperOrg(anOperOrg);
-        anCustOperatorInfo.setId(SerialGenerator.getLongValue(SerialGenerator.OPERATOR_ID));
-        anCustOperatorInfo.setName(anOpenAccountInfo.getOperName());
-        anCustOperatorInfo.setIdentType(anOpenAccountInfo.getOperIdenttype());
-        anCustOperatorInfo.setIdentNo(anOpenAccountInfo.getOperIdentno());
-        anCustOperatorInfo.setMobileNo(anOpenAccountInfo.getOperMobile());
-        anCustOperatorInfo.setPhone(anOpenAccountInfo.getOperPhone());
-        anCustOperatorInfo.setIdentClass(anOpenAccountInfo.getOperIdenttype());
-        anCustOperatorInfo.setValidDate(anOpenAccountInfo.getOperValiddate());
-        anCustOperatorInfo.setStatus("1");
-        anCustOperatorInfo.setLastStatus("1");
-        // anCustOperatorInfo.setSex(IdcardUtils.getGenderByIdCard(anCustOperatorInfo.getIdentNo(), anCustOperatorInfo.getIdentType()));
-        anCustOperatorInfo.setRegDate(BetterDateUtils.getNumDate());
-        anCustOperatorInfo.setModiDate(BetterDateUtils.getNumDateTime());
-        anCustOperatorInfo.setFaxNo(anOpenAccountInfo.getOperFaxNo());
-        anCustOperatorInfo.setAddress(anOpenAccountInfo.getAddress());
-        anCustOperatorInfo.setEmail(anOpenAccountInfo.getOperEmail());
-        anCustOperatorInfo.setZipCode(anOpenAccountInfo.getZipCode());
-        custOperatorService.insert(anCustOperatorInfo);
-        // 附件：经办人brokerIdFile
-        final Collection anCollection = anCustFileItem.get("brokerIdFile");
-        final List<CustFileItem> anFileItemList = new ArrayList(anCollection);
-        if (anFileItemList.size() > 0) {
-            final Long anNewBatchNo = CustFileUtils.findBatchNo();
-            // 更新文件信息,同时写入文件认证信息
-            saveCustFileItem(anFileItemList, "brokerIdFile", anCustNo, anNewBatchNo, anOperId);
+        //若为微信，需新增操作员
+        if (!BetterStringUtils.isEmpty(anOpenAccountInfo.getWechatOpenId())) {
+            final CustOperatorInfo anCustOperatorInfo = new CustOperatorInfo();
+            anCustOperatorInfo.setOperOrg(anOperOrg);
+//            anCustOperatorInfo.setId(SerialGenerator.getLongValue(SerialGenerator.OPERATOR_ID));
+            anCustOperatorInfo.setId(anOperId);
+            anCustOperatorInfo.setName(anOpenAccountInfo.getOperName());
+            anCustOperatorInfo.setIdentType(anOpenAccountInfo.getOperIdenttype());
+            anCustOperatorInfo.setIdentNo(anOpenAccountInfo.getOperIdentno());
+            anCustOperatorInfo.setMobileNo(anOpenAccountInfo.getOperMobile());
+            anCustOperatorInfo.setPhone(anOpenAccountInfo.getOperPhone());
+            anCustOperatorInfo.setIdentClass(anOpenAccountInfo.getOperIdenttype());
+            anCustOperatorInfo.setValidDate(anOpenAccountInfo.getOperValiddate());
+            anCustOperatorInfo.setStatus("1");
+            anCustOperatorInfo.setLastStatus("1");
+            // anCustOperatorInfo.setSex(IdcardUtils.getGenderByIdCard(anCustOperatorInfo.getIdentNo(), anCustOperatorInfo.getIdentType()));
+            anCustOperatorInfo.setRegDate(BetterDateUtils.getNumDate());
+            anCustOperatorInfo.setModiDate(BetterDateUtils.getNumDateTime());
+            anCustOperatorInfo.setFaxNo(anOpenAccountInfo.getOperFaxNo());
+            anCustOperatorInfo.setAddress(anOpenAccountInfo.getAddress());
+            anCustOperatorInfo.setEmail(anOpenAccountInfo.getOperEmail());
+            anCustOperatorInfo.setZipCode(anOpenAccountInfo.getZipCode());
+            custOperatorService.insert(anCustOperatorInfo);
+        }
+        // 法人身份证-头像面-------RepresentIdHeadFile，法人身份证-国徽面-------RepresentIdNationFile，法人身份证-手持证件-------RepresentIdHoldFile
+        String[] fileTypes = {"RepresentIdHeadFile", "RepresentIdNationFile", "RepresentIdHoldFile"};
+        for (String anFileType : fileTypes) {
+            final Collection anCollection = anCustFileItem.get(anFileType);
+            final List<CustFileItem> anFileItemList = new ArrayList(anCollection);
+            if (anFileItemList.size() > 0) {
+                final Long anNewBatchNo = CustFileUtils.findBatchNo();
+                // 更新文件信息,同时写入文件认证信息
+                saveCustFileItem(anFileItemList, anFileType, anCustNo, anNewBatchNo, anOperId);
+            }
         }
     }
 
@@ -937,6 +1056,13 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
 
         return custMechBankAccountService.selectByProperty("bankAcco", anBankAccount).size() > 0;
     }
+    
+    /**
+     * 检查手机号码是否已注册
+     */
+    public boolean checkCustExistsByMobileNo(final String anMobileNo) {
+        return custOperatorService.selectByProperty("mobileNo", anMobileNo).size() > 0;
+    }
 
     private void checkAccountInfoParams(final CustOpenAccountTmp anOpenAccountInfo) {
         // 客户资料检查
@@ -988,4 +1114,5 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
 
         return new HashMap();
     }
+
 }
