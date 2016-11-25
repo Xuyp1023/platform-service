@@ -510,9 +510,7 @@ public class CustWeChatService extends BaseService<CustWeChatInfoMapper, CustWeC
             final WechatAPIImpl wechatApi = WechatAPIImpl.create(mpAccount);
             final File file = wechatApi.dlMedia(anMediaId);
             final CustFileItem fileItem = dataStoreService.saveFileToStore(file, anFileTypeName, anFileTypeName + ".jpg");
-            if ((fileItem != null) && fileItemService.saveAndUpdateFileItem(fileItem)) {
-                return fileItem;
-            }
+            return fileItem;
         }
         catch (final Exception e) {
             logger.error("上传文件发生错误", e);
