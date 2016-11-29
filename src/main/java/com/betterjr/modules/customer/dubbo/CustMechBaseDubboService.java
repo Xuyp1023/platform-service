@@ -114,6 +114,15 @@ public class CustMechBaseDubboService implements ICustMechBaseService {
         return AjaxObject.newOk("查询操作员所有的公司列表成功", custInfos).toJson();
     }
 
+    /* (non-Javadoc)
+     * @see com.betterjr.modules.customer.ICustMechBaseService#queryCustInfoByOperatorInfo(com.betterjr.modules.account.entity.CustOperatorInfo)
+     */
+    @Override
+    public Collection<CustInfo> queryCustInfoByOperId(final Long anOperId) {
+        return baseService.queryCustInfoByOperId(anOperId);
+    }
+
+
     @Override
     public String webFindBaseInfo(final Long anCustNo) {
         final CustMechBase custMechBase = baseService.findCustMechBaseByCustNo(anCustNo);
@@ -194,6 +203,5 @@ public class CustMechBaseDubboService implements ICustMechBaseService {
 
         return AjaxObject.newOk("微信用户信息获取 成功", resultMap).toJson();
     }
-
 
 }

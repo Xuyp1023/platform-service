@@ -16,6 +16,7 @@ import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.account.service.CustAndOperatorRelaService;
+import com.betterjr.modules.account.service.CustOperatorService;
 import com.betterjr.modules.customer.dao.CustMechBaseMapper;
 import com.betterjr.modules.customer.entity.CustMechBase;
 import com.betterjr.modules.customer.entity.CustMechBaseTmp;
@@ -28,6 +29,9 @@ import com.betterjr.modules.customer.entity.CustMechBaseTmp;
  */
 @Service
 public class CustMechBaseService extends BaseService<CustMechBaseMapper, CustMechBase> {
+    @Resource
+    private CustOperatorService custOperatorService;
+
     @Resource
     private CustAccountService accountService;
 
@@ -134,5 +138,15 @@ public class CustMechBaseService extends BaseService<CustMechBaseMapper, CustMec
         custInfos.forEach(custInfo -> custInfoSelects.add(new SimpleDataEntity(custInfo.getCustName(), String.valueOf(custInfo.getCustNo()))));
 
         return custInfoSelects;
+    }
+
+    /**
+     * 通过 operator 取其拥有的公司
+     * @param anOperatorInfo
+     * @return
+     */
+    public Collection<CustInfo> queryCustInfoByOperId(final Long anOperId) {
+        final CustOperatorInfo operator = custOperatorService.findCustOperatorInfo(anOperId);
+        return accountService.findCustInfoByOperator(operator.getId(), operator.getOperOrg());
     }
 }
