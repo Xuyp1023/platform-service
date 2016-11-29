@@ -93,4 +93,19 @@ public class CustOpenAccountDubboService2 implements ICustOpenAccountService2{
     public String findOpenAccountStatus(String anOpenId) {
         return custOpenAccountTmpService.findOpenAccountStatus(anOpenId);
     }
+
+    @Override
+    public String webSendValidMessage(String anMobileNo) {
+        return custOpenAccountTmpService.sendValidMessage(anMobileNo);
+    }
+
+    @Override
+    public String webFindInsteadApplyStatus() {
+        return AjaxObject.newOk("开户申请状态查询成功", custOpenAccountTmpService.findInsteadApplyStatus()).toJson();
+    }
+    
+    @Override
+    public String webFindOpenAccoutnTmp() {
+        return AjaxObject.newOk("开户信息查询成功", custOpenAccountTmpService.findOpenAccoutnTmp()).toJson();
+    }
 }
