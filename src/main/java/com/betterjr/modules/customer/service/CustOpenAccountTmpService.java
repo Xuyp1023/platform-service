@@ -11,6 +11,7 @@ import javax.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.betterjr.common.data.CustPasswordType;
 import com.betterjr.common.exception.BytterTradeException;
 import com.betterjr.common.mapper.BeanMapper;
 import com.betterjr.common.mq.core.RocketMQProducer;
@@ -27,9 +28,11 @@ import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.betterjr.modules.account.entity.CustOperatorRelation;
+import com.betterjr.modules.account.entity.CustPassInfo;
 import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.account.service.CustAndOperatorRelaService;
 import com.betterjr.modules.account.service.CustOperatorService;
+import com.betterjr.modules.account.service.CustPassService;
 import com.betterjr.modules.blacklist.service.BlacklistService;
 import com.betterjr.modules.cert.entity.CustCertInfo;
 import com.betterjr.modules.cert.service.CustCertService;
@@ -50,6 +53,8 @@ import com.betterjr.modules.document.service.CustFileItemService;
 import com.betterjr.modules.document.utils.CustFileUtils;
 import com.betterjr.modules.sys.entity.DictInfo;
 import com.betterjr.modules.sys.entity.DictItemInfo;
+import com.betterjr.modules.sys.security.SystemAuthorizingRealm;
+import com.betterjr.modules.sys.security.SystemAuthorizingRealm.HashPassword;
 import com.betterjr.modules.sys.service.DictItemService;
 import com.betterjr.modules.sys.service.DictService;
 import com.betterjr.modules.wechat.entity.CustTempEnrollInfo;
@@ -125,6 +130,9 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
     
     @Autowired
     private WeChatCustEnrollService custEnrollService;
+    
+    @Autowired
+    private CustPassService custPassService;
 
     /**
      * 开户资料读取
@@ -590,9 +598,23 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
            initCustCertinfo(anOpenAccountInfo, anOperOrg, anOperId, anOperName);
            //绑定微信
            addBindWeChat(custInfo, anOperId, anOperOrg, anOperName, anOpenAccountInfo.getWechatOpenId());
-        }
+           //添加交易密码
+           addTradePassword(anOpenAccountInfo.getDealPassword(), anOperId);
+       }
     }
-    
+    /**
+     * 添加交易密码
+     */
+    private void addTradePassword(String anDealPassword, Long anOperId) {
+        BTAssert.isTrue(!BetterStringUtils.isEmpty(anDealPassword), "交易密码不能为空！");
+        
+        final int passValidLimit = 1;
+        final HashPassword result = SystemAuthorizingRealm.encrypt(anDealPassword);
+        CustPassInfo passInfo = new CustPassInfo(CustPasswordType.PERSON_TRADE, passValidLimit, anOperId, result.salt, result.password);
+        custPassService.insert(passInfo);
+        
+    }
+
     /**
      * 经办人与当前微信绑定
      */
@@ -676,6 +698,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         return custEnrollInfo;
     }
 
+    @SuppressWarnings("unused")
     private void addCustRelation(final CustOpenAccountTmp anOpenAccountInfo, final CustInfo anCustInfo, final String anOperOrg) {
         if (!BetterStringUtils.isBlank(anOpenAccountInfo.getCoreList())) {
             final String[] anCoreList = BetterStringUtils.split(anOpenAccountInfo.getCoreList(), ",");
@@ -1103,7 +1126,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
      * @return
      */
     public Map<String, Object> findOpenTempAccountInfo(Long anCustNo) {
-        Map<String, Object> result = null;
+//        Map<String, Object> result = null;
         if (anCustNo != null && anCustNo.longValue() > 10) {
             List<CustOpenAccountTmp> tmpList = this.selectByProperty("custNo", anCustNo);
             if (Collections3.isEmpty(tmpList) == false) {

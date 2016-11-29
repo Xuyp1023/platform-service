@@ -1,5 +1,7 @@
 package com.betterjr.modules.customer.dubbo;
 
+import java.util.Map;
+
 import javax.annotation.Resource;
 
 import com.alibaba.dubbo.config.annotation.Service;
@@ -18,8 +20,8 @@ public class CustInsteadDubboService2 implements ICustInsteadService2 {
     }
     
     @Override
-    public String webWechatAddInsteadApply(final String anCustName, final Long anId, final String anFileList) {
-        return AjaxObject.newOk("申请代录成功", insteadService.wechatAddInsteadApply(anCustName, anId, anFileList)).toJson();
+    public String webWechatAddInsteadApply(final Map<String, Object> anMap, final Long anId, final String anFileList) {
+        return AjaxObject.newOk("申请代录成功", insteadService.wechatAddInsteadApply(anMap, anId, anFileList)).toJson();
     }
     
     @Override

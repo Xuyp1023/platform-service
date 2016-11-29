@@ -8,7 +8,6 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.apache.taglibs.standard.lang.jstl.AndOperator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,8 +22,10 @@ import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
+import com.betterjr.common.utils.JedisUtils;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.common.utils.reflection.ReflectionUtils;
+import com.betterjr.common.web.AjaxObject;
 import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.betterjr.modules.account.entity.CustOperatorRelation;
@@ -50,6 +51,10 @@ import com.betterjr.modules.document.entity.CustFileItem;
 import com.betterjr.modules.document.service.CustFileAuditService;
 import com.betterjr.modules.document.service.CustFileItemService;
 import com.betterjr.modules.document.utils.CustFileUtils;
+import com.betterjr.modules.sms.constants.SmsConstants;
+import com.betterjr.modules.sms.dubbo.interfaces.IVerificationCodeService;
+import com.betterjr.modules.sms.entity.VerifyCode;
+import com.betterjr.modules.sms.util.VerifyCodeType;
 import com.betterjr.modules.wechat.entity.CustTempEnrollInfo;
 import com.betterjr.modules.wechat.entity.CustWeChatInfo;
 import com.betterjr.modules.wechat.service.CustWeChatService;
@@ -99,6 +104,9 @@ public class CustOpenAccountTmp2Service extends BaseService<CustOpenAccountTmpMa
 
     @Autowired
     private CustInstead2Service custInstead2Service;
+    
+    @Reference(interfaceClass = IVerificationCodeService.class)
+    private IVerificationCodeService verificationCodeService;
 
     /**
      * 开户申请提交
@@ -831,6 +839,8 @@ public class CustOpenAccountTmp2Service extends BaseService<CustOpenAccountTmpMa
         if (null == anId) {
             // 初始化参数设置
             initAddValue(anOpenAccountInfo, CustomerConstants.TMP_TYPE_TEMPSTORE, CustomerConstants.TMP_STATUS_NEW);
+            // 初始化微信相应选--解决前端默认值被暂存刷新问题
+            initWchatVaule(anOpenAccountInfo);
             // 处理附件
             anOpenAccountInfo.setBatchNo(custFileItemService.updateCustFileItemInfo(anFileList, anOpenAccountInfo.getBatchNo()));
             // 数据存盘,开户资料暂存
@@ -850,6 +860,16 @@ public class CustOpenAccountTmp2Service extends BaseService<CustOpenAccountTmpMa
         }
 
         return anOpenAccountInfo;
+    }
+
+    /**
+     * 初始化微信相应选--解决前端默认值被暂存刷新问题
+     */
+    private void initWchatVaule(CustOpenAccountTmp anOpenAccountInfo) {
+        anOpenAccountInfo.setBankNo("901");
+        anOpenAccountInfo.setBankCityno("110100");
+        anOpenAccountInfo.setLawIdentType("1");
+        anOpenAccountInfo.setIdentType("1");
     }
 
     /**
@@ -937,7 +957,7 @@ public class CustOpenAccountTmp2Service extends BaseService<CustOpenAccountTmpMa
     }
 
     /**
-     * 
+     * 根据openId查询开户申请状态，返回对应值，供页面相应跳转使用
      * @param anOpenId
      * @return
      */
@@ -964,5 +984,37 @@ public class CustOpenAccountTmp2Service extends BaseService<CustOpenAccountTmpMa
                 return "0";
             }
         }
+    }
+
+    /**
+     * 发送手机短信验证码
+     */
+    public String sendValidMessage(String anMobileNo) {
+        BTAssert.isTrue(BetterStringUtils.isNotBlank(anMobileNo), "手机号码不允许为空！");
+        final VerifyCode verifyCode = verificationCodeService.sendVerifyCode(anMobileNo, VerifyCodeType.OPEN_ACCOUNT_PASSWORD);
+        BTAssert.notNull(verifyCode, "没有生成验证码！");
+        JedisUtils.delObject(SmsConstants.smsOpenAccountVerifyCodePrefix + anMobileNo);
+        JedisUtils.setObject(SmsConstants.smsOpenAccountVerifyCodePrefix + anMobileNo, verifyCode, SmsConstants.SEC_600);
+        return AjaxObject.newOk("发送验证码成功").toJson();
+    }
+
+    /**
+     * 根据operOrg查询Apply状态
+     */
+    public String findInsteadApplyStatus() {
+        CustInsteadApply instApply = Collections3.getFirst(custInsteadApplyService.selectByProperty("operOrg", UserUtils.getOperatorInfo().getOperOrg()));
+        if (null != instApply) {
+            return instApply.getBusinStatus();
+        }else {
+           return "";
+        }
+    }
+    
+    /**
+     * 根据operOrg查询开户信息
+     */
+    public CustOpenAccountTmp findOpenAccoutnTmp() {
+        CustOpenAccountTmp accountInfo = Collections3.getFirst(this.selectByProperty("operOrg", UserUtils.getOperatorInfo().getOperOrg()));
+        return accountInfo;
     }
 }

@@ -16,6 +16,7 @@ import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.mapper.pagehelper.Page;
+import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.cert.entity.CustCertInfo;
 import com.betterjr.modules.cert.service.CustCertService;
@@ -92,19 +93,25 @@ public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper,
     
     /**
      * 微信端代录申请,无证书
+     * !!-- 在此处生成operId、OperName、OperOrg --!!
      */
     public CustInsteadApply addWeChatCustInsteadApply(final String anInsteadType, final String anCustName, final String anFileList) {
         if (BetterStringUtils.isBlank(anInsteadType) == true) {
             throw new BytterTradeException(20061, "代录申请类型不允许为空！");
         }
-
         final CustInsteadApply custInsteadApply = new CustInsteadApply();
+        
         if (anInsteadType.equals(CustomerConstants.INSTEAD_APPLY_TYPE_OPENACCOUNT) == true) {
             custInsteadApply.initAddValue(anInsteadType, null, null);
         }
-        //代入CustName
+        
+        //更新custName,生成相应微信不存在信息
+        custInsteadApply.setOperOrg(custInsteadApply.getCustName() + SerialGenerator.randomBase62(10));
         custInsteadApply.setCustName(anCustName);
-        custInsteadApply.setBatchNo(fileItemService.updateCustFileItemInfo(anFileList, custInsteadApply.getBatchNo()));
+        custInsteadApply.setRegOperId(SerialGenerator.getLongValue(SerialGenerator.OPERATOR_ID));
+        custInsteadApply.setRegOperName(anCustName);
+        //将文件拷贝再拷贝一分保存
+        copyOpenAccountFile(custInsteadApply, anFileList);
         
         //微信生成默认operOrg和operName
         custInsteadApply.setOperOrg(custInsteadApply.getCustName() + SerialGenerator.randomBase62(10));
@@ -114,6 +121,20 @@ public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper,
         return custInsteadApply;
     }
     
+
+    /**
+     * 将文件拷贝再拷贝一分保存
+     */
+    private void copyOpenAccountFile(CustInsteadApply anCustInsteadApply, String anFileList) {
+        //构造Cust
+        CustOperatorInfo anOperator = new CustOperatorInfo();
+        anOperator.setName(anCustInsteadApply.getRegOperName());
+        anOperator.setId(anCustInsteadApply.getRegOperId());
+        anOperator.setOperOrg(anCustInsteadApply.getOperOrg());
+        
+        Long anBatchNo = fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, anCustInsteadApply.getBatchNo(), anOperator);
+        anCustInsteadApply.setBatchNo(anBatchNo);
+    }
 
     /**
      *

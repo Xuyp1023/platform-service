@@ -4,11 +4,16 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.shiro.authc.DisabledAccountException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.betterjr.common.exception.BytterTradeException;
 import com.betterjr.common.selectkey.SerialGenerator;
+import com.betterjr.common.utils.BTAssert;
+import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
+import com.betterjr.common.utils.JedisUtils;
 import com.betterjr.common.utils.QueryTermBuilder;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.betterjr.modules.account.service.CustOperatorService;
@@ -16,6 +21,8 @@ import com.betterjr.modules.customer.constants.CustomerConstants;
 import com.betterjr.modules.customer.entity.CustInsteadApply;
 import com.betterjr.modules.customer.entity.CustInsteadRecord;
 import com.betterjr.modules.customer.entity.CustOpenAccountTmp;
+import com.betterjr.modules.sms.constants.SmsConstants;
+import com.betterjr.modules.sms.entity.VerifyCode;
 
 /**
  * 代录服务
@@ -58,30 +65,66 @@ public class CustInstead2Service {
      * 微信端代录申请
      * !!-- 在此处生成operId、OperName、OperOrg --!!
      */
-    public CustInsteadApply wechatAddInsteadApply(String anCustName, Long anId, String anFileList) {
-        final String insteadType = CustomerConstants.INSTEAD_APPLY_TYPE_OPENACCOUNT;
-        final String insteadItems = "0,0,0,0,0,0,0";
-        Map<String, Object> anMap = QueryTermBuilder.newInstance().put("insteadType", insteadType).put("insteadItems", insteadItems).build();
-        CustInsteadApply custInsteadApply = custInsteadService.addWeChatInsteadApply(anMap,anCustName, anFileList);
+    public CustInsteadApply wechatAddInsteadApply(Map<String, Object> anMap, Long anId, String anFileList) {
+        //取出相应数据
+        final String anCustName = (String) anMap.get("custName");
+        final String anVerifyCode = (String) anMap.get("verifyCode");
+        final String anNewPassword = (String) anMap.get("newPassword");
+        final String anOkPassword = (String) anMap.get("okPassword");
+        //获取开户信息
+        CustOpenAccountTmp anOpenAccountInfo = custOpenaccountTmpService.selectByPrimaryKey(anId);
+        BTAssert.notNull(anOpenAccountInfo, "无法获取开户信息！");
+        //验证手机验证码
+        verifyMobileMessage(anOpenAccountInfo.getOperMobile(), anVerifyCode);
+        //保存交易密码
+        if (BetterStringUtils.equals(anNewPassword, anOkPassword)) {
+            anOpenAccountInfo.setDealPassword(anNewPassword);
+        } else {
+            BTAssert.notNull(null, "两次输入密码不一致，请检查！");
+        }
         
-        //更新custName,生成相应微信不存在信息
-        custInsteadApply.setCustName(anCustName);
-        custInsteadApply.setRegOperId(SerialGenerator.getLongValue(SerialGenerator.OPERATOR_ID));
-        custInsteadApply.setRegOperName(anCustName);
-        insteadApplyService.updateByPrimaryKeySelective(custInsteadApply);
+        //生成代录申请及代录记录
+        CustInsteadApply custInsteadApply = createInsteadApply(anCustName, anFileList);
         
         //生成operOrg
-        CustOpenAccountTmp anOpenAccountInfo = custOpenaccountTmpService.selectByPrimaryKey(anId);
-        anOpenAccountInfo.setOperOrg(anOpenAccountInfo.getCustName() + SerialGenerator.randomBase62(10));
+        anOpenAccountInfo.setOperOrg(custInsteadApply.getOperOrg());
         anOpenAccountInfo.setRegOperId(custInsteadApply.getRegOperId());
         anOpenAccountInfo.setRegOperName(custInsteadApply.getRegOperName());
+        //更新开户信息数据
         custOpenaccountTmpService.updateByPrimaryKey(anOpenAccountInfo);
         
-        // 保存用户选择信息：客户名称、经办人信息
+        // 保存用户选择信息：客户名称、经办人信息。讲信息与申请进行关联
         fillInsteadRecordByAccountTmp(custInsteadApply.getId(), anOpenAccountInfo.getId());
 
         return custInsteadApply;
     }
+    
+    /**
+     * 生成代录申请
+     */
+    private CustInsteadApply createInsteadApply(String anCustName, String anFileList) {
+        final String insteadType = CustomerConstants.INSTEAD_APPLY_TYPE_OPENACCOUNT;
+        final String insteadItems = "0,0,0,0,0,0,0";
+        Map<String, Object> queryMap = QueryTermBuilder.newInstance().put("insteadType", insteadType).put("insteadItems", insteadItems).build();
+        CustInsteadApply custInsteadApply = custInsteadService.addWeChatInsteadApply(queryMap,anCustName, anFileList);
+        return custInsteadApply;
+    }
+
+    /**
+     * 校验手机验证码
+     */
+    private void verifyMobileMessage(String anMobile, String anVerifyCode) {
+
+        final VerifyCode verifyCode = JedisUtils.getObject(SmsConstants.smsOpenAccountVerifyCodePrefix + anMobile);
+        BTAssert.notNull(verifyCode, "验证码已过期");
+
+        if (BetterStringUtils.equals(verifyCode.getVerifiCode(), anVerifyCode)) {
+            JedisUtils.setObject(SmsConstants.smsOpenAccountVerifyCodePrefix + anMobile, "true", SmsConstants.SEC_300);
+        } else {
+            throw new BytterTradeException(40001, "验证码不正确!");
+        }
+    }
+    
     /**
      * 根据开户信息tmp id 查询开户申请
      */

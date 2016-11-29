@@ -418,6 +418,7 @@ public class CustOpenAccountTmp implements BetterjrEntity {
      */
     @Column(name = "C_WECHAT_OPENID", columnDefinition = "VARCHAR")
     @MetaData(value = "微信用户标识", comments = "微信用户标识")
+    @JsonIgnore
     private String wechatOpenId;
     
     /**
@@ -425,6 +426,7 @@ public class CustOpenAccountTmp implements BetterjrEntity {
      */
     @Column(name = "C_DEAL_PASSWORD", columnDefinition = "VARCHAR")
     @MetaData(value = "交易密码(仅微信有)", comments = "交易密码(仅微信有)")
+    @JsonIgnore
     private String dealPassword;
     
     /**
