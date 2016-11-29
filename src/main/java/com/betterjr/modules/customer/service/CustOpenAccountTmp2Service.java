@@ -114,7 +114,7 @@ public class CustOpenAccountTmp2Service extends BaseService<CustOpenAccountTmpMa
     public CustOpenAccountTmp saveOpenAccountApply(final CustOpenAccountTmp anOpenAccountInfo, final Long anOperId, final String anFileList) {
         logger.info("Begin to Commit Open Account Apply");
         // 填充操作员信息
-        fileOperatorByOperId(anOperId, anOpenAccountInfo);
+        fillOperatorByOperId(anOperId, anOpenAccountInfo);
         // 检查开户资料合法性
         checkAccountInfoValid(anOpenAccountInfo);
         // 初始化参数设置
@@ -129,7 +129,7 @@ public class CustOpenAccountTmp2Service extends BaseService<CustOpenAccountTmpMa
     /**
      * 填充操作员信息
      */
-    private void fileOperatorByOperId(Long anOperId, CustOpenAccountTmp anCustOpenAccountTmp) {
+    private void fillOperatorByOperId(Long anOperId, CustOpenAccountTmp anCustOpenAccountTmp) {
         CustOperatorInfo anOperator = custOperatorService.selectByPrimaryKey(anOperId);
         anCustOpenAccountTmp.setOperName(anOperator.getName());
         anCustOpenAccountTmp.setOperIdenttype(anOperator.getIdentType());
@@ -789,43 +789,6 @@ public class CustOpenAccountTmp2Service extends BaseService<CustOpenAccountTmpMa
 
         custInsteadApplyService.saveCustInsteadApplyCustInfo(insteadRecord.getApplyId(), null, anOpenAccountInfo.getCustName());
 
-        return anOpenAccountInfo;
-    }
-
-    /**
-     * 开户申请驳回
-     */
-    public CustOpenAccountTmp saveRefuseOpenAccountApply(final Long anId, final String anAuditOpinion) {
-        // 检查操作员是否能执行审核操作
-        checkPlatformUser();
-        // 获取客户开户资料
-        final CustOpenAccountTmp anOpenAccountInfo = this.selectByPrimaryKey(anId);
-        BTAssert.notNull(anOpenAccountInfo, "无法获取客户开户资料信息");
-        // 设置状态为驳回
-        anOpenAccountInfo.setBusinStatus(CustomerConstants.TMP_STATUS_REFUSE);
-        anOpenAccountInfo.setLastStatus(CustomerConstants.TMP_STATUS_REFUSE);
-        // 审核日期
-        anOpenAccountInfo.setAuditDate(BetterDateUtils.getNumDate());
-        // 审核时间
-        anOpenAccountInfo.setAuditTime(BetterDateUtils.getNumTime());
-        // 更新数据
-        this.updateByPrimaryKeySelective(anOpenAccountInfo);
-        // 写入开户日志
-        custOpenAccountAuditService.addRefuseOpenAccountApplyLog(anOpenAccountInfo.getId(), anAuditOpinion, "开户审核");
-
-        // 发消息
-        final MQMessage anMessage = new MQMessage("CUSTOMER_OPENACCOUNT_TOPIC");
-
-        try {
-            anMessage.setObject(anOpenAccountInfo);
-            anMessage.addHead("type", "0"); // 驳回
-            anMessage.addHead("operator", UserUtils.getOperatorInfo());
-            anMessage.addHead("auditOpinion", anAuditOpinion);
-            betterProducer.sendMessage(anMessage);
-        }
-        catch (final Exception e) {
-            logger.error("异步消息发送失败！", e);
-        }
         return anOpenAccountInfo;
     }
 

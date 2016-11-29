@@ -379,7 +379,9 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
                 createValidAccount(anOpenAccountInfo, UserUtils.getOperatorInfo().getId(), UserUtils.getOperatorInfo().getName(),
                         UserUtils.getOperatorInfo().getOperOrg());
             }
-            // 更新数据
+            // 更新数据,变更状态
+            anOpenAccountInfo.setLastStatus(anOpenAccountInfo.getBusinStatus());
+            anOpenAccountInfo.setBusinStatus(CustomerConstants.TMP_STATUS_USED);
             this.updateByPrimaryKeySelective(anOpenAccountInfo);
 
             // 回写暂存流水号至代录申请表
