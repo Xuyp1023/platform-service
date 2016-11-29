@@ -933,32 +933,39 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
      */
     private void addCustOperatorInfo(final CustOpenAccountTmp anOpenAccountInfo, final Multimap<String, Object> anCustFileItem, final Long anCustNo,
             final Long anOperId, final String anOperName, final String anOperOrg) {
+        final CustOperatorInfo anCustOperatorInfo = new CustOperatorInfo();
+        anCustOperatorInfo.setOperOrg(anOperOrg);
+//        anCustOperatorInfo.setId(SerialGenerator.getLongValue(SerialGenerator.OPERATOR_ID));
+        anCustOperatorInfo.setName(anOpenAccountInfo.getOperName());
+        anCustOperatorInfo.setIdentType(anOpenAccountInfo.getOperIdenttype());
+        anCustOperatorInfo.setIdentNo(anOpenAccountInfo.getOperIdentno());
+        anCustOperatorInfo.setMobileNo(anOpenAccountInfo.getOperMobile());
+        anCustOperatorInfo.setPhone(anOpenAccountInfo.getOperPhone());
+        anCustOperatorInfo.setIdentClass(anOpenAccountInfo.getOperIdenttype());
+        anCustOperatorInfo.setValidDate(anOpenAccountInfo.getOperValiddate());
+        anCustOperatorInfo.setStatus("1");
+        anCustOperatorInfo.setLastStatus("1");
+        // anCustOperatorInfo.setSex(IdcardUtils.getGenderByIdCard(anCustOperatorInfo.getIdentNo(), anCustOperatorInfo.getIdentType()));
+        anCustOperatorInfo.setModiDate(BetterDateUtils.getNumDateTime());
+        anCustOperatorInfo.setFaxNo(anOpenAccountInfo.getOperFaxNo());
+        anCustOperatorInfo.setAddress(anOpenAccountInfo.getAddress());
+        anCustOperatorInfo.setEmail(anOpenAccountInfo.getOperEmail());
+        anCustOperatorInfo.setZipCode(anOpenAccountInfo.getZipCode());
+        
         //若为微信，需新增操作员
         if (!BetterStringUtils.isEmpty(anOpenAccountInfo.getWechatOpenId())) {
-            final CustOperatorInfo anCustOperatorInfo = new CustOperatorInfo();
-            anCustOperatorInfo.setOperOrg(anOperOrg);
-//            anCustOperatorInfo.setId(SerialGenerator.getLongValue(SerialGenerator.OPERATOR_ID));
             anCustOperatorInfo.setId(anOperId);
-            anCustOperatorInfo.setName(anOpenAccountInfo.getOperName());
-            anCustOperatorInfo.setIdentType(anOpenAccountInfo.getOperIdenttype());
-            anCustOperatorInfo.setIdentNo(anOpenAccountInfo.getOperIdentno());
-            anCustOperatorInfo.setMobileNo(anOpenAccountInfo.getOperMobile());
-            anCustOperatorInfo.setPhone(anOpenAccountInfo.getOperPhone());
-            anCustOperatorInfo.setIdentClass(anOpenAccountInfo.getOperIdenttype());
-            anCustOperatorInfo.setValidDate(anOpenAccountInfo.getOperValiddate());
-            anCustOperatorInfo.setStatus("1");
-            anCustOperatorInfo.setLastStatus("1");
-            // anCustOperatorInfo.setSex(IdcardUtils.getGenderByIdCard(anCustOperatorInfo.getIdentNo(), anCustOperatorInfo.getIdentType()));
             anCustOperatorInfo.setRegDate(BetterDateUtils.getNumDate());
-            anCustOperatorInfo.setModiDate(BetterDateUtils.getNumDateTime());
-            anCustOperatorInfo.setFaxNo(anOpenAccountInfo.getOperFaxNo());
-            anCustOperatorInfo.setAddress(anOpenAccountInfo.getAddress());
-            anCustOperatorInfo.setEmail(anOpenAccountInfo.getOperEmail());
-            anCustOperatorInfo.setZipCode(anOpenAccountInfo.getZipCode());
             custOperatorService.insert(anCustOperatorInfo);
+        }//若为PC，更新操作员信息
+        else{
+            CustOperatorInfo operatorInfo = Collections3.getFirst(custOperatorService.selectByProperty("mobileNo", anOpenAccountInfo.getOperMobile()));
+            BTAssert.notNull(operatorInfo, "未找到对应操作员信息!");
+            anCustOperatorInfo.setId(operatorInfo.getId());
+            custOperatorService.updateByPrimaryKeySelective(anCustOperatorInfo);
         }
-        // 法人身份证-头像面-------RepresentIdHeadFile，法人身份证-国徽面-------RepresentIdNationFile，法人身份证-手持证件-------RepresentIdHoldFile
-        String[] fileTypes = {"RepresentIdHeadFile", "RepresentIdNationFile", "RepresentIdHoldFile"};
+        // 经办人身份证-头像面-------BrokerIdHeadFile，经办人身份证-国徽面-------BrokerIdNationFile，经办人身份证-手持证件-------BrokerIdHoldFile
+        String[] fileTypes = {"BrokerIdHeadFile", "BrokerIdNationFile", "BrokerIdHoldFile"};
         for (String anFileType : fileTypes) {
             final Collection anCollection = anCustFileItem.get(anFileType);
             final List<CustFileItem> anFileItemList = new ArrayList(anCollection);
