@@ -52,7 +52,8 @@ public class NotificationProfileDubboService implements INotificationProfileServ
     @Override
     public String webSaveNotificationChannelProfile(final Map<String, Object> anParam, final Long anChannelProfileId, final Long anCustNo) {
         final NotificationChannelProfile channelProfile = RuleServiceDubboFilterInvoker.getInputObj();
-        return newOk("消息通道模板-保存 成功", channelProfileService.saveChannelProfile(channelProfile, anChannelProfileId, anCustNo)).toJson();
+        final String contentText = (String) anParam.get("contentText");
+        return newOk("消息通道模板-保存 成功", channelProfileService.saveChannelProfile(channelProfile, anChannelProfileId, anCustNo, contentText)).toJson();
     }
 
     @Override

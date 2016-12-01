@@ -76,9 +76,10 @@ public class NotificationChannelProfileService extends BaseService<NotificationC
 
     /**
      * 修改通道模板
+     * @param anContentText
      */
     public NotificationChannelProfile saveChannelProfile(final NotificationChannelProfile anChannelProfile, final Long anChannelProfileId,
-            final Long anCustNo) {
+            final Long anCustNo, final String anContentText) {
         BTAssert.notNull(anChannelProfileId, "消息通道模板编号不允许为空!");
         BTAssert.notNull(anChannelProfile, "消息通知模板内容不允许为空!");
 
@@ -100,14 +101,14 @@ public class NotificationChannelProfileService extends BaseService<NotificationC
             if (profileService.checkDefaultProfile(tempProfile) == true) { // 找到消息模板为 default模板
                 // 需要先同步模板至当前用户
                 tempProfile = saveSyncProfile(tempProfile, anCustNo); // 将消息同步为 custom 模板
-                channelProfile = saveModifyChannelProfile(anChannelProfile, tempProfile, tempChannelProfile.getChannel(), anCustNo);
+                channelProfile = saveModifyChannelProfile(anChannelProfile, tempProfile, tempChannelProfile.getChannel(), anCustNo, anContentText);
             }
             else { // 找到消息模板为 custom模板
-                channelProfile = saveModifyChannelProfile(anChannelProfile, tempProfile, tempChannelProfile.getChannel(), anCustNo);
+                channelProfile = saveModifyChannelProfile(anChannelProfile, tempProfile, tempChannelProfile.getChannel(), anCustNo, anContentText);
             }
         }
         else { // 找到消息模板为 custom模板
-            channelProfile = saveModifyChannelProfile(anChannelProfile, tempProfile, tempChannelProfile.getChannel(), anCustNo);
+            channelProfile = saveModifyChannelProfile(anChannelProfile, tempProfile, tempChannelProfile.getChannel(), anCustNo, anContentText);
         }
 
         return channelProfile;
@@ -120,10 +121,11 @@ public class NotificationChannelProfileService extends BaseService<NotificationC
      * @param anProfile
      * @param anString
      * @param anCustNo
+     * @param anContentText
      * @return
      */
     private NotificationChannelProfile saveModifyChannelProfile(final NotificationChannelProfile anChannelProfile,
-            final NotificationProfile anProfile, final String anChannel, final Long anCustNo) {
+            final NotificationProfile anProfile, final String anChannel, final Long anCustNo, final String anContentText) {
 
         final NotificationChannelProfile tempChannelProfile = findChannelProfileByProfileIdAndChannel(anProfile.getId(), anChannel);
         // 修改状态
@@ -140,7 +142,7 @@ public class NotificationChannelProfileService extends BaseService<NotificationC
                 tempChannelProfile.setContent(resolveContent(anChannelProfile.getContent()));
                 break;
             case "2":
-                tempChannelProfile.setContent(resolveContent(anChannelProfile.getContent()));
+                tempChannelProfile.setContent(anContentText != null ? anContentText : resolveContent(anChannelProfile.getContent()));
                 break;
             }
         }
