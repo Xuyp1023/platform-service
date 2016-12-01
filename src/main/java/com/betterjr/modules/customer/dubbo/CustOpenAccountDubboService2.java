@@ -108,4 +108,9 @@ public class CustOpenAccountDubboService2 implements ICustOpenAccountService2{
     public String webFindOpenAccoutnTmp() {
         return AjaxObject.newOk("开户信息查询成功", custOpenAccountTmpService.findOpenAccoutnTmp()).toJson();
     }
+
+    @Override
+    public String webDeleteSingleFile(Long anId) {
+        return AjaxObject.newOk("删除附件成功", custOpenAccountTmpService.saveDeleteSingleFile(anId)).toJson();
+    }
 }

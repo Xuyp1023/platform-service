@@ -28,4 +28,9 @@ public class CustInsteadDubboService2 implements ICustInsteadService2 {
     public String webFindInsteadApplyByAccountTmpId(final Long anId) {
         return AjaxObject.newOk("查询代录申请成功", insteadService.findInsteadApplyByAccountTmpId(anId)).toJson();
     }
+
+    @Override
+    public String webSaveActiveOpenAccount(Long anId) {
+        return AjaxObject.newOk("账户激活成功", insteadService.saveActiveOpenAccount(anId)).toJson();
+    }
 }

@@ -441,7 +441,7 @@ public class CustInsteadService {
      * 修改代录记录状态： 复核驳回
      */
     public CustInsteadRecord saveReviewRejectInsteadRecord(final Long anId, final String anReason) {
-        BTAssert.isTrue(BetterStringUtils.isNotBlank(anReason), "驳回原因不允许为空！");
+//        BTAssert.isTrue(BetterStringUtils.isNotBlank(anReason), "驳回原因不允许为空！");
 
         checkInsteadRecord(anId, CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN);
 
