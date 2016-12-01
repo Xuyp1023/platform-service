@@ -1,15 +1,14 @@
 package com.betterjr.modules.customer.service;
 
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
 
-import org.apache.shiro.authc.DisabledAccountException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.exception.BytterTradeException;
-import com.betterjr.common.selectkey.SerialGenerator;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
@@ -40,6 +39,8 @@ public class CustInstead2Service {
     private CustOpenAccountTmp2Service custOpenaccountTmpService;
     @Autowired
     private CustInsteadService custInsteadService;
+    
+    private final static Pattern DEAL_PASSWORD_PATTERN = Pattern.compile("^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,10}$");
 
     /**
      * PC端发起代录申请
@@ -81,6 +82,9 @@ public class CustInstead2Service {
             anOpenAccountInfo.setDealPassword(anNewPassword);
         } else {
             BTAssert.notNull(null, "两次输入密码不一致，请检查！");
+        }
+        if(!DEAL_PASSWORD_PATTERN.matcher(anNewPassword).matches()) {
+            BTAssert.notNull(null, "密码为6-18位并包含数字和字母！");
         }
         
         //生成代录申请及代录记录
@@ -163,5 +167,17 @@ public class CustInstead2Service {
         anCustOpenAccountTmp.setOperFaxNo(anOperator.getFaxNo());
         custOpenaccountTmpService.insert(anCustOpenAccountTmp);
         return anCustOpenAccountTmp;
+    }
+
+    /**
+     * 代录开户激活操作
+     */
+    public CustInsteadApply saveActiveOpenAccount(Long anId) {
+        CustInsteadRecord anInsteadRecord = insteadRecordService.selectByPrimaryKey(anId);
+        //调用原有确认开户操作
+        custInsteadService.saveConfirmPassInsteadRecord(anId, "代录开户激活");
+        //调用原有提交操作
+        CustInsteadApply anInsteadApply = custInsteadService.saveSubmitConfirmInsteadApply(anInsteadRecord.getApplyId());
+        return anInsteadApply;
     }
 }

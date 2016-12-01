@@ -126,7 +126,7 @@ public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper,
      * 将文件拷贝再拷贝一分保存
      */
     private void copyOpenAccountFile(CustInsteadApply anCustInsteadApply, String anFileList) {
-        //构造Cust
+        //构造操作员信息，作为调用接口使用
         CustOperatorInfo anOperator = new CustOperatorInfo();
         anOperator.setName(anCustInsteadApply.getRegOperName());
         anOperator.setId(anCustInsteadApply.getRegOperId());
