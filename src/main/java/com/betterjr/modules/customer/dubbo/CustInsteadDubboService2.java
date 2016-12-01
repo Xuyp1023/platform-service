@@ -7,6 +7,8 @@ import javax.annotation.Resource;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.betterjr.common.web.AjaxObject;
 import com.betterjr.modules.customer.ICustInsteadService2;
+import com.betterjr.modules.customer.entity.CustInsteadApply;
+import com.betterjr.modules.customer.entity.CustInsteadRecord;
 import com.betterjr.modules.customer.service.CustInstead2Service;
 
 @Service(interfaceClass = ICustInsteadService2.class)
@@ -21,16 +23,34 @@ public class CustInsteadDubboService2 implements ICustInsteadService2 {
     
     @Override
     public String webWechatAddInsteadApply(final Map<String, Object> anMap, final Long anId, final String anFileList) {
-        return AjaxObject.newOk("申请代录成功", insteadService.wechatAddInsteadApply(anMap, anId, anFileList)).toJson();
+        try {
+            CustInsteadApply info = insteadService.wechatAddInsteadApply(anMap, anId, anFileList);
+            return AjaxObject.newOk("申请代录成功", info).toJson();
+        }
+        catch (Exception e) {
+            return AjaxObject.newError(e.getMessage()).toJson();
+        }
     }
     
     @Override
     public String webFindInsteadApplyByAccountTmpId(final Long anId) {
-        return AjaxObject.newOk("查询代录申请成功", insteadService.findInsteadApplyByAccountTmpId(anId)).toJson();
+        try {
+            CustInsteadApply info = insteadService.findInsteadApplyByAccountTmpId(anId);
+            return AjaxObject.newOk("查询代录申请成功", info).toJson();
+        }
+        catch (Exception e) {
+            return AjaxObject.newError(e.getMessage()).toJson();
+        }
     }
 
     @Override
     public String webSaveActiveOpenAccount(Long anId) {
-        return AjaxObject.newOk("账户激活成功", insteadService.saveActiveOpenAccount(anId)).toJson();
+        try {
+            CustInsteadRecord info = insteadService.saveActiveOpenAccount(anId);
+            return AjaxObject.newOk("账户激活成功", info).toJson();
+        }
+        catch (Exception e) {
+            return AjaxObject.newError(e.getMessage()).toJson();
+        }
     }
 }
