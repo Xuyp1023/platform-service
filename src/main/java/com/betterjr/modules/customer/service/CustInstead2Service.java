@@ -172,12 +172,12 @@ public class CustInstead2Service {
     /**
      * 代录开户激活操作
      */
-    public CustInsteadApply saveActiveOpenAccount(Long anId) {
+    public CustInsteadRecord saveActiveOpenAccount(Long anId) {
         CustInsteadRecord anInsteadRecord = insteadRecordService.selectByPrimaryKey(anId);
         //调用原有确认开户操作
         custInsteadService.saveConfirmPassInsteadRecord(anId, "代录开户激活");
-        //调用原有提交操作
-        CustInsteadApply anInsteadApply = custInsteadService.saveSubmitConfirmInsteadApply(anInsteadRecord.getApplyId());
-        return anInsteadApply;
+        //调用原有提交操作   已经修改。不需再调用
+//        CustInsteadApply anInsteadApply = custInsteadService.saveSubmitConfirmInsteadApply(anInsteadRecord.getApplyId());
+        return anInsteadRecord;
     }
 }
