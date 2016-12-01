@@ -165,6 +165,14 @@ public class CustInstead2Service {
         anCustOpenAccountTmp.setOperEmail(anOperator.getEmail());
         anCustOpenAccountTmp.setOperPhone(anOperator.getPhone());
         anCustOpenAccountTmp.setOperFaxNo(anOperator.getFaxNo());
+        //初始化代录默认值(由于前端默认值实现被覆盖，不得已采用后端赋默认值)
+        anCustOpenAccountTmp.setBankNo("901");
+        anCustOpenAccountTmp.setBankCityno("110100");
+        anCustOpenAccountTmp.setLawIdentType("0");
+        anCustOpenAccountTmp.setIdentType("0");
+        anCustOpenAccountTmp.setOperIdenttype("0");
+        anCustOpenAccountTmp.setBankCityno("110100");
+        //保存数据
         custOpenaccountTmpService.insert(anCustOpenAccountTmp);
         return anCustOpenAccountTmp;
     }

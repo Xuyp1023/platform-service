@@ -110,7 +110,7 @@ public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper,
         custInsteadApply.setCustName(anCustName);
         custInsteadApply.setRegOperId(SerialGenerator.getLongValue(SerialGenerator.OPERATOR_ID));
         custInsteadApply.setRegOperName(anCustName);
-        //将文件拷贝再拷贝一分保存
+        //将文件拷贝再拷贝一份保存
         copyOpenAccountFile(custInsteadApply, anFileList);
         
         //微信生成默认operOrg和operName
