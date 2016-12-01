@@ -444,6 +444,7 @@ public class CustOpenAccountTmp2Service extends BaseService<CustOpenAccountTmpMa
             // 默认数据
             CustFileItem defaultFile = new CustFileItem();
             defaultFile.setFileInfoType(anFileInfoType);
+//            fileMap.put(anFileInfoType, defaultFile);
             // 遍历文件，若存在则放入
             for (CustFileItem anFile : fileList) {
                 if (BetterStringUtils.equals(anFileInfoType, anFile.getFileInfoType())) {
