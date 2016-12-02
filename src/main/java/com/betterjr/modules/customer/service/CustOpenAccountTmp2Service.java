@@ -95,6 +95,7 @@ public class CustOpenAccountTmp2Service extends BaseService<CustOpenAccountTmpMa
      */
     private void fillOperatorByOperId(Long anOperId, CustOpenAccountTmp anCustOpenAccountTmp) {
         CustOperatorInfo anOperator = custOperatorService.selectByPrimaryKey(anOperId);
+        BTAssert.notNull(anOperator, "未找到操作员信息！");
         anCustOpenAccountTmp.setOperName(anOperator.getName());
         anCustOpenAccountTmp.setOperIdenttype(anOperator.getIdentType());
         anCustOpenAccountTmp.setOperIdentno(anOperator.getIdentNo());
