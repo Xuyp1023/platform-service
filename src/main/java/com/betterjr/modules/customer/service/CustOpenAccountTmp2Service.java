@@ -82,7 +82,7 @@ public class CustOpenAccountTmp2Service extends BaseService<CustOpenAccountTmpMa
         // 检查开户资料合法性
         checkAccountInfoValid(anOpenAccountInfo);
         // 初始化参数设置
-        initAddValue(anOpenAccountInfo, CustomerConstants.TMP_TYPE_TEMPSTORE, CustomerConstants.TMP_STATUS_USEING);
+        initAddValue(anOpenAccountInfo, CustomerConstants.TMP_TYPE_TEMPSTORE, CustomerConstants.TMP_STATUS_OWN);
         // 处理附件
         anOpenAccountInfo.setBatchNo(custFileItemService.updateCustFileItemInfo(anFileList, anOpenAccountInfo.getBatchNo()));
         // 数据存盘,开户资料暂存

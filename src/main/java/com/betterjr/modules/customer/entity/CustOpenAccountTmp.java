@@ -363,7 +363,7 @@ public class CustOpenAccountTmp implements BetterjrEntity {
      * 使用状态:0未使用 1使用中 2已使用
      */
     @Column(name = "C_BUSIN_STATUS", columnDefinition = "CHAR")
-    @MetaData(value = "使用状态:0未使用  1使用中  2已使用", comments = "使用状态:0未使用  1使用中  2已使用")
+    @MetaData(value = "使用状态:0未使用  1使用中  2已使用", comments = "使用状态:0未使用  1使用中  2已使用 3驳回4自主开户")
     private String businStatus;
 
     @Column(name = "C_LAST_STATUS", columnDefinition = "CHAR")
