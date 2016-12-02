@@ -282,7 +282,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         //排除代录记录的申请
         Page<CustOpenAccountTmp> accountInfoList = this.selectPropertyByPage(anMap, anPageNum, anPageSize, "1".equals(anFlag));
         for(CustOpenAccountTmp anInfo : accountInfoList) {
-            if(null == anInfo.getParentId()) {
+            if(null != anInfo.getParentId()) {
                 accountInfoList.remove(anInfo);
             }
         }
