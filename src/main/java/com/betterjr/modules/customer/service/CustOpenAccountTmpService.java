@@ -236,7 +236,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         // 开户流水号
         if (null == anId) {
             // 初始化参数设置
-            initAddValue(anOpenAccountInfo, CustomerConstants.TMP_TYPE_TEMPSTORE, CustomerConstants.TMP_STATUS_USEING);
+            initAddValue(anOpenAccountInfo, CustomerConstants.TMP_TYPE_TEMPSTORE, CustomerConstants.TMP_STATUS_OWN);
             // 处理附件
             anOpenAccountInfo.setBatchNo(custFileItemService.updateCustFileItemInfo(anFileList, anOpenAccountInfo.getBatchNo()));
             // 数据存盘,开户资料暂存
@@ -251,8 +251,8 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
             // 营业执照
             initIdentInfo(anOpenAccountInfo);
             // 设置状态为使用中
-            anOpenAccountInfo.setBusinStatus(CustomerConstants.TMP_STATUS_USEING);
-            anOpenAccountInfo.setLastStatus(CustomerConstants.TMP_STATUS_USEING);
+            anOpenAccountInfo.setBusinStatus(CustomerConstants.TMP_STATUS_OWN);
+            anOpenAccountInfo.setLastStatus(CustomerConstants.TMP_STATUS_OWN);
             // 申请日期
             anOpenAccountInfo.setApplyDate(BetterDateUtils.getNumDate());
             // 申请时间
@@ -277,18 +277,10 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
      * @return
      */
     public Page<CustOpenAccountTmp> queryOpenAccountApply(final String anFlag, final int anPageNum, final int anPageSize) {
-        List<CustOpenAccountTmp> result = new ArrayList<CustOpenAccountTmp>();
         final Map<String, Object> anMap = new HashMap<String, Object>();
-        anMap.put("businStatus", CustomerConstants.TMP_STATUS_USEING);// 状态:使用中
-        //排除代录记录的申请
-        Page<CustOpenAccountTmp> page = this.selectPropertyByPage(anMap, anPageNum, anPageSize, "1".equals(anFlag));
-        for(CustOpenAccountTmp anInfo : page) {
-            if(null == anInfo.getParentId()) {
-                page.remove(anInfo);
-                result.add(anInfo);
-            }
-        }
-        return Page.listToPage(result, anPageNum, anPageSize, page.getPages(),page.getStartRow(),page.getTotal());
+        anMap.put("businStatus", CustomerConstants.TMP_STATUS_OWN);// 状态:自主开户
+
+        return this.selectPropertyByPage(CustOpenAccountTmp.class, anMap, anPageNum, anPageSize, "1".equals(anFlag));
     }
 
     /**
@@ -336,7 +328,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         BTAssert.notNull(anOpenAccountInfo, "无法获取客户开户资料信息");
         // 检查开户资料合法性
         checkAccountInfoValid(anOpenAccountInfo);
-        if (BetterStringUtils.equals(anOpenAccountInfo.getBusinStatus(), CustomerConstants.TMP_STATUS_USEING)) {
+        if (BetterStringUtils.equals(anOpenAccountInfo.getBusinStatus(), CustomerConstants.TMP_STATUS_OWN)) {
             // 生成开户数据
             createValidAccount(anOpenAccountInfo, anOpenAccountInfo.getRegOperId(), anOpenAccountInfo.getRegOperName(),
                     anOpenAccountInfo.getOperOrg());
