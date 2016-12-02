@@ -648,7 +648,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         certInfo.setContName(anOpenAccountInfo.getOperName());
         certInfo.setContIdentType("0");
         certInfo.setContIdentNo("");
-        certInfo.setContPhone(anOpenAccountInfo.getOperPhone());
+        certInfo.setContPhone(anOpenAccountInfo.getOperMobile());
         certInfo.setStatus("8"); // 微信端开户
         certInfo.setVersionUid("wechat");
         certInfo.setSubject("wechat" + anOpenAccountInfo.getCustNo());
