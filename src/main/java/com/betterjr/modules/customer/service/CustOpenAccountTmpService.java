@@ -279,8 +279,14 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
     public Page<CustOpenAccountTmp> queryOpenAccountApply(final String anFlag, final int anPageNum, final int anPageSize) {
         final Map<String, Object> anMap = new HashMap<String, Object>();
         anMap.put("businStatus", CustomerConstants.TMP_STATUS_USEING);// 状态:使用中
-
-        return this.selectPropertyByPage(CustOpenAccountTmp.class, anMap, anPageNum, anPageSize, "1".equals(anFlag));
+        //排除代录记录的申请
+        Page<CustOpenAccountTmp> accountInfoList = this.selectPropertyByPage(anMap, anPageNum, anPageSize, "1".equals(anFlag));
+        for(CustOpenAccountTmp anInfo : accountInfoList) {
+            if(null == anInfo.getParentId()) {
+                accountInfoList.remove(anInfo);
+            }
+        }
+        return accountInfoList;
     }
 
     /**
