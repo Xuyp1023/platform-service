@@ -337,7 +337,7 @@ public class CustOpenAccountTmp2Service extends BaseService<CustOpenAccountTmpMa
             // 初始化参数设置
             initAddValue(anOpenAccountInfo, CustomerConstants.TMP_TYPE_TEMPSTORE, CustomerConstants.TMP_STATUS_NEW);
             // 初始化微信相应选--解决前端默认值被暂存刷新问题
-            initWchatVaule(anOpenAccountInfo);
+            anOpenAccountInfo.initDefaultValue();
             // 处理附件
             anOpenAccountInfo.setBatchNo(custFileItemService.updateCustFileItemInfo(anFileList, anOpenAccountInfo.getBatchNo()));
             // 数据存盘,开户资料暂存
@@ -357,18 +357,6 @@ public class CustOpenAccountTmp2Service extends BaseService<CustOpenAccountTmpMa
         }
 
         return anOpenAccountInfo;
-    }
-
-    /**
-     * 初始化微信相应选--解决前端默认值被暂存刷新问题
-     */
-    private void initWchatVaule(CustOpenAccountTmp anOpenAccountInfo) {
-        anOpenAccountInfo.setBankNo("901");
-        anOpenAccountInfo.setBankCityno("110100");
-        anOpenAccountInfo.setLawIdentType("0");
-        anOpenAccountInfo.setIdentType("0");
-        anOpenAccountInfo.setOperIdenttype("0");
-        anOpenAccountInfo.setBankCityno("110100");
     }
 
     /**
