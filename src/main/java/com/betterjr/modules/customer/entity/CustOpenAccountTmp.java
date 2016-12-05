@@ -411,7 +411,7 @@ public class CustOpenAccountTmp implements BetterjrEntity {
      */
     @Column(name = "C_OPEN_LICENSE", columnDefinition = "CHAR")
     @MetaData(value = "开户许可证核准号", comments = "开户许可证核准号")
-    private Long openLicense;
+    private String openLicense;
     
     /**
      * 微信用户标识
@@ -854,11 +854,11 @@ public class CustOpenAccountTmp implements BetterjrEntity {
         this.coreList = coreList;
     }
 
-    public Long getOpenLicense() {
+    public String getOpenLicense() {
         return this.openLicense;
     }
 
-    public void setOpenLicense(Long anOpenLicense) {
+    public void setOpenLicense(String anOpenLicense) {
         this.openLicense = anOpenLicense;
     }
 
@@ -1118,5 +1118,18 @@ public class CustOpenAccountTmp implements BetterjrEntity {
         this.modiTime = BetterDateUtils.getNumTime();
         this.businStatus = anOpenAccountInfo.getBusinStatus();
         this.lastStatus = this.businStatus;
+    }
+
+    /**
+     * 初始化代录默认值(由于前端默认值实现被覆盖，不得已采用后端赋默认值)
+     */
+    public void initDefaultValue() {
+        this.setBankNo("901");
+        this.setBankCityno("110100");
+        this.setLawIdentType("0");
+        this.setIdentType("0");
+        this.setOperIdenttype("0");
+        this.setBankCityno("110100");
+        this.setBankAccoName(this.getCustName());
     }
 }
