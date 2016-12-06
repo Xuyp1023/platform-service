@@ -38,7 +38,7 @@ public class CustOpenAccountDubboService2 implements ICustOpenAccountService2 {
 
     @Override
     public String webCheckCustExistsByIdentNo(String anIdentNo) {
-        return AjaxObject.newOk("检查组织机构代码证是否存在", custOpenAccountTmpService.checkCustExistsByIdentNo(anIdentNo) ? "1" : "0").toJson();
+        return AjaxObject.newOk("检查组织机构代码证是否存在", custOpenAccountTmpService.checkCustExistsByOrgCode(anIdentNo) ? "1" : "0").toJson();
     }
 
     @Override

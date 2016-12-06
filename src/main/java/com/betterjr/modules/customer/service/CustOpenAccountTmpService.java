@@ -1043,7 +1043,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         }
 
         // 检查组织机构代码证是否存在
-        if (checkCustExistsByIdentNo(anOpenAccountInfo.getOrgCode()) == true) {
+        if (checkCustExistsByOrgCode(anOpenAccountInfo.getOrgCode()) == true) {
             logger.warn("组织机构代码证已存在");
             throw new BytterTradeException(40001, "组织机构代码证已存在");
         }
@@ -1069,26 +1069,44 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         }
     }
 
-    private boolean checkCustExistsByCustName(final String anCustName) {
-
+    /**
+     * 检查申请机构名称是否存在
+     */
+    public boolean checkCustExistsByCustName(final String anCustName) {
         return custAccountService.selectByProperty("custName", anCustName).size() > 0;
     }
 
-    private boolean checkCustExistsByIdentNo(final String anIdentNo) {
+    /**
+     * 检查组织机构代码证是否存在
+     */
+    public boolean checkCustExistsByOrgCode(final String anOrgCode) {
 
-        return custAccountService.selectByProperty("identNo", anIdentNo).size() > 0;
+        return custMechBaseService.selectByProperty("orgCode", anOrgCode).size() > 0;
     }
 
-    private boolean checkCustExistsByBusinLicence(final String anBusinLicence) {
+    /**
+     * 检查营业执照号码是否存在
+     */
+    public boolean checkCustExistsByBusinLicence(final String anBusinLicence) {
 
         return custMechBaseService.selectByProperty("businLicence", anBusinLicence).size() > 0;
     }
 
-    private boolean checkCustExistsByBankAccount(final String anBankAccount) {
+    /**
+     * 检查银行账号是否存在
+     */
+    public boolean checkCustExistsByBankAccount(final String anBankAccount) {
 
         return custMechBankAccountService.selectByProperty("bankAcco", anBankAccount).size() > 0;
     }
-    
+
+    /**
+     * 检查邮箱是否已注册
+     */
+    public boolean checkCustExistsByEmail(final String anEmail) {
+        return custOperatorService.selectByProperty("email", anEmail).size() > 0;
+    }
+
     /**
      * 检查手机号码是否已注册
      */

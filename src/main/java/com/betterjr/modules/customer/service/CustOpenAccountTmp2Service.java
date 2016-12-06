@@ -138,7 +138,7 @@ public class CustOpenAccountTmp2Service extends BaseService<CustOpenAccountTmpMa
         }
 
         // 检查组织机构代码证是否存在
-        if (checkCustExistsByIdentNo(anOpenAccountInfo.getOrgCode()) == true) {
+        if (checkCustExistsByOrgCode(anOpenAccountInfo.getOrgCode()) == true) {
             logger.warn("组织机构代码证已存在");
             throw new BytterTradeException(40001, "组织机构代码证已存在");
         }
@@ -205,9 +205,9 @@ public class CustOpenAccountTmp2Service extends BaseService<CustOpenAccountTmpMa
     /**
      * 检查组织机构代码证是否存在
      */
-    public boolean checkCustExistsByIdentNo(final String anIdentNo) {
+    public boolean checkCustExistsByOrgCode(final String anOrgCode) {
 
-        return custAccountService.selectByProperty("identNo", anIdentNo).size() > 0;
+        return custMechBaseService.selectByProperty("orgCode", anOrgCode).size() > 0;
     }
 
     /**
