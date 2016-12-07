@@ -207,6 +207,13 @@ public class CustOpenAccountTmp implements BetterjrEntity {
     @Column(name = "C_OPER_IDENTTYPE", columnDefinition = "CHAR")
     @MetaData(value = "经办人证件类型", comments = "经办人证件类型")
     private String operIdenttype;
+    
+    /**
+     * 经办人其他证件类型
+     */
+    @Column(name = "C_OPER_OTHER_IDENTTYPE", columnDefinition = "VARCHAR")
+    @MetaData(value = "经办人证件类型", comments = "经办人证件类型")
+    private String operOtherIdenttype;
 
     /**
      * 经办人证件号码
@@ -264,6 +271,13 @@ public class CustOpenAccountTmp implements BetterjrEntity {
     @Column(name = "C_LAW_IDENTTYPE", columnDefinition = "VARCHAR")
     @MetaData(value = "法人证件类型", comments = "法人证件类型")
     private String lawIdentType;
+    
+    /**
+     * 法人其他证件类型
+     */
+    @Column(name = "C_LAW_OTHER_IDENTTYPE", columnDefinition = "VARCHAR")
+    @MetaData(value = "法人其他证件类型", comments = "法人其他证件类型")
+    private String lawOtherIdentType;
 
     /**
      * 法人证件号码
@@ -435,6 +449,29 @@ public class CustOpenAccountTmp implements BetterjrEntity {
     @Column(name = "C_ROLE", columnDefinition = "VARCHAR")
     @MetaData(value = "角色：供应商、经销商", comments = "角色：供应商、经销商")
     private String role;
+    
+    /**
+     * 数据来源:0:PC自主开户,1:PC平台代录,2:微信平台代录
+     */
+    @Column(name = "C_DATA_SOURCE", columnDefinition = "VARCHAR")
+    @MetaData(value = "数据来源:0:PC自主开户,1:PC平台代录,2:微信平台代录", comments = "数据来源:0:PC自主开户,1:PC平台代录,2:微信平台代录")
+    private String dataSource;
+    
+    /**
+     * 激活日期
+     */
+    @JsonSerialize(using = CustDateJsonSerializer.class)
+    @Column(name = "D_ACTIVE_DATE", columnDefinition = "VARCHAR")
+    @MetaData(value = "激活日期", comments = "激活日期")
+    private String activeDate;
+
+    /**
+     * 激活时间
+     */
+    @JsonSerialize(using = CustTimeJsonSerializer.class)
+    @Column(name = "T_ACTIVE_TIME", columnDefinition = "VARCHAR")
+    @MetaData(value = "激活时间", comments = "激活时间")
+    private String activeTime;
 
     private static final long serialVersionUID = 1468812783872L;
 
@@ -894,6 +931,46 @@ public class CustOpenAccountTmp implements BetterjrEntity {
         this.role = anRole;
     }
 
+    public String getOperOtherIdenttype() {
+        return this.operOtherIdenttype;
+    }
+
+    public void setOperOtherIdenttype(String anOperOtherIdenttype) {
+        this.operOtherIdenttype = anOperOtherIdenttype;
+    }
+
+    public String getLawOtherIdentType() {
+        return this.lawOtherIdentType;
+    }
+
+    public void setLawOtherIdentType(String anLawOtherIdentType) {
+        this.lawOtherIdentType = anLawOtherIdentType;
+    }
+
+    public String getDataSource() {
+        return this.dataSource;
+    }
+
+    public void setDataSource(String anDataSource) {
+        this.dataSource = anDataSource;
+    }
+
+    public String getActiveDate() {
+        return this.activeDate;
+    }
+
+    public void setActiveDate(String anActiveDate) {
+        this.activeDate = anActiveDate;
+    }
+
+    public String getActiveTime() {
+        return this.activeTime;
+    }
+
+    public void setActiveTime(String anActiveTime) {
+        this.activeTime = anActiveTime;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -957,6 +1034,11 @@ public class CustOpenAccountTmp implements BetterjrEntity {
         sb.append(", wechatOpenId=").append(wechatOpenId);
         sb.append(", dealPassword=").append(dealPassword);
         sb.append(", role=").append(role);
+        sb.append(", dataSource=").append(dataSource);
+        sb.append(", operOtherIdenttype=").append(operOtherIdenttype);
+        sb.append(", lawOtherIdentType=").append(lawOtherIdentType);
+        sb.append(", activeDate=").append(activeDate);
+        sb.append(", activeTime=").append(activeTime);
         sb.append(", serialVersionUID=").append(serialVersionUID);
         sb.append("]");
         return sb.toString();
@@ -1032,6 +1114,11 @@ public class CustOpenAccountTmp implements BetterjrEntity {
                 && (this.getWechatOpenId() == null ? other.getWechatOpenId() == null : this.getWechatOpenId().equals(other.getWechatOpenId()))
                 && (this.getDealPassword() == null ? other.getDealPassword() == null : this.getDealPassword().equals(other.getDealPassword()))
                 && (this.getRole() == null ? other.getRole() == null : this.getRole().equals(other.getRole()))
+                && (this.getDataSource() == null ? other.getDataSource() == null : this.getDataSource().equals(other.getDataSource()))
+                && (this.getOperOtherIdenttype() == null ? other.getOperOtherIdenttype() == null : this.getOperOtherIdenttype().equals(other.getOperOtherIdenttype()))
+                && (this.getLawOtherIdentType() == null ? other.getLawOtherIdentType() == null : this.getLawOtherIdentType().equals(other.getLawOtherIdentType()))
+                && (this.getActiveDate() == null ? other.getActiveDate() == null : this.getActiveDate().equals(other.getActiveDate()))
+                && (this.getActiveTime() == null ? other.getActiveTime() == null : this.getActiveTime().equals(other.getActiveTime()))
                 && (this.getCoreList() == null ? other.getCoreList() == null : this.getCoreList().equals(other.getCoreList()));
     }
 
@@ -1096,6 +1183,11 @@ public class CustOpenAccountTmp implements BetterjrEntity {
         result = prime * result + ((getDealPassword() == null) ? 0 : getDealPassword().hashCode());
         result = prime * result + ((getRole() == null) ? 0 : getRole().hashCode());
         result = prime * result + ((getCoreList() == null) ? 0 : getCoreList().hashCode());
+        result = prime * result + ((getDataSource() == null) ? 0 : getDataSource().hashCode());
+        result = prime * result + ((getLawOtherIdentType() == null) ? 0 : getLawOtherIdentType().hashCode());
+        result = prime * result + ((getActiveDate() == null) ? 0 : getActiveDate().hashCode());
+        result = prime * result + ((getActiveTime() == null) ? 0 : getActiveTime().hashCode());
+        result = prime * result + ((getOperOtherIdenttype() == null) ? 0 : getOperOtherIdenttype().hashCode());
         return result;
     }
 
