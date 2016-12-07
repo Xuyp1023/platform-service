@@ -91,7 +91,7 @@ public class CustWeChatService extends BaseService<CustWeChatInfoMapper, CustWeC
         return this.mpAccount;
     }
     public static void main(final String[] args) {
-        System.out.println(Cryptos.aesEncrypt("{\"AppId\":\"wxa79cca7dac8c27a9\",\"AppSecret\":\"b964af0afa8f8a87edce1b83b0d97830\",\"Token\":\"fd22f35935294b5fb7f38a011106a5\",\"AESKey\":\"c0X0w3KIonikEyW57M9IbM8HVanOtFTaH5RPTuVR81O\",\"MpId\":\"gh_76558e8b69ee\",\"wechatUrl\":\"http://atest.qiejf.com/better/\"}"));
+        System.out.println(Cryptos.aesEncrypt("{\"AppId\":\"wx9b74d1c7a711cd91\",\"AppSecret\":\"a73d359048a665132f78e81d29e1387d\",\"Token\":\"fd22f35935294b5fb7f38a011106a5\",\"AESKey\":\"c0X0w3KIonikEyW57M9IbM8HVanOtFTaH5RPTuVR81O\",\"MpId\":\"gh_76558e8b69ee\",\"wechatUrl\":\"http://5a86w.free.natapp.cc/better/\"}"));
     }
     @PostConstruct
     public synchronized void init() {

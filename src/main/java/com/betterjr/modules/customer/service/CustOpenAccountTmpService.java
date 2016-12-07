@@ -11,6 +11,7 @@ import javax.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.betterjr.common.data.CustPasswordType;
 import com.betterjr.common.exception.BytterTradeException;
 import com.betterjr.common.mapper.BeanMapper;
@@ -22,8 +23,10 @@ import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
+import com.betterjr.common.utils.JedisUtils;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.common.utils.reflection.ReflectionUtils;
+import com.betterjr.common.web.AjaxObject;
 import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
@@ -38,6 +41,7 @@ import com.betterjr.modules.cert.entity.CustCertInfo;
 import com.betterjr.modules.cert.service.CustCertService;
 import com.betterjr.modules.customer.constants.CustomerConstants;
 import com.betterjr.modules.customer.dao.CustOpenAccountTmpMapper;
+import com.betterjr.modules.customer.entity.CustInsteadApply;
 import com.betterjr.modules.customer.entity.CustInsteadRecord;
 import com.betterjr.modules.customer.entity.CustMechBankAccount;
 import com.betterjr.modules.customer.entity.CustMechBase;
@@ -46,11 +50,16 @@ import com.betterjr.modules.customer.entity.CustMechLaw;
 import com.betterjr.modules.customer.entity.CustOpenAccountTmp;
 import com.betterjr.modules.customer.entity.CustRelation;
 import com.betterjr.modules.customer.helper.IFormalDataService;
+import com.betterjr.modules.document.ICustFileService;
 import com.betterjr.modules.document.entity.CustFileAduit;
 import com.betterjr.modules.document.entity.CustFileItem;
 import com.betterjr.modules.document.service.CustFileAuditService;
 import com.betterjr.modules.document.service.CustFileItemService;
 import com.betterjr.modules.document.utils.CustFileUtils;
+import com.betterjr.modules.sms.constants.SmsConstants;
+import com.betterjr.modules.sms.dubbo.interfaces.IVerificationCodeService;
+import com.betterjr.modules.sms.entity.VerifyCode;
+import com.betterjr.modules.sms.util.VerifyCodeType;
 import com.betterjr.modules.sys.entity.DictInfo;
 import com.betterjr.modules.sys.entity.DictItemInfo;
 import com.betterjr.modules.sys.security.SystemAuthorizingRealm;
@@ -132,7 +141,16 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
     private WeChatCustEnrollService custEnrollService;
     
     @Autowired
+    private CustInsteadService custInsteadService;
+    
+    @Autowired
     private CustPassService custPassService;
+    
+    @Reference(interfaceClass = IVerificationCodeService.class)
+    private IVerificationCodeService verificationCodeService;
+    
+    @Reference(interfaceClass = ICustFileService.class)
+    private ICustFileService custFileItemService2;
 
     /**
      * 开户资料读取
@@ -187,20 +205,16 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
 
     /**
      * 开户资料暂存
-     *
-     * @param anOpenAccountInfo
-     * @param anId
-     * @param anCoreList
-     * @param anFileList
-     * @return
      */
     public CustOpenAccountTmp saveOpenAccountInfo(final CustOpenAccountTmp anOpenAccountInfo, final Long anId, final String anFileList) {
         logger.info("Begin to Save Open Account Infomation");
-        // 检查开户资料合法性
-        checkAccountInfoValid(anOpenAccountInfo);
+        // 检查开户资料合法性,部分检查
+        wechatCheckAccountInfoValid(anOpenAccountInfo);
         if (null == anId) {
             // 初始化参数设置
             initAddValue(anOpenAccountInfo, CustomerConstants.TMP_TYPE_TEMPSTORE, CustomerConstants.TMP_STATUS_NEW);
+            // 初始化微信相应选--解决前端默认值被暂存刷新问题
+            anOpenAccountInfo.initDefaultValue();
             // 处理附件
             anOpenAccountInfo.setBatchNo(custFileItemService.updateCustFileItemInfo(anFileList, anOpenAccountInfo.getBatchNo()));
             // 数据存盘,开户资料暂存
@@ -218,7 +232,6 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
             // 数据存盘,开户资料暂存
             this.updateByPrimaryKeySelective(anOpenAccountInfo);
         }
-
         return anOpenAccountInfo;
     }
 
@@ -360,7 +373,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
     }
 
     /**
-     * 客户确认开户
+     * 客户确认开户激活
      */
     @Override
     public void saveFormalData(final Long anParentId) {
@@ -382,6 +395,9 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
             // 更新数据,变更状态
             anOpenAccountInfo.setLastStatus(anOpenAccountInfo.getBusinStatus());
             anOpenAccountInfo.setBusinStatus(CustomerConstants.TMP_STATUS_USED);
+            // 激活日期
+            anOpenAccountInfo.setActiveDate(BetterDateUtils.getNumDate());
+            anOpenAccountInfo.setActiveTime(BetterDateUtils.getNumTime());
             this.updateByPrimaryKeySelective(anOpenAccountInfo);
 
             // 回写暂存流水号至代录申请表
@@ -434,15 +450,9 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
     }
 
     /**
-     * 代录开户资料提交
-     *
-     * @param anOpenAccountInfo
-     * @param anInsteadRecordId
-     * @param anFileList
-     * @return
+     * PC代录开户资料提交
      */
-    public CustOpenAccountTmp saveOpenAccountInfoByInstead(final CustOpenAccountTmp anOpenAccountInfo, final Long anInsteadRecordId,
-            final String anFileList) {
+    public CustOpenAccountTmp saveOpenAccountInfoByInstead(CustOpenAccountTmp anOpenAccountInfo, Long anInsteadRecordId, String anFileList) {
         logger.info("Begin to Save Open Account Infomation Instead");
         // 代录流水号不能为空
         BTAssert.notNull(anInsteadRecordId, "代录流水号不能为空");
@@ -468,7 +478,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
             anOpenAccountInfo.initModifyValue(anExitsOpenAccountInfo);
             // 营业执照
             initIdentInfo(anOpenAccountInfo);
-            // 设置状态为未使用
+            // 设置状态为使用
             anOpenAccountInfo.setBusinStatus(CustomerConstants.TMP_STATUS_USEING);
             anOpenAccountInfo.setLastStatus(CustomerConstants.TMP_STATUS_USEING);
             // 处理附件
@@ -482,6 +492,8 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
 
         // 回写 parentId by instead record id. add by Liuwl 2016-10-12
         anOpenAccountInfo.setParentId(insteadRecord.getId());
+        //设置开户类型  "1"--PC代录
+        anOpenAccountInfo.setDataSource(CustomerConstants.OPEN_ACCOUNT_TYPE_PC_INSTEAD);
         this.updateByPrimaryKeySelective(anOpenAccountInfo);
 
         custInsteadApplyService.saveCustInsteadApplyCustInfo(insteadRecord.getApplyId(), null, anOpenAccountInfo.getCustName());
@@ -1164,5 +1176,197 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
 
         return new HashMap();
     }
+    
+    /**
+     * 开户申请提交
+     */
+    public CustOpenAccountTmp saveOpenAccountApplySubmit(final CustOpenAccountTmp anOpenAccountInfo, final Long anOperId, final String anFileList) {
+        logger.info("Begin to Commit Open Account Apply");
+        // 填充操作员信息
+        fillOperatorByOperId(anOperId, anOpenAccountInfo);
+        // 检查开户资料合法性
+        checkAccountInfoValid(anOpenAccountInfo);
+        // 初始化参数设置
+        initAddValue(anOpenAccountInfo, CustomerConstants.TMP_TYPE_TEMPSTORE, CustomerConstants.TMP_STATUS_OWN);
+        // 设置开户类型,"0"--PC自主开户
+        anOpenAccountInfo.setDataSource(CustomerConstants.OPEN_ACCOUNT_TYPE_PC_OWN);
+        // 处理附件
+        anOpenAccountInfo.setBatchNo(custFileItemService.updateCustFileItemInfo(anFileList, anOpenAccountInfo.getBatchNo()));
+        // 数据存盘,开户资料暂存
+        this.insert(anOpenAccountInfo);
+        return anOpenAccountInfo;
+    }
+    
+    /**
+     * 填充操作员信息
+     */
+    private void fillOperatorByOperId(Long anOperId, CustOpenAccountTmp anCustOpenAccountTmp) {
+        CustOperatorInfo anOperator = custOperatorService.selectByPrimaryKey(anOperId);
+        BTAssert.notNull(anOperator, "未找到操作员信息！");
+        anCustOpenAccountTmp.setOperName(anOperator.getName());
+        anCustOpenAccountTmp.setOperIdenttype(anOperator.getIdentType());
+        anCustOpenAccountTmp.setOperIdentno(anOperator.getIdentNo());
+        anCustOpenAccountTmp.setOperValiddate(anOperator.getValidDate());
+        anCustOpenAccountTmp.setOperMobile(anOperator.getMobileNo());
+        anCustOpenAccountTmp.setOperEmail(anOperator.getEmail());
+        anCustOpenAccountTmp.setOperPhone(anOperator.getPhone());
+        anCustOpenAccountTmp.setOperFaxNo(anOperator.getFaxNo());
+    }
+    
+    /**
+     * 微信检查入参
+     */
+    private void wechatCheckAccountInfoValid(CustOpenAccountTmp anOpenAccountInfo) {
+        BTAssert.notNull(anOpenAccountInfo.getCustName(), "企业名称不能为空");
+        BTAssert.notNull(anOpenAccountInfo.getOperName(), "经办人姓名不能为空");
+        BTAssert.notNull(anOpenAccountInfo.getOperMobile(), "经办人手机号码不能为空");
+        BTAssert.notNull(anOpenAccountInfo.getOperEmail(), "经办人邮箱不能为空");
 
+        // 检查申请机构名称是否存在
+        if (checkCustExistsByCustName(anOpenAccountInfo.getCustName()) == true) {
+            logger.warn("申请机构名称已存在");
+            throw new BytterTradeException(40001, "申请机构名称已存在");
+        }
+        if (checkCustExistsByEmail(anOpenAccountInfo.getOperEmail()) == true) {
+            logger.warn("经办人邮箱已存在");
+            throw new BytterTradeException(40001, "经办人邮箱已存在");
+        }
+        if (checkCustExistsByEmail(anOpenAccountInfo.getOperEmail()) == true) {
+            logger.warn("经办人邮箱已存在");
+            throw new BytterTradeException(40001, "经办人邮箱已存在");
+        }
+        if (checkCustExistsByMobileNo(anOpenAccountInfo.getOperMobile()) == true) {
+            logger.warn("经办人手机号已存在");
+            throw new BytterTradeException(40001, "经办人手机号已存在");
+        }
+    }
+    
+    /**
+     * 通过微信唯一标识查询开户信息
+     */
+    public CustOpenAccountTmp findAccountTmpInfo(String anOpenId) {
+        // 检查入参
+        checkParameter(anOpenId, "请关注微信公众号[qiejftest]后再进行开户!");
+        CustOpenAccountTmp accountTmpInfo = Collections3.getFirst(this.selectByProperty("wechatOpenId", anOpenId));
+        return accountTmpInfo;
+    }
+    
+    private void checkParameter(final String anKey, final String anMessage) {
+        if (BetterStringUtils.isBlank(anKey)) {
+            logger.warn(anMessage);
+            throw new BytterTradeException(40001, anMessage);
+        }
+    }
+    
+    /**
+     * 根据开户id和文件id保存附件
+     */
+    public CustFileItem saveSingleFileLink(Long anId, String anFileTypeName, String anFileMediaId) {
+        CustOpenAccountTmp custOpenInfo = this.selectByPrimaryKey(anId);
+        BTAssert.notNull(custOpenInfo, "无法获取开户信息");
+        CustFileItem fileItem = custWeChatService.saveWechatFile(anFileTypeName, anFileMediaId);
+        System.out.println(fileItem);
+        System.out.println(anId);
+        custOpenInfo.setBatchNo(custFileItemService2.updateCustFileItemInfo(fileItem.getId().toString(), custOpenInfo.getBatchNo()));
+        this.updateByPrimaryKey(custOpenInfo);
+        return fileItem;
+    }
+
+    /**
+     * 根据batchNo生成对应文件类型Map Json对象(微信使用)
+     */
+    public Map<String, Object> findAccountFileByBatChNo(Long anBatchNo) {
+        Map<String, Object> fileMap = new HashMap<String, Object>();
+        List<CustFileItem> fileList = custFileItemService.findCustFiles(anBatchNo);
+        String[] fileInfoTypes = { "CustBizLicenseFile", "CustOrgCodeFile", "CustTaxRegistFile", "CustCreditCodeFile", "CustBankOpenLicenseFile",
+                "BrokerIdHeadFile", "BrokerIdNationFile", "BrokerIdHoldFile", "RepresentIdHeadFile", "RepresentIdNationFile", "RepresentIdHoldFile",
+                "CustOpenAccountFilePack" };
+        for (String anFileInfoType : fileInfoTypes) {
+            // 默认数据
+            CustFileItem defaultFile = new CustFileItem();
+            defaultFile.setFileInfoType(anFileInfoType);
+//            fileMap.put(anFileInfoType, defaultFile);
+            // 遍历文件，若存在则放入
+            for (CustFileItem anFile : fileList) {
+                if (BetterStringUtils.equals(anFileInfoType, anFile.getFileInfoType())) {
+                    fileMap.put(anFileInfoType, anFile);
+                }
+            }
+        }
+        return fileMap;
+    }
+
+    /**
+     * 根据openId查询开户申请状态，返回对应值，供页面相应跳转使用
+     * @param anOpenId
+     * @return
+     */
+    public String findOpenAccountStatus(String anOpenId) {
+        Map<String, Object> conditionMap = new HashMap<>();
+        conditionMap.put("wechatOpenId", anOpenId);
+
+        CustOpenAccountTmp openAccountTmp = Collections3.getFirst(this.selectByProperty(conditionMap));
+
+        if (openAccountTmp == null) {
+            return "0";
+        }
+        else {
+            CustInsteadApply custInsteadApply = custInsteadService.findInsteadApplyByAccountTmpId(openAccountTmp.getId());
+
+            if (custInsteadApply != null) {
+                if (BetterStringUtils.equals(custInsteadApply.getBusinStatus(), "4")) {
+                    return "2";
+                }
+                return "1";
+            }
+            else {
+
+                return "0";
+            }
+        }
+    }
+
+    /**
+     * 发送手机短信验证码
+     */
+    public String sendValidMessage(String anMobileNo) {
+        BTAssert.isTrue(BetterStringUtils.isNotBlank(anMobileNo), "手机号码不允许为空！");
+        final VerifyCode verifyCode = verificationCodeService.sendVerifyCode(anMobileNo, VerifyCodeType.OPEN_ACCOUNT_PASSWORD);
+        BTAssert.notNull(verifyCode, "没有生成验证码！");
+        JedisUtils.delObject(SmsConstants.smsOpenAccountVerifyCodePrefix + anMobileNo);
+        JedisUtils.setObject(SmsConstants.smsOpenAccountVerifyCodePrefix + anMobileNo, verifyCode, SmsConstants.SEC_600);
+        return AjaxObject.newOk("发送验证码成功").toJson();
+    }
+    
+    
+
+    /**
+     * 根据operOrg查询Apply状态
+     */
+    public String findInsteadApplyStatus() {
+        CustInsteadApply instApply = Collections3.getFirst(custInsteadApplyService.selectByProperty("operOrg", UserUtils.getOperatorInfo().getOperOrg()));
+        if (null != instApply) {
+            return instApply.getBusinStatus();
+        }else {
+           return "";
+        }
+    }
+    
+    /**
+     * 根据operOrg查询开户信息
+     */
+    public CustOpenAccountTmp findOpenAccoutnTmp() {
+        CustOpenAccountTmp accountInfo = Collections3.getFirst(this.selectByProperty("operOrg", UserUtils.getOperatorInfo().getOperOrg()));
+        return accountInfo;
+    }
+
+    /**
+     * 微信，删除附件
+     */
+    public int saveDeleteSingleFile(Long anId) {
+        CustFileItem anFile = custFileItemService.selectByPrimaryKey(anId);
+        BTAssert.notNull(anFile, "无法获取相应附件!");
+        anFile.setBatchNo(-anFile.getBatchNo());
+        return custFileItemService.updateByPrimaryKey(anFile);
+    }
 }
