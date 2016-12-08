@@ -11,6 +11,7 @@ import com.betterjr.common.utils.reflection.ReflectionUtils;
 import com.betterjr.modules.document.dao.AuthorFileGroupMapper;
 import com.betterjr.modules.document.data.FileStoreType;
 import com.betterjr.modules.document.data.OSSConfigInfo;
+import com.betterjr.modules.document.entity.AgencyAuthorFileGroup;
 import com.betterjr.modules.document.entity.AuthorFileGroup;
 import com.betterjr.modules.sys.service.SysConfigService;
 
@@ -18,7 +19,6 @@ import java.util.*;
 
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
 import org.springframework.stereotype.Service;
 
 @Service

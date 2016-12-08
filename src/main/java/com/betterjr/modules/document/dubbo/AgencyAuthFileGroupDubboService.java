@@ -95,4 +95,13 @@ public class AgencyAuthFileGroupDubboService implements IAgencyAuthFileGroupServ
         return authorFileGroupService.findFileStoreType(anFileInfoType);
     }
     
+    /***
+     * 根据不同条件查询返回文件类型对象
+     * @param anMap 条件
+     * @return
+     */
+    @Override
+    public AgencyAuthorFileGroup findAuthorFileGroupByMap(Map<String, Object> anMap){
+        return agencyAuthFileGroupService.findAuthorFileGroupByMap(anMap);
+    }
 }

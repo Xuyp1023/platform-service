@@ -17,7 +17,6 @@ import com.betterjr.common.exception.BytterTradeException;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
-import com.betterjr.common.utils.UserUtils;
 import com.betterjr.common.utils.reflection.ReflectionUtils;
 import com.betterjr.modules.document.dao.CustFileAduitMapper;
 import com.betterjr.modules.document.data.AccountAduitData;
@@ -334,6 +333,29 @@ public class CustFileAuditService extends BaseService<CustFileAduitMapper, CustF
         }
         
         return noticeMsg;
+    }
+    
+    /***
+     * 添加附件
+     * @param anCustFileAduit
+     * @return
+     */
+    public boolean addCustFileAduit(CustFileAduit anCustFileAduit){
+        return this.insert(anCustFileAduit)>0;
+    }
+    
+    /***
+     * 删除附件关联审核表
+     * @param anId
+     * @return
+     */
+    public boolean delCustFileAduit(Long anId){
+        CustFileItem custFileItem=custFileItemService.findOne(anId);
+        if(custFileItem!=null){
+             return this.deleteByPrimaryKey(custFileItem.getBatchNo())>0;
+        }else{
+            return false;
+        }
     }
 
     public static void main(String[] args) {
