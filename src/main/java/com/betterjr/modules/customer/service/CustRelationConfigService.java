@@ -60,7 +60,7 @@ public class CustRelationConfigService {
     @Autowired
     private CustWeChatService custWeChatService;
     @Autowired
-    private CustOpenAccountTmp2Service custOpenAccountTmp2Service;
+    private CustOpenAccountTmpService custOpenAccountTmpService;
     @Autowired
     private CustFileAuditService custFileAuditService;
     @Autowired
@@ -304,7 +304,7 @@ public class CustRelationConfigService {
     public boolean saveDeleteCustAduitTempFile(Long anId){
         custFileItemService.delCustFileAduit(anId);// 删除审核表
         custFileAduitTempService.saveDeleteFileAduitTemp(anId); // 删除审核临时表
-        return custOpenAccountTmp2Service.saveDeleteSingleFile(anId)>0; // 删除附件
+        return custOpenAccountTmpService.saveDeleteSingleFile(anId)>0; // 删除附件
     }
     
     /***
