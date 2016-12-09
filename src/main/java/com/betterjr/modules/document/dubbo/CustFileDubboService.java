@@ -8,8 +8,6 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.config.annotation.Service;
-import com.betterjr.common.config.ParamNames;
-import com.betterjr.common.data.KeyAndValueObject;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.common.web.AjaxObject;
@@ -22,7 +20,6 @@ import com.betterjr.modules.document.service.CustFileAuditService;
 import com.betterjr.modules.document.service.CustFileInfoService;
 import com.betterjr.modules.document.service.CustFileItemService;
 import com.betterjr.modules.document.utils.CustFileUtils;
-import com.betterjr.modules.sys.service.SysConfigService;
 
 @Service(interfaceClass=ICustFileService.class)
 public class CustFileDubboService implements ICustFileService{
@@ -58,6 +55,15 @@ public class CustFileDubboService implements ICustFileService{
     public boolean updateAuditFileGroup(AccountAduitData anAduitData) {
 
         return custFileAuditService.updateAuditFileGroup(anAduitData);
+    }
+    
+    /***
+     * 添加客户审核附件
+     * @param anCustFileAduit
+     * @return
+     */
+    public boolean addCustFileAduit(CustFileAduit anCustFileAduit){
+        return custFileAuditService.addCustFileAduit(anCustFileAduit);
     }
 
     @Override
@@ -187,6 +193,15 @@ public class CustFileDubboService implements ICustFileService{
     @Override
     public Long updateAndDelCustFileItemInfo(String anFileList, Long anBatchNo) {
         return this.custFileItemService.updateAndDelCustFileItemInfo(anFileList, anBatchNo);
+    }
+    
+    /***
+     * 删除审核表中的附件关联
+     * @param anId
+     * @return
+     */
+    public boolean delCustFileAduit(Long anId){
+        return this.custFileAuditService.delCustFileAduit(anId);
     }
  
 }

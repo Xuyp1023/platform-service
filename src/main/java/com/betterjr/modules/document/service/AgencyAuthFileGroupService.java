@@ -10,18 +10,14 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.betterjr.common.mapper.JsonMapper;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
-import com.betterjr.common.utils.Cryptos;
 import com.betterjr.common.utils.QueryTermBuilder;
 import com.betterjr.modules.document.dao.AgencyAuthorFileGroupMapper;
 import com.betterjr.modules.document.data.FileStoreType;
-import com.betterjr.modules.document.data.OSSConfigInfo;
 import com.betterjr.modules.document.entity.AgencyAuthorFileGroup;
 import com.betterjr.modules.document.utils.DownloadFileService;
-import com.betterjr.modules.sys.service.SysConfigService;
 
 @Service
 public class AgencyAuthFileGroupService extends BaseService<AgencyAuthorFileGroupMapper, AgencyAuthorFileGroup> {
@@ -132,5 +128,16 @@ public class AgencyAuthFileGroupService extends BaseService<AgencyAuthorFileGrou
             }
         }
         return tmpPath;
+    }
+    
+
+    
+    /***
+     * 根据不同条件查询返回文件类型对象
+     * @param anMap 条件
+     * @return
+     */
+    public AgencyAuthorFileGroup findAuthorFileGroupByMap(Map<String, Object> anMap){
+        return Collections3.getFirst(this.selectByProperty(anMap));
     }
 }
