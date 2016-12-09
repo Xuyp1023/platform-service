@@ -26,6 +26,11 @@ public class CustInsteadDubboService implements ICustInsteadService {
         final Map<String, Object> param = RuleServiceDubboFilterInvoker.getInputObj();
         return AjaxObject.newOk("申请代录成功", insteadService.addInsteadApply(param, anFileList)).toJson();
     }
+    
+    @Override
+    public String webAddOpenAccountInsteadApply(final String anCustName, final Long anOperId, final String anFileList) {
+        return AjaxObject.newOk("PC申请代录开户成功", insteadService.addOpenAccountInsteadApply(anCustName, anOperId, anFileList)).toJson();
+    }
 
     @Override
     public String webSaveInsteadApply(final Map<String, Object> anParam, final Long anApplyId, final String anFileList) {

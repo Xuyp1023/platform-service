@@ -88,6 +88,25 @@ public class CustInsteadService {
         return custInsteadApply;
     }
     
+    /**
+     * PC端发起代录申请
+     */
+    public CustInsteadApply addOpenAccountInsteadApply(final String anCustName, final Long anOperId, final String anFileList) {
+        // pc端默认值
+        final String insteadType = CustomerConstants.INSTEAD_APPLY_TYPE_OPENACCOUNT;
+        final String insteadItems = "0,0,0,0,0,0,0";
+        Map<String, Object> anMap = QueryTermBuilder.newInstance().put("insteadType", insteadType).put("insteadItems", insteadItems).build();
+        CustInsteadApply custInsteadApply = this.addInsteadApply(anMap, anFileList);
+        //更新custName
+        custInsteadApply.setCustName(anCustName);
+        insteadApplyService.updateByPrimaryKeySelective(custInsteadApply);
+        // 保存用户选择信息：客户名称、经办人信息
+        CustOpenAccountTmp anCustOpenAccountTmp = this.addOpenAccountTmp(anCustName, anOperId);
+        // 将开户信息保存至开户申请记录中
+        fillInsteadRecordByAccountTmp(custInsteadApply.getId(), anCustOpenAccountTmp.getId());
+
+        return custInsteadApply;
+    }
 
     /**
      * 代录申请 - 修改申请
@@ -592,25 +611,6 @@ public class CustInsteadService {
         BTAssert.notNull(auditLog, "审核记录添加失败!");
     }
     
-    /**
-     * PC端发起代录申请
-     */
-    public CustInsteadApply addInsteadApply(final String anCustName, final Long anOperId, final String anFileList) {
-        // pc端默认值
-        final String insteadType = CustomerConstants.INSTEAD_APPLY_TYPE_OPENACCOUNT;
-        final String insteadItems = "0,0,0,0,0,0,0";
-        Map<String, Object> anMap = QueryTermBuilder.newInstance().put("insteadType", insteadType).put("insteadItems", insteadItems).build();
-        CustInsteadApply custInsteadApply = this.addInsteadApply(anMap, anFileList);
-        //更新custName
-        custInsteadApply.setCustName(anCustName);
-        insteadApplyService.updateByPrimaryKeySelective(custInsteadApply);
-        // 保存用户选择信息：客户名称、经办人信息
-        CustOpenAccountTmp anCustOpenAccountTmp = this.addOpenAccountTmp(anCustName, anOperId);
-        // 将开户信息保存至开户申请记录中
-        fillInsteadRecordByAccountTmp(custInsteadApply.getId(), anCustOpenAccountTmp.getId());
-
-        return custInsteadApply;
-    }
 
     /**
      * 保存PC端填写开户数据至信息表
