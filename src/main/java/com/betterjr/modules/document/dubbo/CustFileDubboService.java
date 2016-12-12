@@ -204,4 +204,8 @@ public class CustFileDubboService implements ICustFileService{
         return this.custFileAuditService.delCustFileAduit(anId);
     }
  
+    @Override
+    public List<CustFileItem> findFileListByIds(String[] anIds) {
+       return this.custFileItemService.findFileListByIds(anIds);
+    }
 }

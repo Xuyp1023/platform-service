@@ -344,4 +344,8 @@ public class CustFileItemService extends BaseService<CustFileItemMapper, CustFil
         return true;
     }
 
+    public List<CustFileItem> findFileListByIds(String[] anIds) {
+        return this.selectByProperty("id", anIds);
+    }
+
 }

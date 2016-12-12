@@ -208,8 +208,13 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
      */
     public CustOpenAccountTmp saveOpenAccountInfo(final CustOpenAccountTmp anOpenAccountInfo, final Long anId, final String anFileList) {
         logger.info("Begin to Save Open Account Infomation");
-        // 检查开户资料合法性,部分检查
-        wechatCheckAccountInfoValid(anOpenAccountInfo);
+        if(BetterStringUtils.isBlank(anOpenAccountInfo.getWechatOpenId())) {
+            // 检查开户资料合法性(pc)
+            checkAccountInfoValid(anOpenAccountInfo);
+        } else {
+            // 检查开户资料合法性,部分检查(微信)
+            wechatCheckAccountInfoValid(anOpenAccountInfo);
+        }
         if (null == anId) {
             // 初始化参数设置
             initAddValue(anOpenAccountInfo, CustomerConstants.TMP_TYPE_TEMPSTORE, CustomerConstants.TMP_STATUS_NEW);
