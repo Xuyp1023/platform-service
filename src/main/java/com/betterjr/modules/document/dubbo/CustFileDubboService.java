@@ -189,4 +189,8 @@ public class CustFileDubboService implements ICustFileService{
         return this.custFileItemService.updateAndDelCustFileItemInfo(anFileList, anBatchNo);
     }
  
+    @Override
+    public List<CustFileItem> findFileListByIds(String[] anIds) {
+       return this.custFileItemService.findFileListByIds(anIds);
+    }
 }
