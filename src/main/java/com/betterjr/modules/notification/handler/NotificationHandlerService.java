@@ -1,7 +1,9 @@
 package com.betterjr.modules.notification.handler;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -96,7 +98,39 @@ public class NotificationHandlerService {
     }
 
     @RocketMQListener(topic = "NOTIFICATION_TOPIC", consumer = "betterConsumer")
-    public void processNotification(final Object anMessage) {
+    public void consumerNotification(final Object anMessage) {
+        final List<Map<String, Object>> messageList = new ArrayList<>();
+        processNotification(anMessage, messageList);
+        sendMessage(messageList);
+    }
+
+
+    /**
+     * @param anMessageList
+     */
+    private void sendMessage(final List<Map<String, Object>> anMessageList) {
+        for (final Map<String, Object> message: anMessageList) {
+            final Notification anNotification = (Notification) message.get("notification");
+            final CustOperatorInfo anSendOperator = (CustOperatorInfo) message.get("sendOperator");
+            final CustInfo anSendCustomer = (CustInfo) message.get("sendCustomer");
+
+            if (BetterStringUtils.equals(NotificationConstants.CHANNEL_EMAIL, anNotification.getChannel())) {
+                processEmail(anNotification, anSendOperator, anSendCustomer);
+            }
+
+            if (BetterStringUtils.equals(NotificationConstants.CHANNEL_WECHAT, anNotification.getChannel())) {
+                processWechat(anNotification, anSendOperator, anSendCustomer);
+            }
+
+            // 需要即时发送的短信消息
+            if (BetterStringUtils.equals(NotificationConstants.CHANNEL_SMS, anNotification.getChannel())
+                    && BetterStringUtils.equals(anNotification.getImmediate(), NotificationConstants.IMMEDIATE_TRUE)) {
+                processSms(anNotification, anSendOperator, anSendCustomer);
+            }
+        }
+    }
+
+    public void processNotification(final Object anMessage, final List<Map<String, Object>> anMessageList) {
         final MQMessage message = (MQMessage) anMessage;
         final NotificationModel notificationModel = (NotificationModel) message.getObject();
 
@@ -115,7 +149,7 @@ public class NotificationHandlerService {
             final List<NotificationChannelProfile> channelProfiles = channelProfileService.queryChannelProfileByProfileId(profile.getId());
 
             try {
-                processNotification(profile, channelProfiles, notificationModel);
+                processNotification(profile, channelProfiles, notificationModel, anMessageList);
             }
             catch (final Exception e) {
                 logger.error("消息发送失败!" + profile, e);
@@ -130,7 +164,7 @@ public class NotificationHandlerService {
      * 处理消息
      */
     private void processNotification(final NotificationProfile anProfile, final List<NotificationChannelProfile> anChannelProfiles,
-            final NotificationModel anNotificationModel) throws Exception {
+            final NotificationModel anNotificationModel, final List<Map<String, Object>> anMessageList) throws Exception {
 
         final CustInfo sendCustomer = anNotificationModel.getSendCustomer();
         final CustOperatorInfo sendOperator = anNotificationModel.getSendOperator();
@@ -155,7 +189,7 @@ public class NotificationHandlerService {
                 final Notification notification = addNotification(anProfile, channelProfile, param, sendOperator, sendCustomer, batchNo);
                 BTAssert.notNull(notification);
 
-                processNotificationCustomer(notification, anNotificationModel, sendOperator, sendCustomer);
+                processNotificationCustomer(notification, anNotificationModel, sendOperator, sendCustomer, anMessageList);
             }
             else {
                 final String channelName = getChannelName(channelProfile.getChannel());
@@ -165,7 +199,7 @@ public class NotificationHandlerService {
     }
 
     private void processNotificationCustomer(final Notification anNotification, final NotificationModel anNotificationModel, final CustOperatorInfo anSendOperator,
-            final CustInfo anSendCustomer) {
+            final CustInfo anSendCustomer, final List<Map<String, Object>> anMessageList) {
         final Collection<Pair<CustOperatorInfo, CustInfo>> operators = queryOperatorInfo(anNotificationModel);
         if (Collections3.isEmpty(operators) == false) {
             for (final Pair<CustOperatorInfo, CustInfo> tempOperator : operators) {
@@ -203,17 +237,32 @@ public class NotificationHandlerService {
         }
 
         if (BetterStringUtils.equals(NotificationConstants.CHANNEL_EMAIL, anNotification.getChannel())) {
-            processEmail(anNotification, anSendOperator, anSendCustomer);
+            final Map<String, Object> message = new HashMap<>();
+            message.put("notification", anNotification);
+            message.put("sendOperator", anSendOperator);
+            message.put("sendCustomer", anSendCustomer);
+            anMessageList.add(message);
+            //processEmail(anNotification, anSendOperator, anSendCustomer);
         }
 
         if (BetterStringUtils.equals(NotificationConstants.CHANNEL_WECHAT, anNotification.getChannel())) {
-            processWechat(anNotification, anSendOperator, anSendCustomer);
+            final Map<String, Object> message = new HashMap<>();
+            message.put("notification", anNotification);
+            message.put("sendOperator", anSendOperator);
+            message.put("sendCustomer", anSendCustomer);
+            anMessageList.add(message);
+            //processWechat(anNotification, anSendOperator, anSendCustomer);
         }
 
         // 需要即时发送的短信消息
         if (BetterStringUtils.equals(NotificationConstants.CHANNEL_SMS, anNotification.getChannel())
                 && BetterStringUtils.equals(anNotification.getImmediate(), NotificationConstants.IMMEDIATE_TRUE)) {
-            processSms(anNotification, anSendOperator, anSendCustomer);
+            final Map<String, Object> message = new HashMap<>();
+            message.put("notification", anNotification);
+            message.put("sendOperator", anSendOperator);
+            message.put("sendCustomer", anSendCustomer);
+            anMessageList.add(message);
+            //processSms(anNotification, anSendOperator, anSendCustomer);
         }
     }
 
