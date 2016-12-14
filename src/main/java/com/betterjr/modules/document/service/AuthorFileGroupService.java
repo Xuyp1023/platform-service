@@ -7,7 +7,9 @@ import com.betterjr.common.data.NormalStatus;
 import com.betterjr.common.mapper.JsonMapper;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BetterStringUtils;
+import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.Cryptos;
+import com.betterjr.common.utils.FileUtils;
 import com.betterjr.common.utils.reflection.ReflectionUtils;
 import com.betterjr.modules.document.dao.AuthorFileGroupMapper;
 import com.betterjr.modules.document.data.FileStoreType;
@@ -125,5 +127,24 @@ public class AuthorFileGroupService extends BaseService<AuthorFileGroupMapper, A
     public CheckDataResult findFileTypePermit(String anFileInfoType, String anFileType){
         AuthorFileGroup fileGroup = findAuthFileGroup(anFileInfoType);
         return new CheckDataResult(fileGroup.checkFileType(anFileType), fileGroup.getPermitFileTypes());
+    }
+    
+    /**
+     * 查找上传文件允许的文件类型列表信息
+     * @param anFileInfoType
+     * @return
+     */
+    public String findFileTypePermitInfo(String anFileInfoType){
+        AuthorFileGroup fileGroup = findAuthFileGroup(anFileInfoType);
+        String tmpStr = fileGroup.getPermitFileTypes();
+        if (BetterStringUtils.isBlank(tmpStr)){
+            tmpStr = BetterStringUtils.join(FileUtils.SupportedUploadFileType, ",");
+        }
+        StringBuilder sb = new StringBuilder();
+        for(String tmpChar: BetterStringUtils.splitTrim(tmpStr)){
+            sb.append("*.").append(tmpChar).append(", ");
+        }
+        sb.setLength( sb.length() -2);
+        return sb.toString();
     }
 }
