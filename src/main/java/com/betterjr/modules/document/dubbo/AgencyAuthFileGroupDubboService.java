@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import com.betterjr.common.data.CheckDataResult;
+import com.betterjr.common.web.AjaxObject;
 import com.betterjr.modules.document.IAgencyAuthFileGroupService;
 import com.betterjr.modules.document.data.FileStoreType;
 import com.betterjr.modules.document.data.OSSConfigInfo;
@@ -109,5 +110,11 @@ public class AgencyAuthFileGroupDubboService implements IAgencyAuthFileGroupServ
     public CheckDataResult findFileTypePermit(String anFileInfoType, String anFileType){
         
         return authorFileGroupService.findFileTypePermit(anFileInfoType, anFileType);
+    }
+    
+    public String webFindFileTypePermitInfo(String anFileInfoType){
+        
+        return AjaxObject.newOk("查询用户认证文件允许的文件类型成功", authorFileGroupService.findFileTypePermitInfo(anFileInfoType)).toJson();
+
     }
 }
