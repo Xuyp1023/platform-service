@@ -2,6 +2,7 @@ package com.betterjr.modules.document.service;
 
 import com.betterjr.common.config.ParamNames;
 import com.betterjr.common.config.SpringPropertyResourceReader;
+import com.betterjr.common.data.CheckDataResult;
 import com.betterjr.common.data.NormalStatus;
 import com.betterjr.common.mapper.JsonMapper;
 import com.betterjr.common.service.BaseService;
@@ -77,13 +78,13 @@ public class AuthorFileGroupService extends BaseService<AuthorFileGroupMapper, A
         return configInfo;
     }
 
-    private AuthorFileGroup findAuthFileGroup(String anFileInfoType) {        
+    private AuthorFileGroup findAuthFileGroup(String anFileInfoType) {
         AuthorFileGroup fileGroup = this.selectByPrimaryKey(anFileInfoType);
         if (fileGroup == null) {
             fileGroup = new AuthorFileGroup("00", anFileInfoType);
             fileGroup.setStoreType(SpringPropertyResourceReader.getProperty("fileStoreType", "0"));
         }
-        
+
         return fileGroup;
     }
 
@@ -113,5 +114,16 @@ public class AuthorFileGroupService extends BaseService<AuthorFileGroupMapper, A
         String basePath = (String) SysConfigService.getString(ParamNames.OPENACCO_FILE_DOWNLOAD_PATH);
 
         return basePath + anFilePath;
+    }
+
+    /**
+     * 检查文件类型是否允许
+     * @param anFileInfoType 文件业务类型
+     * @param anFileType 文件类型
+     * @return
+     */
+    public CheckDataResult findFileTypePermit(String anFileInfoType, String anFileType){
+        AuthorFileGroup fileGroup = findAuthFileGroup(anFileInfoType);
+        return new CheckDataResult(fileGroup.checkFileType(anFileType), fileGroup.getPermitFileTypes());
     }
 }
