@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.betterjr.common.data.CheckDataResult;
 import com.betterjr.modules.document.IAgencyAuthFileGroupService;
 import com.betterjr.modules.document.data.FileStoreType;
 import com.betterjr.modules.document.data.OSSConfigInfo;
@@ -103,5 +104,10 @@ public class AgencyAuthFileGroupDubboService implements IAgencyAuthFileGroupServ
     @Override
     public AgencyAuthorFileGroup findAuthorFileGroupByMap(Map<String, Object> anMap){
         return agencyAuthFileGroupService.findAuthorFileGroupByMap(anMap);
+    }
+    
+    public CheckDataResult findFileTypePermit(String anFileInfoType, String anFileType){
+        
+        return authorFileGroupService.findFileTypePermit(anFileInfoType, anFileType);
     }
 }
