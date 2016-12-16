@@ -77,7 +77,7 @@ public class AuthorFileGroupService extends BaseService<AuthorFileGroupMapper, A
         return configInfo;
     }
 
-    private AuthorFileGroup findAuthFileGroup(String anFileInfoType) {        
+    public AuthorFileGroup findAuthFileGroup(String anFileInfoType) {        
         AuthorFileGroup fileGroup = this.selectByPrimaryKey(anFileInfoType);
         if (fileGroup == null) {
             fileGroup = new AuthorFileGroup("00", anFileInfoType);

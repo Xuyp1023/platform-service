@@ -104,4 +104,13 @@ public class AgencyAuthFileGroupDubboService implements IAgencyAuthFileGroupServ
     public AgencyAuthorFileGroup findAuthorFileGroupByMap(Map<String, Object> anMap){
         return agencyAuthFileGroupService.findAuthorFileGroupByMap(anMap);
     }
+    
+    /***
+     * 查询文件类型对象
+     * @param anFileInfoType
+     * @return
+     */
+    public AuthorFileGroup findAuthFileGroup(String anFileInfoType) {   
+        return authorFileGroupService.findAuthFileGroup(anFileInfoType);
+    }
 }
