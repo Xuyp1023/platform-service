@@ -203,6 +203,17 @@ public class CustFileDubboService implements ICustFileService{
     public boolean delCustFileAduit(Long anId){
         return this.custFileAuditService.delCustFileAduit(anId);
     }
+    
+    /****
+     * 审核通过查询的附件来源为审核正式表
+     * @param anCustNo
+     * @param anRelateCustNo
+     * @return
+     */
+    public List<CustFileItem> findCustFileAduit(Long anCustNo,Long anRelateCustNo){
+        return this.custFileAuditService.findCustFileAduit(anCustNo, anRelateCustNo);
+    }
+    
  
     @Override
     public List<CustFileItem> findFileListByIds(String[] anIds) {

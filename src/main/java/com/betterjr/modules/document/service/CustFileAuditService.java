@@ -13,11 +13,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.betterjr.common.exception.BytterTradeException;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.reflection.ReflectionUtils;
+import com.betterjr.modules.document.IAgencyAuthFileGroupService;
 import com.betterjr.modules.document.dao.CustFileAduitMapper;
 import com.betterjr.modules.document.data.AccountAduitData;
 import com.betterjr.modules.document.data.AuthDocumentStatus;
@@ -36,8 +38,8 @@ public class CustFileAuditService extends BaseService<CustFileAduitMapper, CustF
     @Autowired
     private CustFileItemService custFileItemService;
 
-    @Autowired
-    private AgencyAuthFileGroupService agencyAuthFileGroupService;
+    @Reference(interfaceClass=IAgencyAuthFileGroupService.class)
+    private IAgencyAuthFileGroupService agencyAuthFileGroupService;
     @Autowired
     private AuthorFileGroupService authorFileGroupService;
 
@@ -356,6 +358,29 @@ public class CustFileAuditService extends BaseService<CustFileAduitMapper, CustF
         }else{
             return false;
         }
+    }
+    
+    /****
+     * 审核通过查询的附件来源为审核正式表
+     * @param anCustNo
+     * @param anRelateCustNo
+     * @return
+     */
+    public List<CustFileItem> findCustFileAduit(Long anCustNo,Long anRelateCustNo){
+        List<CustFileItem>  custFileItemList=new ArrayList<CustFileItem>();
+        Map<String, Object> anMap=new HashMap<String, Object>();
+        anMap.put("custNo", anCustNo);
+        anMap.put("aduitCustNo", anRelateCustNo);   
+        anMap.put("auditStatus","1");
+        for(CustFileAduit custFileAduit:this.selectByProperty(anMap)){
+            CustFileItem custFileItem=custFileItemService.findOneByBatchNo(custFileAduit.getId());
+            if(custFileItem!=null){
+                custFileItem.setBusinStatus("1");
+                custFileItem.setFileDescription(agencyAuthFileGroupService.findAuthFileGroup(custFileItem.getFileInfoType()).getDescription());
+                custFileItemList.add(custFileItem);
+            }
+        }
+        return custFileItemList;
     }
 
     public static void main(String[] args) {

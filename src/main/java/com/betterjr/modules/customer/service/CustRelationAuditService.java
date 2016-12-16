@@ -44,5 +44,4 @@ public class CustRelationAuditService extends BaseService<CustRelationAuditMappe
         relationAudit.setAuditAgency(anAuditAgency);
         return this.insert(relationAudit);
     }
-
 }

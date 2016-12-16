@@ -115,6 +115,15 @@ public class AgencyAuthFileGroupDubboService implements IAgencyAuthFileGroupServ
     public String webFindFileTypePermitInfo(String anFileInfoType){
         
         return AjaxObject.newOk("查询用户认证文件允许的文件类型成功", authorFileGroupService.findFileTypePermitInfo(anFileInfoType)).toJson();
+    }
+    
+    /***
+     * 查询文件类型对象
+     * @param anFileInfoType
+     * @return
+     */
+    public AuthorFileGroup findAuthFileGroup(String anFileInfoType) {   
+        return authorFileGroupService.findAuthFileGroup(anFileInfoType);
 
     }
 }

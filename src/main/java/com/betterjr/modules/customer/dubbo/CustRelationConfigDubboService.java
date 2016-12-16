@@ -1,5 +1,7 @@
 package com.betterjr.modules.customer.dubbo;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.config.annotation.Service;
@@ -84,8 +86,8 @@ public class CustRelationConfigDubboService implements ICustRelationConfigServic
      * @param anCustNo
      * @return
      */
-    public String webFindCustAduitTempFile(Long anRelateCustNo,Long anCustNo){
-        return AjaxObject.newOk("获取审核文件",relationConfigService.findCustAduitTemp(anRelateCustNo, anCustNo)).toJson();
+    public String webFindCustAduitTempFile(Long anRelateCustNo){
+        return AjaxObject.newOk("获取审核文件",relationConfigService.findCustAduitTemp(anRelateCustNo)).toJson();
     }
     
     /***
@@ -96,8 +98,8 @@ public class CustRelationConfigDubboService implements ICustRelationConfigServic
      * @param anFileMediaId
      * @return
      */
-    public String webAddCustAduitTempFile(Long anRelateCustNo,Long anCustNo,String anFileTypeName, String anFileMediaId,String anCustType){
-        return AjaxObject.newOk("文件保存成功",relationConfigService.addCustTempFile(anRelateCustNo, anCustNo, anFileTypeName, anFileMediaId,anCustType)).toJson();
+    public String webAddCustAduitTempFile(Long anRelateCustNo,String anFileTypeName, String anFileMediaId,String anCustType){
+        return AjaxObject.newOk("文件保存成功",relationConfigService.addCustTempFile(anRelateCustNo, anFileTypeName, anFileMediaId,anCustType)).toJson();
     }
     
     /****
@@ -122,11 +124,57 @@ public class CustRelationConfigDubboService implements ICustRelationConfigServic
      * @param anRelationCustNo 关联电子合同服务的客户号
      * @return
      */
-    public String webAddFactorCustRelation(String anFactorCustType,String anWosCustType,Long anCustNo,String anFactorCustStr,String anWosCustStr){
-        if(relationConfigService.addFactorCustRelation(anFactorCustType,anWosCustType, anCustNo,anFactorCustStr,anWosCustStr)){
+    public String webAddFactorCustRelation(String anFactorCustType,String anWosCustType,String anFactorCustStr,String anWosCustStr){
+        if(relationConfigService.addFactorCustRelation(anFactorCustType,anWosCustType,anFactorCustStr,anWosCustStr)){
             return AjaxObject.newOk("客户关系添加成功").toJson();
         }else{
             return AjaxObject.newError("客户关联关系已经存在").toJson();
         }
+    }
+    
+    /***
+     * 查询保理业务申请基础数据
+     * @param anCustNo 申请客户号
+     * @return
+     */
+    public String webFindFactorBusinessRequestData(Long anCustNo){
+        return AjaxObject.newOk("保理业务申请基础数据",relationConfigService.findFactorRequestInfo(anCustNo)).toJson();
+    }
+    
+    /***
+     * 添加客户文件关系
+     * @param anRelationCustNo 关联的客户号
+     * @param anFileIds 上传的文件列表(以,分隔)
+     * @param anCustType 客户类型
+     */
+    public String webSaveCustAduitTempFile(Long anRelateCustNo,String anFileIds,String anCustType){
+        relationConfigService.saveCustFileAduitTemp(anRelateCustNo, anFileIds, anCustType);
+        return AjaxObject.newOk("添加客户文件关系").toJson();
+    }
+    
+    /***
+     * 查询关联临时文件
+     * @param anCustNo 关联客户号
+     * @return
+     */
+    public String webFindRelateAduitTempFile(Long anCustNo){
+        return AjaxObject.newOk("查询附件",relationConfigService.findRelateAduitTempFile(anCustNo)).toJson();
+    }
+    
+    /***
+     * 受理审批
+     */
+    public String webSaveAcceptAduit(Map<String, Object> anMap){
+        relationConfigService.saveAcceptAduit(anMap);
+        return AjaxObject.newOk("成功").toJson(); 
+    }
+    
+    /***
+     * 查询审核/受理记录
+     * @param anCustNo
+     * @return
+     */
+    public String webFindCustRelateAduitRecord(Long anCustNo){
+        return AjaxObject.newOk("查询审批记录",relationConfigService.findCustRelateAduitRecord(anCustNo)).toJson(); 
     }
 }
