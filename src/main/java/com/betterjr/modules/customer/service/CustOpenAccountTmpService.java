@@ -497,8 +497,6 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
 
         // 回写 parentId by instead record id. add by Liuwl 2016-10-12
         anOpenAccountInfo.setParentId(insteadRecord.getId());
-        //设置开户类型  "1"--PC代录
-        anOpenAccountInfo.setDataSource(CustomerConstants.OPEN_ACCOUNT_TYPE_PC_INSTEAD);
         this.updateByPrimaryKeySelective(anOpenAccountInfo);
 
         custInsteadApplyService.saveCustInsteadApplyCustInfo(insteadRecord.getApplyId(), null, anOpenAccountInfo.getCustName());
