@@ -434,9 +434,10 @@ public class CustRelationConfigService {
         CustMechBase custMechBase=custMechBaseService.findCustMechBaseByCustNo(custInfo.getCustNo());
         businessRequestData.setOrgCode(custMechBase.getOrgCode());
         businessRequestData.setLawName(custMechBase.getLawName());
-        CustOperatorInfo custOperator =operatorService.findCustClerkMan(custInfo.getOperOrg());
+        CustOperatorInfo custOperator =operatorService.findCustClerkMan(custInfo.getOperOrg(),"1");
         if(custOperator==null){
-            custOperator = (CustOperatorInfo) UserUtils.getPrincipal().getUser();// 查询当前操作员（经办人）信息
+            custOperator =operatorService.findCustClerkMan(custInfo.getOperOrg(),"0");
+            
         }
         businessRequestData.setOperName(custOperator.getName());
         businessRequestData.setOperIdentNo(custOperator.getIdentNo());
