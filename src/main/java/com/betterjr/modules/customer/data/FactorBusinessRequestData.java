@@ -26,6 +26,7 @@ public class FactorBusinessRequestData implements Serializable {
     private String email;
     private String address;
     private String post;
+    private String orgCode;
     public Long getCustNo() {
         return this.custNo;
     }
@@ -105,6 +106,12 @@ public class FactorBusinessRequestData implements Serializable {
         this.post = anPost;
     }
     
+    public String getOrgCode() {
+        return this.orgCode;
+    }
+    public void setOrgCode(String anOrgCode) {
+        this.orgCode = anOrgCode;
+    }
     public FactorBusinessRequestData(){
         
     }

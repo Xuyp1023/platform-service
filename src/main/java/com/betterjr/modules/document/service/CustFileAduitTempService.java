@@ -194,6 +194,11 @@ public class CustFileAduitTempService extends BaseService<CustFileAduitTempMappe
                 CustFileAduitTemp custFileAduitTemp=findCustFileAduitTempByType(anRelateCustNo,anFile.getFileInfoType());
                 if(custFileAduitTemp==null){ //添加绑定关系
                     addCustFileRelate(anCustNo,anRelateCustNo,anFile,anCustType);
+                }else if(BetterStringUtils.equalsIgnoreCase("0", custFileAduitTemp.getAuditStatus()) && BetterStringUtils.equalsIgnoreCase(String.valueOf(custFileAduitTemp.getId()), String.valueOf(anFile.getBatchNo()))){ // 审核失败且没有重新上传情况，将原来的文件状态改回成已上传状态
+                    custFileAduitTemp.setAuditStatus("2");
+                    Map<String, Object> anMap=new HashMap<String, Object>();
+                    anMap.put("id", custFileAduitTemp.getId());
+                    this.updateByExample(custFileAduitTemp, anMap);
                 }else if(!BetterStringUtils.equalsIgnoreCase(String.valueOf(custFileAduitTemp.getId()), String.valueOf(anFile.getBatchNo()))){ // 将原来的废弃，添加新的绑定
                     custFileAduitTemp.setWorkType("-"+custFileAduitTemp.getWorkType());
                     custFileAduitTemp.setAduitCustNo(-custFileAduitTemp.getAduitCustNo());
