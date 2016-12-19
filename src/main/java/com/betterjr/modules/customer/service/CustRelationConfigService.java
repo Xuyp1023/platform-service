@@ -29,7 +29,7 @@ import com.betterjr.modules.cert.service.CustCertService;
 import com.betterjr.modules.customer.constants.CustomerConstants;
 import com.betterjr.modules.customer.data.FactorBusinessRequestData;
 import com.betterjr.modules.customer.entity.CustMajor;
-import com.betterjr.modules.customer.entity.CustMechLaw;
+import com.betterjr.modules.customer.entity.CustMechBase;
 import com.betterjr.modules.customer.entity.CustRelation;
 import com.betterjr.modules.customer.entity.CustRelationAudit;
 import com.betterjr.modules.document.IAgencyAuthFileGroupService;
@@ -79,6 +79,8 @@ public class CustRelationConfigService {
     private ICustInfoService custInfoService;
     @Reference(interfaceClass=IOperatorService.class)
     private IOperatorService operatorService;
+    @Autowired
+    private CustMechBaseService custMechBaseService;
     
     /***
      * 判断当前登录的身份信息，并返回需要关联选择的客户类型
@@ -358,7 +360,7 @@ public class CustRelationConfigService {
     public void checkAduitFileExist(Long anCustNo,Long anRelateCustNo){
         CustMajor custMajor=custMajorService.findCustMajorByCustNo(anRelateCustNo);
         if(custFileAduitTempService.checkCustFileAduitTempExist(anRelateCustNo, agencyAuthFileGroupService.findAuthorFileGroup(custMajor.getCustCorp(), "01"))){
-            throw new BytterTradeException(custMajor.getCustName()+"，资料不全");
+            throw new BytterTradeException(custMajor.getCustName()+"\n资料不全");
         } 
     }
     
@@ -428,13 +430,14 @@ public class CustRelationConfigService {
         businessRequestData.setCustName(custInfo.getCustName());
         businessRequestData.setIdentNo(custInfo.getIdentNo());
         businessRequestData.setIdentType(custInfo.getIdentType());
-        CustMechLaw custMechLaw=custMechLawService.findCustMechLawByCustNo(custInfo.getCustNo());// 查询法人信息
-        businessRequestData.setLawName(custMechLaw.getName());
+        
+        CustMechBase custMechBase=custMechBaseService.findCustMechBaseByCustNo(custInfo.getCustNo());
+        businessRequestData.setOrgCode(custMechBase.getOrgCode());
+        businessRequestData.setLawName(custMechBase.getLawName());
         CustOperatorInfo custOperator =operatorService.findCustClerkMan(custInfo.getOperOrg());
         if(custOperator==null){
             custOperator = (CustOperatorInfo) UserUtils.getPrincipal().getUser();// 查询当前操作员（经办人）信息
         }
-//        CustOperatorInfo custOperator = (CustOperatorInfo) UserUtils.getPrincipal().getUser();// 查询当前操作员（经办人）信息
         businessRequestData.setOperName(custOperator.getName());
         businessRequestData.setOperIdentNo(custOperator.getIdentNo());
         businessRequestData.setOperIdentType(custOperator.getIdentType());
