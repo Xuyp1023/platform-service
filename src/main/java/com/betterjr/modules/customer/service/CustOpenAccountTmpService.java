@@ -973,6 +973,8 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         if (!BetterStringUtils.isEmpty(anOpenAccountInfo.getWechatOpenId())) {
             anCustOperatorInfo.setId(anOperId);
             anCustOperatorInfo.setRegDate(BetterDateUtils.getNumDate());
+            //设置为对外经办人
+            anCustOperatorInfo.setClerkMan("1");;
             custOperatorService.insert(anCustOperatorInfo);
         }//若为PC，更新操作员信息
         else{
