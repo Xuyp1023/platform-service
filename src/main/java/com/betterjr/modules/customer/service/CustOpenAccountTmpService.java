@@ -615,20 +615,21 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
            initCustCertinfo(anOpenAccountInfo, anOperOrg, anOperId, anOperName);
            //绑定微信
            addBindWeChat(custInfo, anOperId, anOperOrg, anOperName, anOpenAccountInfo.getWechatOpenId());
-           //添加交易密码
-           addTradePassword(anOpenAccountInfo.getDealPassword(), anOperId);
+           //添加密码相关
+           addPassword(anOpenAccountInfo, anOperId);
        }
     }
     /**
-     * 添加交易密码
+     * 添加密码相关
      */
-    private void addTradePassword(String anDealPassword, Long anOperId) {
-        BTAssert.isTrue(!BetterStringUtils.isEmpty(anDealPassword), "交易密码不能为空！");
+    private void addPassword(CustOpenAccountTmp anOpenAccountInfo, Long anOperId) {
         
         final int passValidLimit = 1;
-        final HashPassword result = SystemAuthorizingRealm.encrypt(anDealPassword);
-        CustPassInfo passInfo = new CustPassInfo(CustPasswordType.PERSON_TRADE, passValidLimit, anOperId, result.salt, result.password);
-        custPassService.insert(passInfo);
+        CustPassInfo dealPassInfo = new CustPassInfo(CustPasswordType.PERSON_TRADE, passValidLimit, anOperId, anOpenAccountInfo.getDealPasswordSalt(), anOpenAccountInfo.getDealPassword());
+        custPassService.insert(dealPassInfo);
+        
+        CustPassInfo loginPassInfo = new CustPassInfo(CustPasswordType.ORG, passValidLimit, anOperId, anOpenAccountInfo.getLoginPasswordSalt(), anOpenAccountInfo.getLoginPassword());
+        custPassService.insert(loginPassInfo);
         
     }
 
@@ -972,7 +973,9 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
             anCustOperatorInfo.setId(anOperId);
             anCustOperatorInfo.setRegDate(BetterDateUtils.getNumDate());
             //设置为对外经办人
-            anCustOperatorInfo.setClerkMan("1");;
+            anCustOperatorInfo.setClerkMan("1");
+            //设置登录帐号
+            anCustOperatorInfo.setOperCode(anOpenAccountInfo.getLoginUserName());
             custOperatorService.insert(anCustOperatorInfo);
         }//若为PC，更新操作员信息
         else{
