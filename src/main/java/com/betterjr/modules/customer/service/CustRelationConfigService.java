@@ -345,11 +345,14 @@ public class CustRelationConfigService {
      *      保理公司添加成功返回，电子合同服务商直接通过
      */
     public boolean addFactorCustRelation(String anFactorCustType,String anWosCustType,String anFactorCustStr,String anWosCustStr){
-        Long anCustNo=custInfoService.findCustNo(); // 获取当前登录的客户号
-        BTAssert.notNull(anFactorCustStr, "关联保理公司客户号不能为空");
-        BTAssert.notNull(anWosCustStr, "关联电子合同服务商客户号不能为空");
-        addFactorCustRelation(anWosCustType,anWosCustStr,anCustNo); // 添加电子服务商关系
-        return addFactorCustRelation(anFactorCustType,anFactorCustStr,anCustNo); // 添加保理关系 
+        synchronized(this){
+            Long anCustNo=custInfoService.findCustNo(); // 获取当前登录的客户号
+            BTAssert.notNull(anFactorCustStr, "关联保理公司客户号不能为空");
+            BTAssert.notNull(anWosCustStr, "关联电子合同服务商客户号不能为空");
+            addFactorCustRelation(anWosCustType,anWosCustStr,anCustNo); // 添加电子服务商关系
+            addFactorCustRelation(anFactorCustType,anFactorCustStr,anCustNo); // 添加保理关系
+        }
+        return true;
     }
     
     /***
@@ -371,14 +374,14 @@ public class CustRelationConfigService {
      * @param anCustNo
      * @return
      */
-    public boolean addFactorCustRelation(String anCustType,String anRelationCustStr,Long anCustNo){
-        boolean bool=false;
+    public void addFactorCustRelation(String anCustType,String anRelationCustStr,Long anCustNo){
         for(String relationCust:anRelationCustStr.split(",")){
             // 如果是保理公司或电子合同服务商，则要判断附件是否都已上传，有未上传的附件，则提示绑定失败，重新上传
             checkAduitFileExist(anCustNo, Long.parseLong(relationCust));
             
-            CustRelation custRelation=findCustRelation(anCustType, anCustNo, Long.parseLong(relationCust)); // 初始数据
+            CustRelation custRelation=findCustRelation(anCustType, anCustNo, Long.parseLong(relationCust)); // 初始类型数据
             CustRelation requestCustRelation= custRelationService.findCustRelation(custRelation.getCustNo(), custRelation.getRelateCustno(), custRelation.getRelateType());
+            
             if(requestCustRelation!=null && BetterStringUtils.equalsIgnoreCase(requestCustRelation.getBusinStatus(), CustomerConstants.RELATION_STATUS_BACK)){ // 存在并且已经驳回的，将关系删除
                 custRelationService.delete(requestCustRelation);
                 requestCustRelation=null;
@@ -391,10 +394,8 @@ public class CustRelationConfigService {
                     addAuditCustRelation(custRelation,"申请开通业务","申请开通业务");
                 }
                 custRelationService.insert(custRelation); // 添加关系
-                bool=true;
             }
         }
-        return bool;
     }
     
     /***
