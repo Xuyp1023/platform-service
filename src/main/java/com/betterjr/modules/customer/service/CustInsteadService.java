@@ -38,6 +38,8 @@ import com.betterjr.modules.customer.helper.FormalDataHelper;
 import com.betterjr.modules.customer.helper.IFormalDataService;
 import com.betterjr.modules.sms.constants.SmsConstants;
 import com.betterjr.modules.sms.entity.VerifyCode;
+import com.betterjr.modules.sys.security.SystemAuthorizingRealm;
+import com.betterjr.modules.sys.security.SystemAuthorizingRealm.HashPassword;
 
 /**
  * 代录服务
@@ -657,23 +659,16 @@ public class CustInsteadService {
     public CustInsteadApply wechatAddInsteadApply(Map<String, Object> anMap, Long anId, String anFileList) {
         //取出相应数据
         final String anCustName = (String) anMap.get("custName");
+        //验证码
         final String anVerifyCode = (String) anMap.get("verifyCode");
-        final String anNewPassword = (String) anMap.get("newPassword");
-        final String anOkPassword = (String) anMap.get("okPassword");
+        
         //获取开户信息
         CustOpenAccountTmp anOpenAccountInfo = custOpenAccountTmpService.selectByPrimaryKey(anId);
         BTAssert.notNull(anOpenAccountInfo, "无法获取开户信息！");
         //验证手机验证码
         verifyMobileMessage(anOpenAccountInfo.getOperMobile(), anVerifyCode);
-        //保存交易密码
-        if (BetterStringUtils.equals(anNewPassword, anOkPassword)) {
-            anOpenAccountInfo.setDealPassword(anNewPassword);
-        } else {
-            BTAssert.notNull(null, "两次输入密码不一致，请检查！");
-        }
-        if(!DEAL_PASSWORD_PATTERN.matcher(anNewPassword).matches()) {
-            BTAssert.notNull(null, "密码为6-18位并包含数字和字母！");
-        }
+        //根据请求处理密码相关
+        generatePassword(anOpenAccountInfo, anMap);
         
         //生成代录申请及代录记录
         CustInsteadApply custInsteadApply = addWeChatInsteadApply(anCustName, anFileList);
@@ -691,6 +686,42 @@ public class CustInsteadService {
         fillInsteadRecordByAccountTmp(custInsteadApply.getId(), anOpenAccountInfo.getId());
 
         return custInsteadApply;
+    }
+    
+    /**
+     * 根据入参填充相应密码信息
+     */
+    public void generatePassword(CustOpenAccountTmp anAccountTmp, Map<String, Object> anMap) {
+        //交易密码
+        final String anNewDealPassword = (String) anMap.get("newDealPassword");
+        final String anOkDealPassword = (String) anMap.get("okDealPassword");
+        //登录信息
+        final String anLoginUserName = (String) anMap.get("loginUserName");
+        final String anNewLoginPassword = (String) anMap.get("newLoginPassword");
+        final String anOkLoginPassword = (String) anMap.get("okLoginPassword");
+        //数据校验
+        if(BetterStringUtils.isEmpty(anLoginUserName)) {
+            BTAssert.notNull(null, "用户登录名不能为空！");
+        }
+        if(!BetterStringUtils.equals(anNewLoginPassword, anOkLoginPassword)) {
+            BTAssert.notNull(null, "所输入两次登录密码不一致，请检查！");
+        }
+        if(!BetterStringUtils.equals(anNewDealPassword, anOkDealPassword)) {
+            BTAssert.notNull(null, "所输入两次登录密码不一致，请检查！");
+        }
+        if(!DEAL_PASSWORD_PATTERN.matcher(anNewDealPassword).matches()) {
+            BTAssert.notNull(null, "交易密码为6-18位并包含数字和字母！");
+        }
+        if(!DEAL_PASSWORD_PATTERN.matcher(anNewLoginPassword).matches()) {
+            BTAssert.notNull(null, "交易密码为6-18位并包含数字和字母！");
+        }
+        HashPassword dealPassResult = SystemAuthorizingRealm.encrypt(anNewDealPassword);
+        HashPassword loginPassResult = SystemAuthorizingRealm.encrypt(anNewLoginPassword);
+        anAccountTmp.setDealPassword(dealPassResult.password);
+        anAccountTmp.setDealPasswordSalt(dealPassResult.salt);
+        anAccountTmp.setLoginUserName(anLoginUserName);
+        anAccountTmp.setLoginPassword(loginPassResult.password);
+        anAccountTmp.setLoginPasswordSalt(loginPassResult.salt);
     }
     
     /**

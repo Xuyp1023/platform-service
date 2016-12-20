@@ -472,6 +472,38 @@ public class CustOpenAccountTmp implements BetterjrEntity {
     @Column(name = "T_ACTIVE_TIME", columnDefinition = "VARCHAR")
     @MetaData(value = "激活时间", comments = "激活时间")
     private String activeTime;
+    
+    /**
+     * 交易密码加密salt(仅微信有)
+     */
+    @Column(name = "C_DEAL_PASSWORD_SALT", columnDefinition = "VARCHAR")
+    @MetaData(value = "交易密码加密salt(仅微信有)", comments = "交易密码加密salt(仅微信有)")
+    @JsonIgnore
+    private String dealPasswordSalt;
+    
+    /**
+     * 用户登录名(仅微信有)
+     */
+    @Column(name = "C_LOGIN_USERNAME", columnDefinition = "VARCHAR")
+    @MetaData(value = "用户登录名(仅微信有)", comments = "用户登录名(仅微信有)")
+    @JsonIgnore
+    private String loginUserName;
+    
+    /**
+     * 登录密码加密(仅微信有)
+     */
+    @Column(name = "C_LOGIN_PASSWORD", columnDefinition = "VARCHAR")
+    @MetaData(value = "登录密码(仅微信有)", comments = "登录密码(仅微信有)")
+    @JsonIgnore
+    private String loginPassword;
+    
+    /**
+     * 登录密码加密SALT(仅微信有)
+     */
+    @Column(name = "C_LOGIN_PASSWORD_SALT", columnDefinition = "VARCHAR")
+    @MetaData(value = "登录密码加密SALT(仅微信有)", comments = "登录密码加密SALT(仅微信有)")
+    @JsonIgnore
+    private String loginPasswordSalt;
 
     private static final long serialVersionUID = 1468812783872L;
 
@@ -971,6 +1003,38 @@ public class CustOpenAccountTmp implements BetterjrEntity {
         this.activeTime = anActiveTime;
     }
 
+    public String getDealPasswordSalt() {
+        return this.dealPasswordSalt;
+    }
+
+    public void setDealPasswordSalt(String anDealPasswordSalt) {
+        this.dealPasswordSalt = anDealPasswordSalt;
+    }
+
+    public String getLoginUserName() {
+        return this.loginUserName;
+    }
+
+    public void setLoginUserName(String anLoginUserName) {
+        this.loginUserName = anLoginUserName;
+    }
+
+    public String getLoginPassword() {
+        return this.loginPassword;
+    }
+
+    public void setLoginPassword(String anLoginPassword) {
+        this.loginPassword = anLoginPassword;
+    }
+
+    public String getLoginPasswordSalt() {
+        return this.loginPasswordSalt;
+    }
+
+    public void setLoginPasswordSalt(String anLoginPasswordSalt) {
+        this.loginPasswordSalt = anLoginPasswordSalt;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -1039,6 +1103,10 @@ public class CustOpenAccountTmp implements BetterjrEntity {
         sb.append(", lawOtherIdentType=").append(lawOtherIdentType);
         sb.append(", activeDate=").append(activeDate);
         sb.append(", activeTime=").append(activeTime);
+        sb.append(", dealPasswordSalt=").append(dealPasswordSalt);
+        sb.append(", loginUserName=").append(loginUserName);
+        sb.append(", loginPassword=").append(loginPassword);
+        sb.append(", loginPasswordSalt=").append(loginPasswordSalt);
         sb.append(", serialVersionUID=").append(serialVersionUID);
         sb.append("]");
         return sb.toString();
@@ -1119,6 +1187,10 @@ public class CustOpenAccountTmp implements BetterjrEntity {
                 && (this.getLawOtherIdentType() == null ? other.getLawOtherIdentType() == null : this.getLawOtherIdentType().equals(other.getLawOtherIdentType()))
                 && (this.getActiveDate() == null ? other.getActiveDate() == null : this.getActiveDate().equals(other.getActiveDate()))
                 && (this.getActiveTime() == null ? other.getActiveTime() == null : this.getActiveTime().equals(other.getActiveTime()))
+                && (this.getDealPasswordSalt() == null ? other.getDealPasswordSalt() == null : this.getDealPasswordSalt().equals(other.getDealPasswordSalt()))
+                && (this.getLoginUserName() == null ? other.getLoginUserName() == null : this.getLoginUserName().equals(other.getLoginUserName()))
+                && (this.getLoginPassword() == null ? other.getLoginPassword() == null : this.getLoginPassword().equals(other.getLoginPassword()))
+                && (this.getLoginPasswordSalt() == null ? other.getLoginPasswordSalt() == null : this.getLoginPasswordSalt().equals(other.getLoginPasswordSalt()))
                 && (this.getCoreList() == null ? other.getCoreList() == null : this.getCoreList().equals(other.getCoreList()));
     }
 
@@ -1187,6 +1259,11 @@ public class CustOpenAccountTmp implements BetterjrEntity {
         result = prime * result + ((getLawOtherIdentType() == null) ? 0 : getLawOtherIdentType().hashCode());
         result = prime * result + ((getActiveDate() == null) ? 0 : getActiveDate().hashCode());
         result = prime * result + ((getActiveTime() == null) ? 0 : getActiveTime().hashCode());
+        result = prime * result + ((getDealPassword() == null) ? 0 : getDealPassword().hashCode());
+        result = prime * result + ((getDealPasswordSalt() == null) ? 0 : getDealPasswordSalt().hashCode());
+        result = prime * result + ((getLoginUserName() == null) ? 0 : getLoginUserName().hashCode());
+        result = prime * result + ((getLoginPassword() == null) ? 0 : getLoginPassword().hashCode());
+        result = prime * result + ((getLoginPasswordSalt() == null) ? 0 : getLoginPasswordSalt().hashCode());
         result = prime * result + ((getOperOtherIdenttype() == null) ? 0 : getOperOtherIdenttype().hashCode());
         return result;
     }
