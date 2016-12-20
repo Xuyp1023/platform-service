@@ -665,10 +665,10 @@ public class CustInsteadService {
         //获取开户信息
         CustOpenAccountTmp anOpenAccountInfo = custOpenAccountTmpService.selectByPrimaryKey(anId);
         BTAssert.notNull(anOpenAccountInfo, "无法获取开户信息！");
-        //验证手机验证码
-        verifyMobileMessage(anOpenAccountInfo.getOperMobile(), anVerifyCode);
         //根据请求处理密码相关
         generatePassword(anOpenAccountInfo, anMap);
+        //验证手机验证码
+        verifyMobileMessage(anOpenAccountInfo.getOperMobile(), anVerifyCode);
         
         //生成代录申请及代录记录
         CustInsteadApply custInsteadApply = addWeChatInsteadApply(anCustName, anFileList);
@@ -733,7 +733,6 @@ public class CustInsteadService {
         BTAssert.notNull(verifyCode, "验证码已过期");
 
         if (BetterStringUtils.equals(verifyCode.getVerifiCode(), anVerifyCode)) {
-            JedisUtils.setObject(SmsConstants.smsOpenAccountVerifyCodePrefix + anMobile, "true", SmsConstants.SEC_300);
         } else {
             throw new BytterTradeException(40001, "验证码不正确!");
         }
