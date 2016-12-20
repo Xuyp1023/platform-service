@@ -251,7 +251,7 @@ public class CustFileAduitTempService extends BaseService<CustFileAduitTempMappe
     public List<CustFileItem> findRelateAduitTempFile(Long anCustNo){
         List<CustFileItem>  custFileItemList=new ArrayList<CustFileItem>();
         Map<String, Object> anMap=setLoginParam(anCustNo);
-        anMap.put("auditStatus",new String[]{"1","2"});
+        anMap.put("auditStatus",new String[]{"0","1","2"});
         
         for(CustFileAduitTemp custFileAduitTemp:this.selectByProperty(anMap)){
             CustFileItem custFileItem=custFileItemService.findOneByBatchNo(custFileAduitTemp.getId());
