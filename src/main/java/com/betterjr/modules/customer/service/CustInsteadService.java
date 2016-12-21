@@ -707,13 +707,13 @@ public class CustInsteadService {
             BTAssert.notNull(null, "所输入两次登录密码不一致，请检查！");
         }
         if(!BetterStringUtils.equals(anNewDealPassword, anOkDealPassword)) {
-            BTAssert.notNull(null, "所输入两次登录密码不一致，请检查！");
+            BTAssert.notNull(null, "所输入两次交易密码不一致，请检查！");
         }
         if(!DEAL_PASSWORD_PATTERN.matcher(anNewDealPassword).matches()) {
             BTAssert.notNull(null, "交易密码为6-18位并包含数字和字母！");
         }
         if(!DEAL_PASSWORD_PATTERN.matcher(anNewLoginPassword).matches()) {
-            BTAssert.notNull(null, "交易密码为6-18位并包含数字和字母！");
+            BTAssert.notNull(null, "登录密码为6-18位并包含数字和字母！");
         }
         HashPassword dealPassResult = SystemAuthorizingRealm.encrypt(anNewDealPassword);
         HashPassword loginPassResult = SystemAuthorizingRealm.encrypt(anNewLoginPassword);
