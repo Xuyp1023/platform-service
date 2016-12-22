@@ -101,6 +101,13 @@ public class NotificationHandlerService {
     public void consumerNotification(final Object anMessage) {
         final List<Map<String, Object>> messageList = new ArrayList<>();
         processNotification(anMessage, messageList);
+        try {
+            logger.info("NOTIFICATION SLEEP SEND MESSAGE");
+            Thread.sleep(1000);
+        }
+        catch (final InterruptedException e) {
+            logger.error("延时发送信息发生错误！", e);
+        }
         sendMessage(messageList);
     }
 

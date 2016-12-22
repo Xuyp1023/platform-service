@@ -169,4 +169,17 @@ public class NotificationSubscribeService extends BaseService<NotificationSubscr
         }
     }
 
+    /**
+     * @param anProfileId
+     * @param anChannelProfileId
+     * @param anRight
+     * @param anLeft
+     * @param anCustNo
+     * @return
+     */
+    public boolean checkSubscribe(final Long anProfileId, final Long anChannelProfileId, final CustInfo anRight, final CustOperatorInfo anLeft, final Long anCustNo) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
 }
