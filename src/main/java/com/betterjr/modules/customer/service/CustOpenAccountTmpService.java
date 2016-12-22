@@ -62,8 +62,6 @@ import com.betterjr.modules.sms.entity.VerifyCode;
 import com.betterjr.modules.sms.util.VerifyCodeType;
 import com.betterjr.modules.sys.entity.DictInfo;
 import com.betterjr.modules.sys.entity.DictItemInfo;
-import com.betterjr.modules.sys.security.SystemAuthorizingRealm;
-import com.betterjr.modules.sys.security.SystemAuthorizingRealm.HashPassword;
 import com.betterjr.modules.sys.service.DictItemService;
 import com.betterjr.modules.sys.service.DictService;
 import com.betterjr.modules.wechat.entity.CustTempEnrollInfo;
@@ -1376,5 +1374,15 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         BTAssert.notNull(anFile, "无法获取相应附件!");
         anFile.setBatchNo(-anFile.getBatchNo());
         return custFileItemService.updateByPrimaryKey(anFile);
+    }
+
+    /**
+     * 微信查询开户成功后资料
+     * --不能直接通过wechat标识去查询tmp表，因为若是微信绑定已开户账户，则tmp表中wechat标识为空--
+     */
+    public CustOpenAccountTmp findSuccessAccountInfo(String anOpenId) {
+        CustWeChatInfo wehchatUserInfo = custWeChatService.findWechatUserByOpenId(anOpenId);
+        BTAssert.isTrue(null != wehchatUserInfo.getCustNo(), "此微信账户未开户！");
+        return Collections3.getFirst(this.selectByProperty("custNo", wehchatUserInfo.getCustNo()));
     }
 }
