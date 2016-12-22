@@ -1,6 +1,7 @@
 package com.betterjr.modules.document.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -223,11 +224,14 @@ public class CustFileItemService extends BaseService<CustFileItemMapper, CustFil
      * @return
      */
     public List<CustFileItem> findCustFiles(final Long anBatchNo) {
-        final Map<String, Object> conditionMap = new HashMap<>();
-        conditionMap.put("batchNo", anBatchNo);
-        conditionMap.put("GTid", 0L);
-
-        return this.selectByProperty(conditionMap);
+        if(anBatchNo != null && anBatchNo > 0){
+            final Map<String, Object> conditionMap = new HashMap<>();
+            conditionMap.put("batchNo", anBatchNo);
+            conditionMap.put("GTid", 0L);
+            return this.selectByProperty(conditionMap);
+        }else{
+            return Collections.EMPTY_LIST; 
+        }
     }
 
     /**
