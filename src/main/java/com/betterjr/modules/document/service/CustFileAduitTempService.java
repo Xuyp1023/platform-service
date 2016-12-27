@@ -87,7 +87,10 @@ public class CustFileAduitTempService extends BaseService<CustFileAduitTempMappe
         List<String> fileTypeList=new ArrayList<String>();
         fileTypeList.add(anFileType);
         List<Long> batchNos=custFileAuditService.findBatchNo(custInfoService.findCustNo(),fileTypeList);
-        CustFileItem custFileItem=custFileItemService.findOneByBatchNo(Collections3.getFirst(batchNos));
+        CustFileItem custFileItem=null;
+        if(batchNos!=null && batchNos.size()>0){
+            custFileItem=custFileItemService.findOneByBatchNo(Collections3.getFirst(batchNos));
+        }
         if(custFileItem!=null){
             custFileItem.setFileDescription(agencyAuthFileGroupService.findAuthFileGroup(custFileItem.getFileInfoType()).getDescription());
         }
