@@ -60,6 +60,22 @@
 		</dependency>
 
 
+        <!-- snaker work flow engine-->
+        <dependency>
+            <groupId>com.github.snakerflow</groupId>
+            <artifactId>snaker-core</artifactId>
+            <version>${snaker.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.snakerflow</groupId>
+            <artifactId>snaker-spring</artifactId>
+            <version>${snaker.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.snakerflow</groupId>
+            <artifactId>snaker-mybatis</artifactId>
+            <version>${snaker.version}</version>
+        </dependency>
 	</dependencies>
 
 	<packaging>war</packaging>
