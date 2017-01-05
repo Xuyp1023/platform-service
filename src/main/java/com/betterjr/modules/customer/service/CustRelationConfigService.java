@@ -5,15 +5,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.alibaba.rocketmq.client.producer.SendResult;
 import com.betterjr.common.data.PlatformBaseRuleType;
 import com.betterjr.common.data.SimpleDataEntity;
 import com.betterjr.common.exception.BytterTradeException;
 import com.betterjr.common.mapper.BeanMapper;
+import com.betterjr.common.mq.core.RocketMQProducer;
+import com.betterjr.common.mq.message.MQMessage;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
@@ -29,7 +36,9 @@ import com.betterjr.modules.cert.service.CustCertService;
 import com.betterjr.modules.customer.constants.CustomerConstants;
 import com.betterjr.modules.customer.data.FactorBusinessRequestData;
 import com.betterjr.modules.customer.entity.CustMajor;
+import com.betterjr.modules.customer.entity.CustMechBankAccount;
 import com.betterjr.modules.customer.entity.CustMechBase;
+import com.betterjr.modules.customer.entity.CustMechBusinLicence;
 import com.betterjr.modules.customer.entity.CustRelation;
 import com.betterjr.modules.customer.entity.CustRelationAudit;
 import com.betterjr.modules.document.IAgencyAuthFileGroupService;
@@ -49,6 +58,8 @@ import com.betterjr.modules.wechat.service.CustWeChatService;
  */
 @Service
 public class CustRelationConfigService {
+    
+    private static final Logger logger=LoggerFactory.getLogger(CustRelationConfigService.class);
     
     @Autowired
     private CustAccountService custAccountService;
@@ -81,6 +92,12 @@ public class CustRelationConfigService {
     private IOperatorService operatorService;
     @Autowired
     private CustMechBaseService custMechBaseService;
+    @Autowired
+    private CustMechBankAccountService custMechBankAccountService;
+    @Autowired
+    private CustMechBusinLicenceService custMechBusinLicenceService;
+    @Resource
+    private RocketMQProducer betterProducer;
     
     /***
      * 判断当前登录的身份信息，并返回需要关联选择的客户类型
@@ -107,6 +124,7 @@ public class CustRelationConfigService {
      * @return
      */
     public boolean addCustRelation(String anCustType,Long anCustNo,String anRelationCustStr){
+        logger.info("addCustRelation 入参：anCustType="+anCustType+",anCustNo="+anCustNo+",anRelationCustStr="+anRelationCustStr);
         BTAssert.notNull(anCustType, "类型不能为空");
         BTAssert.notNull(anCustNo, "客户号不能为空");
         BTAssert.notNull(anRelationCustStr, "关联客户号不能为空");
@@ -139,6 +157,7 @@ public class CustRelationConfigService {
         if(BetterStringUtils.isNotBlank(custName)){
             anMap.put("LIKEcustName", "%" + custName + "%");
         }
+        logger.info("findCustInfo anMap:"+anMap);
         for(CustInfo custInfo:custAccountService.findValidCustInfo(anMap)){
             if(BetterStringUtils.isNoneBlank(custInfo.getOperOrg())){
                 CustCertInfo certInfo=custCertService.findCertByOperOrg(custInfo.getOperOrg());
@@ -269,7 +288,7 @@ public class CustRelationConfigService {
      * @return
      */
     public List<CustFileItem> findCustAduitTemp(Long anRelateCustNo){
-        
+        logger.info("findCustAduitTemp,anRelateCustNo:"+anRelateCustNo);
         Map<String, Object> anMap=setParam(anRelateCustNo);
         anMap.put("businStatus", CustomerConstants.RELATION_STATUS_ADUIT);
         CustRelation custRelation=Collections3.getFirst(custRelationService.selectByProperty(anMap));
@@ -294,15 +313,19 @@ public class CustRelationConfigService {
      */
     public CustFileItem addCustTempFile(Long anRelateCustNo,String anFileTypeName, String anFileMediaId,String anCustType){
         Long anCustNo=custInfoService.findCustNo(); // 获取当前登录的客户号
+        logger.info("当前登录客户号是："+anCustNo);
         // 查询文件类型名称
         CustMajor custMajor=custMajorService.findCustMajorByCustNo(anRelateCustNo);
+        logger.info("custMajor:"+custMajor);
         Map<String,Object> anMap=new HashMap<String, Object>();
         anMap.put("agencyNo", custMajor.getCustCorp());
         anMap.put("fileInfoType", anFileTypeName);
         AgencyAuthorFileGroup authorFIleGroup=agencyAuthFileGroupService.findAuthorFileGroupByMap(anMap);
+        logger.info("authorFIleGroup:"+authorFIleGroup);
         CustFileItem fileItem = custWeChatService.saveWechatFile(anFileTypeName, anFileMediaId);
         fileItem.setFileDescription(authorFIleGroup.getDescription());
         fileItem.setBatchNo(custFileItemService.updateCustFileItemInfo(fileItem.getId().toString(), null));
+        logger.info("fileItem:"+fileItem);
         CustFileAduitTemp custFileAduitTemp=new CustFileAduitTemp();
         custFileAduitTemp.setCustNo(anCustNo);
         custFileAduitTemp.setAduitCustNo(anRelateCustNo);
@@ -381,19 +404,36 @@ public class CustRelationConfigService {
             
             CustRelation custRelation=findCustRelation(anCustType, anCustNo, Long.parseLong(relationCust)); // 初始类型数据
             CustRelation requestCustRelation= custRelationService.findCustRelation(custRelation.getCustNo(), custRelation.getRelateCustno(), custRelation.getRelateType());
-            
+            logger.info("custRelation:"+custRelation);
+            logger.info("requestCustRelation:"+requestCustRelation);
             if(requestCustRelation!=null && BetterStringUtils.equalsIgnoreCase(requestCustRelation.getBusinStatus(), CustomerConstants.RELATION_STATUS_BACK)){ // 存在并且已经驳回的，将关系删除
                 custRelationService.delete(requestCustRelation);
                 requestCustRelation=null;
             }
             if(requestCustRelation==null){
                 custRelation.initAddValue();
+                custRelation.setBusinStatus(CustomerConstants.RELATION_STATUS_REQUEST);// 初始值为已申请
                 if(BetterStringUtils.equalsIgnoreCase(anCustType,PlatformBaseRuleType.FACTOR_USER.toString())){ // 保理公司初始添加状态为未开通，电子服务合同直接通过
-                    custRelation.setBusinStatus(CustomerConstants.RELATION_STATUS_REQUEST);// 初始值为已申请
                     // 添加关系审核记录表
                     addAuditCustRelation(custRelation,"申请开通业务","申请开通业务");
                 }
-                custRelationService.insert(custRelation); // 添加关系
+                int insertValue=custRelationService.insert(custRelation); // 添加关系
+                logger.info("添加关系值："+insertValue);
+                if(insertValue>0){
+                    // 调用开通保理业务的消息推送
+                    final MQMessage anMessage = new MQMessage("CUSTOMER_OPEN_SCF_ACCOUNT");
+                    logger.info("调用消息发送接口："+anMessage);
+                    try {
+                        anMessage.setObject(custRelation);
+                        anMessage.addHead("type", CustomerConstants.RELATION_STATUS_REQUEST);// 开通申请
+                        anMessage.addHead("operator", UserUtils.getOperatorInfo());
+                        SendResult result=betterProducer.sendMessage(anMessage);
+                        logger.info("result:"+result);
+                    }
+                    catch (final Exception e) {
+                        logger.error("异步消息发送失败！", e);
+                    }
+                }
             }
         }
     }
@@ -435,10 +475,22 @@ public class CustRelationConfigService {
         CustMechBase custMechBase=custMechBaseService.findCustMechBaseByCustNo(custInfo.getCustNo());
         businessRequestData.setOrgCode(custMechBase.getOrgCode());
         businessRequestData.setLawName(custMechBase.getLawName());
+        businessRequestData.setFax(custMechBase.getFax());
+        
+        CustMechBankAccount mechBankAccount=custMechBankAccountService.findDefaultCustMechBankAccount(anCustNo);
+        if(mechBankAccount!=null){
+            businessRequestData.setBankAccount(mechBankAccount.getBankAcco());
+            businessRequestData.setBankAccountName(mechBankAccount.getBankAccoName());
+            businessRequestData.setBankName(mechBankAccount.getBankName());
+        }
+        CustMechBusinLicence custMechBusinLicence=custMechBusinLicenceService.findBusinLicenceByCustNo(anCustNo);
+        if(custMechBusinLicence!=null){
+            businessRequestData.setTaxCode(custMechBusinLicence.getTaxNo());
+        }
+        
         CustOperatorInfo custOperator =operatorService.findCustClerkMan(custInfo.getOperOrg(),"1");
         if(custOperator==null){
             custOperator =operatorService.findCustClerkMan(custInfo.getOperOrg(),"0");
-            
         }
         businessRequestData.setOperName(custOperator.getName());
         businessRequestData.setOperIdentNo(custOperator.getIdentNo());

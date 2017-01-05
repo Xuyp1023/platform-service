@@ -9,6 +9,7 @@ import com.betterjr.common.data.PlatformBaseRuleType;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.common.web.AjaxObject;
 import com.betterjr.modules.customer.ICustRelationConfigService;
+import com.betterjr.modules.customer.data.FactorBusinessRequestData;
 import com.betterjr.modules.customer.service.CustRelationConfigService;
 
 @Service(interfaceClass=ICustRelationConfigService.class)
@@ -176,5 +177,9 @@ public class CustRelationConfigDubboService implements ICustRelationConfigServic
      */
     public String webFindCustRelateAduitRecord(Long anCustNo){
         return AjaxObject.newOk("查询审批记录",relationConfigService.findCustRelateAduitRecord(anCustNo)).toJson(); 
+    }
+    
+    public FactorBusinessRequestData findBusinessCustInfo(Long anCustNo){
+        return relationConfigService.findFactorRequestInfo(anCustNo);
     }
 }
