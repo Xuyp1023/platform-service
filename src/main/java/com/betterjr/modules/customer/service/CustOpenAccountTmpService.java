@@ -811,21 +811,29 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         // anCustMechLawInfo.setSex(IdcardUtils.getGenderByIdCard(anOpenAccountInfo.getLawIdentNo(), anOpenAccountInfo.getLawIdentType()));
         // anCustMechLawInfo.setBirthdate(IdcardUtils.getBirthByIdCard(anOpenAccountInfo.getLawIdentNo()));
         anCustMechLawInfo.setVersion(0l);
-        //法人身份证-头像面-RepresentIdHeadFile,法人身份证-国徽面-RepresentIdNationFile,法人身份证-手持证件-RepresentIdHoldFile
-        final String[] fileTypes = {"RepresentIdHeadFile", "RepresentIdNationFile", "RepresentIdHoldFile"};
-        //由协定附件类型写入文件认证部分
-        for (String anFileType : fileTypes) {
-            final Collection anCollection = anCustFileItem.get(anFileType);
-            final List<CustFileItem> anFileItemList = new ArrayList(anCollection);
-            if (anFileItemList.size() > 0) {
-                final Long anNewBatchNo = CustFileUtils.findBatchNo();
-                // 更新文件信息,同时写入文件认证信息
-                saveCustFileItem(anFileItemList, anFileType, anCustNo, anNewBatchNo, anOperId);
-                // 更新附件批次号
-                anCustMechLawInfo.setBatchNo(anNewBatchNo);
-            }
-            custMechLawService.addCustMechLaw(anCustMechLawInfo, anCustNo);
+        
+        // 附件：法人身份证-头像面RepresentIdHeadFile
+        final Collection headCollection = anCustFileItem.get("RepresentIdHeadFile");
+        final List<CustFileItem> headFileList = new ArrayList(headCollection);
+        // 附件：法人身份证-国徽面RepresentIdNationFile
+        final Collection nationCollection = anCustFileItem.get("RepresentIdNationFile");
+        final List<CustFileItem> nationFileList = new ArrayList(nationCollection);
+        // 附件：法人身份证-手持证件RepresentIdHoldFile
+        final Collection holdCollection = anCustFileItem.get("RepresentIdHoldFile");
+        final List<CustFileItem> holdFileList = new ArrayList(holdCollection);
+        // 企业三证附件信息同时处理
+        if (headFileList.size() > 0 || nationFileList.size() > 0 || holdFileList.size() > 0) {
+            final Long anNewBatchNo = CustFileUtils.findBatchNo();
+            // 附件：法人身份证-头像面RepresentIdHeadFile,更新文件信息,同时写入文件认证信息
+            saveCustFileItem(headFileList, "RepresentIdHeadFile", anCustNo, anNewBatchNo, anOperId);
+            // 附件：法人身份证-国徽面RepresentIdNationFile,更新文件信息,同时写入文件认证信息
+            saveCustFileItem(nationFileList, "RepresentIdNationFile", anCustNo, anNewBatchNo, anOperId);
+            // 附件：法人身份证-手持证件RepresentIdHoldFile,更新文件信息,同时写入文件认证信息
+            saveCustFileItem(holdFileList, "RepresentIdHoldFile", anCustNo, anNewBatchNo, anOperId);
+            // 更新附件批次号
+            anCustMechLawInfo.setBatchNo(anNewBatchNo);
         }
+        custMechLawService.addCustMechLaw(anCustMechLawInfo, anCustNo);
     }
 
     /**
@@ -845,24 +853,24 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         anCustMechBusinLicenceInfo.setEndDate(anOpenAccountInfo.getBusinLicenceValidDate());
         //税务登记证号
         anCustMechBusinLicenceInfo.setTaxNo(anOpenAccountInfo.getTaxNo());
-        // 附件：组织机构代码证orgCodeFile
+        // 附件：组织机构代码证CustOrgCodeFile
         final Collection anOrgCodeCollection = anCustFileItem.get("CustOrgCodeFile");
         final List<CustFileItem> anOrgCodeFileItemList = new ArrayList(anOrgCodeCollection);
-        // 附件：税务登记证taxRegistFile
+        // 附件：税务登记证CustTaxRegistFile
         final Collection anTaxRegistollection = anCustFileItem.get("CustTaxRegistFile");
         final List<CustFileItem> anTaxRegistFileItemList = new ArrayList(anTaxRegistollection);
-        // 附件：营业执照bizLicenseFile
+        // 附件：营业执照CustBizLicenseFile
         final Collection anBizLicenseCollection = anCustFileItem.get("CustBizLicenseFile");
         final List<CustFileItem> anBizLicenseFileItemList = new ArrayList(anBizLicenseCollection);
         // 企业三证附件信息同时处理
         if (anOrgCodeFileItemList.size() > 0 || anTaxRegistFileItemList.size() > 0 || anBizLicenseFileItemList.size() > 0) {
             final Long anNewBatchNo = CustFileUtils.findBatchNo();
-            // 附件：组织机构代码证orgCodeFile,更新文件信息,同时写入文件认证信息
+            // 附件：组织机构代码证CustOrgCodeFile,更新文件信息,同时写入文件认证信息
             saveCustFileItem(anOrgCodeFileItemList, "CustOrgCodeFile", anCustNo, anNewBatchNo, anOperId);
-            // 附件：税务登记证taxRegistFile,更新文件信息,同时写入文件认证信息
+            // 附件：税务登记证CustTaxRegistFile,更新文件信息,同时写入文件认证信息
             saveCustFileItem(anTaxRegistFileItemList, "CustTaxRegistFile", anCustNo, anNewBatchNo, anOperId);
-            // 附件：营业执照bizLicenseFile,更新文件信息,同时写入文件认证信息
-            saveCustFileItem(anTaxRegistFileItemList, "CustBizLicenseFile", anCustNo, anNewBatchNo, anOperId);
+            // 附件：营业执照CustBizLicenseFile,更新文件信息,同时写入文件认证信息
+            saveCustFileItem(anBizLicenseFileItemList, "CustBizLicenseFile", anCustNo, anNewBatchNo, anOperId);
             // 更新附件批次号
             anCustMechBusinLicenceInfo.setBatchNo(anNewBatchNo);
         }
@@ -896,13 +904,13 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         anCustMechBankAccountInfo.setCityName("");
         anCustMechBankAccountInfo.setAccoStatus("0");
         anCustMechBankAccountInfo.setVersion(0l);
-        // 附件：银行账户bankAcctAckFile
-        final Collection anCollection = anCustFileItem.get("bankAcctAckFile");
+        // 附件：银行账户开户许可证CustBankOpenLicenseFile
+        final Collection anCollection = anCustFileItem.get("CustBankOpenLicenseFile");
         final List<CustFileItem> anFileItemList = new ArrayList(anCollection);
         if (anFileItemList.size() > 0) {
             final Long anNewBatchNo = CustFileUtils.findBatchNo();
             // 更新文件信息,同时写入文件认证信息
-            saveCustFileItem(anFileItemList, "bankAcctAckFile", anCustNo, anNewBatchNo, anOperId);
+            saveCustFileItem(anFileItemList, "CustBankOpenLicenseFile", anCustNo, anNewBatchNo, anOperId);
             // 更新附件批次号
             anCustMechBankAccountInfo.setBatchNo(anNewBatchNo);
         }
@@ -982,16 +990,25 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
             anCustOperatorInfo.setId(operatorInfo.getId());
             custOperatorService.updateByPrimaryKeySelective(anCustOperatorInfo);
         }
-        // 经办人身份证-头像面-------BrokerIdHeadFile，经办人身份证-国徽面-------BrokerIdNationFile，经办人身份证-手持证件-------BrokerIdHoldFile
-        String[] fileTypes = {"BrokerIdHeadFile", "BrokerIdNationFile", "BrokerIdHoldFile"};
-        for (String anFileType : fileTypes) {
-            final Collection anCollection = anCustFileItem.get(anFileType);
-            final List<CustFileItem> anFileItemList = new ArrayList(anCollection);
-            if (anFileItemList.size() > 0) {
-                final Long anNewBatchNo = CustFileUtils.findBatchNo();
-                // 更新文件信息,同时写入文件认证信息
-                saveCustFileItem(anFileItemList, anFileType, anCustNo, anNewBatchNo, anOperId);
-            }
+        
+        // 附件：经办人身份证-头像面BrokerIdHeadFile
+        final Collection brokerIdHeadFile = anCustFileItem.get("BrokerIdHeadFile");
+        final List<CustFileItem> brokerIdHeadFileList = new ArrayList(brokerIdHeadFile);
+        // 附件：经办人身份证-国徽面BrokerIdNationFile
+        final Collection brokerIdNationFile = anCustFileItem.get("BrokerIdNationFile");
+        final List<CustFileItem> brokerIdNationFileList = new ArrayList(brokerIdNationFile);
+        // 附件：经办人身份证-手持证件BrokerIdHoldFile
+        final Collection brokerIdHoldFile = anCustFileItem.get("BrokerIdHoldFile");
+        final List<CustFileItem> brokerIdHoldFileList = new ArrayList(brokerIdHoldFile);
+        // 企业三证附件信息同时处理
+        if (brokerIdHeadFileList.size() > 0 || brokerIdNationFileList.size() > 0 || brokerIdHoldFileList.size() > 0) {
+            final Long anNewBatchNo = CustFileUtils.findBatchNo();
+            // 附件：经办人身份证-头像面BrokerIdHeadFile,更新文件信息,同时写入文件认证信息
+            saveCustFileItem(brokerIdHeadFileList, "BrokerIdHeadFile", anCustNo, anNewBatchNo, anOperId);
+            // 附件：经办人身份证-国徽面BrokerIdNationFile,更新文件信息,同时写入文件认证信息
+            saveCustFileItem(brokerIdNationFileList, "BrokerIdNationFile", anCustNo, anNewBatchNo, anOperId);
+            // 附件：经办人身份证-手持证件BrokerIdHoldFile,更新文件信息,同时写入文件认证信息
+            saveCustFileItem(brokerIdHoldFileList, "BrokerIdHoldFile", anCustNo, anNewBatchNo, anOperId);
         }
     }
 
