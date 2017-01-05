@@ -154,7 +154,7 @@ public class CustRelationDubboService implements ICustRelationService {
     }
 
     @Override
-    public CustRelation findOneRelation(final Long anCustNo, final Long anRelateCustno, final String anPartnerCustNo) {
+    public CustRelation findOneRelation_OLD(final Long anCustNo, final Long anRelateCustno, final String anPartnerCustNo) {
         // TODO Auto-generated method stub
         return custRelationService.findOneRelation(anCustNo, anRelateCustno, anPartnerCustNo);
     }
@@ -263,6 +263,12 @@ public class CustRelationDubboService implements ICustRelationService {
     @Override
     public String webQueryCoreCust(Long anCoreCustNo) {
         return AjaxObject.newOk("查询核心企业下所有客户成功", custRelationService.queryCoreCust(anCoreCustNo)).toJson();
+    }
+
+    @Override
+    public CustRelation findRelationWithCustCorp(Long anCustNo, String anPartnerCustNo, String anCustCorp) {
+
+        return custRelationService.findRelationWithCustCorp(anCustNo, anPartnerCustNo, anCustCorp);
     }
 
 }

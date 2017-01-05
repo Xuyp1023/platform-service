@@ -821,7 +821,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
      * @param anFactorNo
      */
     public boolean saveFactorRelationStatus(final Long anCustNo, final String anScfId, final String anStatus, final String anFactorNo) {
-        final CustRelation factorRel = findOneRelation(anCustNo, Long.parseLong(anFactorNo), anScfId);
+        final CustRelation factorRel = findRelationWithCustCorp(anCustNo, anScfId, anFactorNo);
         if (factorRel != null) {
             factorRel.setBusinStatus(anStatus);
             factorRel.setModiDate(BetterDateUtils.getNumDate());
@@ -1203,6 +1203,20 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
             }
         }
         return result;
+    }
+    
+    /**
+     * 根据关联方简称和关联方客户编号查询客户关联关系信息
+     * @param anCustNo 客户号
+     * @param anCustCorp 关联方简称
+     * @param anPartnerCustNo 关联方客户号
+     * @return
+     */
+    public CustRelation findRelationWithCustCorp(final Long anCustNo, final String anPartnerCustNo, final String anCustCorp) {
+        final Map<String, Object> tmpMap = QueryTermBuilder.newInstance().put("custNo", anCustNo).put("relateCustCorp", anCustCorp).put("partnerCustNo", anPartnerCustNo).build();
+        List<CustRelation> tmpList = this.selectByProperty(tmpMap);
+        
+        return Collections3.getFirst(tmpList);
     }
 }
 
