@@ -477,13 +477,13 @@ public class CustRelationConfigService {
         businessRequestData.setLawName(custMechBase.getLawName());
         businessRequestData.setFax(custMechBase.getFax());
         
-        CustMechBankAccount mechBankAccount=custMechBankAccountService.findDefaultCustMechBankAccount(anCustNo);
+        CustMechBankAccount mechBankAccount=custMechBankAccountService.findDefaultCustMechBankAccount(custInfo.getCustNo());
         if(mechBankAccount!=null){
             businessRequestData.setBankAccount(mechBankAccount.getBankAcco());
             businessRequestData.setBankAccountName(mechBankAccount.getBankAccoName());
             businessRequestData.setBankName(mechBankAccount.getBankName());
         }
-        CustMechBusinLicence custMechBusinLicence=custMechBusinLicenceService.findBusinLicenceByCustNo(anCustNo);
+        CustMechBusinLicence custMechBusinLicence=custMechBusinLicenceService.findBusinLicenceByCustNo(custInfo.getCustNo());
         if(custMechBusinLicence!=null){
             businessRequestData.setTaxCode(custMechBusinLicence.getTaxNo());
         }
