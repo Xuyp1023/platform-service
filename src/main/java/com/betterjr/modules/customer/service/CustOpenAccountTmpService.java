@@ -1028,8 +1028,8 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
             for (final CustFileItem fileItem : anCustFileItem) {
                 addCustFileItem(fileItem, anBatchNo);
             }
-            // 操作员编码
-            final String anOperCode = custOperatorService.selectByPrimaryKey(anOperId).getOperCode();
+            // 操作员编码    
+            final String anOperCode = custOperatorService.selectByPrimaryKey(anOperId).getId().toString();
             // 写入文件认证信息
             addCustFileAduit(anCustNo, anBatchNo, anCustFileItem.size(), anFileInfoType, anOperCode);
         }
