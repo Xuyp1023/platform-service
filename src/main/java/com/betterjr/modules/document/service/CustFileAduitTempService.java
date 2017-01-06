@@ -226,13 +226,13 @@ public class CustFileAduitTempService extends BaseService<CustFileAduitTempMappe
      * @param anFile
      */
     public void addCustFileRelate(Long anCustNo,Long anRelateCustNo,CustFileItem anFile,String anCustType){
+        final CustOperatorInfo custOperator = (CustOperatorInfo) UserUtils.getPrincipal().getUser();
         CustFileAduitTemp custFileAduitTemp=new CustFileAduitTemp();
         custFileAduitTemp.setCustNo(anCustNo);
         custFileAduitTemp.setAduitCustNo(anRelateCustNo);
-        custFileAduitTemp.setId(custFileItemService.updateCustFileItemInfo(anFile.getId().toString(), null));
+        custFileAduitTemp.setId(custFileItemService.updateDuplicateCustFileItemInfo(anFile.getId(), custOperator));
         custFileAduitTemp.setWorkType(anFile.getFileInfoType());
         custFileAduitTemp.setAuditStatus("2");
-        final CustOperatorInfo custOperator = (CustOperatorInfo) UserUtils.getPrincipal().getUser();
         custFileAduitTemp.setOperNo(String.valueOf(custOperator.getId()));
         custFileAduitTemp.initValue();
         this.insert(custFileAduitTemp);

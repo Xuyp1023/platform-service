@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.service.BaseService;
+import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
@@ -137,6 +138,34 @@ public class CustFileItemService extends BaseService<CustFileItemMapper, CustFil
             }
         }
 
+        return anBatchNo;
+    }
+    
+    /**
+     * 更新文件列表的批次号，如果批次号不存在，则创建批次号
+     * @param anFileList 以逗号分隔的文件编号
+     * @param anBatchNo 文件批次号
+     * @return 返回文件批次号
+     */
+    public Long updateDuplicateCustFileItemInfo(final Long anFileItemId, final CustOperatorInfo anOperator) {
+        BTAssert.notNull(anFileItemId, "文件编号不允许为空！");
+        
+        final CustFileItem fileItem = this.selectByPrimaryKey(anFileItemId);
+        
+        Long anBatchNo = CustFileUtils.findBatchNo();
+        
+        if (fileItem != null) {
+            if (fileItem.getBatchNo().equals(0L) == true) {
+                fileItem.setBatchNo(anBatchNo);
+                this.updateByPrimaryKeySelective(fileItem) ;
+            } else if (fileItem.getBatchNo().equals(anBatchNo) == false) {
+                final CustFileItem tempFileItem = new CustFileItem();
+                tempFileItem.initDuplicateConflictValue(fileItem);
+                tempFileItem.setBatchNo(anBatchNo);
+                this.saveAndUpdateFileItem(tempFileItem, anOperator);
+            }
+        }
+        
         return anBatchNo;
     }
 
