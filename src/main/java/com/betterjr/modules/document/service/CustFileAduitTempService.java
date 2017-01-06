@@ -87,10 +87,7 @@ public class CustFileAduitTempService extends BaseService<CustFileAduitTempMappe
         List<String> fileTypeList=new ArrayList<String>();
         fileTypeList.add(anFileType);
         List<Long> batchNos=custFileAuditService.findBatchNo(custInfoService.findCustNo(),fileTypeList);
-        CustFileItem custFileItem=null;
-        if(batchNos!=null && batchNos.size()>0){
-            custFileItem=custFileItemService.findOneByBatchNo(Collections3.getFirst(batchNos));
-        }
+        CustFileItem custFileItem=custFileItemService.findOneByBatchNo(Collections3.getFirst(batchNos));
         if(custFileItem!=null){
             custFileItem.setFileDescription(agencyAuthFileGroupService.findAuthFileGroup(custFileItem.getFileInfoType()).getDescription());
         }
@@ -140,7 +137,7 @@ public class CustFileAduitTempService extends BaseService<CustFileAduitTempMappe
                     custFileAduitTemp=new CustFileAduitTemp();
                     custFileAduitTemp.setCustNo(custInfoService.findCustNo());
                     custFileAduitTemp.setAduitCustNo(anCustNo);
-                    custFileAduitTemp.setId(custFileItemService.updateCustFileItemInfo(custFileItem.getId().toString(), null));
+                    custFileAduitTemp.setId(custFileItemService.updateDuplicateCustFileItemInfo(custFileItem.getId(), UserUtils.getOperatorInfo()));
                     custFileAduitTemp.setWorkType(custFileItem.getFileInfoType());
                     custFileAduitTemp.setAuditStatus("1");
                     final CustOperatorInfo custOperator = (CustOperatorInfo) UserUtils.getPrincipal().getUser();
@@ -208,9 +205,9 @@ public class CustFileAduitTempService extends BaseService<CustFileAduitTempMappe
                     Map<String, Object> anMap=new HashMap<String, Object>();
                     anMap.put("id", custFileAduitTemp.getId());
                     this.updateByExample(custFileAduitTemp, anMap);
-                    // 附件修改
-                    anFile.setBatchNo(-anFile.getBatchNo());
-                    custFileItemService.updateByPrimaryKey(anFile);
+//                    // 附件修改
+//                    anFile.setBatchNo(-anFile.getBatchNo());
+//                    custFileItemService.updateByPrimaryKey(anFile);
                     // 删除沃通关系审核附件表
                     if(BetterStringUtils.equalsIgnoreCase(String.valueOf(PlatformBaseRuleType.WOS), anCustType)){
                         custFileAuditService.deleteByPrimaryKey(custFileAduitTemp.getId());
@@ -229,13 +226,13 @@ public class CustFileAduitTempService extends BaseService<CustFileAduitTempMappe
      * @param anFile
      */
     public void addCustFileRelate(Long anCustNo,Long anRelateCustNo,CustFileItem anFile,String anCustType){
+        final CustOperatorInfo custOperator = (CustOperatorInfo) UserUtils.getPrincipal().getUser();
         CustFileAduitTemp custFileAduitTemp=new CustFileAduitTemp();
         custFileAduitTemp.setCustNo(anCustNo);
         custFileAduitTemp.setAduitCustNo(anRelateCustNo);
-        custFileAduitTemp.setId(custFileItemService.updateCustFileItemInfo(anFile.getId().toString(), null));
+        custFileAduitTemp.setId(custFileItemService.updateDuplicateCustFileItemInfo(anFile.getId(), custOperator));
         custFileAduitTemp.setWorkType(anFile.getFileInfoType());
         custFileAduitTemp.setAuditStatus("2");
-        final CustOperatorInfo custOperator = (CustOperatorInfo) UserUtils.getPrincipal().getUser();
         custFileAduitTemp.setOperNo(String.valueOf(custOperator.getId()));
         custFileAduitTemp.initValue();
         this.insert(custFileAduitTemp);
