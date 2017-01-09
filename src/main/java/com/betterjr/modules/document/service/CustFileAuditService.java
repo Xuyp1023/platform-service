@@ -373,7 +373,7 @@ public class CustFileAuditService extends BaseService<CustFileAduitMapper, CustF
         anMap.put("aduitCustNo", anRelateCustNo);   
         anMap.put("auditStatus","1");
         for(CustFileAduit custFileAduit:this.selectByProperty(anMap)){
-            CustFileItem custFileItem=custFileItemService.findOneByBatchNo(custFileAduit.getId());
+            CustFileItem custFileItem=custFileItemService.findOneByBatchNo(custFileAduit.getId(),custFileAduit.getWorkType());
             if(custFileItem!=null){
                 custFileItem.setBusinStatus("1");
                 custFileItem.setFileDescription(agencyAuthFileGroupService.findAuthFileGroup(custFileItem.getFileInfoType()).getDescription());

@@ -53,7 +53,7 @@ public class CustFileAduitTempService extends BaseService<CustFileAduitTempMappe
         for(AgencyAuthorFileGroup agencyAuthorFileGroup:anAgencyAuthorFileGroupList){
             CustFileAduitTemp custFileAduitTemp=findCustFileAduitTempByType(anCustNo,agencyAuthorFileGroup.getFileInfoType());
             if(custFileAduitTemp!=null){
-                CustFileItem custFileItem=custFileItemService.findOneByBatchNo(custFileAduitTemp.getId());
+                CustFileItem custFileItem=custFileItemService.findOneByBatchNo(custFileAduitTemp.getId(),agencyAuthorFileGroup.getFileInfoType());
                 if(custFileItem!=null && BetterStringUtils.equalsIgnoreCase(custFileAduitTemp.getWorkType(), custFileItem.getFileInfoType())){
                     custFileItem.setFileDescription(agencyAuthorFileGroup.getDescription());
                     custFileItem.setBusinStatus(custFileAduitTemp.getAuditStatus());
@@ -87,7 +87,7 @@ public class CustFileAduitTempService extends BaseService<CustFileAduitTempMappe
         List<String> fileTypeList=new ArrayList<String>();
         fileTypeList.add(anFileType);
         List<Long> batchNos=custFileAuditService.findBatchNo(custInfoService.findCustNo(),fileTypeList);
-        CustFileItem custFileItem=custFileItemService.findOneByBatchNo(Collections3.getFirst(batchNos));
+        CustFileItem custFileItem=custFileItemService.findOneByBatchNo(Collections3.getFirst(batchNos),anFileType);
         if(custFileItem!=null){
             custFileItem.setFileDescription(agencyAuthFileGroupService.findAuthFileGroup(custFileItem.getFileInfoType()).getDescription());
         }
@@ -147,7 +147,7 @@ public class CustFileAduitTempService extends BaseService<CustFileAduitTempMappe
                 }
             }
             if(custFileAduitTemp!=null){
-                CustFileItem custFileItem=custFileItemService.findOneByBatchNo(custFileAduitTemp.getId());
+                CustFileItem custFileItem=custFileItemService.findOneByBatchNo(custFileAduitTemp.getId(),agencyAuthorFileGroup.getFileInfoType());
                 if(custFileItem==null){
                     bool=true;
                     break;
@@ -254,7 +254,7 @@ public class CustFileAduitTempService extends BaseService<CustFileAduitTempMappe
         anMap.put("auditStatus",new String[]{"0","1","2"});
         
         for(CustFileAduitTemp custFileAduitTemp:this.selectByProperty(anMap)){
-            CustFileItem custFileItem=custFileItemService.findOneByBatchNo(custFileAduitTemp.getId());
+            CustFileItem custFileItem=custFileItemService.findOneByBatchNo(custFileAduitTemp.getId(),custFileAduitTemp.getWorkType());
             if(custFileItem!=null){
                 custFileItem.setFileDescription(agencyAuthFileGroupService.findAuthFileGroup(custFileItem.getFileInfoType()).getDescription());
                 custFileItemList.add(custFileItem);

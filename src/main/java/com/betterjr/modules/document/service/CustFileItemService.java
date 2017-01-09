@@ -229,8 +229,13 @@ public class CustFileItemService extends BaseService<CustFileItemMapper, CustFil
      * @param anBatchNo
      * @return
      */
-    public CustFileItem findOneByBatchNo(final Long anBatchNo) {
-        final List<CustFileItem> fileList = this.selectByProperty("batchNo", anBatchNo);
+    public CustFileItem findOneByBatchNo(final Long anBatchNo,final String anFileInfoType) {
+        Map<String,Object> anMap=new HashMap<String,Object>();
+        anMap.put("batchNo", anBatchNo);
+        if(BetterStringUtils.isNotBlank(anFileInfoType)){
+            anMap.put("fileInfoType", anFileInfoType);
+        }
+        final List<CustFileItem> fileList = this.selectByProperty(anMap);
 
         return Collections3.getFirst(fileList);
     }
