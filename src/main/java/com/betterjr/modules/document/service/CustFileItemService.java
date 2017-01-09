@@ -124,7 +124,7 @@ public class CustFileItemService extends BaseService<CustFileItemMapper, CustFil
             return anBatchNo;
         }
 
-        if (anBatchNo == null) {
+        if (anBatchNo == null || (anBatchNo < 1)) {
             anBatchNo = CustFileUtils.findBatchNo();
         }
 
