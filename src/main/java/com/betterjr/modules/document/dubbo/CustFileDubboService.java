@@ -118,7 +118,7 @@ public class CustFileDubboService implements ICustFileService{
     @Override
     public CustFileItem findOneByBatchNo(Long anBatchNo) {
 
-        return custFileItemService.findOneByBatchNo(anBatchNo);
+        return custFileItemService.findOneByBatchNo(anBatchNo,"");
     }
 
     @Override
