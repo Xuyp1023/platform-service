@@ -1,6 +1,7 @@
 package com.betterjr.modules.customer.service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -465,6 +466,10 @@ public class CustRelationConfigService {
         CustInfo custInfo=UserUtils.getDefCustInfo();
         if(anCustNo!=null){
             custInfo=custAccountService.findCustInfo(anCustNo);// 查询企业基本信息  
+        }
+        if(custInfo==null){ // 判断注册情况下，不退出后绑定的客户信息
+            Collection<CustInfo> custInfoList=custMechBaseService.queryCustInfo();
+            custInfo=Collections3.getFirst(custInfoList);
         }
         FactorBusinessRequestData businessRequestData=new FactorBusinessRequestData();
         businessRequestData.setCustNo(custInfo.getCustNo());
