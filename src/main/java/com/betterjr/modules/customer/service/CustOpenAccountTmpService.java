@@ -904,6 +904,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         anCustMechBankAccountInfo.setCityName("");
         anCustMechBankAccountInfo.setAccoStatus("0");
         anCustMechBankAccountInfo.setVersion(0l);
+        anCustMechBankAccountInfo.setOpenLicense(anOpenAccountInfo.getOpenLicense());
         // 附件：银行账户开户许可证CustBankOpenLicenseFile
         final Collection anCollection = anCustFileItem.get("CustBankOpenLicenseFile");
         final List<CustFileItem> anFileItemList = new ArrayList(anCollection);
