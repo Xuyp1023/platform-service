@@ -103,6 +103,24 @@ public class CustMechBaseDubboService implements ICustMechBaseService {
     }
 
     @Override
+    public String webGetCurrentRole() {
+        String role = "";
+        if (UserUtils.factorUser()) {
+            role =  "FACTOR_USER";
+        } else if (UserUtils.sellerUser()) {
+            role =  "SELLER_USER";
+        } else if (UserUtils.coreUser()) {
+            role =  "CORE_USER";
+        } else if (UserUtils.supplierUser()) {
+            role =  "SUPPLIER_USER";
+        } else if (UserUtils.platformUser()) {
+            role =  "PLATFORM_USER";
+        }
+
+        return AjaxObject.newOk("检查机构类型成功", role).toJson();
+    }
+
+    @Override
     public String webQueryCustInfo() {
         final Collection<CustInfo> custInfos = baseService.queryCustInfo();
         return AjaxObject.newOk("查询操作员所有的公司列表成功", custInfos).toJson();
