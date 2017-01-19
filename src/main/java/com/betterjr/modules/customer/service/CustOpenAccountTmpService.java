@@ -1403,4 +1403,33 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         BTAssert.isTrue(null != wehchatUserInfo.getCustNo(), "此微信账户未开户！");
         return Collections3.getFirst(this.selectByProperty("custNo", wehchatUserInfo.getCustNo()));
     }
+    
+    /**
+     * 根据custNo查询已经开户的信息
+     */
+    public CustOpenAccountTmp findAccountInfoByCustNo(Long anCustNo) {
+        return Collections3.getFirst(this.selectByProperty("custNo", anCustNo));
+    }
+    
+    /**
+     * 平台查询客户信息
+     */
+    public Page<List<Map<String, Object>>> queryCustInfoByPlatform(final String anFlag, final int anPageNum, final int anPageSize) {
+        if(UserUtils.platformUser()) {
+            throw new BytterTradeException("无相应权限操作！");
+        }
+        List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
+        List<CustInfo> custInfoList = custAccountService.selectAll();
+        for(CustInfo custInfo : custInfoList) {
+            Map<String, Object> tmpResultMap = new HashMap<String, Object>();
+            tmpResultMap.put("custInfo", custInfo);
+            CustOpenAccountTmp tmpInfo = Collections3.getFirst(this.selectByProperty("custNo", custInfo.getCustNo()));
+            if(null == tmpInfo) {
+                continue;
+            }
+            tmpResultMap.put("tmpInfo", tmpInfo);
+            resultList.add(tmpResultMap);
+        }
+        return Page.listToPage(resultList);
+    }
 }

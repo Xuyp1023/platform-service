@@ -211,4 +211,14 @@ public class CustOpenAccountDubboService implements ICustOpenAccountService {
     public String webFindSuccessAccountInfo(String anOpenId) {
         return AjaxObject.newOk("开户资料读取成功", custOpenAccountTmpService.findSuccessAccountInfo(anOpenId)).toJson();
     }
+    
+    @Override 
+    public CustOpenAccountTmp findAccountInfoByCustNo(Long anCustNo) {
+        return custOpenAccountTmpService.findAccountInfoByCustNo(anCustNo);
+    }
+    
+    @Override
+    public String webQueryCustInfoByPlatform(final String anFlag, final int anPageNum, final int anPageSize) {
+      return AjaxObject.newOkWithPage("保理公司查询客户信息成功", custOpenAccountTmpService.queryCustInfoByPlatform(anFlag, anPageNum, anPageSize)).toJson();  
+    }
 }
