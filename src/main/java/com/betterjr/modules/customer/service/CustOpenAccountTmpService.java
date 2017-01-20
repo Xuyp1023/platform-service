@@ -24,6 +24,7 @@ import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.JedisUtils;
+import com.betterjr.common.utils.QueryTermBuilder;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.common.utils.reflection.ReflectionUtils;
 import com.betterjr.common.web.AjaxObject;
@@ -1419,17 +1420,14 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
             throw new BytterTradeException("无相应权限操作！");
         }
         List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
-        List<CustInfo> custInfoList = custAccountService.selectAll();
+        Page<CustInfo> custInfoList = custAccountService.selectPropertyByPage("GTEcustNo", "0L", anPageNum, anPageSize, "1".equals(anFlag));
         for(CustInfo custInfo : custInfoList) {
             Map<String, Object> tmpResultMap = new HashMap<String, Object>();
             tmpResultMap.put("custInfo", custInfo);
             CustOpenAccountTmp tmpInfo = Collections3.getFirst(this.selectByProperty("custNo", custInfo.getCustNo()));
-            if(null == tmpInfo) {
-                continue;
-            }
             tmpResultMap.put("tmpInfo", tmpInfo);
             resultList.add(tmpResultMap);
         }
-        return Page.listToPage(resultList);
+        return Page.listToPage(resultList, anPageNum, anPageSize, custInfoList.getPages(), custInfoList.getStartRow(), custInfoList.getTotal());
     }
 }

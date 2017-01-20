@@ -219,6 +219,6 @@ public class CustOpenAccountDubboService implements ICustOpenAccountService {
     
     @Override
     public String webQueryCustInfoByPlatform(final String anFlag, final int anPageNum, final int anPageSize) {
-      return AjaxObject.newOkWithPage("保理公司查询客户信息成功", custOpenAccountTmpService.queryCustInfoByPlatform(anFlag, anPageNum, anPageSize)).toJson();  
+      return AjaxObject.newOkWithPage("平台查询客户信息成功", custOpenAccountTmpService.queryCustInfoByPlatform(anFlag, anPageNum, anPageSize)).toJson();  
     }
 }
