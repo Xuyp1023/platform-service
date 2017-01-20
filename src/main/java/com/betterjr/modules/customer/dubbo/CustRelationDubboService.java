@@ -271,4 +271,8 @@ public class CustRelationDubboService implements ICustRelationService {
         return custRelationService.findRelationWithCustCorp(anCustNo, anPartnerCustNo, anCustCorp);
     }
 
+    @Override
+    public String webQueryCustInfoByFactor(final String anRelateType, final String anFlag, final int anPageNum, final int anPageSize) {
+        return AjaxObject.newOkWithPage("保理公司查询企业信息成功", custRelationService.queryCustInfoByFactor(anRelateType, anFlag, anPageNum, anPageSize)).toJson();
+    }
 }
