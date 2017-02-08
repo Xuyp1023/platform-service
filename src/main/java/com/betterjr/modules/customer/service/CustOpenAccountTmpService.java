@@ -1207,6 +1207,8 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
      */
     public CustOpenAccountTmp saveOpenAccountApplySubmit(final CustOpenAccountTmp anOpenAccountInfo, final Long anOperId, final String anFileList) {
         logger.info("Begin to Commit Open Account Apply");
+        // 检查重复提交
+        checkRepeatSubmit(anOpenAccountInfo);
         // 填充操作员信息
         fillOperatorByOperId(anOperId, anOpenAccountInfo);
         // 检查开户资料合法性
@@ -1220,6 +1222,16 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         // 数据存盘,开户资料暂存
         this.insert(anOpenAccountInfo);
         return anOpenAccountInfo;
+    }
+    
+    /**
+     * 后端检查重复提交--使用申请机构名称
+     */
+    public void checkRepeatSubmit(CustOpenAccountTmp anOpenAccountInfo) {
+        if(this.selectByProperty("custName", anOpenAccountInfo.getCustName()).size() > 0) {
+            logger.warn("此申请机构已提交申请");
+            throw new BytterTradeException(40001, "此申请机构已提交申请，请勿重复提交");
+        }
     }
     
     /**
