@@ -64,6 +64,8 @@ public class BlacklistService extends BaseService<BlacklistMapper, Blacklist> {
         // 初始化黑名单
         anBlacklist.initAddValue();
         anBlacklist.initLawName(anBlacklist.getCustType());
+        logger.info("初始化法人名称，lawname is null is");
+        System.out.println(anBlacklist.getLawName() == null);
 
         // 数据存盘
         this.insert(anBlacklist);
