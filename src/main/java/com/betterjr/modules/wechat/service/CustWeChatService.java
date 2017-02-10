@@ -1,9 +1,7 @@
 package com.betterjr.modules.wechat.service;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,9 +17,7 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.betterjr.common.config.ParamNames;
 import com.betterjr.common.data.CustPasswordType;
-import com.betterjr.common.data.KeyAndValueObject;
 import com.betterjr.common.exception.BytterTradeException;
 import com.betterjr.common.mapper.JsonMapper;
 import com.betterjr.common.service.BaseService;
@@ -30,7 +26,6 @@ import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.Cryptos;
 import com.betterjr.common.utils.DictUtils;
-import com.betterjr.common.utils.FileUtils;
 import com.betterjr.common.utils.JedisUtils;
 import com.betterjr.common.utils.QueryTermBuilder;
 import com.betterjr.common.utils.UserUtils;
@@ -43,7 +38,6 @@ import com.betterjr.modules.document.entity.CustFileItem;
 import com.betterjr.modules.document.service.CustFileAuditService;
 import com.betterjr.modules.document.service.CustFileItemService;
 import com.betterjr.modules.document.service.DataStoreService;
-import com.betterjr.modules.document.utils.CustFileUtils;
 import com.betterjr.modules.notification.INotificationSendService;
 import com.betterjr.modules.notification.NotificationModel;
 import com.betterjr.modules.notification.NotificationModel.Builder;
@@ -90,9 +84,7 @@ public class CustWeChatService extends BaseService<CustWeChatInfoMapper, CustWeC
     public MPAccount getMpAccount() {
         return this.mpAccount;
     }
-    public static void main(final String[] args) {
-        System.out.println(Cryptos.aesEncrypt("{\"AppId\":\"wx9b74d1c7a711cd91\",\"AppSecret\":\"a73d359048a665132f78e81d29e1387d\",\"Token\":\"fd22f35935294b5fb7f38a011106a5\",\"AESKey\":\"c0X0w3KIonikEyW57M9IbM8HVanOtFTaH5RPTuVR81O\",\"MpId\":\"gh_76558e8b69ee\",\"wechatUrl\":\"http://5a86w.free.natapp.cc/better/\"}"));
-    }
+
     @PostConstruct
     public synchronized void init() {
         // 修改为实际的公众号信息,可以在开发者栏目中查看
@@ -268,6 +260,11 @@ public class CustWeChatService extends BaseService<CustWeChatInfoMapper, CustWeC
             BTAssert.notNull(weChatInfo, "没有找到微信账户信息");
             subscribeStatus = "0";
             weChatInfo.setBusinStatus("0");
+            weChatInfo.setOperId(null);
+            weChatInfo.setOperName(null);
+            weChatInfo.setCustNo(null);
+            weChatInfo.setOperOrg(null);
+            weChatInfo.setFirstLogin(true);
             weChatInfo.setUnSubscribeTime(BetterDateUtils.getNumDateTime());
         }
         else if (EventType.subscribe == anEventType) {
