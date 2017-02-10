@@ -2,6 +2,8 @@ package com.betterjr.modules.customer.dubbo;
 
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.config.annotation.Service;
@@ -14,6 +16,8 @@ import com.betterjr.modules.customer.service.CustRelationConfigService;
 
 @Service(interfaceClass=ICustRelationConfigService.class)
 public class CustRelationConfigDubboService implements ICustRelationConfigService {
+    
+    Logger logger=LoggerFactory.getLogger(CustRelationConfigDubboService.class);
 
     @Autowired
     private CustRelationConfigService relationConfigService;
@@ -70,6 +74,7 @@ public class CustRelationConfigDubboService implements ICustRelationConfigServic
         }else if(UserUtils.platformUser()){
             type= String.valueOf(PlatformBaseRuleType.PLATFORM_USER);
         }
+        logger.info("type:"+type);
         return AjaxObject.newOk("获取当前客户类型",type).toJson();
     }
     
