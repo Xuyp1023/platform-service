@@ -260,11 +260,7 @@ public class CustWeChatService extends BaseService<CustWeChatInfoMapper, CustWeC
             BTAssert.notNull(weChatInfo, "没有找到微信账户信息");
             subscribeStatus = "0";
             weChatInfo.setBusinStatus("0");
-            weChatInfo.setOperId(null);
-            weChatInfo.setOperName(null);
-            weChatInfo.setCustNo(null);
-            weChatInfo.setOperOrg(null);
-            weChatInfo.setFirstLogin(true);
+
             weChatInfo.setUnSubscribeTime(BetterDateUtils.getNumDateTime());
         }
         else if (EventType.subscribe == anEventType) {
@@ -272,9 +268,10 @@ public class CustWeChatService extends BaseService<CustWeChatInfoMapper, CustWeC
             subscribeStatus = "1";
             weChatInfo.setUnSubscribeTime("");
             // 如果不是暂停的情况下，则允许修改状态，如果是设置为暂停；则不修改状态
-            if ("2".equals(weChatInfo.getBusinStatus()) == false) {
-                weChatInfo.setBusinStatus("3");
-            }
+            //            if ("2".equals(weChatInfo.getBusinStatus()) == false) {
+            //                weChatInfo.setBusinStatus("3");
+            //            }
+            weChatInfo.setFirstLogin(true);
         }
         else {
 
