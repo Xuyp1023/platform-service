@@ -480,7 +480,6 @@ public class CustRelationConfigService {
         CustMechBase custMechBase=custMechBaseService.findCustMechBaseByCustNo(custInfo.getCustNo());
         businessRequestData.setOrgCode(custMechBase.getOrgCode());
         businessRequestData.setLawName(custMechBase.getLawName());
-        businessRequestData.setFax(custMechBase.getFax());
         
         CustMechBankAccount mechBankAccount=custMechBankAccountService.findDefaultCustMechBankAccount(custInfo.getCustNo());
         if(mechBankAccount!=null){
@@ -501,10 +500,11 @@ public class CustRelationConfigService {
         businessRequestData.setOperIdentNo(custOperator.getIdentNo());
         businessRequestData.setOperIdentType(custOperator.getIdentType());
         businessRequestData.setAddress(custOperator.getAddress());
-        businessRequestData.setPost(custOperator.getZipCode());
+        businessRequestData.setZipCode(custOperator.getZipCode());
         businessRequestData.setPhone(custOperator.getPhone());
         businessRequestData.setMobileNo(custOperator.getMobileNo());
         businessRequestData.setEmail(custOperator.getEmail());
+        businessRequestData.setFax(custOperator.getFaxNo());
         return businessRequestData;
     }  
     
