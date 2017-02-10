@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.betterjr.common.data.CustPasswordType;
+import com.betterjr.common.exception.BytterException;
 import com.betterjr.common.exception.BytterTradeException;
 import com.betterjr.common.mapper.JsonMapper;
 import com.betterjr.common.service.BaseService;
@@ -346,7 +347,7 @@ public class CustWeChatService extends BaseService<CustWeChatInfoMapper, CustWeC
      * @param anOperator
      * @return
      */
-    public CustWeChatInfo saveFristLogin(final String anTradePassword, final CustOperatorInfo anOperator) {
+    public boolean saveFristLogin(final String anTradePassword, final CustOperatorInfo anOperator) {
 
         if (tradePassService.checkTradePassword(anOperator, anTradePassword)) {
             final CustWeChatInfo wechatInfo = Collections3.getFirst(this.selectByProperty("operId", anOperator.getId()));
@@ -355,9 +356,11 @@ public class CustWeChatService extends BaseService<CustWeChatInfoMapper, CustWeC
             wechatInfo.setFirstLogin(Boolean.FALSE);
 
             this.updateByPrimaryKeySelective(wechatInfo);
+            return true;
+        } else {
+            throw new BytterException("交易密码错误！");
         }
 
-        return null;
     }
 
     /**
@@ -384,9 +387,9 @@ public class CustWeChatService extends BaseService<CustWeChatInfoMapper, CustWeC
      */
     public boolean checkFristLogin(final Long anOperId) {
         final CustWeChatInfo wechatInfo = Collections3.getFirst(this.selectByProperty("operId", anOperId));
-        BTAssert.notNull(wechatInfo, "没有找到相应的微信绑定信息！");
-        if (wechatInfo.getFirstLogin() == null) {
-            return Boolean.FALSE;
+
+        if (wechatInfo == null || wechatInfo.getFirstLogin() == null) {
+            return Boolean.TRUE;
         }
         return wechatInfo.getFirstLogin();
     }
