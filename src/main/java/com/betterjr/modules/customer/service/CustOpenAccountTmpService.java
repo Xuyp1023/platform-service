@@ -1302,8 +1302,6 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         CustOpenAccountTmp custOpenInfo = this.selectByPrimaryKey(anId);
         BTAssert.notNull(custOpenInfo, "无法获取开户信息");
         CustFileItem fileItem = custWeChatService.saveWechatFile(anFileTypeName, anFileMediaId);
-        System.out.println(fileItem);
-        System.out.println(anId);
         custOpenInfo.setBatchNo(custFileItemService2.updateCustFileItemInfo(fileItem.getId().toString(), custOpenInfo.getBatchNo()));
         this.updateByPrimaryKey(custOpenInfo);
         return fileItem;
@@ -1428,7 +1426,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
      * 平台查询客户信息
      */
     public Page<List<Map<String, Object>>> queryCustInfoByPlatform(final String anFlag, final int anPageNum, final int anPageSize) {
-        if(UserUtils.platformUser()) {
+        if(!UserUtils.platformUser()) {
             throw new BytterTradeException("无相应权限操作！");
         }
         List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();

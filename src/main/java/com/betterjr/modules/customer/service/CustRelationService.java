@@ -1223,7 +1223,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
      * 保理公司查询客户信息
      */
     public Page<CustRelation> queryCustInfoByFactor(final String anRelateType, final String anFlag, final int anPageNum, final int anPageSize) {
-        if(UserUtils.factorUser()) {
+        if(!UserUtils.factorUser()) {
             throw new BytterTradeException("无相应权限操作！");
         }
         final Map<String, Object> anMap = QueryTermBuilder.newInstance().put("relateType", anRelateType.split(",")).build();
