@@ -32,6 +32,7 @@ import com.betterjr.common.utils.MathExtend;
 import com.betterjr.common.utils.QueryTermBuilder;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.mapper.pagehelper.Page;
+import com.betterjr.modules.account.dubbo.CustInfoDubboService;
 import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.betterjr.modules.account.service.CustAccountService;
@@ -64,6 +65,9 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
 
     @Resource(name = "betterProducer")
     private RocketMQProducer betterProducer;
+    
+    @Autowired
+    private CustInfoDubboService custOperatorDubboClientService;
 
     /**
      * 修改编号对应的公司名称
@@ -1226,7 +1230,8 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         if(!UserUtils.factorUser()) {
             throw new BytterTradeException("无相应权限操作！");
         }
-        final Map<String, Object> anMap = QueryTermBuilder.newInstance().put("relateType", anRelateType.split(",")).build();
+        final Map<String, Object> anMap = QueryTermBuilder.newInstance().put("relateType", anRelateType.split(","))
+                .put("relateCustno", custOperatorDubboClientService.findCustNo()).build();
         Page<CustRelation> result = this.selectPropertyByPage(anMap, anPageNum, anPageSize, "1".equals(anFlag));
         return result;
     }
