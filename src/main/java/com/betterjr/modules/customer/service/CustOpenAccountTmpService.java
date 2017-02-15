@@ -975,13 +975,13 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         anCustOperatorInfo.setAddress(anOpenAccountInfo.getAddress());
         anCustOperatorInfo.setEmail(anOpenAccountInfo.getOperEmail());
         anCustOperatorInfo.setZipCode(anOpenAccountInfo.getZipCode());
+        //设置为对外经办人
+        anCustOperatorInfo.setClerkMan("1");
         
         //若为微信，需新增操作员
         if (!BetterStringUtils.isEmpty(anOpenAccountInfo.getWechatOpenId())) {
             anCustOperatorInfo.setId(anOperId);
             anCustOperatorInfo.setRegDate(BetterDateUtils.getNumDate());
-            //设置为对外经办人
-            anCustOperatorInfo.setClerkMan("1");
             //设置登录帐号
             anCustOperatorInfo.setOperCode(anOpenAccountInfo.getLoginUserName());
             custOperatorService.insert(anCustOperatorInfo);
