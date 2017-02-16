@@ -501,6 +501,7 @@ public class CustRelationConfigService {
         businessRequestData.setOperIdentType(custOperator.getIdentType());
         businessRequestData.setAddress(custOperator.getAddress());
         businessRequestData.setZipCode(custOperator.getZipCode());
+        businessRequestData.setPost(custOperator.getZipCode());
         businessRequestData.setPhone(custOperator.getPhone());
         businessRequestData.setMobileNo(custOperator.getMobileNo());
         businessRequestData.setEmail(custOperator.getEmail());
