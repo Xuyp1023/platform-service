@@ -57,6 +57,7 @@ public class NotificationProvider {
                 sql.append(" AND sn.D_SENT_DATE <= #{param.LTEsentDate} ");
             }
         });
+        sql.append(" ORDER BY sn.D_SENT_DATE DESC, sn.T_SENT_TIME DESC ");
         return sql.toString();
     }
 
