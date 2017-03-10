@@ -104,6 +104,19 @@ public class CustRelationConfigService {
      * 判断当前登录的身份信息，并返回需要关联选择的客户类型
      * @return
      */
+    public List<SimpleDataEntity> findCustByPlatform(String anCustType){
+        List<CustMajor> list = custMajorService.findCustMajorByType(anCustType);
+        List<SimpleDataEntity> custTypeList=new ArrayList<SimpleDataEntity>();
+        for (CustMajor cust : list) {
+        	 custTypeList.add(new SimpleDataEntity(cust.getCustName(), cust.getCustNo().toString()));
+		}
+        return custTypeList;
+    }
+    
+    /***
+     * 判断当前登录的身份信息，并返回需要关联选择的客户类型
+     * @return
+     */
     public List<SimpleDataEntity> findCustType(){
         List<SimpleDataEntity> custTypeList=new ArrayList<SimpleDataEntity>();
         if(UserUtils.coreUser()){
