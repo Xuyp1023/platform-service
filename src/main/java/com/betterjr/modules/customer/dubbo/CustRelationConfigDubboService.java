@@ -23,6 +23,11 @@ public class CustRelationConfigDubboService implements ICustRelationConfigServic
     private CustRelationConfigService relationConfigService;
     
     @Override
+	public String webFindCustByPlatform(String anCustType) {
+		return AjaxObject.newOk("查询客户信息", relationConfigService.findCustByPlatform(anCustType)).toJson();
+	}
+    
+    @Override
     public String webFindCustInfo(String anCustType, Long anCustNo,String anCustName) {
         return AjaxObject.newOk("查询客户关系信息", relationConfigService.findCustInfo(anCustType, anCustNo,anCustName)).toJson();
     }
@@ -187,4 +192,5 @@ public class CustRelationConfigDubboService implements ICustRelationConfigServic
     public FactorBusinessRequestData findBusinessCustInfo(Long anCustNo){
         return relationConfigService.findFactorRequestInfo(anCustNo);
     }
+
 }
