@@ -102,6 +102,7 @@ public class NoticeProvider {
                 sql.append(" AND sn.D_PUBLISH_DATE <= #{param.LTEpublishDate} ");
             }
         });
+        sql.append(" ORDER BY sn.D_PUBLISH_DATE DESC, sn.T_PUBLISH_TIME DESC ");
         return sql.toString();
     }
 }
