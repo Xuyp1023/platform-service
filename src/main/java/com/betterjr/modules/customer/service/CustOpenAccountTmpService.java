@@ -24,7 +24,6 @@ import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.JedisUtils;
-import com.betterjr.common.utils.QueryTermBuilder;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.common.utils.reflection.ReflectionUtils;
 import com.betterjr.common.web.AjaxObject;
@@ -132,22 +131,22 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
 
     @Resource
     private RocketMQProducer betterProducer;
-    
+
     @Autowired
     private CustWeChatService custWeChatService;
-    
+
     @Autowired
     private WeChatCustEnrollService custEnrollService;
-    
+
     @Autowired
     private CustInsteadService custInsteadService;
-    
+
     @Autowired
     private CustPassService custPassService;
-    
+
     @Reference(interfaceClass = IVerificationCodeService.class)
     private IVerificationCodeService verificationCodeService;
-    
+
     @Reference(interfaceClass = ICustFileService.class)
     private ICustFileService custFileItemService2;
 
@@ -302,7 +301,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
 
     /**
      * 微信开户审核生效
-     * 
+     *
      * @param anId
      * @return
      */
@@ -411,7 +410,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
                     anOpenAccountInfo.getCustName());
         }
     }
-    
+
     /**
      * 开户申请驳回
      *
@@ -456,7 +455,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
     /**
      * PC代录开户资料提交
      */
-    public CustOpenAccountTmp saveOpenAccountInfoByInstead(CustOpenAccountTmp anOpenAccountInfo, Long anInsteadRecordId, String anFileList) {
+    public CustOpenAccountTmp saveOpenAccountInfoByInstead(final CustOpenAccountTmp anOpenAccountInfo, final Long anInsteadRecordId, final String anFileList) {
         logger.info("Begin to Save Open Account Infomation Instead");
         // 代录流水号不能为空
         BTAssert.notNull(anInsteadRecordId, "代录流水号不能为空");
@@ -586,7 +585,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
 
     private void createValidAccount(final CustOpenAccountTmp anOpenAccountInfo, final Long anOperId, final String anOperName,
             final String anOperOrg) {
-     // 开户资料附件信息
+        // 开户资料附件信息
         final Multimap<String, Object> anCustFileItem = ReflectionUtils
                 .listConvertToMuiltMap(custFileItemService.findCustFiles(anOpenAccountInfo.getBatchNo()), "fileInfoType");
         // 数据存盘,客户资料
@@ -607,35 +606,35 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         custAndOperatorRelaService.insert(new CustOperatorRelation(anOperId, custInfo.getCustNo(), anOperOrg));
         // 写入T_TEMP_CUST_ENROLL表
         addCustEnroll(anOpenAccountInfo, anOperOrg);
-        
+
         //若为微信开户
         if(!BetterStringUtils.isEmpty(anOpenAccountInfo.getWechatOpenId())) {
-           //生成证书信息
-           initCustCertinfo(anOpenAccountInfo, anOperOrg, anOperId, anOperName);
-           //绑定微信
-           addBindWeChat(custInfo, anOperId, anOperOrg, anOperName, anOpenAccountInfo.getWechatOpenId());
-           //添加密码相关
-           addPassword(anOpenAccountInfo, anOperId);
-       }
+            //生成证书信息
+            initCustCertinfo(anOpenAccountInfo, anOperOrg, anOperId, anOperName);
+            //绑定微信
+            addBindWeChat(custInfo, anOperId, anOperOrg, anOperName, anOpenAccountInfo.getWechatOpenId());
+            //添加密码相关
+            addPassword(anOpenAccountInfo, anOperId);
+        }
     }
     /**
      * 添加密码相关
      */
-    private void addPassword(CustOpenAccountTmp anOpenAccountInfo, Long anOperId) {
-        
+    private void addPassword(final CustOpenAccountTmp anOpenAccountInfo, final Long anOperId) {
+
         final int passValidLimit = 1;
-        CustPassInfo dealPassInfo = new CustPassInfo(CustPasswordType.PERSON_TRADE, passValidLimit, anOperId, anOpenAccountInfo.getDealPasswordSalt(), anOpenAccountInfo.getDealPassword());
+        final CustPassInfo dealPassInfo = new CustPassInfo(CustPasswordType.ORG_TRADE, passValidLimit, anOperId, anOpenAccountInfo.getDealPasswordSalt(), anOpenAccountInfo.getDealPassword());
         custPassService.insert(dealPassInfo);
-        
-        CustPassInfo loginPassInfo = new CustPassInfo(CustPasswordType.ORG, passValidLimit, anOperId, anOpenAccountInfo.getLoginPasswordSalt(), anOpenAccountInfo.getLoginPassword());
+
+        final CustPassInfo loginPassInfo = new CustPassInfo(CustPasswordType.ORG, passValidLimit, anOperId, anOpenAccountInfo.getLoginPasswordSalt(), anOpenAccountInfo.getLoginPassword());
         custPassService.insert(loginPassInfo);
-        
+
     }
 
     /**
      * 经办人与当前微信绑定
      */
-    private void addBindWeChat(final CustInfo anCustInfo,Long anOperId, String anOperOrg, String anOperName, final String anOpenId) {
+    private void addBindWeChat(final CustInfo anCustInfo,final Long anOperId, final String anOperOrg, final String anOperName, final String anOpenId) {
         BTAssert.isTrue(BetterStringUtils.isNotBlank(anOpenId), "openid 不允许为空");
         final CustWeChatInfo weChatInfo = custWeChatService.selectByPrimaryKey(anOpenId);
         BTAssert.notNull(weChatInfo, "没有找到微信用户信息！");
@@ -650,11 +649,11 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         weChatInfo.setBusinStatus("1");// 开户结束后设置为已完成状态;
         custWeChatService.updateByPrimaryKeySelective(weChatInfo);
     }
-    
+
     /**
      * 生成证书信息
      */
-    private void initCustCertinfo(final CustOpenAccountTmp anOpenAccountInfo, String anOperOrg, Long anOperId, String anOperName) {
+    private void initCustCertinfo(final CustOpenAccountTmp anOpenAccountInfo, final String anOperOrg, final Long anOperId, final String anOperName) {
         final CustCertInfo certInfo = new CustCertInfo();
         certInfo.setSerialNo(Long.toUnsignedString(System.currentTimeMillis() * 10000 + SerialGenerator.randomInt(10000)));
         certInfo.setCustNo(anOpenAccountInfo.getCustNo());
@@ -689,11 +688,11 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         certInfo.setEmail(anOpenAccountInfo.getOperEmail());
         custCertService.addCustCertInfo(certInfo);
     }
-    
+
     /**
      * 写入T_TEMP_CUST_ENROLL表
      */
-    private CustTempEnrollInfo addCustEnroll(final CustOpenAccountTmp anOpenAccountInfo, String anOperOrg) {
+    private CustTempEnrollInfo addCustEnroll(final CustOpenAccountTmp anOpenAccountInfo, final String anOperOrg) {
         final CustTempEnrollInfo custEnrollInfo = new CustTempEnrollInfo();
         custEnrollInfo.initWeChatAddValue();
         custEnrollInfo.setCustName(anOpenAccountInfo.getCustName());
@@ -812,7 +811,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         // anCustMechLawInfo.setSex(IdcardUtils.getGenderByIdCard(anOpenAccountInfo.getLawIdentNo(), anOpenAccountInfo.getLawIdentType()));
         // anCustMechLawInfo.setBirthdate(IdcardUtils.getBirthByIdCard(anOpenAccountInfo.getLawIdentNo()));
         anCustMechLawInfo.setVersion(0l);
-        
+
         // 附件：法人身份证-头像面RepresentIdHeadFile
         final Collection headCollection = anCustFileItem.get("RepresentIdHeadFile");
         final List<CustFileItem> headFileList = new ArrayList(headCollection);
@@ -959,7 +958,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
             final Long anOperId, final String anOperName, final String anOperOrg) {
         final CustOperatorInfo anCustOperatorInfo = new CustOperatorInfo();
         anCustOperatorInfo.setOperOrg(anOperOrg);
-//        anCustOperatorInfo.setId(SerialGenerator.getLongValue(SerialGenerator.OPERATOR_ID));
+        //        anCustOperatorInfo.setId(SerialGenerator.getLongValue(SerialGenerator.OPERATOR_ID));
         anCustOperatorInfo.setName(anOpenAccountInfo.getOperName());
         anCustOperatorInfo.setIdentType(anOpenAccountInfo.getOperIdenttype());
         anCustOperatorInfo.setIdentNo(anOpenAccountInfo.getOperIdentno());
@@ -977,7 +976,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         anCustOperatorInfo.setZipCode(anOpenAccountInfo.getZipCode());
         //设置为对外经办人
         anCustOperatorInfo.setClerkMan("1");
-        
+
         //若为微信，需新增操作员
         if (!BetterStringUtils.isEmpty(anOpenAccountInfo.getWechatOpenId())) {
             anCustOperatorInfo.setId(anOperId);
@@ -987,12 +986,12 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
             custOperatorService.insert(anCustOperatorInfo);
         }//若为PC，更新操作员信息
         else{
-            CustOperatorInfo operatorInfo = Collections3.getFirst(custOperatorService.selectByProperty("mobileNo", anOpenAccountInfo.getOperMobile()));
+            final CustOperatorInfo operatorInfo = Collections3.getFirst(custOperatorService.selectByProperty("mobileNo", anOpenAccountInfo.getOperMobile()));
             BTAssert.notNull(operatorInfo, "未找到对应操作员信息!");
             anCustOperatorInfo.setId(operatorInfo.getId());
             custOperatorService.updateByPrimaryKeySelective(anCustOperatorInfo);
         }
-        
+
         // 附件：经办人身份证-头像面BrokerIdHeadFile
         final Collection brokerIdHeadFile = anCustFileItem.get("BrokerIdHeadFile");
         final List<CustFileItem> brokerIdHeadFileList = new ArrayList(brokerIdHeadFile);
@@ -1030,7 +1029,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
             for (final CustFileItem fileItem : anCustFileItem) {
                 addCustFileItem(fileItem, anBatchNo);
             }
-            // 操作员编码    
+            // 操作员编码
             final String anOperCode = custOperatorService.selectByPrimaryKey(anOperId).getId().toString();
             // 写入文件认证信息
             addCustFileAduit(anCustNo, anBatchNo, anCustFileItem.size(), anFileInfoType, anOperCode);
@@ -1184,24 +1183,24 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
 
     /**
      * 读取开户的临时文件信息，用于远程开通业务
-     * 
+     *
      * @param anCustNo
      *            客户编号
      * @return
      */
-    public Map<String, Object> findOpenTempAccountInfo(Long anCustNo) {
-//        Map<String, Object> result = null;
+    public Map<String, Object> findOpenTempAccountInfo(final Long anCustNo) {
+        //        Map<String, Object> result = null;
         if (anCustNo != null && anCustNo.longValue() > 10) {
-            List<CustOpenAccountTmp> tmpList = this.selectByProperty("custNo", anCustNo);
+            final List<CustOpenAccountTmp> tmpList = this.selectByProperty("custNo", anCustNo);
             if (Collections3.isEmpty(tmpList) == false) {
-                CustOpenAccountTmp tmpAccount = Collections3.getFirst(tmpList);
+                final CustOpenAccountTmp tmpAccount = Collections3.getFirst(tmpList);
                 return BeanMapper.map(tmpAccount, HashMap.class);
             }
         }
 
         return new HashMap();
     }
-    
+
     /**
      * 开户申请提交
      */
@@ -1223,22 +1222,22 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         this.insert(anOpenAccountInfo);
         return anOpenAccountInfo;
     }
-    
+
     /**
      * 后端检查重复提交--使用申请机构名称
      */
-    public void checkRepeatSubmit(CustOpenAccountTmp anOpenAccountInfo) {
+    public void checkRepeatSubmit(final CustOpenAccountTmp anOpenAccountInfo) {
         if(this.selectByProperty("custName", anOpenAccountInfo.getCustName()).size() > 0) {
             logger.warn("此申请机构已提交申请");
             throw new BytterTradeException(40001, "此申请机构已提交申请，请勿重复提交");
         }
     }
-    
+
     /**
      * 填充操作员信息
      */
-    private void fillOperatorByOperId(Long anOperId, CustOpenAccountTmp anCustOpenAccountTmp) {
-        CustOperatorInfo anOperator = custOperatorService.selectByPrimaryKey(anOperId);
+    private void fillOperatorByOperId(final Long anOperId, final CustOpenAccountTmp anCustOpenAccountTmp) {
+        final CustOperatorInfo anOperator = custOperatorService.selectByPrimaryKey(anOperId);
         BTAssert.notNull(anOperator, "未找到操作员信息！");
         anCustOpenAccountTmp.setOperName(anOperator.getName());
         anCustOpenAccountTmp.setOperIdenttype(anOperator.getIdentType());
@@ -1249,11 +1248,11 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         anCustOpenAccountTmp.setOperPhone(anOperator.getPhone());
         anCustOpenAccountTmp.setOperFaxNo(anOperator.getFaxNo());
     }
-    
+
     /**
      * 微信检查入参
      */
-    private void wechatCheckAccountInfoValid(CustOpenAccountTmp anOpenAccountInfo) {
+    private void wechatCheckAccountInfoValid(final CustOpenAccountTmp anOpenAccountInfo) {
         BTAssert.notNull(anOpenAccountInfo.getCustName(), "企业名称不能为空");
         BTAssert.notNull(anOpenAccountInfo.getOperName(), "经办人姓名不能为空");
         BTAssert.notNull(anOpenAccountInfo.getOperMobile(), "经办人手机号码不能为空");
@@ -1277,31 +1276,31 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
             throw new BytterTradeException(40001, "经办人手机号已存在");
         }
     }
-    
+
     /**
      * 通过微信唯一标识查询开户信息
      */
-    public CustOpenAccountTmp findAccountTmpInfo(String anOpenId) {
+    public CustOpenAccountTmp findAccountTmpInfo(final String anOpenId) {
         // 检查入参
         checkParameter(anOpenId, "请关注微信公众号[qiejftest]后再进行开户!");
-        CustOpenAccountTmp accountTmpInfo = Collections3.getFirst(this.selectByProperty("wechatOpenId", anOpenId));
+        final CustOpenAccountTmp accountTmpInfo = Collections3.getFirst(this.selectByProperty("wechatOpenId", anOpenId));
         return accountTmpInfo;
     }
-    
+
     private void checkParameter(final String anKey, final String anMessage) {
         if (BetterStringUtils.isBlank(anKey)) {
             logger.warn(anMessage);
             throw new BytterTradeException(40001, anMessage);
         }
     }
-    
+
     /**
      * 根据开户id和文件id保存附件
      */
-    public CustFileItem saveSingleFileLink(Long anId, String anFileTypeName, String anFileMediaId) {
-        CustOpenAccountTmp custOpenInfo = this.selectByPrimaryKey(anId);
+    public CustFileItem saveSingleFileLink(final Long anId, final String anFileTypeName, final String anFileMediaId) {
+        final CustOpenAccountTmp custOpenInfo = this.selectByPrimaryKey(anId);
         BTAssert.notNull(custOpenInfo, "无法获取开户信息");
-        CustFileItem fileItem = custWeChatService.saveWechatFile(anFileTypeName, anFileMediaId);
+        final CustFileItem fileItem = custWeChatService.saveWechatFile(anFileTypeName, anFileMediaId);
         custOpenInfo.setBatchNo(custFileItemService2.updateCustFileItemInfo(fileItem.getId().toString(), custOpenInfo.getBatchNo()));
         this.updateByPrimaryKey(custOpenInfo);
         return fileItem;
@@ -1310,19 +1309,19 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
     /**
      * 根据batchNo生成对应文件类型Map Json对象(微信使用)
      */
-    public Map<String, Object> findAccountFileByBatChNo(Long anBatchNo) {
-        Map<String, Object> fileMap = new HashMap<String, Object>();
-        List<CustFileItem> fileList = custFileItemService.findCustFiles(anBatchNo);
-        String[] fileInfoTypes = { "CustBizLicenseFile", "CustOrgCodeFile", "CustTaxRegistFile", "CustCreditCodeFile", "CustBankOpenLicenseFile",
+    public Map<String, Object> findAccountFileByBatChNo(final Long anBatchNo) {
+        final Map<String, Object> fileMap = new HashMap<String, Object>();
+        final List<CustFileItem> fileList = custFileItemService.findCustFiles(anBatchNo);
+        final String[] fileInfoTypes = { "CustBizLicenseFile", "CustOrgCodeFile", "CustTaxRegistFile", "CustCreditCodeFile", "CustBankOpenLicenseFile",
                 "BrokerIdHeadFile", "BrokerIdNationFile", "BrokerIdHoldFile", "RepresentIdHeadFile", "RepresentIdNationFile", "RepresentIdHoldFile",
-                "CustOpenAccountFilePack" };
-        for (String anFileInfoType : fileInfoTypes) {
+        "CustOpenAccountFilePack" };
+        for (final String anFileInfoType : fileInfoTypes) {
             // 默认数据
-            CustFileItem defaultFile = new CustFileItem();
+            final CustFileItem defaultFile = new CustFileItem();
             defaultFile.setFileInfoType(anFileInfoType);
-//            fileMap.put(anFileInfoType, defaultFile);
+            //            fileMap.put(anFileInfoType, defaultFile);
             // 遍历文件，若存在则放入
-            for (CustFileItem anFile : fileList) {
+            for (final CustFileItem anFile : fileList) {
                 if (BetterStringUtils.equals(anFileInfoType, anFile.getFileInfoType())) {
                     fileMap.put(anFileInfoType, anFile);
                 }
@@ -1336,17 +1335,17 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
      * @param anOpenId
      * @return
      */
-    public String findOpenAccountStatus(String anOpenId) {
-        Map<String, Object> conditionMap = new HashMap<>();
+    public String findOpenAccountStatus(final String anOpenId) {
+        final Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("wechatOpenId", anOpenId);
 
-        CustOpenAccountTmp openAccountTmp = Collections3.getFirst(this.selectByProperty(conditionMap));
+        final CustOpenAccountTmp openAccountTmp = Collections3.getFirst(this.selectByProperty(conditionMap));
 
         if (openAccountTmp == null) {
             return "0";
         }
         else {
-            CustInsteadApply custInsteadApply = custInsteadService.findInsteadApplyByAccountTmpId(openAccountTmp.getId());
+            final CustInsteadApply custInsteadApply = custInsteadService.findInsteadApplyByAccountTmpId(openAccountTmp.getId());
 
             if (custInsteadApply != null) {
                 if (BetterStringUtils.equals(custInsteadApply.getBusinStatus(), "4")) {
@@ -1364,7 +1363,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
     /**
      * 发送手机短信验证码
      */
-    public String sendValidMessage(String anMobileNo) {
+    public String sendValidMessage(final String anMobileNo) {
         BTAssert.isTrue(BetterStringUtils.isNotBlank(anMobileNo), "手机号码不允许为空！");
         final VerifyCode verifyCode = verificationCodeService.sendVerifyCode(anMobileNo, VerifyCodeType.OPEN_ACCOUNT_PASSWORD);
         BTAssert.notNull(verifyCode, "没有生成验证码！");
@@ -1372,34 +1371,34 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         JedisUtils.setObject(SmsConstants.smsOpenAccountVerifyCodePrefix + anMobileNo, verifyCode, SmsConstants.SEC_600);
         return AjaxObject.newOk("发送验证码成功").toJson();
     }
-    
-    
+
+
 
     /**
      * 根据operOrg查询Apply状态
      */
     public String findInsteadApplyStatus() {
-        CustInsteadApply instApply = Collections3.getFirst(custInsteadApplyService.selectByProperty("operOrg", UserUtils.getOperatorInfo().getOperOrg()));
+        final CustInsteadApply instApply = Collections3.getFirst(custInsteadApplyService.selectByProperty("operOrg", UserUtils.getOperatorInfo().getOperOrg()));
         if (null != instApply) {
             return instApply.getBusinStatus();
         }else {
-           return "";
+            return "";
         }
     }
-    
+
     /**
      * 根据operOrg查询开户信息
      */
     public CustOpenAccountTmp findOpenAccoutnTmp() {
-        CustOpenAccountTmp accountInfo = Collections3.getFirst(this.selectByProperty("operOrg", UserUtils.getOperatorInfo().getOperOrg()));
+        final CustOpenAccountTmp accountInfo = Collections3.getFirst(this.selectByProperty("operOrg", UserUtils.getOperatorInfo().getOperOrg()));
         return accountInfo;
     }
 
     /**
      * 微信，删除附件
      */
-    public int saveDeleteSingleFile(Long anId) {
-        CustFileItem anFile = custFileItemService.selectByPrimaryKey(anId);
+    public int saveDeleteSingleFile(final Long anId) {
+        final CustFileItem anFile = custFileItemService.selectByPrimaryKey(anId);
         BTAssert.notNull(anFile, "无法获取相应附件!");
         anFile.setBatchNo(-anFile.getBatchNo());
         return custFileItemService.updateByPrimaryKey(anFile);
@@ -1409,19 +1408,19 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
      * 微信查询开户成功后资料
      * --不能直接通过wechat标识去查询tmp表，因为若是微信绑定已开户账户，则tmp表中wechat标识为空--
      */
-    public CustOpenAccountTmp findSuccessAccountInfo(String anOpenId) {
-        CustWeChatInfo wehchatUserInfo = custWeChatService.findWechatUserByOpenId(anOpenId);
+    public CustOpenAccountTmp findSuccessAccountInfo(final String anOpenId) {
+        final CustWeChatInfo wehchatUserInfo = custWeChatService.findWechatUserByOpenId(anOpenId);
         BTAssert.isTrue(null != wehchatUserInfo.getCustNo(), "此微信账户未开户！");
         return Collections3.getFirst(this.selectByProperty("custNo", wehchatUserInfo.getCustNo()));
     }
-    
+
     /**
      * 根据custNo查询已经开户的信息
      */
-    public CustOpenAccountTmp findAccountInfoByCustNo(Long anCustNo) {
+    public CustOpenAccountTmp findAccountInfoByCustNo(final Long anCustNo) {
         return Collections3.getFirst(this.selectByProperty("custNo", anCustNo));
     }
-    
+
     /**
      * 平台查询客户信息
      */
@@ -1429,12 +1428,12 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         if(!UserUtils.platformUser()) {
             throw new BytterTradeException("无相应权限操作！");
         }
-        List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
-        Page<CustInfo> custInfoList = custAccountService.selectPropertyByPage("GTEcustNo", "0L", anPageNum, anPageSize, "1".equals(anFlag));
-        for(CustInfo custInfo : custInfoList) {
-            Map<String, Object> tmpResultMap = new HashMap<String, Object>();
+        final List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
+        final Page<CustInfo> custInfoList = custAccountService.selectPropertyByPage("GTEcustNo", "0L", anPageNum, anPageSize, "1".equals(anFlag));
+        for(final CustInfo custInfo : custInfoList) {
+            final Map<String, Object> tmpResultMap = new HashMap<String, Object>();
             tmpResultMap.put("custInfo", custInfo);
-            CustOpenAccountTmp tmpInfo = Collections3.getFirst(this.selectByProperty("custNo", custInfo.getCustNo()));
+            final CustOpenAccountTmp tmpInfo = Collections3.getFirst(this.selectByProperty("custNo", custInfo.getCustNo()));
             tmpResultMap.put("tmpInfo", tmpInfo);
             resultList.add(tmpResultMap);
         }
