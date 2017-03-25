@@ -11,6 +11,7 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
+import com.betterjr.common.data.PlatformBaseRuleType;
 import com.betterjr.common.exception.BytterTradeException;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
@@ -197,7 +198,8 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
                 targetCusts = custNoList.toArray(new String[custNoList.size()]);
             }
             else { // 当前机构面向所有关系客户发送公告
-                final List<String> custNoList = relationService.queryCustRelation(anCustNo).stream().map(data -> data.getValue())
+                final PlatformBaseRuleType role = UserUtils.getPrincipal().getInnerRules().iterator().next();
+                final List<String> custNoList = relationService.queryCustRelation(anCustNo, role).stream().map(data -> data.getValue())
                         .collect(Collectors.toList());
                 targetCusts = custNoList.toArray(new String[custNoList.size()]);
             }
