@@ -1,7 +1,9 @@
 package com.betterjr.modules.customer.dubbo;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -24,10 +26,12 @@ import com.betterjr.modules.customer.constants.CustomerConstants;
 import com.betterjr.modules.customer.entity.CustChangeApply;
 import com.betterjr.modules.customer.entity.CustMechBase;
 import com.betterjr.modules.customer.entity.CustMechBaseTmp;
+import com.betterjr.modules.customer.entity.CustInfoRole;
 import com.betterjr.modules.customer.helper.ChangeDetailBean;
 import com.betterjr.modules.customer.service.CustChangeService;
 import com.betterjr.modules.customer.service.CustMechBaseService;
 import com.betterjr.modules.customer.service.CustMechBaseTmpService;
+import com.betterjr.modules.customer.service.CustInfoRoleService;
 import com.betterjr.modules.rule.service.RuleServiceDubboFilterInvoker;
 
 /**
@@ -51,6 +55,9 @@ public class CustMechBaseDubboService implements ICustMechBaseService {
 
     @Resource
     private CustAccountService accountService;
+    
+    @Resource
+    private CustInfoRoleService custInfoRoleService;
 
     /* (non-Javadoc)
      * @see com.betterjr.modules.customer.ICustMechBaseService#webQueryValidCustInfo()
@@ -123,7 +130,7 @@ public class CustMechBaseDubboService implements ICustMechBaseService {
     @Override
     public String webQueryCustInfo() {
         final Collection<CustInfo> custInfos = baseService.queryCustInfo();
-        return AjaxObject.newOk("查询操作员所有的公司列表成功", custInfos).toJson();
+        return AjaxObject.newOk("查询操作员所有的公司列表成功", custInfoRoleService.custInfoFilter(custInfos)).toJson();
     }
 
     @Override
