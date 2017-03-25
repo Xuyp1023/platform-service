@@ -151,6 +151,7 @@ public class CustMechBaseService extends BaseService<CustMechBaseMapper, CustMec
      */
     public Collection<CustInfo> queryCustInfoByOperId(final Long anOperId) {
         final CustOperatorInfo operator = custOperatorService.findCustOperatorInfo(anOperId);
-        return accountService.findCustInfoByOperator(operator.getId(), operator.getOperOrg());
+        List<CustInfo> custInfos = accountService.findCustInfoByOperator(operator.getId(), operator.getOperOrg());
+        return custInfoRoleService.custInfoFilter(custInfos);
     }
 }
