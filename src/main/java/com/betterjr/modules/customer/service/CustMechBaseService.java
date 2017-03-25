@@ -47,6 +47,9 @@ public class CustMechBaseService extends BaseService<CustMechBaseMapper, CustMec
     @Resource
     private CustRelationService custRelationService;
 
+    @Resource
+    private CustInfoRoleService custInfoRoleService;
+    
     /**
      * 公司基本信息-查询详情
      *
@@ -132,7 +135,8 @@ public class CustMechBaseService extends BaseService<CustMechBaseMapper, CustMec
      */
     public Collection<SimpleDataEntity> queryCustInfoSelect() {
         final CustOperatorInfo operator = UserUtils.getOperatorInfo();
-        final List<CustInfo> custInfos = accountService.findCustInfoByOperator(operator.getId(), operator.getOperOrg());
+        List<CustInfo> custInfos = accountService.findCustInfoByOperator(operator.getId(), operator.getOperOrg());
+        custInfos = custInfoRoleService.custInfoFilter(custInfos);
         final Collection<SimpleDataEntity> custInfoSelects = new ArrayList<>();
 
         custInfos.forEach(custInfo -> custInfoSelects.add(new SimpleDataEntity(custInfo.getCustName(), String.valueOf(custInfo.getCustNo()))));
