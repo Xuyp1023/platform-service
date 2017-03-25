@@ -11,6 +11,7 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
+import com.betterjr.common.data.PlatformBaseRuleType;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.Collections3;
@@ -66,8 +67,9 @@ public class NotificationSubscribeService extends BaseService<NotificationSubscr
 
         final Map<String, Object> param = new HashMap<>();
 
+        final PlatformBaseRuleType role = UserUtils.getPrincipal().getInnerRules().iterator().next();
         // 取关系客户
-        final Set<String> custNoSet = relationService.queryCustRelation(anCustNo).stream().map(data -> data.getValue())
+        final Set<String> custNoSet = relationService.queryCustRelation(anCustNo, role).stream().map(data -> data.getValue())
                 .collect(Collectors.toSet());
         // 取平台
         final List<CustCertRule> certRules = certRuleService.queryCertRuleListByRule("PLATFORM_USER");

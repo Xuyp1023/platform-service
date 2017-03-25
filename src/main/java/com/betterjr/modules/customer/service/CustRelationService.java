@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.rocketmq.client.producer.SendResult;
 import com.alibaba.rocketmq.client.producer.SendStatus;
+import com.betterjr.common.data.PlatformBaseRuleType;
 import com.betterjr.common.data.SimpleDataEntity;
 import com.betterjr.common.data.WebServiceErrorCode;
 import com.betterjr.common.exception.BytterTradeException;
@@ -65,12 +66,13 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
 
     @Resource(name = "betterProducer")
     private RocketMQProducer betterProducer;
-    
+
     @Autowired
     private CustInfoDubboService custOperatorDubboClientService;
 
     /**
      * 修改编号对应的公司名称
+     *
      * @param anCustNo
      * @param anCustName
      */
@@ -80,7 +82,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         conditionMap.put("custNo", anCustNo);
 
         List<CustRelation> custRelations = this.selectByProperty(conditionMap);
-        for (final CustRelation custRelation: custRelations) {
+        for (final CustRelation custRelation : custRelations) {
             custRelation.setCustName(anCustName);
             this.updateByPrimaryKeySelective(custRelation);
         }
@@ -89,7 +91,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         conditionMap.put("relateCustno", anCustNo);
 
         custRelations = this.selectByProperty(conditionMap);
-        for (final CustRelation custRelation: custRelations) {
+        for (final CustRelation custRelation : custRelations) {
             custRelation.setRelateCustname(anCustName);
             this.updateByPrimaryKeySelective(custRelation);
         }
@@ -225,9 +227,9 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
      * @param anFactorNo
      * @return
      */
-    public List<SimpleDataEntity> queryFactorCoreRelation(  Long anFactorNo) {
+    public List<SimpleDataEntity> queryFactorCoreRelation(Long anFactorNo) {
         final List<SimpleDataEntity> result = new ArrayList<SimpleDataEntity>();
-        if (MathExtend.smallValue(anFactorNo)){
+        if (MathExtend.smallValue(anFactorNo)) {
             anFactorNo = Collections3.getFirst(UserUtils.findCustNoList());
         }
         if (null == anFactorNo) {
@@ -243,22 +245,31 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         return result;
     }
 
-
     /**
      * 保理机构下拉列表查询,适用于供应商/经销商/核心企业相关查询
      *
      * @param anCustNo
+     * @param anRole
      * @return
      */
-    public List<SimpleDataEntity> queryFactorKeyAndValue(final Long anCustNo) {
+    public List<SimpleDataEntity> queryFactorKeyAndValue(final Long anCustNo, final PlatformBaseRuleType anRole) {
         final List<SimpleDataEntity> result = new ArrayList<SimpleDataEntity>();
         if (null == anCustNo) {
             return result;
         }
         final Map<String, Object> anMap = new HashMap<String, Object>();
         anMap.put("custNo", anCustNo);
-        anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR, CustomerConstants.RELATE_TYPE_CORE_FACTOR,
-                CustomerConstants.RELATE_TYPE_SELLER_FACTOR });
+
+        if (PlatformBaseRuleType.CORE_USER.equals(anRole)) {
+            anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_CORE_FACTOR });
+        }
+        else if (PlatformBaseRuleType.SUPPLIER_USER.equals(anRole)) {
+            anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR });
+        }
+        else if (PlatformBaseRuleType.SELLER_USER.equals(anRole)) {
+            anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SELLER_FACTOR });
+        }
+
         anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
         for (final CustRelation relation : this.selectByProperty(anMap)) {
             result.add(new SimpleDataEntity(relation.getRelateCustname(), String.valueOf(relation.getRelateCustno())));
@@ -293,29 +304,81 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
      * @param anCustNo
      * @return
      */
-    public List<SimpleDataEntity> queryCustRelation(final Long anCustNo) {
+    public List<SimpleDataEntity> queryCustRelation(final Long anCustNo, final PlatformBaseRuleType anRole) {
         final List<SimpleDataEntity> result = new ArrayList<SimpleDataEntity>();
         if (null == anCustNo) {
             return result;
         }
-        Map<String, Object> anMap = new HashMap<String, Object>();
-        anMap.put("custNo", anCustNo);
-        anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
-        for (final CustRelation relation : this.selectByProperty(anMap)) {
-            final SimpleDataEntity entity = new SimpleDataEntity(relation.getRelateCustname(), String.valueOf(relation.getRelateCustno()));
-            if (!result.contains(entity)) {
-                result.add(entity);
+
+        if (PlatformBaseRuleType.CORE_USER.equals(anRole)) {
+            Map<String, Object> anMap = new HashMap<String, Object>();
+            anMap.put("custNo", anCustNo);
+            anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
+            anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_CORE_FACTOR });
+            for (final CustRelation relation : this.selectByProperty(anMap)) {
+                final SimpleDataEntity entity = new SimpleDataEntity(relation.getRelateCustname(), String.valueOf(relation.getRelateCustno()));
+                if (!result.contains(entity)) {
+                    result.add(entity);
+                }
+            }
+
+            anMap = new HashMap<String, Object>();
+            anMap.put("relateCustno", anCustNo);
+            anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
+            anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_CORE, CustomerConstants.RELATE_TYPE_SELLER_CORE });
+            for (final CustRelation relation : this.selectByProperty(anMap)) {
+                final SimpleDataEntity entity = new SimpleDataEntity(relation.getCustName(), String.valueOf(relation.getCustNo()));
+                if (!result.contains(entity)) {
+                    result.add(entity);
+                }
+            }
+
+        } else if (PlatformBaseRuleType.SUPPLIER_USER.equals(anRole)) {
+            Map<String, Object> anMap = new HashMap<String, Object>();
+            anMap.put("custNo", anCustNo);
+            anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
+            anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR });
+            for (final CustRelation relation : this.selectByProperty(anMap)) {
+                final SimpleDataEntity entity = new SimpleDataEntity(relation.getRelateCustname(), String.valueOf(relation.getRelateCustno()));
+                if (!result.contains(entity)) {
+                    result.add(entity);
+                }
+            }
+
+            anMap = new HashMap<String, Object>();
+            anMap.put("custNo", anCustNo);
+            anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
+            anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_CORE });
+            for (final CustRelation relation : this.selectByProperty(anMap)) {
+                final SimpleDataEntity entity = new SimpleDataEntity(relation.getCustName(), String.valueOf(relation.getCustNo()));
+                if (!result.contains(entity)) {
+                    result.add(entity);
+                }
+            }
+        } else if (PlatformBaseRuleType.SELLER_USER.equals(anRole)) {
+            Map<String, Object> anMap = new HashMap<String, Object>();
+            anMap.put("custNo", anCustNo);
+            anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
+            anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SELLER_FACTOR });
+            for (final CustRelation relation : this.selectByProperty(anMap)) {
+                final SimpleDataEntity entity = new SimpleDataEntity(relation.getRelateCustname(), String.valueOf(relation.getRelateCustno()));
+                if (!result.contains(entity)) {
+                    result.add(entity);
+                }
+            }
+
+            anMap = new HashMap<String, Object>();
+            anMap.put("custNo", anCustNo);
+            anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
+            anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SELLER_CORE });
+            for (final CustRelation relation : this.selectByProperty(anMap)) {
+                final SimpleDataEntity entity = new SimpleDataEntity(relation.getCustName(), String.valueOf(relation.getCustNo()));
+                if (!result.contains(entity)) {
+                    result.add(entity);
+                }
             }
         }
-        anMap = new HashMap<String, Object>();
-        anMap.put("relateCustno", anCustNo);
-        anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
-        for (final CustRelation relation : this.selectByProperty(anMap)) {
-            final SimpleDataEntity entity = new SimpleDataEntity(relation.getCustName(), String.valueOf(relation.getCustNo()));
-            if (!result.contains(entity)) {
-                result.add(entity);
-            }
-        }
+
         return result;
     }
 
@@ -400,26 +463,38 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         }
         return this.selectPropertyByPage(CustRelation.class, anMap, anPageNum, anPageSize, "1".equals(anFlag));
     }
-    
+
     /***
      * 根据map 的参数分页查询
+     *
      * @param anMap
      * @param anFlag
      * @param anPageNum
      * @param anPageSize
      * @return
      */
-    public Page<CustRelation> queryCustRelationInfo(Map<String,Object> anMap,final String anFlag, final int anPageNum, final int anPageSize){
+    public Page<CustRelation> queryCustRelationInfo(final Map<String, Object> anMap, final String anFlag, final int anPageNum, final int anPageSize) {
         return this.selectPropertyByPage(CustRelation.class, anMap, anPageNum, anPageSize, "1".equals(anFlag));
     }
-    
-    public Page<CustRelation> findCustRelationInfo(Long anCustNo,String anRelateType){
-        if(BetterStringUtils.isNotBlank(anRelateType)){
-            return mapper.findCustRelationListByRelateType(anCustNo,anRelateType);
-        }else{
-            return mapper.findCustRelationList(anCustNo);
+
+
+    public Page<CustRelation> findCustRelationInfo(final Long anCustNo, final String anRelateType, final PlatformBaseRuleType anRole) {
+        //        if (BetterStringUtils.isNotBlank(anRelateType)) {
+        //            return mapper.findCustRelationListByRelateType(anCustNo, anRelateType);
+        //        }
+        // TODO 需要改
+        if (PlatformBaseRuleType.CORE_USER.equals(anRole)) {
+            return mapper.findCustCoreRelationList(anCustNo);
+        } else if (PlatformBaseRuleType.SUPPLIER_USER.equals(anRole)) {
+            return mapper.findCustSupplierRelationList(anCustNo);
+        } else if (PlatformBaseRuleType.SELLER_USER.equals(anRole)) {
+            return mapper.findCustSellerRelationList(anCustNo);
         }
+
+        return null;
+
     }
+
     /**
      * 客户白名单受理
      *
@@ -1199,7 +1274,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         final Map<String, Object> anMap = new HashMap<String, Object>();
         anMap.put("relateCustno", anCoreCustNo);
         anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
-        anMap.put("relateType", new String[]{CustomerConstants.RELATE_TYPE_SUPPLIER_CORE, CustomerConstants.RELATE_TYPE_SELLER_CORE});
+        anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_CORE, CustomerConstants.RELATE_TYPE_SELLER_CORE });
         for (final CustRelation relation : this.selectByProperty(anMap)) {
             final SimpleDataEntity entity = new SimpleDataEntity(relation.getCustName(), String.valueOf(relation.getCustNo()));
             if (!result.contains(entity)) {
@@ -1208,32 +1283,36 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         }
         return result;
     }
-    
+
     /**
      * 根据关联方简称和关联方客户编号查询客户关联关系信息
-     * @param anCustNo 客户号
-     * @param anCustCorp 关联方简称
-     * @param anPartnerCustNo 关联方客户号
+     *
+     * @param anCustNo
+     *            客户号
+     * @param anCustCorp
+     *            关联方简称
+     * @param anPartnerCustNo
+     *            关联方客户号
      * @return
      */
     public CustRelation findRelationWithCustCorp(final Long anCustNo, final String anPartnerCustNo, final String anCustCorp) {
-        final Map<String, Object> tmpMap = QueryTermBuilder.newInstance().put("custNo", anCustNo).put("relateCustCorp", anCustCorp).put("partnerCustNo", anPartnerCustNo).build();
-        List<CustRelation> tmpList = this.selectByProperty(tmpMap);
-        
+        final Map<String, Object> tmpMap = QueryTermBuilder.newInstance().put("custNo", anCustNo).put("relateCustCorp", anCustCorp)
+                .put("partnerCustNo", anPartnerCustNo).build();
+        final List<CustRelation> tmpList = this.selectByProperty(tmpMap);
+
         return Collections3.getFirst(tmpList);
     }
-    
+
     /**
      * 保理公司查询客户信息
      */
     public Page<CustRelation> queryCustInfoByFactor(final String anRelateType, final String anFlag, final int anPageNum, final int anPageSize) {
-        if(!UserUtils.factorUser()) {
+        if (!UserUtils.factorUser()) {
             throw new BytterTradeException("无相应权限操作！");
         }
         final Map<String, Object> anMap = QueryTermBuilder.newInstance().put("relateType", anRelateType.split(","))
                 .put("relateCustno", custOperatorDubboClientService.findCustNo()).build();
-        Page<CustRelation> result = this.selectPropertyByPage(anMap, anPageNum, anPageSize, "1".equals(anFlag));
+        final Page<CustRelation> result = this.selectPropertyByPage(anMap, anPageNum, anPageSize, "1".equals(anFlag));
         return result;
     }
 }
-

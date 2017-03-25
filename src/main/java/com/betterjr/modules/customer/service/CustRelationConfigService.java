@@ -59,9 +59,9 @@ import com.betterjr.modules.wechat.service.CustWeChatService;
  */
 @Service
 public class CustRelationConfigService {
-    
+
     private static final Logger logger=LoggerFactory.getLogger(CustRelationConfigService.class);
-    
+
     @Autowired
     private CustAccountService custAccountService;
     @Autowired
@@ -72,7 +72,7 @@ public class CustRelationConfigService {
     private CustMajorService custMajorService;
     @Reference(interfaceClass=IAgencyAuthFileGroupService.class)
     private IAgencyAuthFileGroupService agencyAuthFileGroupService;
-    
+
     @Reference(interfaceClass=ICustFileAduitTempService.class)
     private  ICustFileAduitTempService custFileAduitTempService;
     @Autowired
@@ -99,26 +99,26 @@ public class CustRelationConfigService {
     private CustMechBusinLicenceService custMechBusinLicenceService;
     @Resource
     private RocketMQProducer betterProducer;
-    
+
     /***
      * 判断当前登录的身份信息，并返回需要关联选择的客户类型
      * @return
      */
-    public List<SimpleDataEntity> findCustByPlatform(String anCustType){
-        List<CustMajor> list = custMajorService.findCustMajorByType(anCustType);
-        List<SimpleDataEntity> custTypeList=new ArrayList<SimpleDataEntity>();
-        for (CustMajor cust : list) {
-        	 custTypeList.add(new SimpleDataEntity(cust.getCustName(), cust.getCustNo().toString()));
-		}
+    public List<SimpleDataEntity> findCustByPlatform(final String anCustType){
+        final List<CustMajor> list = custMajorService.findCustMajorByType(anCustType);
+        final List<SimpleDataEntity> custTypeList=new ArrayList<SimpleDataEntity>();
+        for (final CustMajor cust : list) {
+            custTypeList.add(new SimpleDataEntity(cust.getCustName(), cust.getCustNo().toString()));
+        }
         return custTypeList;
     }
-    
+
     /***
      * 判断当前登录的身份信息，并返回需要关联选择的客户类型
      * @return
      */
     public List<SimpleDataEntity> findCustType(){
-        List<SimpleDataEntity> custTypeList=new ArrayList<SimpleDataEntity>();
+        final List<SimpleDataEntity> custTypeList=new ArrayList<SimpleDataEntity>();
         if(UserUtils.coreUser()){
             custTypeList.add(new SimpleDataEntity(PlatformBaseRuleType.SUPPLIER_USER.getTitle(),PlatformBaseRuleType.SUPPLIER_USER.toString()));
             custTypeList.add(new SimpleDataEntity(PlatformBaseRuleType.SELLER_USER.getTitle(),PlatformBaseRuleType.SELLER_USER.toString()));
@@ -129,7 +129,7 @@ public class CustRelationConfigService {
         }
         return custTypeList;
     }
-    
+
     /****
      * 添加关联关系
      * @param anCustType
@@ -137,14 +137,14 @@ public class CustRelationConfigService {
      * @param anRelationCustNo
      * @return
      */
-    public boolean addCustRelation(String anCustType,Long anCustNo,String anRelationCustStr){
+    public boolean addCustRelation(final String anCustType,final Long anCustNo,final String anRelationCustStr){
         logger.info("addCustRelation 入参：anCustType="+anCustType+",anCustNo="+anCustNo+",anRelationCustStr="+anRelationCustStr);
         BTAssert.notNull(anCustType, "类型不能为空");
         BTAssert.notNull(anCustNo, "客户号不能为空");
         BTAssert.notNull(anRelationCustStr, "关联客户号不能为空");
         boolean bool=false;
-        for(String relationCust:anRelationCustStr.split(",")){
-            CustRelation custRelation=findCustRelation(anCustType, anCustNo, Long.parseLong(relationCust));
+        for(final String relationCust:anRelationCustStr.split(",")){
+            final CustRelation custRelation=findCustRelation(anCustType, anCustNo, Long.parseLong(relationCust));
             if(custRelationService.findCustRelation(custRelation.getCustNo(), custRelation.getRelateCustno(), custRelation.getRelateType())==null){
                 custRelation.initAddValue();
                 custRelationService.insert(custRelation);
@@ -153,28 +153,28 @@ public class CustRelationConfigService {
         }
         return bool;
     }
-    
-    
+
+
     /****
      * 查询选择的客户类型的客户信息
      * @param anCustType 需要关联的客户类型
      * @param anCustNo   关联客户类型的客户号
      * @return
      */
-    public List<SimpleDataEntity> findCustInfo(String anCustType,Long anCustNo,String custName){
+    public List<SimpleDataEntity> findCustInfo(final String anCustType,Long anCustNo,final String custName){
         if(anCustNo==null){ // 如果查询的客户类型为空，则获取当前登录的客户号
             anCustNo=custInfoService.findCustNo();
         }
         BTAssert.notNull(anCustNo, "查询的客户号不能为空");
-        List<SimpleDataEntity> custList=new ArrayList<SimpleDataEntity>();
-        Map<String, Object> anMap=new HashMap<String, Object>();
+        final List<SimpleDataEntity> custList=new ArrayList<SimpleDataEntity>();
+        final Map<String, Object> anMap=new HashMap<String, Object>();
         if(BetterStringUtils.isNotBlank(custName)){
             anMap.put("LIKEcustName", "%" + custName + "%");
         }
         logger.info("findCustInfo anMap:"+anMap);
-        for(CustInfo custInfo:custAccountService.findValidCustInfo(anMap)){
+        for(final CustInfo custInfo:custAccountService.findValidCustInfo(anMap)){
             if(BetterStringUtils.isNoneBlank(custInfo.getOperOrg())){
-                CustCertInfo certInfo=custCertService.findCertByOperOrg(custInfo.getOperOrg());
+                final CustCertInfo certInfo=custCertService.findCertByOperOrg(custInfo.getOperOrg());
                 if(certInfo!=null && BetterStringUtils.equalsIgnoreCase(certInfo.getRuleList(), anCustType) && checkExist(anCustType,anCustNo,custInfo.getCustNo())){
                     custList.add(new SimpleDataEntity(custInfo.getCustName(), String.valueOf(custInfo.getCustNo())));
                 }
@@ -182,40 +182,33 @@ public class CustRelationConfigService {
         }
         return custList;
     }
-    
-    public Page<CustRelation> queryCustRelationInfo(final Long anCustNo,final String anRelationType,final String anFlag, final int anPageNum, final int anPageSize) {
+
+    public Page<CustRelation> queryCustRelationInfo(final Long anCustNo, final PlatformBaseRuleType anRole, final String anRelationType,final String anFlag, final int anPageNum, final int anPageSize) {
         BTAssert.notNull(anCustNo, "查询的客户号不能为空");
-        Map<String, Object> anMap = new HashMap<String, Object>();
-        anMap.put("custNo", anCustNo);
-        if(BetterStringUtils.isNotBlank(anRelationType)){
-            anMap.put("relateType", anRelationType);
-        }
-        
-        if(UserUtils.coreUser()){// 如果是核心企业，还要查出以核心企业没条件的保理公司和电子合同信息
-            PageHelper.startPage(anPageNum, anPageSize, Integer.parseInt(anFlag) == 1);
-            Page<CustRelation> page=custRelationService.findCustRelationInfo(anCustNo,anRelationType);
-            for (CustRelation custRelation:page) {
-                if(StringUtils.equalsIgnoreCase(CustomerConstants.RELATE_TYPE_CORE_FACTOR, custRelation.getRelateType()) || StringUtils.equalsIgnoreCase(CustomerConstants.RELATE_TYPE_ELEC_CONTRACT, custRelation.getRelateType())){
-                    String custName=custRelation.getCustName();
-                    custRelation.setCustName(custRelation.getRelateCustname());
-                    custRelation.setRelateCustname(custName);
-                }
+
+        PageHelper.startPage(anPageNum, anPageSize, Integer.parseInt(anFlag) == 1);
+
+
+
+        final Page<CustRelation> page=custRelationService.findCustRelationInfo(anCustNo,anRelationType, anRole);
+        for (final CustRelation custRelation:page) {
+            if(StringUtils.equalsIgnoreCase(CustomerConstants.RELATE_TYPE_CORE_FACTOR, custRelation.getRelateType()) || StringUtils.equalsIgnoreCase(CustomerConstants.RELATE_TYPE_ELEC_CONTRACT, custRelation.getRelateType())){
+                final String custName=custRelation.getCustName();
+                custRelation.setCustName(custRelation.getRelateCustname());
+                custRelation.setRelateCustname(custName);
             }
-            return page;
-        }else{
-            Page<CustRelation> page= custRelationService.queryCustRelationInfo(anMap,anFlag,anPageNum,anPageSize);
-            return page;
         }
+        return page;
     }
-    
-    
+
+
     /****
      * 过滤已经关联的客户
      * @param anCustType
      * @param anCustNo
      * @return
      */
-    public boolean checkExist(String anCustType,Long anCustNo,Long anCustRelationNo){
+    public boolean checkExist(final String anCustType,final Long anCustNo,final Long anCustRelationNo){
         CustRelation custRelation=null;
         if(UserUtils.supplierUser() && BetterStringUtils.equalsIgnoreCase(anCustType,PlatformBaseRuleType.CORE_USER.toString())){ // 供应商与核心企业的关系
             custRelation=custRelationService.findCustRelation(anCustNo, anCustRelationNo, CustomerConstants.RELATE_TYPE_SUPPLIER_CORE);
@@ -240,15 +233,15 @@ public class CustRelationConfigService {
             return false;
         }
     }
-    
+
     /****
      * 添加关联信息
      * @param anCustType
      * @param anCustNo
-     * @return 
+     * @return
      */
-    public CustRelation findCustRelation(String anCustType,Long anCustNo,Long anCustRelationNo){
-        CustRelation custRelation=new CustRelation();
+    public CustRelation findCustRelation(final String anCustType,final Long anCustNo,final Long anCustRelationNo){
+        final CustRelation custRelation=new CustRelation();
         custRelation.setCustNo(anCustNo);
         custRelation.setCustName(custAccountService.queryCustName(anCustNo));
         custRelation.setRelateCustno(anCustRelationNo);
@@ -283,33 +276,33 @@ public class CustRelationConfigService {
         }
         return custRelation;
     }
-    
+
     /***
-     * 查询电子合同服务商客户号 
+     * 查询电子合同服务商客户号
      * @return
      */
     public List<SimpleDataEntity> findElecAgreementServiceCust(){
-        List<SimpleDataEntity> custTypeList=new ArrayList<SimpleDataEntity>();
-        for(CustMajor custMajor:custMajorService.findCustMajorByCustCorp("wos")){
-            custTypeList.add(new SimpleDataEntity(custMajor.getCustName(), String.valueOf(custMajor.getCustNo()))); 
+        final List<SimpleDataEntity> custTypeList=new ArrayList<SimpleDataEntity>();
+        for(final CustMajor custMajor:custMajorService.findCustMajorByCustCorp("wos")){
+            custTypeList.add(new SimpleDataEntity(custMajor.getCustName(), String.valueOf(custMajor.getCustNo())));
         }
         return custTypeList;
     }
-    
+
     /****
      * 查询要上传的文件类型
      * @param anFactorNo 关联附件公司客户号
      * @return
      */
-    public List<CustFileItem> findCustAduitTemp(Long anRelateCustNo){
+    public List<CustFileItem> findCustAduitTemp(final Long anRelateCustNo){
         logger.info("findCustAduitTemp,anRelateCustNo:"+anRelateCustNo);
-        Map<String, Object> anMap=setParam(anRelateCustNo);
+        final Map<String, Object> anMap=setParam(anRelateCustNo);
         anMap.put("businStatus", CustomerConstants.RELATION_STATUS_ADUIT);
-        CustRelation custRelation=Collections3.getFirst(custRelationService.selectByProperty(anMap));
+        final CustRelation custRelation=Collections3.getFirst(custRelationService.selectByProperty(anMap));
         if(custRelation!=null){ // 审核通则取正式表中的附件数据
             return custFileItemService.findCustFileAduit(custRelation.getCustNo(), custRelation.getRelateCustno());
         }else{
-            CustMajor custMajor=custMajorService.findCustMajorByCustNo(anRelateCustNo);
+            final CustMajor custMajor=custMajorService.findCustMajorByCustNo(anRelateCustNo);
             if(custMajor!=null){
                 return custFileAduitTempService.findCustAduitTemp(anRelateCustNo, agencyAuthFileGroupService.findAuthorFileGroup(custMajor.getCustCorp(), "01"));
             }else{
@@ -317,7 +310,7 @@ public class CustRelationConfigService {
             }
         }
     }
-    
+
     /****
      * 保存附件（微信端）
      * @param anRelateCustNo 关联客户号
@@ -325,22 +318,22 @@ public class CustRelationConfigService {
      * @param anFileTypeName 文件类型名称
      * @param anFileMediaId  微信标识
      */
-    public CustFileItem addCustTempFile(Long anRelateCustNo,String anFileTypeName, String anFileMediaId,String anCustType){
-        Long anCustNo=custInfoService.findCustNo(); // 获取当前登录的客户号
+    public CustFileItem addCustTempFile(final Long anRelateCustNo,final String anFileTypeName, final String anFileMediaId,final String anCustType){
+        final Long anCustNo=custInfoService.findCustNo(); // 获取当前登录的客户号
         logger.info("当前登录客户号是："+anCustNo);
         // 查询文件类型名称
-        CustMajor custMajor=custMajorService.findCustMajorByCustNo(anRelateCustNo);
+        final CustMajor custMajor=custMajorService.findCustMajorByCustNo(anRelateCustNo);
         logger.info("custMajor:"+custMajor);
-        Map<String,Object> anMap=new HashMap<String, Object>();
+        final Map<String,Object> anMap=new HashMap<String, Object>();
         anMap.put("agencyNo", custMajor.getCustCorp());
         anMap.put("fileInfoType", anFileTypeName);
-        AgencyAuthorFileGroup authorFIleGroup=agencyAuthFileGroupService.findAuthorFileGroupByMap(anMap);
+        final AgencyAuthorFileGroup authorFIleGroup=agencyAuthFileGroupService.findAuthorFileGroupByMap(anMap);
         logger.info("authorFIleGroup:"+authorFIleGroup);
-        CustFileItem fileItem = custWeChatService.saveWechatFile(anFileTypeName, anFileMediaId);
+        final CustFileItem fileItem = custWeChatService.saveWechatFile(anFileTypeName, anFileMediaId);
         fileItem.setFileDescription(authorFIleGroup.getDescription());
         fileItem.setBatchNo(custFileItemService.updateCustFileItemInfo(fileItem.getId().toString(), null));
         logger.info("fileItem:"+fileItem);
-        CustFileAduitTemp custFileAduitTemp=new CustFileAduitTemp();
+        final CustFileAduitTemp custFileAduitTemp=new CustFileAduitTemp();
         custFileAduitTemp.setCustNo(anCustNo);
         custFileAduitTemp.setAduitCustNo(anRelateCustNo);
         custFileAduitTemp.setId(fileItem.getBatchNo());
@@ -350,40 +343,40 @@ public class CustRelationConfigService {
         custFileAduitTemp.setOperNo(String.valueOf(custOperator.getId()));
         custFileAduitTemp.initValue();
         if(BetterStringUtils.equalsIgnoreCase(anCustType,PlatformBaseRuleType.WOS.toString())){ // 沃通附件不需要审核，直接保存到正式表中
-            CustFileAduit custFileAduit=new CustFileAduit();        
+            final CustFileAduit custFileAduit=new CustFileAduit();
             BeanMapper.copy(custFileAduitTemp,custFileAduit);
             custFileItemService.addCustFileAduit(custFileAduit);
         }
-        
+
         custFileAduitTempService.addCustFileAduitTemp(custFileAduitTemp);
-        
+
         return fileItem;
     }
-    
+
     /***
      * 删除附件
      * @param anId 附件id
      * @return
      */
-    public boolean saveDeleteCustAduitTempFile(Long anId){
+    public boolean saveDeleteCustAduitTempFile(final Long anId){
         custFileItemService.delCustFileAduit(anId);// 删除审核表
         custFileAduitTempService.saveDeleteFileAduitTemp(anId); // 删除审核临时表
         return custOpenAccountTmpService.saveDeleteSingleFile(anId)>0; // 删除附件
     }
-    
+
     /***
-     * 添加保理公司/电子合同服务商 关联关系    
+     * 添加保理公司/电子合同服务商 关联关系
      * @param anFactorCustType 保理公司关联类型
      * @param anWosCustType    电子合同服务商关联类型
      * @param anCustNo    申请的客户号
      * @param anFactorCustStr 保理公司客户号
      * @param anWosCustStr  电子合同服务商客户号
-     * @return 
+     * @return
      *      保理公司添加成功返回，电子合同服务商直接通过
      */
-    public boolean addFactorCustRelation(String anFactorCustType,String anWosCustType,String anFactorCustStr,String anWosCustStr){
+    public boolean addFactorCustRelation(final String anFactorCustType,final String anWosCustType,final String anFactorCustStr,final String anWosCustStr){
         synchronized(this){
-            Long anCustNo=custInfoService.findCustNo(); // 获取当前登录的客户号
+            final Long anCustNo=custInfoService.findCustNo(); // 获取当前登录的客户号
             BTAssert.notNull(anFactorCustStr, "关联保理公司客户号不能为空");
             BTAssert.notNull(anWosCustStr, "关联电子合同服务商客户号不能为空");
             addFactorCustRelation(anWosCustType,anWosCustStr,anCustNo); // 添加电子服务商关系
@@ -391,19 +384,19 @@ public class CustRelationConfigService {
         }
         return true;
     }
-    
+
     /***
      * 检查附件是否全部上传
      * @param anCustNo
      * @param anRelateCustNo
      */
-    public void checkAduitFileExist(Long anCustNo,Long anRelateCustNo){
-        CustMajor custMajor=custMajorService.findCustMajorByCustNo(anRelateCustNo);
+    public void checkAduitFileExist(final Long anCustNo,final Long anRelateCustNo){
+        final CustMajor custMajor=custMajorService.findCustMajorByCustNo(anRelateCustNo);
         if(custFileAduitTempService.checkCustFileAduitTempExist(anRelateCustNo, agencyAuthFileGroupService.findAuthorFileGroup(custMajor.getCustCorp(), "01"))){
             throw new BytterTradeException(custMajor.getCustName()+"\n资料不全");
-        } 
+        }
     }
-    
+
     /***
      * 添加保理公司/电子合同服务关联关系
      * @param anCustType
@@ -411,12 +404,12 @@ public class CustRelationConfigService {
      * @param anCustNo
      * @return
      */
-    public void addFactorCustRelation(String anCustType,String anRelationCustStr,Long anCustNo){
-        for(String relationCust:anRelationCustStr.split(",")){
+    public void addFactorCustRelation(final String anCustType,final String anRelationCustStr,final Long anCustNo){
+        for(final String relationCust:anRelationCustStr.split(",")){
             // 如果是保理公司或电子合同服务商，则要判断附件是否都已上传，有未上传的附件，则提示绑定失败，重新上传
             checkAduitFileExist(anCustNo, Long.parseLong(relationCust));
-            
-            CustRelation custRelation=findCustRelation(anCustType, anCustNo, Long.parseLong(relationCust)); // 初始类型数据
+
+            final CustRelation custRelation=findCustRelation(anCustType, anCustNo, Long.parseLong(relationCust)); // 初始类型数据
             CustRelation requestCustRelation= custRelationService.findCustRelation(custRelation.getCustNo(), custRelation.getRelateCustno(), custRelation.getRelateType());
             logger.info("custRelation:"+custRelation);
             logger.info("requestCustRelation:"+requestCustRelation);
@@ -431,7 +424,7 @@ public class CustRelationConfigService {
                     // 添加关系审核记录表
                     addAuditCustRelation(custRelation,"申请开通业务","申请开通业务");
                 }
-                int insertValue=custRelationService.insert(custRelation); // 添加关系
+                final int insertValue=custRelationService.insert(custRelation); // 添加关系
                 logger.info("添加关系值："+insertValue);
                 if(insertValue>0){
                     // 调用开通保理业务的消息推送
@@ -441,7 +434,7 @@ public class CustRelationConfigService {
                         anMessage.setObject(custRelation);
                         anMessage.addHead("type", CustomerConstants.RELATION_STATUS_REQUEST);// 开通申请
                         anMessage.addHead("operator", UserUtils.getOperatorInfo());
-                        SendResult result=betterProducer.sendMessage(anMessage);
+                        final SendResult result=betterProducer.sendMessage(anMessage);
                         logger.info("result:"+result);
                     }
                     catch (final Exception e) {
@@ -451,14 +444,14 @@ public class CustRelationConfigService {
             }
         }
     }
-    
+
     /***
      * 添加审核记录
      * @param anCustRelation
      * @param anAduitOpinion
      * @param anTaskName
      */
-    public void addAuditCustRelation(CustRelation anCustRelation,String anAduitOpinion,String anTaskName){
+    public void addAuditCustRelation(final CustRelation anCustRelation,final String anAduitOpinion,final String anTaskName){
         if(BetterStringUtils.equalsIgnoreCase("4", anCustRelation.getBusinStatus())){ // 驳回
             custRelationAuditService.addRefuseCustRelation(anCustRelation, anCustRelation.getRelateCustname(), anAduitOpinion, anTaskName);
         }else{
@@ -469,42 +462,42 @@ public class CustRelationConfigService {
             custRelationAuditService.addAuditCustRelation(anCustRelation, anAuditAgency, anAduitOpinion, anTaskName);
         }
     }
-    
+
     /***
      * 查询客户申请基本信息
      * @param anCustNo 申请客户号
      */
-    public FactorBusinessRequestData findFactorRequestInfo(Long anCustNo){
+    public FactorBusinessRequestData findFactorRequestInfo(final Long anCustNo){
         // 得到当前登录用户
         CustInfo custInfo=UserUtils.getDefCustInfo();
         if(anCustNo!=null){
-            custInfo=custAccountService.findCustInfo(anCustNo);// 查询企业基本信息  
+            custInfo=custAccountService.findCustInfo(anCustNo);// 查询企业基本信息
         }
         if(custInfo==null){ // 判断注册情况下，不退出后绑定的客户信息
-            Collection<CustInfo> custInfoList=custMechBaseService.queryCustInfo();
+            final Collection<CustInfo> custInfoList=custMechBaseService.queryCustInfo();
             custInfo=Collections3.getFirst(custInfoList);
         }
-        FactorBusinessRequestData businessRequestData=new FactorBusinessRequestData();
+        final FactorBusinessRequestData businessRequestData=new FactorBusinessRequestData();
         businessRequestData.setCustNo(custInfo.getCustNo());
         businessRequestData.setCustName(custInfo.getCustName());
         businessRequestData.setIdentNo(custInfo.getIdentNo());
         businessRequestData.setIdentType(custInfo.getIdentType());
-        
-        CustMechBase custMechBase=custMechBaseService.findCustMechBaseByCustNo(custInfo.getCustNo());
+
+        final CustMechBase custMechBase=custMechBaseService.findCustMechBaseByCustNo(custInfo.getCustNo());
         businessRequestData.setOrgCode(custMechBase.getOrgCode());
         businessRequestData.setLawName(custMechBase.getLawName());
-        
-        CustMechBankAccount mechBankAccount=custMechBankAccountService.findDefaultCustMechBankAccount(custInfo.getCustNo());
+
+        final CustMechBankAccount mechBankAccount=custMechBankAccountService.findDefaultCustMechBankAccount(custInfo.getCustNo());
         if(mechBankAccount!=null){
             businessRequestData.setBankAccount(mechBankAccount.getBankAcco());
             businessRequestData.setBankAccountName(mechBankAccount.getBankAccoName());
             businessRequestData.setBankName(mechBankAccount.getBankName());
         }
-        CustMechBusinLicence custMechBusinLicence=custMechBusinLicenceService.findBusinLicenceByCustNo(custInfo.getCustNo());
+        final CustMechBusinLicence custMechBusinLicence=custMechBusinLicenceService.findBusinLicenceByCustNo(custInfo.getCustNo());
         if(custMechBusinLicence!=null){
             businessRequestData.setTaxCode(custMechBusinLicence.getTaxNo());
         }
-        
+
         CustOperatorInfo custOperator =operatorService.findCustClerkMan(custInfo.getOperOrg(),"1");
         if(custOperator==null){
             custOperator =operatorService.findCustClerkMan(custInfo.getOperOrg(),"0");
@@ -520,38 +513,38 @@ public class CustRelationConfigService {
         businessRequestData.setEmail(custOperator.getEmail());
         businessRequestData.setFax(custOperator.getFaxNo());
         return businessRequestData;
-    }  
-    
+    }
+
     /***
      * 添加客户文件关系
      * @param anRelationCustNo 关联的客户号
      * @param anFileIds 上传的文件列表(以,分隔)
      * @param anCustType 客户类型
      */
-    public void saveCustFileAduitTemp(Long anRelateCustNo,String anFileIds,String anCustType){
-        Long anCustNo=custInfoService.findCustNo(); // 获取当前登录的客户号
+    public void saveCustFileAduitTemp(final Long anRelateCustNo,final String anFileIds,final String anCustType){
+        final Long anCustNo=custInfoService.findCustNo(); // 获取当前登录的客户号
         custFileAduitTempService.saveCustFileAduitTemp(anCustNo, anRelateCustNo, anFileIds, anCustType);
     }
-    
+
     /***
      * 查询附件
      * @param anCustNo
      * @return
      */
-    public List<CustFileItem> findRelateAduitTempFile(Long anCustNo){
+    public List<CustFileItem> findRelateAduitTempFile(final Long anCustNo){
         return custFileAduitTempService.findRelateAduitTempFile(anCustNo);
     }
-    
+
     /***
      * 保存受理审核
      * @param anMap
      */
-    public void saveAcceptAduit(Map<String, Object> anMap){
-        Long relateCustNo=custInfoService.findCustNo(); // 获取当前登录的客户号
+    public void saveAcceptAduit(final Map<String, Object> anMap){
+        final Long relateCustNo=custInfoService.findCustNo(); // 获取当前登录的客户号
         // 查询选择的客户号是供应商还是核心企业
-        Long custNo=Long.parseLong(anMap.get("custNo").toString());
+        final Long custNo=Long.parseLong(anMap.get("custNo").toString());
         // 查询关联的对象
-        CustRelation custRelation=custRelationService.findCustRelation(custNo, relateCustNo,findRelateType(custNo));
+        final CustRelation custRelation=custRelationService.findCustRelation(custNo, relateCustNo,findRelateType(custNo));
         custRelation.setLastStatus(custRelation.getBusinStatus());
         custRelation.setBusinStatus(anMap.get("aduitStatus").toString());
         custRelationService.updateByPrimaryKey(custRelation);
@@ -574,19 +567,19 @@ public class CustRelationConfigService {
             custFileAduitTempService.saveAduitFile(custNo,relateCustNo);
         }
     }
-    
+
     /***
      * 查询审核/受理记录
      * @param anCustNo
      * @return
      */
-    public List<CustRelationAudit> findCustRelateAduitRecord(Long anCustNo){
-        Map<String, Object> anMap=setParam(anCustNo);
+    public List<CustRelationAudit> findCustRelateAduitRecord(final Long anCustNo){
+        final Map<String, Object> anMap=setParam(anCustNo);
         return custRelationAuditService.selectByProperty(anMap);
     }
-    
-    private Map<String, Object> setParam(Long anCustNo){
-        Map<String, Object> anMap=new HashMap<String, Object>();
+
+    private Map<String, Object> setParam(final Long anCustNo){
+        final Map<String, Object> anMap=new HashMap<String, Object>();
         if(UserUtils.factorUser()){
             anMap.put("custNo", anCustNo);
             anMap.put("relateCustno", custInfoService.findCustNo());
@@ -598,15 +591,15 @@ public class CustRelationConfigService {
         }
         return anMap;
     }
-    
+
     /***
      * 获取客户号的关系类型
      * @param anCustNo
      * @return
      */
-    public String findRelateType(Long anCustNo){
-        CustInfo custInfo=custAccountService.findCustInfo(anCustNo);
-        CustCertInfo certInfo=custCertService.findCertByOperOrg(custInfo.getOperOrg());
+    public String findRelateType(final Long anCustNo){
+        final CustInfo custInfo=custAccountService.findCustInfo(anCustNo);
+        final CustCertInfo certInfo=custCertService.findCertByOperOrg(custInfo.getOperOrg());
         String relateType="";
         if(BetterStringUtils.equalsIgnoreCase(certInfo.getRuleList(),PlatformBaseRuleType.SUPPLIER_USER.toString())){ // 供应商
             relateType=CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR;
