@@ -48,10 +48,10 @@ public class CustFileAduitTempService extends BaseService<CustFileAduitTempMappe
      * @param anAgencyAuthorFileGroupList 文件类型
      * @return
      */
-    public List<CustFileItem> findCustFileAduitTempByCustNoAndType(Long anCustNo,List<AgencyAuthorFileGroup> anAgencyAuthorFileGroupList){
+    public List<CustFileItem> findCustFileAduitTempByCustNoAndType(Long anCustNo,Long anSelectCustNo,List<AgencyAuthorFileGroup> anAgencyAuthorFileGroupList){
         List<CustFileItem>  custFileItemList=new ArrayList<CustFileItem>();
         for(AgencyAuthorFileGroup agencyAuthorFileGroup:anAgencyAuthorFileGroupList){
-            CustFileAduitTemp custFileAduitTemp=findCustFileAduitTempByType(anCustNo,agencyAuthorFileGroup.getFileInfoType());
+            CustFileAduitTemp custFileAduitTemp=findCustFileAduitTempByType(anCustNo,anSelectCustNo,agencyAuthorFileGroup.getFileInfoType());
             if(custFileAduitTemp!=null){
                 CustFileItem custFileItem=custFileItemService.findOneByBatchNo(custFileAduitTemp.getId(),agencyAuthorFileGroup.getFileInfoType());
                 if(custFileItem!=null && BetterStringUtils.equalsIgnoreCase(custFileAduitTemp.getWorkType(), custFileItem.getFileInfoType())){
@@ -94,8 +94,13 @@ public class CustFileAduitTempService extends BaseService<CustFileAduitTempMappe
         return custFileItem;
     }
     
-    public CustFileAduitTemp findCustFileAduitTempByType(Long anCustNo,String anType){
-        Map<String, Object> anMap=setLoginParam(anCustNo);
+    public CustFileAduitTemp findCustFileAduitTempByType(Long anCustNo,Long anSelectCustNo,String anType){
+        Map<String, Object> anMap= new HashMap<String, Object>();
+        if(anSelectCustNo==null){        
+            anMap= setLoginParam(anCustNo);
+        }else{
+            anMap= setParam(anCustNo,anSelectCustNo);
+        }
         anMap.put("workType", anType);
         return Collections3.getFirst(this.selectByProperty(anMap));
     }
@@ -108,6 +113,19 @@ public class CustFileAduitTempService extends BaseService<CustFileAduitTempMappe
             anMap.put("aduitCustNo", custInfoService.findCustNo());   
         }else{
             anMap.put("custNo", custInfoService.findCustNo());
+            anMap.put("aduitCustNo", anCustNo);   
+        }
+        return anMap;
+    }
+    
+    private Map<String, Object> setParam(Long anCustNo,Long anSelectCustNo){
+        Map<String, Object> anMap=new HashMap<String, Object>();
+        // 当前登录的用户是保理公司则传进查询条件要变动
+        if(UserUtils.factorUser()){
+            anMap.put("custNo", anCustNo);
+            anMap.put("aduitCustNo", anSelectCustNo);   
+        }else{
+            anMap.put("custNo", anSelectCustNo);
             anMap.put("aduitCustNo", anCustNo);   
         }
         return anMap;
@@ -127,10 +145,10 @@ public class CustFileAduitTempService extends BaseService<CustFileAduitTempMappe
      * @param anAgencyAuthorFileGroupList 文件类型列表
      * @return
      */
-    public boolean checkCustFileAduitTempExist(Long anCustNo,List<AgencyAuthorFileGroup> anAgencyAuthorFileGroupList){
+    public boolean checkCustFileAduitTempExist(Long anCustNo,Long anSelectCustNo,List<AgencyAuthorFileGroup> anAgencyAuthorFileGroupList){
         boolean bool=false;
         for(AgencyAuthorFileGroup agencyAuthorFileGroup:anAgencyAuthorFileGroupList){
-            CustFileAduitTemp custFileAduitTemp=findCustFileAduitTempByType(anCustNo,agencyAuthorFileGroup.getFileInfoType());
+            CustFileAduitTemp custFileAduitTemp=findCustFileAduitTempByType(anCustNo,anSelectCustNo,agencyAuthorFileGroup.getFileInfoType());
             if(custFileAduitTemp==null){ // 临时表若为空，则在正式表中查询出备份到临时表一份
                 CustFileItem custFileItem=findCustFileAduitByFileType(agencyAuthorFileGroup.getFileInfoType());
                 if(custFileItem!=null){
@@ -191,7 +209,7 @@ public class CustFileAduitTempService extends BaseService<CustFileAduitTempMappe
             if(BetterStringUtils.isNoneBlank(fileId)){
                 CustFileItem anFile = custFileItemService.selectByPrimaryKey(Long.parseLong(fileId));
     
-                CustFileAduitTemp custFileAduitTemp=findCustFileAduitTempByType(anRelateCustNo,anFile.getFileInfoType());
+                CustFileAduitTemp custFileAduitTemp=findCustFileAduitTempByType(anRelateCustNo,anCustNo,anFile.getFileInfoType());
                 if(custFileAduitTemp==null){ //添加绑定关系
                     addCustFileRelate(anCustNo,anRelateCustNo,anFile,anCustType);
                 }else if(BetterStringUtils.equalsIgnoreCase("0", custFileAduitTemp.getAuditStatus()) && BetterStringUtils.equalsIgnoreCase(String.valueOf(custFileAduitTemp.getId()), String.valueOf(anFile.getBatchNo()))){ // 审核失败且没有重新上传情况，将原来的文件状态改回成已上传状态

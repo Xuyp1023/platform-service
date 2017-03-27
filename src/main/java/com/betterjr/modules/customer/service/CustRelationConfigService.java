@@ -294,9 +294,9 @@ public class CustRelationConfigService {
      * @param anFactorNo 关联附件公司客户号
      * @return
      */
-    public List<CustFileItem> findCustAduitTemp(final Long anRelateCustNo){
+    public List<CustFileItem> findCustAduitTemp(final Long anRelateCustNo,final Long anSelectCustNo){
         logger.info("findCustAduitTemp,anRelateCustNo:"+anRelateCustNo);
-        final Map<String, Object> anMap=setParam(anRelateCustNo);
+        final Map<String, Object> anMap=setParam(anRelateCustNo,anSelectCustNo);
         anMap.put("businStatus", CustomerConstants.RELATION_STATUS_ADUIT);
         final CustRelation custRelation=Collections3.getFirst(custRelationService.selectByProperty(anMap));
         if(custRelation!=null){ // 审核通则取正式表中的附件数据
@@ -304,7 +304,7 @@ public class CustRelationConfigService {
         }else{
             final CustMajor custMajor=custMajorService.findCustMajorByCustNo(anRelateCustNo);
             if(custMajor!=null){
-                return custFileAduitTempService.findCustAduitTemp(anRelateCustNo, agencyAuthFileGroupService.findAuthorFileGroup(custMajor.getCustCorp(), "01"));
+                return custFileAduitTempService.findCustAduitTemp(anRelateCustNo,anSelectCustNo, agencyAuthFileGroupService.findAuthorFileGroup(custMajor.getCustCorp(), "01"));
             }else{
                 throw new BytterTradeException("无记录");
             }
@@ -374,9 +374,11 @@ public class CustRelationConfigService {
      * @return
      *      保理公司添加成功返回，电子合同服务商直接通过
      */
-    public boolean addFactorCustRelation(final String anFactorCustType,final String anWosCustType,final String anFactorCustStr,final String anWosCustStr){
+    public boolean addFactorCustRelation(final String anFactorCustType,final String anWosCustType,final String anFactorCustStr,final String anWosCustStr,Long anCustNo){
         synchronized(this){
-            final Long anCustNo=custInfoService.findCustNo(); // 获取当前登录的客户号
+            if(anCustNo==null){
+                anCustNo=custInfoService.findCustNo(); // 获取当前登录的客户号
+            }
             BTAssert.notNull(anFactorCustStr, "关联保理公司客户号不能为空");
             BTAssert.notNull(anWosCustStr, "关联电子合同服务商客户号不能为空");
             addFactorCustRelation(anWosCustType,anWosCustStr,anCustNo); // 添加电子服务商关系
@@ -392,7 +394,7 @@ public class CustRelationConfigService {
      */
     public void checkAduitFileExist(final Long anCustNo,final Long anRelateCustNo){
         final CustMajor custMajor=custMajorService.findCustMajorByCustNo(anRelateCustNo);
-        if(custFileAduitTempService.checkCustFileAduitTempExist(anRelateCustNo, agencyAuthFileGroupService.findAuthorFileGroup(custMajor.getCustCorp(), "01"))){
+        if(custFileAduitTempService.checkCustFileAduitTempExist(anRelateCustNo,anCustNo, agencyAuthFileGroupService.findAuthorFileGroup(custMajor.getCustCorp(), "01"))){
             throw new BytterTradeException(custMajor.getCustName()+"\n资料不全");
         }
     }
@@ -521,8 +523,10 @@ public class CustRelationConfigService {
      * @param anFileIds 上传的文件列表(以,分隔)
      * @param anCustType 客户类型
      */
-    public void saveCustFileAduitTemp(final Long anRelateCustNo,final String anFileIds,final String anCustType){
-        final Long anCustNo=custInfoService.findCustNo(); // 获取当前登录的客户号
+    public void saveCustFileAduitTemp(final Long anRelateCustNo,final String anFileIds,final String anCustType,Long anCustNo){
+        if(anCustNo==null){
+            anCustNo=custInfoService.findCustNo(); // 获取当前登录的客户号
+        }
         custFileAduitTempService.saveCustFileAduitTemp(anCustNo, anRelateCustNo, anFileIds, anCustType);
     }
 
@@ -543,8 +547,9 @@ public class CustRelationConfigService {
         final Long relateCustNo=custInfoService.findCustNo(); // 获取当前登录的客户号
         // 查询选择的客户号是供应商还是核心企业
         final Long custNo=Long.parseLong(anMap.get("custNo").toString());
+        final String relateType=(String)anMap.get("relateType");
         // 查询关联的对象
-        final CustRelation custRelation=custRelationService.findCustRelation(custNo, relateCustNo,findRelateType(custNo));
+        final CustRelation custRelation=custRelationService.findCustRelation(custNo, relateCustNo,relateType);
         custRelation.setLastStatus(custRelation.getBusinStatus());
         custRelation.setBusinStatus(anMap.get("aduitStatus").toString());
         custRelationService.updateByPrimaryKey(custRelation);
@@ -573,21 +578,43 @@ public class CustRelationConfigService {
      * @param anCustNo
      * @return
      */
-    public List<CustRelationAudit> findCustRelateAduitRecord(final Long anCustNo){
-        final Map<String, Object> anMap=setParam(anCustNo);
+    public List<CustRelationAudit> findCustRelateAduitRecord(final Long anCustNo,final Long anSelectCustNo,final String anRelateType){
+        Map<String, Object> anMap=new HashMap<String, Object>();
+        if(anSelectCustNo!=null){
+            anMap=setParam(anCustNo,anSelectCustNo);
+        }else{
+            anMap=setLoginParam(anCustNo);
+        }
+        if(BetterStringUtils.isNotBlank(anRelateType)){
+            anMap.put("relateType", anRelateType);
+        }
         return custRelationAuditService.selectByProperty(anMap);
     }
 
-    private Map<String, Object> setParam(final Long anCustNo){
+    private Map<String, Object> setParam(final Long anCustNo,final Long anSelectCustNo){
+        final Map<String, Object> anMap=new HashMap<String, Object>();
+        if(UserUtils.factorUser()){
+            anMap.put("custNo", anCustNo);
+            anMap.put("relateCustno", anSelectCustNo);
+//            anMap.put("relateType", findRelateType(anCustNo));
+        }else{
+            anMap.put("custNo", anSelectCustNo);
+            anMap.put("relateCustno", anCustNo);
+//            anMap.put("relateType", findRelateType(anSelectCustNo));
+        }
+        return anMap;
+    }
+    
+    private Map<String, Object> setLoginParam(final Long anCustNo){
         final Map<String, Object> anMap=new HashMap<String, Object>();
         if(UserUtils.factorUser()){
             anMap.put("custNo", anCustNo);
             anMap.put("relateCustno", custInfoService.findCustNo());
-            anMap.put("relateType", findRelateType(anCustNo));
+//            anMap.put("relateType", findRelateType(anCustNo));
         }else{
             anMap.put("custNo", custInfoService.findCustNo());
             anMap.put("relateCustno", anCustNo);
-            anMap.put("relateType", findRelateType(custInfoService.findCustNo()));
+//            anMap.put("relateType", findRelateType(custInfoService.findCustNo()));
         }
         return anMap;
     }
