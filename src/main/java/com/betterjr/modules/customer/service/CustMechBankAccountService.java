@@ -126,5 +126,17 @@ public class CustMechBankAccountService extends BaseService<CustMechBankAccountM
         return Collections3.getFirst(this.selectByProperty(conditionMap));
     }
 
+    /**
+     * @param anTmpAcco
+     * @param anTmpAccoName
+     * @return
+     */
+    public CustMechBankAccount findCustMechBankAccount(final String anBankAcco, final String anBankAccoName) {
+        final Map<String, Object> conditionMap = new HashMap<>();
+        conditionMap.put("bankAcco", anBankAcco);
+        conditionMap.put("bankAccoName", anBankAccoName);
+        return Collections3.getFirst(this.selectByProperty(conditionMap));
+    }
+
 
 }

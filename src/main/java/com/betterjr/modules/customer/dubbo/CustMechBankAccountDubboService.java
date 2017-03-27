@@ -183,4 +183,9 @@ public class CustMechBankAccountDubboService implements ICustMechBankAccountServ
     public String webSaveInsteadRecord(final Map<String, Object> anParam, final Long anInsteadRecordId) {
         return newOk("公司银行账户-修改代录 成功", bankAccountTmpService.saveInsteadRecord(anParam, anInsteadRecordId)).toJson();
     }
+
+    @Override
+    public CustMechBankAccount findCustMechBankAccount(final String anBankAcco, final String anBankAccoName) {
+        return bankAccountService.findCustMechBankAccount(anBankAcco, anBankAccoName);
+    }
 }
