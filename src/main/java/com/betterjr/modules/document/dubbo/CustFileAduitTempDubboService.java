@@ -18,9 +18,9 @@ public class CustFileAduitTempDubboService implements ICustFileAduitTempService 
     public CustFileAduitTempService custFileAduitTempService;
     
     @Override
-    public List<CustFileItem> findCustAduitTemp(Long anCustNo, List<AgencyAuthorFileGroup> anAgencyAuthorFileGroupList) {
+    public List<CustFileItem> findCustAduitTemp(Long anCustNo,Long anSelectCustNo, List<AgencyAuthorFileGroup> anAgencyAuthorFileGroupList) {
         
-        return custFileAduitTempService.findCustFileAduitTempByCustNoAndType(anCustNo, anAgencyAuthorFileGroupList);
+        return custFileAduitTempService.findCustFileAduitTempByCustNoAndType(anCustNo,anSelectCustNo, anAgencyAuthorFileGroupList);
     }
     
     /***
@@ -37,8 +37,8 @@ public class CustFileAduitTempDubboService implements ICustFileAduitTempService 
      * @param anAgencyAuthorFileGroupList 文件类型列表
      * @return
      */
-    public boolean checkCustFileAduitTempExist(Long anCustNo,List<AgencyAuthorFileGroup> anAgencyAuthorFileGroupList){
-        return custFileAduitTempService.checkCustFileAduitTempExist(anCustNo, anAgencyAuthorFileGroupList);
+    public boolean checkCustFileAduitTempExist(Long anCustNo,Long anSelectCustNo,List<AgencyAuthorFileGroup> anAgencyAuthorFileGroupList){
+        return custFileAduitTempService.checkCustFileAduitTempExist(anCustNo,anSelectCustNo,anAgencyAuthorFileGroupList);
     }
     
     /***

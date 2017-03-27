@@ -103,8 +103,8 @@ public class CustRelationConfigDubboService implements ICustRelationConfigServic
      * @return
      */
     @Override
-    public String webFindCustAduitTempFile(final Long anRelateCustNo){
-        return AjaxObject.newOk("获取审核文件",relationConfigService.findCustAduitTemp(anRelateCustNo)).toJson();
+    public String webFindCustAduitTempFile(final Long anRelateCustNo,Long anSelectCustNo){
+        return AjaxObject.newOk("获取审核文件",relationConfigService.findCustAduitTemp(anRelateCustNo,anSelectCustNo)).toJson();
     }
 
     /***
@@ -144,8 +144,8 @@ public class CustRelationConfigDubboService implements ICustRelationConfigServic
      * @return
      */
     @Override
-    public String webAddFactorCustRelation(final String anFactorCustType,final String anWosCustType,final String anFactorCustStr,final String anWosCustStr){
-        if(relationConfigService.addFactorCustRelation(anFactorCustType,anWosCustType,anFactorCustStr,anWosCustStr)){
+    public String webAddFactorCustRelation(final String anFactorCustType,final String anWosCustType,final String anFactorCustStr,final String anWosCustStr,final Long anCustNo){
+        if(relationConfigService.addFactorCustRelation(anFactorCustType,anWosCustType,anFactorCustStr,anWosCustStr,anCustNo)){
             return AjaxObject.newOk("客户关系添加成功").toJson();
         }else{
             return AjaxObject.newError("客户关联关系已经存在").toJson();
@@ -169,8 +169,8 @@ public class CustRelationConfigDubboService implements ICustRelationConfigServic
      * @param anCustType 客户类型
      */
     @Override
-    public String webSaveCustAduitTempFile(final Long anRelateCustNo,final String anFileIds,final String anCustType){
-        relationConfigService.saveCustFileAduitTemp(anRelateCustNo, anFileIds, anCustType);
+    public String webSaveCustAduitTempFile(final Long anRelateCustNo,final String anFileIds,final String anCustType,final Long anCustNo){
+        relationConfigService.saveCustFileAduitTemp(anRelateCustNo, anFileIds, anCustType,anCustNo);
         return AjaxObject.newOk("添加客户文件关系").toJson();
     }
 
@@ -199,8 +199,8 @@ public class CustRelationConfigDubboService implements ICustRelationConfigServic
      * @return
      */
     @Override
-    public String webFindCustRelateAduitRecord(final Long anCustNo){
-        return AjaxObject.newOk("查询审批记录",relationConfigService.findCustRelateAduitRecord(anCustNo)).toJson();
+    public String webFindCustRelateAduitRecord(final Long anCustNo,final Long anSelectCustNo,String anRelateType){
+        return AjaxObject.newOk("查询审批记录",relationConfigService.findCustRelateAduitRecord(anCustNo,anSelectCustNo,anRelateType)).toJson();
     }
 
     @Override
