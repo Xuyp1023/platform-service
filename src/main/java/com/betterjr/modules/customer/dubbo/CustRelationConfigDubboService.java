@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import com.betterjr.common.data.PlatformBaseRuleType;
+import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.common.web.AjaxObject;
 import com.betterjr.modules.customer.ICustRelationConfigService;
@@ -29,7 +30,12 @@ public class CustRelationConfigDubboService implements ICustRelationConfigServic
 
     @Override
     public String webFindCustInfo(final String anCustType, final Long anCustNo,final String anCustName) {
-        return AjaxObject.newOk("查询客户关系信息", relationConfigService.findCustInfo(anCustType, anCustNo,anCustName)).toJson();
+        //  如果选择的是供应商或经销商则调用之前的方法
+        if(BetterStringUtils.equalsIgnoreCase(anCustType,PlatformBaseRuleType.SUPPLIER_USER.toString()) || BetterStringUtils.equalsIgnoreCase(anCustType,PlatformBaseRuleType.SELLER_USER.toString())){
+            return AjaxObject.newOk("查询客户关系信息", relationConfigService.findCustInfoOld(anCustType, anCustNo,anCustName)).toJson();
+        }else{
+            return AjaxObject.newOk("查询客户关系信息", relationConfigService.findCustInfo(anCustType, anCustNo,anCustName)).toJson();
+        }
     }
 
     @Override

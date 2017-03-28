@@ -54,4 +54,14 @@ public class CustMajorService extends BaseService<CustMajorMapper, CustMajor>{
         return this.selectByProperty(anMap);
     }
     
+    /***
+     * 根据客户类型查询重要客户对象
+     * @param anCustNo
+     * @return
+     */
+    public List<CustMajor> findCustMajorByMap(Map<String,Object> anMap){
+        anMap.put("businStatus", "1");
+        return this.selectByProperty(anMap);
+    }
+    
 }
