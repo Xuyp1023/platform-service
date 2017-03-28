@@ -161,7 +161,7 @@ public class CustRelationConfigService {
      * @param anCustNo   关联客户类型的客户号
      * @return
      */
-    public List<SimpleDataEntity> findCustInfo(final String anCustType,Long anCustNo,final String custName){
+    public List<SimpleDataEntity> findCustInfoOld(final String anCustType,Long anCustNo,final String custName){
         if(anCustNo==null){ // 如果查询的客户类型为空，则获取当前登录的客户号
             anCustNo=custInfoService.findCustNo();
         }
@@ -181,6 +181,57 @@ public class CustRelationConfigService {
             }
         }
         return custList;
+    }
+    
+    /****
+     * 查询选择的客户类型的客户信息
+     * @param anCustType 需要关联的客户类型
+     * @param anCustNo   关联客户类型的客户号
+     * @return
+     */
+    public List<SimpleDataEntity> findCustInfo(final String anCustType,Long anCustNo,final String custName){
+        if(anCustNo==null){ // 如果查询的客户类型为空，则获取当前登录的客户号
+            anCustNo=custInfoService.findCustNo();
+        }
+        BTAssert.notNull(anCustNo, "查询的客户号不能为空");
+        final List<SimpleDataEntity> custList=new ArrayList<SimpleDataEntity>();
+        final Map<String, Object> anMap=new HashMap<String, Object>();
+        if(BetterStringUtils.isNotBlank(custName)){
+            anMap.put("LIKEcustName", "%" + custName + "%");
+        }
+        String type=convertType(anCustType);
+        if(type!=null){
+            anMap.put("custType", type);
+        }
+        logger.info("findCustInfo anMap:"+anMap);
+        
+        for(final CustMajor custMajorInfo:custMajorService.findCustMajorByMap(anMap)){
+            if(checkExist(anCustType,anCustNo,custMajorInfo.getCustNo())){
+                custList.add(new SimpleDataEntity(custMajorInfo.getCustName(), String.valueOf(custMajorInfo.getCustNo())));
+            }
+        }
+        return custList;
+    }
+    
+    public String convertType(String anCustType){
+        switch(anCustType){
+            case "CORE_USER":
+                anCustType="2";
+                break;
+            case "FACTOR_USER":
+                anCustType="3";
+                break;
+            case "PLATFORM_USER":
+                anCustType="0";
+                break;
+            case "WOS":
+                anCustType="1";
+                break;
+            default:
+                anCustType=null;
+                break;
+        }
+        return anCustType;
     }
 
     public Page<CustRelation> queryCustRelationInfo(final Long anCustNo, final PlatformBaseRuleType anRole, final String anRelationType,final String anFlag, final int anPageNum, final int anPageSize) {
