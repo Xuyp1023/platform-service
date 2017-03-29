@@ -479,9 +479,9 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
 
 
     public Page<CustRelation> findCustRelationInfo(final Long anCustNo, final String anRelateType, final PlatformBaseRuleType anRole) {
-        //        if (BetterStringUtils.isNotBlank(anRelateType)) {
-        //            return mapper.findCustRelationListByRelateType(anCustNo, anRelateType);
-        //        }
+        if (BetterStringUtils.isNotBlank(anRelateType)) {
+            return mapper.findCustRelationListByRelateType(anCustNo, anRelateType);
+        }
         // TODO 需要改
         if (PlatformBaseRuleType.CORE_USER.equals(anRole)) {
             return mapper.findCustCoreRelationList(anCustNo);
