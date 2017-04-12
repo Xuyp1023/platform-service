@@ -32,6 +32,7 @@
 		com.betterjr.modules.account.service;
         com.betterjr.modules.rule.service;
         com.betterjr.modules.rule.validator;
+        com.betterjr.modules.generator;
         com.betterjr.common" />
 	<!-- <bean id="jedisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory" 
 		p:host-name="192.168.2.49" p:port="6379" /> <bean id="stringRedisSerializer" 
@@ -224,6 +225,9 @@
 
 	<bean id="serialGenerator" class="com.betterjr.common.selectkey.SerialGenerator"
 		init-method="init" scope="singleton" lazy-init="false" />
+
+	<bean id="sequenceFactory" class="com.betterjr.modules.generator.SequenceFactory"
+		init-method="init" scope="singleton" lazy-init="false"></bean>
 		
 	<bean id="qlExpressUtil" class="com.betterjr.modules.rule.service.QlExpressUtil" init-method="initRunner">
      <property name="defPackages">
