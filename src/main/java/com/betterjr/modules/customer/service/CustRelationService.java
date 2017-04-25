@@ -178,6 +178,23 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         }
         return result;
     }
+    
+    /**
+     * 供应商查询核心企业
+     *
+     * @param anCustNo
+     * @return
+     */
+    public List<CustRelation> queryCoreList(final Long anCustNo) {
+        if (null == anCustNo) {
+            return null;
+        }
+        final Map<String, Object> anMap = new HashMap<String, Object>();
+        anMap.put("custNo", anCustNo);
+        anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_CORE, CustomerConstants.RELATE_TYPE_SELLER_CORE });
+        anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
+        return this.selectByProperty(anMap);
+    }
 
     /**
      * 供应商下拉列表查询,使用于核心企业查询
