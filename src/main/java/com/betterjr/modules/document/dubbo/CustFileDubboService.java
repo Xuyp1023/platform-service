@@ -5,9 +5,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.betterjr.common.mq.core.RocketMQProducer;
+import com.betterjr.common.mq.message.MQMessage;
+import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.common.web.AjaxObject;
@@ -16,9 +20,11 @@ import com.betterjr.modules.document.data.AccountAduitData;
 import com.betterjr.modules.document.data.FileStoreType;
 import com.betterjr.modules.document.entity.CustFileAduit;
 import com.betterjr.modules.document.entity.CustFileItem;
+import com.betterjr.modules.document.entity.CustResolveFile;
 import com.betterjr.modules.document.service.CustFileAuditService;
 import com.betterjr.modules.document.service.CustFileInfoService;
 import com.betterjr.modules.document.service.CustFileItemService;
+import com.betterjr.modules.document.service.CustResolveFileService;
 import com.betterjr.modules.document.utils.CustFileUtils;
 
 @Service(interfaceClass=ICustFileService.class)
@@ -31,6 +37,11 @@ public class CustFileDubboService implements ICustFileService{
     @Autowired
     private CustFileItemService custFileItemService;
 
+    @Autowired
+    private CustResolveFileService resolveFileService;
+    @Resource
+    private RocketMQProducer betterProducer;
+    
     @Override
     public String webUpdateCustFileAuditInfo(Map<String, String[]> anParamMap, Enumeration<String> anParamNames, Long anCustNo) {
 
@@ -219,4 +230,58 @@ public class CustFileDubboService implements ICustFileService{
     public List<CustFileItem> findFileListByIds(String[] anIds) {
        return this.custFileItemService.findFileListByIds(anIds);
     }
+
+    @Override
+    public CustResolveFile webSaveAddResolveFile(CustResolveFile anResolveFile) {
+        
+        //AjaxObject.newOk("文件解析日志插入成功", resolveFileService.saveAddResolveFile(anResolveFile)).toJson();
+        return resolveFileService.saveAddResolveFile(anResolveFile);
+    }
+
+    @Override
+    public boolean sendResolveMessage(CustResolveFile anResolveFile) {
+        
+     // 发消息
+        final MQMessage anMessage = new MQMessage("FILE_RESOLVE_CUST_TOPIC");
+
+        try {
+            anMessage.setObject(anResolveFile);
+            anMessage.addHead("id", anResolveFile.getId()); 
+            anMessage.addHead("infoType", anResolveFile.getInfoType());
+            betterProducer.sendMessage(anMessage);
+            return true;
+        }
+        catch (Exception e) {
+            
+            return false;
+        }
+        
+    }
+
+    @Override
+    public void saveModifyResolveFile(Map<String, Object> anResolveFileMap) {
+        
+        resolveFileService.saveUpdateOnlyStatus(anResolveFileMap);
+    }
+    
+    @Override
+    public void saveModifyResolveFile(CustResolveFile anResolveFile) {
+        
+        BTAssert.notNull(anResolveFile,"修改记录失败，数据为空");
+        BTAssert.notNull(anResolveFile.getId(),"修改记录失败，数据为空");
+        resolveFileService.updateByPrimaryKeySelective(anResolveFile);
+        
+    }
+
+    @Override
+    public CustFileItem findOneAndButchId(Long anId) {
+        CustFileItem fileItem = custFileItemService.findOne(anId);
+        if(fileItem.getBatchNo()==null || fileItem.getBatchNo()<0){
+            Long butchId = custFileItemService.updateCustFileItemInfo(anId+"", 0l);
+            fileItem.setBatchNo(butchId);
+        }
+        return fileItem;
+    }
+
+    
 }
