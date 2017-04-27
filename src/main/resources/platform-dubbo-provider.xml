@@ -16,6 +16,7 @@
 		com.betterjr.modules.document,
 		com.betterjr.modules.workflow,
 		com.betterjr.modules.sms,
+		com.betterjr.modules.base,
         com.betterjr.modules.operator.dubbo,
         com.betterjr.modules.role.dubbo,
         com.betterjr.modules.wechat.dubbo,

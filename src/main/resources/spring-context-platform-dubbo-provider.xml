@@ -23,6 +23,7 @@
         com.betterjr.modules.notice;
 		com.betterjr.modules.document;
 		com.betterjr.modules.workflow;
+		com.betterjr.modules.base;
         com.betterjr.modules.operator.service;
         com.betterjr.modules.role.service;
         com.betterjr.modules.wechat.service;
