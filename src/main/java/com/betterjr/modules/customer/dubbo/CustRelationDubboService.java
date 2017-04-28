@@ -86,6 +86,10 @@ public class CustRelationDubboService implements ICustRelationService {
 
         return AjaxObject.newOk("核心企业下拉列表查询成功", custRelationService.queryCoreKeyAndValue(anCustNo)).toJson();
     }
+    
+    public List<CustRelation> queryCoreList(final Long anCustNo){
+    	return custRelationService.queryCoreList(anCustNo);
+    }
 
     @Override
     public String webQuerySupplierByCore(final Long anCoreCustNo) {
