@@ -34,7 +34,8 @@
         com.betterjr.modules.rule.service;
         com.betterjr.modules.rule.validator;
         com.betterjr.modules.generator;
-        com.betterjr.modules.config;
+        com.betterjr.modules.config.service;
+        com.betterjr.modules.config.dubboclient;
         com.betterjr.common" />
 	<!-- <bean id="jedisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory" 
 		p:host-name="192.168.2.49" p:port="6379" /> <bean id="stringRedisSerializer" 

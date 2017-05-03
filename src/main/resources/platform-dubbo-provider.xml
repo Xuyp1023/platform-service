@@ -24,6 +24,7 @@
         com.betterjr.modules.cert.dubbo,
 		com.betterjr.modules.sys.dubbo,
         com.betterjr.modules.account.dubbo,
+        com.betterjr.modules.config.dubbo,
         com.betterjr.dubbo.extend.filter" />
         
 	<!-- 提供方应用信息，用于计算依赖关系 -->
