@@ -23,6 +23,7 @@
         com.betterjr.modules.notice;
 		com.betterjr.modules.document;
 		com.betterjr.modules.workflow;
+		com.betterjr.modules.base;
         com.betterjr.modules.operator.service;
         com.betterjr.modules.role.service;
         com.betterjr.modules.wechat.service;
@@ -33,6 +34,7 @@
         com.betterjr.modules.rule.service;
         com.betterjr.modules.rule.validator;
         com.betterjr.modules.generator;
+        com.betterjr.modules.config;
         com.betterjr.common" />
 	<!-- <bean id="jedisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory" 
 		p:host-name="192.168.2.49" p:port="6379" /> <bean id="stringRedisSerializer" 

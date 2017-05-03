@@ -19,6 +19,7 @@ import org.springframework.util.Log4jConfigurer;
 
 import com.betterjr.common.mapper.JsonMapper;
 import com.betterjr.common.security.KeyReader;
+import com.betterjr.common.security.SignHelper;
 import com.betterjr.common.selectkey.SelectKeyAutoIDGen;
 import com.betterjr.common.selectkey.SerialGenerator;
 import com.betterjr.common.utils.BetterDateUtils;
@@ -51,6 +52,16 @@ public class CertMainTest  {
         ctx.getBean(SerialGenerator.class);
     }
 
+    public static void main(final String[] args) throws Exception{
+        final Certificate cert = KeyReader.fromCerStoredFile("E:\\xxxxxxx\\cert1.cer");
+        if (cert instanceof X509Certificate){
+            final X509Certificate cert123 =(X509Certificate) cert;
+            System.out.println(  BetterX509Utils.findCertificateSubjectItem(cert123, "CN") );
+        }
+        final boolean result = SignHelper.verifySignFile(new File("E:\\new\\platform-service\\src\\main\\java\\com\\betterjr\\modules\\base\\dubbo\\BusinessTypeDubboService.java"), "N/IbcYMm9RK7NGN58oQKRWFtYxsyuzJzJGUkmcALsleXZytgfeoLBO+K/7W/ORtq/7RzQn4nGfBZau2EfLWEYnPNuq5f7DeQ73pnq/aAg8yV9GUuNvEtg37fTap4mwu6LNrAcqv8xr9mMzmmWXGAag9JXti6JwRUMRq8HM47rpQ=", cert.getPublicKey());
+        System.out.println(cert.getClass());
+        System.out.println(result);
+    }
 
     public static void main3(final String[] args) throws Exception{
         final Certificate cert = KeyReader.fromCerStoredFile("D:\\cert\\certs\\BYTTER_DEMO_CA.cer");
@@ -187,7 +198,7 @@ public class CertMainTest  {
         FileUtils.copyInputStreamToFile(new ByteArrayInputStream(bbs) , new File("d://cert/cets/test1231312.p12"));
     }
 
-    public static void main(final String[] args) throws Exception{
+    public static void main11(final String[] args) throws Exception{
         //testDownloadX509Cert();
 
         //testPushlishX509Cert();
