@@ -1452,7 +1452,7 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
 
         final List<SimpleDataEntity> custInfos = custAccountService.queryValidCustInfo()
                 .stream()
-                .map(custInfo -> new SimpleDataEntity(custInfo.getId().toString(), custInfo.getCustName()))
+                .map(custInfo -> new SimpleDataEntity(custInfo.getCustName(), custInfo.getId().toString()))
                 .collect(Collectors.toList());
 
         return custInfos;
