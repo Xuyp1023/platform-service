@@ -88,7 +88,7 @@ public class VerifySignCertService extends BaseService<VerifySignCertMapper, Ver
         final Map<String, Object> conditionMap = QueryTermBuilder.newInstance().put("custNo", anVerifySignCert.getCustNo()).build();
         final VerifySignCert verifySignCert = Collections3.getFirst(this.selectByProperty(conditionMap));
 
-        BTAssert.isNull(verifySignCert, "该公司证书已经存在！");
+        BTAssert.isNull(verifySignCert, "该公司验签证书已经存在！");
 
         final CustOperatorInfo operator = UserUtils.getOperatorInfo();
 
@@ -113,7 +113,7 @@ public class VerifySignCertService extends BaseService<VerifySignCertMapper, Ver
         BTAssert.notNull(anId, "编号不允许为空！");
         final VerifySignCert verifySignCert = this.selectByPrimaryKey(anId);
 
-        BTAssert.notNull(verifySignCert, "没有找到该证书！");
+        BTAssert.notNull(verifySignCert, "没有找到验签证书！");
 
         final String name = anVerifySignCert.getName();
         final String serialNo = anVerifySignCert.getSerialNo();
@@ -145,7 +145,7 @@ public class VerifySignCertService extends BaseService<VerifySignCertMapper, Ver
         BTAssert.notNull(anId, "编号不允许为空！");
         final VerifySignCert verifySignCert = this.selectByPrimaryKey(anId);
 
-        BTAssert.notNull(verifySignCert, "没有找到该证书！");
+        BTAssert.notNull(verifySignCert, "没有找到验签证书！");
         final String businStatus = verifySignCert.getBusinStatus();
         BTAssert.isTrue(BetterStringUtils.equals("0", businStatus), "状态不正确！");
         verifySignCert.setBusinStatus("1");
@@ -169,7 +169,7 @@ public class VerifySignCertService extends BaseService<VerifySignCertMapper, Ver
         BTAssert.notNull(anId, "编号不允许为空！");
         final VerifySignCert verifySignCert = this.selectByPrimaryKey(anId);
 
-        BTAssert.notNull(verifySignCert, "没有找到该证书！");
+        BTAssert.notNull(verifySignCert, "没有找到验签证书！");
 
         final String businStatus = verifySignCert.getBusinStatus();
         BTAssert.isTrue(BetterStringUtils.equals("1", businStatus), "状态不正确！");
@@ -193,6 +193,8 @@ public class VerifySignCertService extends BaseService<VerifySignCertMapper, Ver
         BTAssert.isTrue(UserUtils.platformUser(), "操作失败！");
         BTAssert.notNull(anId, "编号不允许为空！");
         final VerifySignCert verifySignCert = this.selectByPrimaryKey(anId);
+
+        BTAssert.notNull(verifySignCert, "没有找到验签证书！");
 
         return verifySignCert;
     }
