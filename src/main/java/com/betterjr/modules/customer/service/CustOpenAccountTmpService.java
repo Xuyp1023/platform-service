@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.betterjr.common.data.CustPasswordType;
+import com.betterjr.common.data.SimpleDataEntity;
 import com.betterjr.common.exception.BytterTradeException;
 import com.betterjr.common.mapper.BeanMapper;
 import com.betterjr.common.mq.core.RocketMQProducer;
@@ -1439,4 +1441,22 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         }
         return Page.listToPage(resultList, anPageNum, anPageSize, custInfoList.getPages(), custInfoList.getStartRow(), custInfoList.getTotal());
     }
+
+    /**
+     * @return
+     */
+    public List<SimpleDataEntity> queryCustInfoByPlatformSelect() {
+        if(!UserUtils.platformUser()) {
+            throw new BytterTradeException("无相应权限操作！");
+        }
+
+        final List<SimpleDataEntity> custInfos = custAccountService.queryValidCustInfo()
+                .stream()
+                .map(custInfo -> new SimpleDataEntity(custInfo.getId().toString(), custInfo.getCustName()))
+                .collect(Collectors.toList());
+
+        return custInfos;
+    }
+
+
 }
