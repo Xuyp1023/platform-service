@@ -93,6 +93,7 @@ public class VerifySignCertService extends BaseService<VerifySignCertMapper, Ver
         final CustOperatorInfo operator = UserUtils.getOperatorInfo();
 
         anVerifySignCert.init(operator);
+		anVerifySignCert.setBusinStatus("0");
 
         anVerifySignCert.setCustName(custInfo.getCustName());
         anVerifySignCert.setOperOrg(custInfo.getOperOrg());
