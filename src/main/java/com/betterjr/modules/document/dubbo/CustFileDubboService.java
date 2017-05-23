@@ -237,6 +237,12 @@ public class CustFileDubboService implements ICustFileService{
         //AjaxObject.newOk("文件解析日志插入成功", resolveFileService.saveAddResolveFile(anResolveFile)).toJson();
         return resolveFileService.saveAddResolveFile(anResolveFile);
     }
+    
+    @Override
+    public String webfindResolveFile(Long anResolveFileId) {
+
+        return AjaxObject.newOk(resolveFileService.findOne(anResolveFileId)).toJson();
+    }
 
     @Override
     public boolean sendResolveMessage(CustResolveFile anResolveFile) {
