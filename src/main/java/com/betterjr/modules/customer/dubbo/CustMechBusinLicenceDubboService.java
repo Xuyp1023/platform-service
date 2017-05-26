@@ -4,6 +4,8 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.alibaba.dubbo.config.annotation.Service;
 import com.betterjr.common.web.AjaxObject;
 import com.betterjr.mapper.pagehelper.Page;
@@ -19,6 +21,7 @@ import com.betterjr.modules.customer.service.CustInsteadService;
 import com.betterjr.modules.customer.service.CustMechBusinLicenceService;
 import com.betterjr.modules.customer.service.CustMechBusinLicenceTmpService;
 import com.betterjr.modules.rule.service.RuleServiceDubboFilterInvoker;
+import com.ctc.wstx.util.StringUtil;
 
 /**
  * 营业执照
@@ -45,6 +48,16 @@ public class CustMechBusinLicenceDubboService implements ICustMechBusinLicenceSe
     public String webFindBusinLicence(Long anCustNo) {
         final CustMechBusinLicence businLicence = businLicenceService.findBusinLicenceByCustNo(anCustNo);
         return AjaxObject.newOk("营业执照信息-详情查询 成功", businLicence).toJson();
+    }
+
+    @Override
+    public String findBusinLicenceTaxNo(Long anCustNo) {
+        
+        CustMechBusinLicence businLicence = businLicenceService.findBusinLicenceByCustNo(anCustNo);
+        if(businLicence !=null && StringUtils.isNoneBlank(businLicence.getTaxNo())){
+            return businLicence.getTaxNo();
+        }
+        return "";
     }
 
     @Override
@@ -100,6 +113,5 @@ public class CustMechBusinLicenceDubboService implements ICustMechBusinLicenceSe
         final CustMechBusinLicenceTmp businLicenceTmp = RuleServiceDubboFilterInvoker.getInputObj();
         return AjaxObject.newOk("营业执照信息-代录修改 成功", businLicenceTmpService.saveInsteadRecord(businLicenceTmp, anInsteadRecordId, anFileList)).toJson();
      }
-
 
 }

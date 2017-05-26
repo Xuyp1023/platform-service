@@ -228,9 +228,6 @@
 
 	<bean id="serialGenerator" class="com.betterjr.common.selectkey.SerialGenerator"
 		init-method="init" scope="singleton" lazy-init="false" />
-
-	<bean id="sequenceFactory" class="com.betterjr.modules.generator.SequenceFactory"
-		init-method="init" scope="singleton" lazy-init="false"></bean>
 		
 	<bean id="qlExpressUtil" class="com.betterjr.modules.rule.service.QlExpressUtil" init-method="initRunner">
      <property name="defPackages">
