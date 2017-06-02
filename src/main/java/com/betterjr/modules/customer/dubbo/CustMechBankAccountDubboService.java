@@ -195,4 +195,9 @@ public class CustMechBankAccountDubboService implements ICustMechBankAccountServ
     public CustMechBankAccount findCustMechBankAccount(final String anBankAcco, final String anBankAccoName) {
         return bankAccountService.findCustMechBankAccount(anBankAcco, anBankAccoName);
     }
+    
+    @Override
+    public String webFindCustMechBankAccount(final String anBankAcco) {
+        return newOk("公司银行账户-查询成功",  bankAccountService.findBankAccountByAcco(anBankAcco)).toJson();
+    }
 }

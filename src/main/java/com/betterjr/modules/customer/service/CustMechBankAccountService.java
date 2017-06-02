@@ -52,7 +52,7 @@ public class CustMechBankAccountService extends BaseService<CustMechBankAccountM
     	List<CustMechBankAccount> accountList = this.queryCustMechBankAccount(anCustNo);
     	List<SimpleDataEntity> result = new ArrayList<SimpleDataEntity>();
     	for (CustMechBankAccount account : accountList) {
-    		result.add(new SimpleDataEntity(account.getBankAcco()+"-" +account.getBankName(), String.valueOf(account.getId())));
+    		result.add(new SimpleDataEntity(account.getBankAcco()+"-" +account.getBankName(), String.valueOf(account.getBankAcco())));
 		}
     	return result;
     }
@@ -151,6 +151,16 @@ public class CustMechBankAccountService extends BaseService<CustMechBankAccountM
         final Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("bankAcco", anBankAcco);
         conditionMap.put("bankAccoName", anBankAccoName);
+        return Collections3.getFirst(this.selectByProperty(conditionMap));
+    }
+    
+    /**
+     * @param anTmpAcco
+     * @return
+     */
+    public CustMechBankAccount findBankAccountByAcco(final String anBankAcco) {
+        final Map<String, Object> conditionMap = new HashMap<>();
+        conditionMap.put("bankAcco", anBankAcco);
         return Collections3.getFirst(this.selectByProperty(conditionMap));
     }
 
