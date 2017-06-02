@@ -3,11 +3,13 @@ package com.betterjr.modules.customer.dubbo;
 import static com.betterjr.common.web.AjaxObject.newOk;
 import static com.betterjr.common.web.AjaxObject.newOkWithPage;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.betterjr.common.data.SimpleDataEntity;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.mapper.pagehelper.Page;
@@ -53,6 +55,11 @@ public class CustMechBankAccountDubboService implements ICustMechBankAccountServ
     public CustMechBankAccount findDefaultBankAccount(final Long anCustNo) {
         final CustMechBankAccount bankAccount = bankAccountService.findDefaultCustMechBankAccount(anCustNo);
         return bankAccount;
+    }
+    
+    @Override
+    public String webQueryBankAccountKeyAndValue(final Long anCustNo) {
+    	 return newOk("查询公司银行账户列表成功", bankAccountService.querBankAccountKeyAndValue(anCustNo)).toJson();
     }
 
     @Override
