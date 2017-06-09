@@ -1,5 +1,6 @@
 package com.betterjr.modules.customer.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +9,7 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
+import com.betterjr.common.data.SimpleDataEntity;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.Collections3;
@@ -39,6 +41,20 @@ public class CustMechBankAccountService extends BaseService<CustMechBankAccountM
         BTAssert.notNull(anCustNo, "客户编号不允许为空！");
 
         return this.selectByProperty("custNo", anCustNo);
+    }
+    
+    /**
+     * 查询银行跟账号用于下拉
+     * @param anCustNo
+     * @return
+     */
+    public List<SimpleDataEntity> querBankAccountKeyAndValue(final Long anCustNo){
+    	List<CustMechBankAccount> accountList = this.queryCustMechBankAccount(anCustNo);
+    	List<SimpleDataEntity> result = new ArrayList<SimpleDataEntity>();
+    	for (CustMechBankAccount account : accountList) {
+    		result.add(new SimpleDataEntity(account.getBankAcco()+"-" +account.getBankName(), String.valueOf(account.getBankAcco())));
+		}
+    	return result;
     }
 
     /**
@@ -135,6 +151,16 @@ public class CustMechBankAccountService extends BaseService<CustMechBankAccountM
         final Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("bankAcco", anBankAcco);
         conditionMap.put("bankAccoName", anBankAccoName);
+        return Collections3.getFirst(this.selectByProperty(conditionMap));
+    }
+    
+    /**
+     * @param anTmpAcco
+     * @return
+     */
+    public CustMechBankAccount findBankAccountByAcco(final String anBankAcco) {
+        final Map<String, Object> conditionMap = new HashMap<>();
+        conditionMap.put("bankAcco", anBankAcco);
         return Collections3.getFirst(this.selectByProperty(conditionMap));
     }
 
