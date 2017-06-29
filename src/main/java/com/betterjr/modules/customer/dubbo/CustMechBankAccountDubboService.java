@@ -23,6 +23,7 @@ import com.betterjr.modules.customer.service.CustChangeService;
 import com.betterjr.modules.customer.service.CustInsteadService;
 import com.betterjr.modules.customer.service.CustMechBankAccountService;
 import com.betterjr.modules.customer.service.CustMechBankAccountTmpService;
+import com.betterjr.modules.customer.service.SysNapsBankCodeService;
 import com.betterjr.modules.rule.service.RuleServiceDubboFilterInvoker;
 
 /**
@@ -45,6 +46,10 @@ public class CustMechBankAccountDubboService implements ICustMechBankAccountServ
 
     @Resource
     private CustMechBankAccountTmpService bankAccountTmpService;
+    
+    @Resource
+    private SysNapsBankCodeService sysNapsBankCodeService;
+    
 
     @Override
     public String webQueryBankAccount(final Long anCustNo) {
@@ -199,5 +204,9 @@ public class CustMechBankAccountDubboService implements ICustMechBankAccountServ
     @Override
     public String webFindCustMechBankAccount(final String anBankAcco) {
         return newOk("公司银行账户-查询成功",  bankAccountService.findBankAccountByAcco(anBankAcco)).toJson();
+
+    @Override
+    public String webFindSysBankCodeList(Map<String, Object> anParam){
+        return newOkWithPage("查询联行号", sysNapsBankCodeService.findSysBankCodeList(anParam)).toJson();
     }
 }

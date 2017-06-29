@@ -51,6 +51,7 @@ import com.betterjr.modules.customer.entity.CustMechBusinLicence;
 import com.betterjr.modules.customer.entity.CustMechLaw;
 import com.betterjr.modules.customer.entity.CustOpenAccountTmp;
 import com.betterjr.modules.customer.entity.CustRelation;
+import com.betterjr.modules.customer.entity.SysNapsBankCode;
 import com.betterjr.modules.customer.helper.IFormalDataService;
 import com.betterjr.modules.document.ICustFileService;
 import com.betterjr.modules.document.entity.CustFileAduit;
@@ -151,6 +152,9 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
 
     @Reference(interfaceClass = ICustFileService.class)
     private ICustFileService custFileItemService2;
+    
+    @Autowired
+    private SysNapsBankCodeService bankCodeService;
 
     /**
      * 开户资料读取
@@ -468,6 +472,20 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         BTAssert.notNull(anInsteadRecord, "无法获取代录信息");
         // 获取代录暂存的开户资料ID号
         final String anTempId = anInsteadRecord.getTmpIds();
+        
+        // 检查联行号不存在而银行全称正确情况，则可通过银行全称再获取一遍联行号
+        if(BetterStringUtils.isBlank(anOpenAccountInfo.getPaySysNum())){
+            SysNapsBankCode bankCode=bankCodeService.findSysBankCodeInfoByBankName(anOpenAccountInfo.getBankName());
+            if(bankCode==null){
+                throw new BytterTradeException("银行全称输入不正确，请检查");
+            }else{
+                anOpenAccountInfo.setPaySysNum(bankCode.getPaySysNum());
+            }
+        }
+        
+        // 检查联行号对应的银行名称与所输入的银行全称是否一致
+        bankCodeService.checkBankCode(anOpenAccountInfo.getPaySysNum(),anOpenAccountInfo.getBankName());
+        
         if (null == anTempId) {
             // 初始化参数设置
             initAddValue(anOpenAccountInfo, CustomerConstants.TMP_TYPE_INSTEADSTORE, CustomerConstants.TMP_STATUS_USEING);
@@ -1075,10 +1093,10 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         checkAccountInfoParams(anOpenAccountInfo);
 
         // 检查申请机构名称是否存在
-        if (checkCustExistsByCustName(anOpenAccountInfo.getCustName()) == true) {
-            logger.warn("申请机构名称已存在");
-            throw new BytterTradeException(40001, "申请机构名称已存在");
-        }
+//        if (checkCustExistsByCustName(anOpenAccountInfo.getCustName()) == true) {
+//            logger.warn("申请机构名称已存在");
+//            throw new BytterTradeException(40001, "申请机构名称已存在");
+//        }
 
         // 检查组织机构代码证是否存在
         if (checkCustExistsByOrgCode(anOpenAccountInfo.getOrgCode()) == true) {
@@ -1214,6 +1232,18 @@ public class CustOpenAccountTmpService extends BaseService<CustOpenAccountTmpMap
         fillOperatorByOperId(anOperId, anOpenAccountInfo);
         // 检查开户资料合法性
         checkAccountInfoValid(anOpenAccountInfo);
+        // 检查联行号不存在而银行全称正确情况，则可通过银行全称再获取一遍联行号
+        if(BetterStringUtils.isBlank(anOpenAccountInfo.getPaySysNum())){
+            SysNapsBankCode bankCode=bankCodeService.findSysBankCodeInfoByBankName(anOpenAccountInfo.getBankName());
+            if(bankCode==null){
+                throw new BytterTradeException("银行全称输入不正确，请检查");
+            }else{
+                anOpenAccountInfo.setPaySysNum(bankCode.getPaySysNum());
+            }
+        }
+        
+        // 检查联行号对应的银行名称与所输入的银行全称是否一致
+        bankCodeService.checkBankCode(anOpenAccountInfo.getPaySysNum(),anOpenAccountInfo.getBankName());
         // 初始化参数设置
         initAddValue(anOpenAccountInfo, CustomerConstants.TMP_TYPE_TEMPSTORE, CustomerConstants.TMP_STATUS_OWN);
         // 设置开户类型,"0"--PC自主开户
