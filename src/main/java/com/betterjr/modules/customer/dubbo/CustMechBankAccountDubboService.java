@@ -204,6 +204,7 @@ public class CustMechBankAccountDubboService implements ICustMechBankAccountServ
     @Override
     public String webFindCustMechBankAccount(final String anBankAcco) {
         return newOk("公司银行账户-查询成功",  bankAccountService.findBankAccountByAcco(anBankAcco)).toJson();
+    }
 
     @Override
     public String webFindSysBankCodeList(Map<String, Object> anParam){
