@@ -1,15 +1,14 @@
 package com.betterjr.modules.customer.dubbo;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import com.betterjr.common.data.SimpleDataEntity;
@@ -26,12 +25,12 @@ import com.betterjr.modules.customer.constants.CustomerConstants;
 import com.betterjr.modules.customer.entity.CustChangeApply;
 import com.betterjr.modules.customer.entity.CustMechBase;
 import com.betterjr.modules.customer.entity.CustMechBaseTmp;
-import com.betterjr.modules.customer.entity.CustInfoRole;
 import com.betterjr.modules.customer.helper.ChangeDetailBean;
 import com.betterjr.modules.customer.service.CustChangeService;
+import com.betterjr.modules.customer.service.CustInfoRoleService;
+import com.betterjr.modules.customer.service.CustMajorService;
 import com.betterjr.modules.customer.service.CustMechBaseService;
 import com.betterjr.modules.customer.service.CustMechBaseTmpService;
-import com.betterjr.modules.customer.service.CustInfoRoleService;
 import com.betterjr.modules.rule.service.RuleServiceDubboFilterInvoker;
 
 /**
@@ -58,6 +57,9 @@ public class CustMechBaseDubboService implements ICustMechBaseService {
     
     @Resource
     private CustInfoRoleService custInfoRoleService;
+    
+    @Autowired
+    private CustMajorService custMajorService;
 
     /* (non-Javadoc)
      * @see com.betterjr.modules.customer.ICustMechBaseService#webQueryValidCustInfo()
@@ -227,6 +229,12 @@ public class CustMechBaseDubboService implements ICustMechBaseService {
         resultMap.put("custName", custInfo.getCustName());
 
         return AjaxObject.newOk("微信用户信息获取 成功", resultMap).toJson();
+    }
+
+    @Override
+    public Long findPlatCustNo() {
+        
+        return custMajorService.findPlatCustMajor();
     }
 
 }

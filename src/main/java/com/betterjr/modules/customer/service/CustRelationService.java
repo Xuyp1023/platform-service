@@ -1300,6 +1300,23 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         }
         return result;
     }
+    
+    /**
+     * 查询所有供应商和核心企业
+     * @return
+     */
+    public List<SimpleDataEntity> queryAllCust() {
+        final List<SimpleDataEntity> result = new ArrayList<SimpleDataEntity>();
+        
+        
+        for (final CustRelation relation : this.mapper.queryAllCust()) {
+            final SimpleDataEntity entity = new SimpleDataEntity(relation.getCustName(), String.valueOf(relation.getCustNo()));
+            if (!result.contains(entity)) {
+                result.add(entity);
+            }
+        }
+        return result;
+    }
 
     /**
      * 根据关联方简称和关联方客户编号查询客户关联关系信息

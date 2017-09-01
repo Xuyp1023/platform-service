@@ -39,4 +39,9 @@ public interface CustRelationMapper extends Mapper<CustRelation>{
     @Select(" select * from t_cust_relation as t where t.L_CUSTNO=#{anCustNo} and (t.C_RELATE_TYPE = '3' or t.C_RELATE_TYPE = '4' or t.C_RELATE_TYPE = '5') ORDER BY D_REG_DATE DESC")
     @ResultType(CustRelation.class)
     public Page<CustRelation> findCustSellerRelationList(@Param("anCustNo") Long anCustNo);
+    
+    @Select(" select DISTINCT l_custno,C_CUSTNAME from t_cust_relation where C_BUSIN_STATUS='3' and C_RELATE_TYPE in(1,4)")
+    @ResultType(CustRelation.class)
+    public List<CustRelation> queryAllCust();
+
 }
