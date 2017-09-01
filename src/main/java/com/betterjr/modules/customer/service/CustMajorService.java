@@ -12,6 +12,7 @@ import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
+import com.betterjr.common.utils.QueryTermBuilder;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.modules.customer.dao.CustMajorMapper;
 import com.betterjr.modules.customer.entity.CustMajor;
@@ -97,6 +98,30 @@ public class CustMajorService extends BaseService<CustMajorMapper, CustMajor>{
     public List<CustMajor> findCustMajorByMap(final Map<String,Object> anMap){
         anMap.put("businStatus", "1");
         return this.selectByProperty(anMap);
+    }
+    
+    
+    /**
+     * 查询平台企业id
+     * @return
+     */
+    public Long findPlatCustMajor(){
+        
+        Map<String,Object> paramMap= QueryTermBuilder.newInstance()
+                .put("businStatus", "1")
+                .put("custType", "0")
+                .build();
+        
+        List<CustMajor> list = this.selectByProperty(paramMap);
+        
+        if(!Collections3.isEmpty(list)){
+            
+            return Collections3.getFirst(list).getCustNo();
+            
+        }
+        
+        return null;
+        
     }
 
 }
