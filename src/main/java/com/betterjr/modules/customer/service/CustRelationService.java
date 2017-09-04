@@ -9,6 +9,7 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -1349,4 +1350,50 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         final Page<CustRelation> result = this.selectPropertyByPage(anMap, anPageNum, anPageSize, "1".equals(anFlag));
         return result;
     }
+    
+    
+    /**
+     * 通过核心企业查询保理公司 并且 是内部结算中心
+     * @param anCoreCustNo
+     * @return
+     */
+    public List<SimpleDataEntity> queryFactoryByCore(final Long anCoreCustNo) {
+        final List<SimpleDataEntity> result = new ArrayList<SimpleDataEntity>();
+        if (null == anCoreCustNo) {
+            return result;
+        }
+        final Map<String, Object> anMap = new HashMap<String, Object>();
+        anMap.put("custNo", anCoreCustNo);
+        anMap.put("relateType", CustomerConstants.RELATE_TYPE_CORE_FACTOR);
+        anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
+        for (final CustRelation relation : this.selectByProperty(anMap)) {
+            if(StringUtils.isNoneBlank(relation.getIsInside()) && "1".equals(relation.getIsInside())){
+                result.add(new SimpleDataEntity(relation.getRelateCustname(), String.valueOf(relation.getRelateCustno())));
+            }
+        }
+        return result;
+    }
+    
+
+    /**
+     * 企业合作银行下拉列表查询
+     *
+     * @param anCustNo
+     * @return
+     */
+    public List<SimpleDataEntity> queryBankInfoKeyAndValue(final Long anCustNo) {
+        final List<SimpleDataEntity> result = new ArrayList<SimpleDataEntity>();
+        if (null == anCustNo) {
+            return result;
+        }
+        final Map<String, Object> anMap = new HashMap<String, Object>();
+        anMap.put("custNo", anCustNo);
+        anMap.put("relateType", CustomerConstants.RELATE_TYPE_BANK_CONTRACT);
+        anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
+        for (final CustRelation relation : this.selectByProperty(anMap)) {
+            result.add(new SimpleDataEntity(relation.getRelateCustname(), String.valueOf(relation.getRelateCustno())));
+        }
+        return result;
+    }
+    
 }
