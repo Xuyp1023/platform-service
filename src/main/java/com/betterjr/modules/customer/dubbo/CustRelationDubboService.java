@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.config.annotation.Service;
 import com.betterjr.common.data.PlatformBaseRuleType;
+import com.betterjr.common.data.SimpleDataEntity;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.common.web.AjaxObject;
 import com.betterjr.modules.customer.ICustRelationService;
@@ -286,5 +287,18 @@ public class CustRelationDubboService implements ICustRelationService {
     public String webQueryAllCust() {
         
         return AjaxObject.newOk("查询所有客户成功", custRelationService.queryAllCust()).toJson();
+    }
+
+    @Override
+    public List<SimpleDataEntity> queryFactoryByCore(Long anCoreCustNo) {
+        
+        return custRelationService.queryFactoryByCore(anCoreCustNo);
+    }
+
+    @Override
+    public String webQueryBankInfoKeyAndValue(Long anCustNo) {
+        // TODO Auto-generated method stub
+        
+        return AjaxObject.newOk("企业合作银行下拉列表查询成功", custRelationService.queryBankInfoKeyAndValue(anCustNo)).toJson();
     }
 }
