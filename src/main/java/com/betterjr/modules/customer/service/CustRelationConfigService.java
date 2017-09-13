@@ -99,6 +99,9 @@ public class CustRelationConfigService {
     private CustMechBusinLicenceService custMechBusinLicenceService;
     @Resource
     private RocketMQProducer betterProducer;
+    @Autowired
+    private ScfPushWechatService scfPushWechatService;
+    
 
     /***
      * 判断当前登录的身份信息，并返回需要关联选择的客户类型
@@ -149,6 +152,16 @@ public class CustRelationConfigService {
                 custRelation.initAddValue();
                 custRelationService.insert(custRelation);
                 bool=true;
+                // 发送微信消息
+                if(UserUtils.coreUser() && BetterStringUtils.equalsIgnoreCase(custRelation.getRelateType(), CustomerConstants.RELATE_TYPE_SUPPLIER_CORE)){
+                    Map<String,Object> param=new HashMap<String, Object>();
+                    param.put("custNo", custRelation.getCustNo());
+                    param.put("custName", custRelation.getCustName());
+                    param.put("coreCustNo", custRelation.getRelateCustno());
+                    param.put("coreCustName", custRelation.getRelateCustname());
+                    param.put("operName", custRelation.getOperName());
+                    scfPushWechatService.pushVerifySend(param);
+                }
             }
         }
         return bool;
