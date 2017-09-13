@@ -1341,12 +1341,15 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
     /**
      * 保理公司查询客户信息
      */
-    public Page<CustRelation> queryCustInfoByFactor(final String anRelateType, final String anFlag, final int anPageNum, final int anPageSize) {
+    public Page<CustRelation> queryCustInfoByFactor(final String anRelateType,String businStatus, final String anFlag, final int anPageNum, final int anPageSize) {
         if (!UserUtils.factorUser()) {
             throw new BytterTradeException("无相应权限操作！");
         }
-        final Map<String, Object> anMap = QueryTermBuilder.newInstance().put("relateType", anRelateType.split(","))
-                .put("relateCustno", custOperatorDubboClientService.findCustNo()).build();
+        final Map<String, Object> anMap = QueryTermBuilder.newInstance()
+                .put("relateType", anRelateType.split(","))
+                .put("relateCustno", custOperatorDubboClientService.findCustNo())
+                .put("businStatus", businStatus)
+                .build();
         final Page<CustRelation> result = this.selectPropertyByPage(anMap, anPageNum, anPageSize, "1".equals(anFlag));
         return result;
     }
@@ -1370,6 +1373,29 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
             if(StringUtils.isNoneBlank(relation.getIsInside()) && "1".equals(relation.getIsInside())){
                 result.add(new SimpleDataEntity(relation.getRelateCustname(), String.valueOf(relation.getRelateCustno())));
             }
+        }
+        return result;
+    }
+    
+    /**
+     * 通过核心企业查询保理公司列表
+     * @param anCoreCustNo
+     * @return
+     */
+    public List<Long> queryNoInsideFactoryByCore(final Long anCoreCustNo) {
+        final List<Long> result = new ArrayList<>();
+        if (null == anCoreCustNo) {
+            return result;
+        }
+        final Map<String, Object> anMap = new HashMap<String, Object>();
+        anMap.put("custNo", anCoreCustNo);
+        anMap.put("relateType", CustomerConstants.RELATE_TYPE_CORE_FACTOR);
+        anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
+        for (final CustRelation relation : this.selectByProperty(anMap)) {
+            result.add(relation.getRelateCustno());
+            
+            //result.add(new SimpleDataEntity(relation.getRelateCustname(), String.valueOf(relation.getRelateCustno())));
+            
         }
         return result;
     }
