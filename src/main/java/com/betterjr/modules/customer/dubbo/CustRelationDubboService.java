@@ -279,8 +279,8 @@ public class CustRelationDubboService implements ICustRelationService {
     }
 
     @Override
-    public String webQueryCustInfoByFactor(final String anRelateType, final String anFlag, final int anPageNum, final int anPageSize) {
-        return AjaxObject.newOkWithPage("保理公司查询企业信息成功", custRelationService.queryCustInfoByFactor(anRelateType, anFlag, anPageNum, anPageSize)).toJson();
+    public String webQueryCustInfoByFactor(final String anRelateType,String anBusinStatus, final String anFlag, final int anPageNum, final int anPageSize) {
+        return AjaxObject.newOkWithPage("保理公司查询企业信息成功", custRelationService.queryCustInfoByFactor(anRelateType,anBusinStatus, anFlag, anPageNum, anPageSize)).toJson();
     }
 
     @Override
@@ -294,6 +294,12 @@ public class CustRelationDubboService implements ICustRelationService {
         
         return custRelationService.queryFactoryByCore(anCoreCustNo);
     }
+    
+    @Override
+    public List<Long> queryNoInsideFactoryByCore(Long anCoreCustNo) {
+        
+        return custRelationService.queryNoInsideFactoryByCore(anCoreCustNo);
+    }
 
     @Override
     public String webQueryBankInfoKeyAndValue(Long anCustNo) {
@@ -301,4 +307,6 @@ public class CustRelationDubboService implements ICustRelationService {
         
         return AjaxObject.newOk("企业合作银行下拉列表查询成功", custRelationService.queryBankInfoKeyAndValue(anCustNo)).toJson();
     }
+
+   
 }
