@@ -62,7 +62,7 @@ public class ScfPushWechatService {
             builder.addParam("wechatUrl", wechatService.getMpAccount().getWechatUrl());
             builder.addParam("coreCustName", anMap.get("coreCustName"));
             builder.addParam("operName",anMap.get("operName"));
-            builder.addParam("dateTime",BetterDateUtils.formatDate(BetterDateUtils.parseDate(new Date()), "yyyy年MM月dd日 HH:mm"));
+            builder.addParam("dateTime",BetterDateUtils.formatDate(new Date(), "yyyy年MM月dd日 HH时mm分"));
             builder.addReceiver(targetCustomer.getCustNo(), null);  // 接收人
             bool=notificationSendService.sendNotification(builder.build());
             logger.info("pushVerifySend 消息发送标识  bool："+bool);
