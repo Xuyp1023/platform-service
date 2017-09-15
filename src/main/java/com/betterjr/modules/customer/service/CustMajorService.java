@@ -84,7 +84,13 @@ public class CustMajorService extends BaseService<CustMajorMapper, CustMajor>{
     public List<CustMajor> findCustMajorByType(final String anCustType){
         final Map<String, Object> anMap=new HashMap<String, Object>();
         if (BetterStringUtils.isNotBlank(anCustType)) {
-            anMap.put("custType", anCustType);
+            if(!anCustType.contains(",")){
+                
+                anMap.put("custType", anCustType);
+            }else{
+                anMap.put("custType", anCustType.split(","));
+                
+            }
         }
         anMap.put("businStatus", "1");
         return this.selectByProperty(anMap);

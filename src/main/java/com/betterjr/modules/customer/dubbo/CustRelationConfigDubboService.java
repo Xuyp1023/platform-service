@@ -69,6 +69,9 @@ public class CustRelationConfigDubboService implements ICustRelationConfigServic
         final PlatformBaseRuleType role = UserUtils.getUserRole();
         return AjaxObject.newOkWithPage("分页查询客户关系信息", relationConfigService.queryCustRelationInfo(anCustNo, role, anRelationType,anFlag, anPageNum,anPageSize)).toJson();
     }
+    
+    
+   
 
     /****
      * 查询当前客户的类型
@@ -213,5 +216,7 @@ public class CustRelationConfigDubboService implements ICustRelationConfigServic
     public FactorBusinessRequestData findBusinessCustInfo(final Long anCustNo){
         return relationConfigService.findFactorRequestInfo(anCustNo);
     }
+
+   
 
 }
