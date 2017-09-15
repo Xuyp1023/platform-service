@@ -31,7 +31,8 @@ public interface CustRelationMapper extends Mapper<CustRelation>{
     @Select(" select * from t_cust_relation as t where (t.L_CUSTNO=#{anCustNo} and (t.C_RELATE_TYPE = '2' or t.C_RELATE_TYPE = '5')) or (t.L_RELATE_CUSTNO=#{anCustNo} and (t.C_RELATE_TYPE = '1' or t.C_RELATE_TYPE = '4')) ORDER BY D_REG_DATE DESC")
     @ResultType(CustRelation.class)
     public Page<CustRelation> findCustCoreRelationList(@Param("anCustNo") Long anCustNo);
-
+    
+    
     @Select(" select * from t_cust_relation as t where t.L_CUSTNO=#{anCustNo} and (t.C_RELATE_TYPE = '0' or t.C_RELATE_TYPE = '1' or t.C_RELATE_TYPE = '5') ORDER BY D_REG_DATE DESC")
     @ResultType(CustRelation.class)
     public Page<CustRelation> findCustSupplierRelationList(@Param("anCustNo") Long anCustNo);
