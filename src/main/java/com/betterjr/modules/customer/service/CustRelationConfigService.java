@@ -347,7 +347,7 @@ public class CustRelationConfigService {
      */
     public List<SimpleDataEntity> findElecAgreementServiceCust(){
         final List<SimpleDataEntity> custTypeList=new ArrayList<SimpleDataEntity>();
-        for(final CustMajor custMajor:custMajorService.findCustMajorByCustCorp("wos")){
+        for(final CustMajor custMajor:custMajorService.findCustMajorByType("1")){
             custTypeList.add(new SimpleDataEntity(custMajor.getCustName(), String.valueOf(custMajor.getCustNo())));
         }
         return custTypeList;
