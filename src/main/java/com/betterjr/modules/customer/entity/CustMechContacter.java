@@ -458,7 +458,7 @@ public class CustMechContacter implements BetterjrEntity {
         this.phone = anContacterTmp.getPhone();
         this.address = anContacterTmp.getAddress();
         this.email = anContacterTmp.getEmail();
-
+        this.setBatchNo(anContacterTmp.getBatchNo());
         this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
         this.businStatus = "0";
     }
