@@ -12,12 +12,13 @@ import com.betterjr.common.entity.BetterjrEntity;
 import com.betterjr.common.selectkey.SerialGenerator;
 import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.UserUtils;
+import com.betterjr.modules.customer.data.ICustAuditEntityFace;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Access(AccessType.FIELD)
 @Entity
 @Table(name = "t_cust_mech_contacter_tmp")
-public class CustMechContacterTmp implements BetterjrEntity {
+public class CustMechContacterTmp implements BetterjrEntity, ICustAuditEntityFace {
     /**
      * 编号
      */
@@ -208,7 +209,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -216,7 +217,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
         return version;
     }
 
-    public void setVersion(Long version) {
+    public void setVersion(final Long version) {
         this.version = version;
     }
 
@@ -224,7 +225,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name == null ? null : name.trim();
     }
 
@@ -232,7 +233,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
         return sex;
     }
 
-    public void setSex(String sex) {
+    public void setSex(final String sex) {
         this.sex = sex == null ? null : sex.trim();
     }
 
@@ -240,7 +241,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
         return mobile;
     }
 
-    public void setMobile(String mobile) {
+    public void setMobile(final String mobile) {
         this.mobile = mobile == null ? null : mobile.trim();
     }
 
@@ -248,7 +249,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
         return phone;
     }
 
-    public void setPhone(String phone) {
+    public void setPhone(final String phone) {
         this.phone = phone == null ? null : phone.trim();
     }
 
@@ -256,7 +257,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
         return email;
     }
 
-    public void setEmail(String email) {
+    public void setEmail(final String email) {
         this.email = email == null ? null : email.trim();
     }
 
@@ -264,7 +265,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
         return address;
     }
 
-    public void setAddress(String address) {
+    public void setAddress(final String address) {
         this.address = address == null ? null : address.trim();
     }
 
@@ -272,7 +273,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
         return regOperId;
     }
 
-    public void setRegOperId(Long regOperId) {
+    public void setRegOperId(final Long regOperId) {
         this.regOperId = regOperId;
     }
 
@@ -280,7 +281,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
         return regOperName;
     }
 
-    public void setRegOperName(String regOperName) {
+    public void setRegOperName(final String regOperName) {
         this.regOperName = regOperName == null ? null : regOperName.trim();
     }
 
@@ -288,7 +289,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
         return regDate;
     }
 
-    public void setRegDate(String regDate) {
+    public void setRegDate(final String regDate) {
         this.regDate = regDate == null ? null : regDate.trim();
     }
 
@@ -296,7 +297,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
         return regTime;
     }
 
-    public void setRegTime(String regTime) {
+    public void setRegTime(final String regTime) {
         this.regTime = regTime == null ? null : regTime.trim();
     }
 
@@ -304,7 +305,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
         return modiOperId;
     }
 
-    public void setModiOperId(Long modiOperId) {
+    public void setModiOperId(final Long modiOperId) {
         this.modiOperId = modiOperId;
     }
 
@@ -312,7 +313,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
         return modiOperName;
     }
 
-    public void setModiOperName(String modiOperName) {
+    public void setModiOperName(final String modiOperName) {
         this.modiOperName = modiOperName == null ? null : modiOperName.trim();
     }
 
@@ -320,7 +321,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
         return modiDate;
     }
 
-    public void setModiDate(String modiDate) {
+    public void setModiDate(final String modiDate) {
         this.modiDate = modiDate == null ? null : modiDate.trim();
     }
 
@@ -328,7 +329,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
         return modiTime;
     }
 
-    public void setModiTime(String modiTime) {
+    public void setModiTime(final String modiTime) {
         this.modiTime = modiTime == null ? null : modiTime.trim();
     }
 
@@ -336,7 +337,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
         return operOrg;
     }
 
-    public void setOperOrg(String operOrg) {
+    public void setOperOrg(final String operOrg) {
         this.operOrg = operOrg == null ? null : operOrg.trim();
     }
 
@@ -344,7 +345,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
         return businStatus;
     }
 
-    public void setBusinStatus(String businStatus) {
+    public void setBusinStatus(final String businStatus) {
         this.businStatus = businStatus == null ? null : businStatus.trim();
     }
 
@@ -352,7 +353,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
         return lastStatus;
     }
 
-    public void setLastStatus(String lastStatus) {
+    public void setLastStatus(final String lastStatus) {
         this.lastStatus = lastStatus == null ? null : lastStatus.trim();
     }
 
@@ -360,7 +361,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
         return custNo;
     }
 
-    public void setCustNo(Long custNo) {
+    public void setCustNo(final Long custNo) {
         this.custNo = custNo;
     }
 
@@ -368,7 +369,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
         return batchNo;
     }
 
-    public void setBatchNo(Long anBatchNo) {
+    public void setBatchNo(final Long anBatchNo) {
         batchNo = anBatchNo;
     }
 
@@ -376,7 +377,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
         return refId;
     }
 
-    public void setRefId(Long refId) {
+    public void setRefId(final Long refId) {
         this.refId = refId;
     }
 
@@ -384,7 +385,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
         return tmpType;
     }
 
-    public void setTmpType(String tmpType) {
+    public void setTmpType(final String tmpType) {
         this.tmpType = tmpType == null ? null : tmpType.trim();
     }
 
@@ -392,7 +393,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
         return tmpOperType;
     }
 
-    public void setTmpOperType(String tmpOperType) {
+    public void setTmpOperType(final String tmpOperType) {
         this.tmpOperType = tmpOperType == null ? null : tmpOperType.trim();
     }
 
@@ -400,13 +401,13 @@ public class CustMechContacterTmp implements BetterjrEntity {
         return parentId;
     }
 
-    public void setParentId(Long anParentId) {
+    public void setParentId(final Long anParentId) {
         parentId = anParentId;
     }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         sb.append(getClass().getSimpleName());
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
@@ -441,7 +442,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
     }
 
     @Override
-    public boolean equals(Object that) {
+    public boolean equals(final Object that) {
         if (this == that) {
             return true;
         }
@@ -451,7 +452,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
         if (getClass() != that.getClass()) {
             return false;
         }
-        CustMechContacterTmp other = (CustMechContacterTmp) that;
+        final CustMechContacterTmp other = (CustMechContacterTmp) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
                 && (this.getParentId() == null ? other.getParentId() == null : this.getParentId().equals(other.getParentId()))
                 && (this.getVersion() == null ? other.getVersion() == null : this.getVersion().equals(other.getVersion()))
@@ -511,11 +512,11 @@ public class CustMechContacterTmp implements BetterjrEntity {
         return result;
     }
 
-    public void initAddValue(String anBusinStatus) {
+    public void initAddValue(final String anBusinStatus) {
         this.initAddValue(anBusinStatus, null, null);
     }
 
-    public void initAddValue(CustMechContacter anContacter, String anBusinStatus) {
+    public void initAddValue(final CustMechContacter anContacter, final String anBusinStatus) {
         this.initAddValue(anBusinStatus, null, null);
 
         this.custNo = anContacter.getCustNo();
@@ -528,7 +529,7 @@ public class CustMechContacterTmp implements BetterjrEntity {
         this.batchNo = anContacter.getBatchNo();
     }
 
-    public void initAddValue(String anBusinStatus, String anTmpType, Long anVersion) {
+    public void initAddValue(final String anBusinStatus, final String anTmpType, final Long anVersion) {
         this.id = SerialGenerator.getLongValue("CustMechContacterTmp.id");
 
         this.regOperId = UserUtils.getOperatorInfo().getId();
@@ -562,14 +563,14 @@ public class CustMechContacterTmp implements BetterjrEntity {
         this.email = anContacterTmp.getEmail();
     }
 
-    public void initModifyValue(CustMechContacterTmp anContacterTmp, String anBusinStatus, Long anVersion) {
+    public void initModifyValue(final CustMechContacterTmp anContacterTmp, final String anBusinStatus, final Long anVersion) {
         this.initModifyValue(anContacterTmp);
 
         this.businStatus = anBusinStatus;
         this.version = anVersion;
     }
 
-    public void initModifyValue(CustMechContacter anContacter, String anBusinStatus) {
+    public void initModifyValue(final CustMechContacter anContacter, final String anBusinStatus) {
         this.modiOperId = UserUtils.getOperatorInfo().getId();
         this.modiOperName = UserUtils.getOperatorInfo().getName();
         this.modiDate = BetterDateUtils.getNumDate();

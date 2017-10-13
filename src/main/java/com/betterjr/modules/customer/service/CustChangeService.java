@@ -8,16 +8,19 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.betterjr.common.exception.BytterTradeException;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.customer.constants.CustomerConstants;
+import com.betterjr.modules.customer.data.ICustAuditEntityFace;
 import com.betterjr.modules.customer.entity.CustAuditLog;
 import com.betterjr.modules.customer.entity.CustChangeApply;
 import com.betterjr.modules.customer.helper.FormalDataHelper;
 import com.betterjr.modules.customer.helper.IFormalDataService;
+import com.betterjr.modules.document.ICustFileService;
 
 /**
  * 变更服务
@@ -33,6 +36,8 @@ public class CustChangeService {
 
     @Resource
     private CustAuditLogService auditLogService;
+    @Reference(interfaceClass = ICustFileService.class)
+    private ICustFileService fileItemService;
 
     /**
      * 查询变更申请详情
@@ -54,7 +59,8 @@ public class CustChangeService {
     /**
      * 查询变更申请列表 分类查询
      */
-    public Page<CustChangeApply> queryChangeApply(final Long anCustNo, final String anChangeItem, final int anFlag, final int anPageNum, final int anPageSize) {
+    public Page<CustChangeApply> queryChangeApply(final Long anCustNo, final String anChangeItem, final int anFlag, final int anPageNum,
+            final int anPageSize) {
         BTAssert.notNull(anCustNo, "客户编号不允许为空!");
         BTAssert.notNull(anChangeItem, "变更项不允许为空!");
 
@@ -68,7 +74,8 @@ public class CustChangeService {
     /**
      * 查询变更申请列表 审核使用
      */
-    public Page<CustChangeApply> queryChangeApplyList(final Map<String, Object> anParam, final int anFlag, final int anPageNum, final int anPageSize) {
+    public Page<CustChangeApply> queryChangeApplyList(final Map<String, Object> anParam, final int anFlag, final int anPageNum,
+            final int anPageSize) {
         BTAssert.notNull(anParam, "查询条件不允许为空!");
 
         return changeApplyService.queryCustChangeApply(anParam, anFlag, anPageNum, anPageSize);
@@ -93,11 +100,15 @@ public class CustChangeService {
         final IFormalDataService formalDataService = FormalDataHelper.getFormalDataService(changeApply);
         BTAssert.notNull(formalDataService, "变更项目不正确！");
 
+        final ICustAuditEntityFace entityFace = formalDataService.findSaveDataByParentId(changeApply.getId());
 
         formalDataService.saveFormalData(changeApply.getId());
 
-        final CustAuditLog auditLog = auditLogService.addCustAuditLog(CustomerConstants.AUDIT_TYPE_CHANGEAPPLY, CustomerConstants.AUDIT_STEP_AUDIT, anId, CustomerConstants.AUDIT_RESULT_PASS,
-                BetterStringUtils.isNotBlank(anReason) ? anReason : "同意", changeApply.getChangeItem(), changeApply.getCustNo());
+        fileItemService.savePlatformAduitFile(entityFace.getCustNo(), entityFace.getBatchNo());
+
+        final CustAuditLog auditLog = auditLogService.addCustAuditLog(CustomerConstants.AUDIT_TYPE_CHANGEAPPLY, CustomerConstants.AUDIT_STEP_AUDIT,
+                anId, CustomerConstants.AUDIT_RESULT_PASS, BetterStringUtils.isNotBlank(anReason) ? anReason : "同意", changeApply.getChangeItem(),
+                changeApply.getCustNo());
         BTAssert.notNull(auditLog, "审核记录添加失败!");
 
         return changeApply;
@@ -119,8 +130,8 @@ public class CustChangeService {
 
         final CustChangeApply changeApply = changeApplyService.saveChangeApplyStatus(anId, CustomerConstants.CHANGE_APPLY_STATUS_AUDIT_REJECT);
 
-        final CustAuditLog auditLog = auditLogService.addCustAuditLog(CustomerConstants.AUDIT_TYPE_CHANGEAPPLY, CustomerConstants.AUDIT_STEP_AUDIT, anId, CustomerConstants.AUDIT_RESULT_REJECT,
-                anReason, changeApply.getChangeItem(), changeApply.getCustNo());
+        final CustAuditLog auditLog = auditLogService.addCustAuditLog(CustomerConstants.AUDIT_TYPE_CHANGEAPPLY, CustomerConstants.AUDIT_STEP_AUDIT,
+                anId, CustomerConstants.AUDIT_RESULT_REJECT, anReason, changeApply.getChangeItem(), changeApply.getCustNo());
         BTAssert.notNull(auditLog, "审核记录添加失败!");
 
         return changeApply;
@@ -144,12 +155,11 @@ public class CustChangeService {
 
         formalDataService.saveCancelData(changeApply.getId());
 
-        final CustAuditLog auditLog = auditLogService.addCustAuditLog(CustomerConstants.AUDIT_TYPE_CHANGEAPPLY, null, anId, CustomerConstants.AUDIT_RESULT_CANCEL,
-                anReason, changeApply.getChangeItem(), changeApply.getCustNo());
+        final CustAuditLog auditLog = auditLogService.addCustAuditLog(CustomerConstants.AUDIT_TYPE_CHANGEAPPLY, null, anId,
+                CustomerConstants.AUDIT_RESULT_CANCEL, anReason, changeApply.getChangeItem(), changeApply.getCustNo());
         BTAssert.notNull(auditLog, "审核记录添加失败!");
 
         return tempChangeApply;
     }
-
 
 }

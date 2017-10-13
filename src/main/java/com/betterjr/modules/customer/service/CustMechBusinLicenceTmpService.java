@@ -20,6 +20,7 @@ import com.betterjr.common.utils.UserUtils;
 import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.customer.constants.CustomerConstants;
 import com.betterjr.modules.customer.dao.CustMechBusinLicenceTmpMapper;
+import com.betterjr.modules.customer.data.ICustAuditEntityFace;
 import com.betterjr.modules.customer.entity.CustChangeApply;
 import com.betterjr.modules.customer.entity.CustInsteadApply;
 import com.betterjr.modules.customer.entity.CustInsteadRecord;
@@ -37,7 +38,7 @@ import com.betterjr.modules.document.service.CustFileItemService;
  */
 @Service
 public class CustMechBusinLicenceTmpService extends BaseService<CustMechBusinLicenceTmpMapper, CustMechBusinLicenceTmp>
-implements IFormalDataService {
+        implements IFormalDataService {
     @Resource
     private CustMechBusinLicenceService businLicenceService;
 
@@ -55,7 +56,6 @@ implements IFormalDataService {
 
     @Autowired
     private CustFileItemService fileItemService;
-
 
     public CustMechBusinLicenceTmp findBusinLicenceTmp(final Long anId) {
         BTAssert.notNull(anId, "编号不允许为空！");
@@ -117,7 +117,8 @@ implements IFormalDataService {
     /**
      * 营业执照流水信息-添加
      */
-    public CustMechBusinLicenceTmp addBusinLicenceTmp(final CustMechBusinLicenceTmp anBusinLicenceTmp, final String anFileList, final String anTmpType) {
+    public CustMechBusinLicenceTmp addBusinLicenceTmp(final CustMechBusinLicenceTmp anBusinLicenceTmp, final String anFileList,
+            final String anTmpType) {
         BTAssert.notNull(anBusinLicenceTmp, "营业执照流水信息不允许为空！");
 
         final Long custNo = anBusinLicenceTmp.getRefId();
@@ -126,7 +127,8 @@ implements IFormalDataService {
         final String custName = accountService.queryCustName(custNo);
         anBusinLicenceTmp.initAddValue(anTmpType, custNo, custName);
 
-        anBusinLicenceTmp.setBatchNo(fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, anBusinLicenceTmp.getBatchNo(), UserUtils.getOperatorInfo()));
+        anBusinLicenceTmp.setBatchNo(
+                fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, anBusinLicenceTmp.getBatchNo(), UserUtils.getOperatorInfo()));
         anBusinLicenceTmp.setVersion(VersionHelper.generateVersion(this.mapper, custNo));
         this.insert(anBusinLicenceTmp);
 
@@ -204,9 +206,8 @@ implements IFormalDataService {
      * 营业执照流水信息-修改代录
      */
     public Object saveInsteadRecord(final CustMechBusinLicenceTmp anBusinLicenceTmp, final Long anInsteadRecordId, final String anFileList) {
-        final CustInsteadRecord insteadRecord = checkInsteadRecord(anBusinLicenceTmp,  anInsteadRecordId,
-                CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN,
-                CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT,
+        final CustInsteadRecord insteadRecord = checkInsteadRecord(anBusinLicenceTmp, anInsteadRecordId,
+                CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN, CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT,
                 CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_REJECT);
 
         final Long tmpId = Long.valueOf(insteadRecord.getTmpIds());
@@ -232,7 +233,8 @@ implements IFormalDataService {
     /**
      * 检查并返回代录记录
      */
-    private CustInsteadRecord checkInsteadRecord(final CustMechBusinLicenceTmp anBusinLicenceTmp, final Long anInsteadRecordId, final String... anBusinStatus) {
+    private CustInsteadRecord checkInsteadRecord(final CustMechBusinLicenceTmp anBusinLicenceTmp, final Long anInsteadRecordId,
+            final String... anBusinStatus) {
         BTAssert.notNull(anBusinLicenceTmp, "营业执照信息流水信息不允许为空！");
         BTAssert.notNull(anInsteadRecordId, "代录记录编号不允许为空！");
 
@@ -252,10 +254,8 @@ implements IFormalDataService {
         final Long applyId = insteadRecord.getApplyId();
         final CustInsteadApply insteadApply = insteadApplyService.findCustInsteadApply(applyId);
 
-        final List<String> applyAllowStatus = Arrays.asList(new String[] {
-                CustomerConstants.INSTEAD_APPLY_STATUS_AUDIT_PASS,
-                CustomerConstants.INSTEAD_APPLY_STATUS_REVIEW_REJECT,
-                CustomerConstants.INSTEAD_APPLY_STATUS_CONFIRM_REJECT });
+        final List<String> applyAllowStatus = Arrays.asList(new String[] { CustomerConstants.INSTEAD_APPLY_STATUS_AUDIT_PASS,
+                CustomerConstants.INSTEAD_APPLY_STATUS_REVIEW_REJECT, CustomerConstants.INSTEAD_APPLY_STATUS_CONFIRM_REJECT });
         if (applyAllowStatus.contains(insteadApply.getBusinStatus()) == false) {
             throw new BytterTradeException(20073, "此代录申请状态不正确！");
         }
@@ -305,5 +305,11 @@ implements IFormalDataService {
     @Override
     public void saveCancelData(final Long anId) {
 
+    }
+
+    @Override
+    public ICustAuditEntityFace findSaveDataByParentId(final Long anParentId) {
+
+        return Collections3.getFirst(this.selectByProperty("parentId", anParentId));
     }
 }

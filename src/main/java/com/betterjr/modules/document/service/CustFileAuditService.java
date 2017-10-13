@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +19,10 @@ import com.betterjr.common.exception.BytterTradeException;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
+import com.betterjr.common.utils.QueryTermBuilder;
+import com.betterjr.common.utils.UserUtils;
 import com.betterjr.common.utils.reflection.ReflectionUtils;
+import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.document.IAgencyAuthFileGroupService;
 import com.betterjr.modules.document.dao.CustFileAduitMapper;
 import com.betterjr.modules.document.data.AccountAduitData;
@@ -38,7 +42,7 @@ public class CustFileAuditService extends BaseService<CustFileAduitMapper, CustF
     @Autowired
     private CustFileItemService custFileItemService;
 
-    @Reference(interfaceClass=IAgencyAuthFileGroupService.class)
+    @Reference(interfaceClass = IAgencyAuthFileGroupService.class)
     private IAgencyAuthFileGroupService agencyAuthFileGroupService;
     @Autowired
     private AuthorFileGroupService authorFileGroupService;
@@ -48,30 +52,30 @@ public class CustFileAuditService extends BaseService<CustFileAduitMapper, CustF
      * 
      * @param request
      */
-    public void updateCustFileAuditInfo(Map<String, String[]> anParamMap, Enumeration<String> anParamNames,Long anCustNo) {
+    public void updateCustFileAuditInfo(final Map<String, String[]> anParamMap, final Enumeration<String> anParamNames, final Long anCustNo) {
         logger.info("Begin to update customer file audit information.");
-        logger.debug("Get param map:"+ anParamMap);
-        Map<String, String> numMap = getTypeNumber(anParamMap, anParamNames);
-//        Long custNo = Collections3.getFirst(UserUtils.findCustNoList());
-        //get current upload file audit information
-        List<CustFileAduit> fileAuditInfos = getUploadFileAuditInfo(anParamMap, numMap, anCustNo);
-        List<CustFileAduit> dbAuditInfos = this.selectByProperty("custNo", anCustNo);
-        Map<String, CustFileAduit> dbAuditMap = ReflectionUtils.listConvertToMapKeyObj(dbAuditInfos, "workType");
-        List<Long> delItemIds = new ArrayList<Long>();
-        for(CustFileAduit fileAudit:fileAuditInfos) {
-            String type = fileAudit.getWorkType();
-            CustFileAduit dbAuditInfo = dbAuditMap.get(type);
+        logger.debug("Get param map:" + anParamMap);
+        final Map<String, String> numMap = getTypeNumber(anParamMap, anParamNames);
+        // Long custNo = Collections3.getFirst(UserUtils.findCustNoList());
+        // get current upload file audit information
+        final List<CustFileAduit> fileAuditInfos = getUploadFileAuditInfo(anParamMap, numMap, anCustNo);
+        final List<CustFileAduit> dbAuditInfos = this.selectByProperty("custNo", anCustNo);
+        final Map<String, CustFileAduit> dbAuditMap = ReflectionUtils.listConvertToMapKeyObj(dbAuditInfos, "workType");
+        final List<Long> delItemIds = new ArrayList<Long>();
+        for (final CustFileAduit fileAudit : fileAuditInfos) {
+            final String type = fileAudit.getWorkType();
+            final CustFileAduit dbAuditInfo = dbAuditMap.get(type);
             RuleServiceAspect.clearMarket();
-            if(null == dbAuditInfo) {
-                if(fileAudit.getFileCount() > 0) {
-                    fileAudit.setId( CustFileUtils.findBatchNo() );
-                    logger.debug("insert new audit information:"+fileAudit.toString());
+            if (null == dbAuditInfo) {
+                if (fileAudit.getFileCount() > 0) {
+                    fileAudit.setId(CustFileUtils.findBatchNo());
+                    logger.debug("insert new audit information:" + fileAudit.toString());
                     this.insert(fileAudit);
                 }
             }
             else {
-                if(!dbAuditInfo.getAuditStatus().equals("0")) {
-                    logger.error("Customer:"+anCustNo+" type:"+type+" can't modify for status.");
+                if (!dbAuditInfo.getAuditStatus().equals("0")) {
+                    logger.error("Customer:" + anCustNo + " type:" + type + " can't modify for status.");
                     continue;
                 }
                 fileAudit.setId(dbAuditInfo.getId());
@@ -84,34 +88,34 @@ public class CustFileAuditService extends BaseService<CustFileAduitMapper, CustF
                     this.updateByPrimaryKey(fileAudit);
                 }
             }
-            RuleCheckResult result = RuleServiceAspect.getCheckResult();
+            final RuleCheckResult result = RuleServiceAspect.getCheckResult();
             if (!result.isOk()) {
                 logger.error(result.toString());
                 throw new BytterTradeException(40001, "保存用户认证信息失败，请检查。");
             }
 
-            Long batchNo = fileAudit.getId();
+            final Long batchNo = fileAudit.getId();
             // 当前类型的文件未入库，不需要更新相关文件处理
             if (null == batchNo) {
                 logger.debug("Type " + type + " don't have any file item to update.");
                 continue;
             }
-            List<CustFileItem> dbFileItems = custFileItemService.findCustFiles(batchNo);
+            final List<CustFileItem> dbFileItems = custFileItemService.findCustFiles(batchNo);
 
-            String[] currentIds = fileAudit.getFileIds().split(",");
-            List<Long> addItemIds = getAddFileItemIds(dbFileItems, currentIds);
+            final String[] currentIds = fileAudit.getFileIds().split(",");
+            final List<Long> addItemIds = getAddFileItemIds(dbFileItems, currentIds);
             getDelFileItemIds(delItemIds, dbFileItems, currentIds);
 
             logger.debug("add item:" + addItemIds.size() + " " + addItemIds);
-            for (Long id : addItemIds) {
-                CustFileItem item = custFileItemService.selectByPrimaryKey(id);
+            for (final Long id : addItemIds) {
+                final CustFileItem item = custFileItemService.selectByPrimaryKey(id);
                 item.setBatchNo(batchNo);
                 custFileItemService.updateByPrimaryKeySelective(item);
             }
         }
         logger.debug("delete item:" + delItemIds.size() + " " + delItemIds);
-        for (Long id : delItemIds) {
-            CustFileItem item = custFileItemService.selectByPrimaryKey(id);
+        for (final Long id : delItemIds) {
+            final CustFileItem item = custFileItemService.selectByPrimaryKey(id);
             item.setBatchNo((long) 0);
             custFileItemService.updateByPrimaryKeySelective(item);
         }
@@ -125,28 +129,28 @@ public class CustFileAuditService extends BaseService<CustFileAduitMapper, CustF
      * @param custNo
      * @return
      */
-    private List<CustFileAduit> getUploadFileAuditInfo(Map<String, String[]> paramMap, Map<String, String> numMap, Long custNo) {
+    private List<CustFileAduit> getUploadFileAuditInfo(final Map<String, String[]> paramMap, final Map<String, String> numMap, final Long custNo) {
         logger.info("Begin to get upload file audit information to customer:" + custNo);
-        List<CustFileAduit> fileAuditInfos = new ArrayList<CustFileAduit>();
-        List<AuthorFileGroup> fileGroups = authorFileGroupService.findCustFileGroupList();
-        for (AuthorFileGroup fileGroup : fileGroups) {
-            String fileInfoType = fileGroup.getFileInfoType();
-            String number = numMap.get(fileInfoType);
+        final List<CustFileAduit> fileAuditInfos = new ArrayList<CustFileAduit>();
+        final List<AuthorFileGroup> fileGroups = authorFileGroupService.findCustFileGroupList();
+        for (final AuthorFileGroup fileGroup : fileGroups) {
+            final String fileInfoType = fileGroup.getFileInfoType();
+            final String number = numMap.get(fileInfoType);
             if (BetterStringUtils.isBlank(number)) {
                 logger.error("请求参数中无类型为" + fileInfoType + "的数据");
                 continue;
                 // throw new BytterTradeException(40001, "认证资料不全，请检查。");
             }
-            String status = paramMap.get("param[" + number + "][status]")[0];
-            String itemIds = paramMap.get("param[" + number + "][id]")[0];
+            final String status = paramMap.get("param[" + number + "][status]")[0];
+            final String itemIds = paramMap.get("param[" + number + "][id]")[0];
             logger.debug("type:" + fileInfoType + " id:" + itemIds);
-            String[] itArray = itemIds.split(",");
+            final String[] itArray = itemIds.split(",");
             int count = itArray.length;
             if (BetterStringUtils.isBlank(itemIds)) {
                 logger.debug("Customer:" + custNo + " file type:" + fileInfoType + " don't have audit file upload.");
                 count = 0;
             }
-            CustFileAduit audit = new CustFileAduit();
+            final CustFileAduit audit = new CustFileAduit();
             CustFileAduit.init(audit, fileInfoType, custNo);
             audit.setAuditStatus(status);
             audit.setFileCount(count);
@@ -161,21 +165,21 @@ public class CustFileAuditService extends BaseService<CustFileAduitMapper, CustF
      * 
      * @return
      */
-    public List<CustFileAduit> findCustFileAuditInfo(Long anCustNo) {
+    public List<CustFileAduit> findCustFileAuditInfo(final Long anCustNo) {
         logger.info("Begin to find customer file audit information.");
-        List<CustFileAduit> auditInfos = this.selectByProperty("custNo", anCustNo);
+        final List<CustFileAduit> auditInfos = this.selectByProperty("custNo", anCustNo);
 
-        for (CustFileAduit auditInfo : auditInfos) {
-            Long batchNo = auditInfo.getId();
-            List<CustFileItem> itemList = custFileItemService.findCustFiles(batchNo);
-            StringBuilder fileInfos = new StringBuilder();
-            for (CustFileItem item : itemList) {
+        for (final CustFileAduit auditInfo : auditInfos) {
+            final Long batchNo = auditInfo.getId();
+            final List<CustFileItem> itemList = custFileItemService.findCustFiles(batchNo);
+            final StringBuilder fileInfos = new StringBuilder();
+            for (final CustFileItem item : itemList) {
                 if (fileInfos.length() > 0) {
                     fileInfos.append(",");
                 }
                 fileInfos.append(item.getId()).append(":").append(item.getFileName());
             }
-            String[] fileArray = fileInfos.toString().split(",");
+            final String[] fileArray = fileInfos.toString().split(",");
             auditInfo.setFileList(fileArray);
         }
 
@@ -189,10 +193,10 @@ public class CustFileAuditService extends BaseService<CustFileAduitMapper, CustF
      * @param dbFileItems
      * @param currentIds
      */
-    private void getDelFileItemIds(List<Long> delItemIds, List<CustFileItem> dbFileItems, String[] currentIds) {
-        for (CustFileItem item : dbFileItems) {
+    private void getDelFileItemIds(final List<Long> delItemIds, final List<CustFileItem> dbFileItems, final String[] currentIds) {
+        for (final CustFileItem item : dbFileItems) {
             boolean isExist = false;
-            for (String currentID : currentIds) {
+            for (final String currentID : currentIds) {
                 if (BetterStringUtils.isBlank(currentID)) {
                     continue;
                 }
@@ -214,14 +218,14 @@ public class CustFileAuditService extends BaseService<CustFileAduitMapper, CustF
      * @param currentIds
      * @return
      */
-    private List<Long> getAddFileItemIds(List<CustFileItem> dbFileItems, String[] currentIds) {
-        List<Long> addItemIds = new ArrayList<Long>();
-        for (String currentID : currentIds) {
+    private List<Long> getAddFileItemIds(final List<CustFileItem> dbFileItems, final String[] currentIds) {
+        final List<Long> addItemIds = new ArrayList<Long>();
+        for (final String currentID : currentIds) {
             if (BetterStringUtils.isBlank(currentID)) {
                 continue;
             }
             boolean isExist = false;
-            for (CustFileItem item : dbFileItems) {
+            for (final CustFileItem item : dbFileItems) {
                 if (currentID.equals(item.getId().toString())) {
                     isExist = true;
                     break;
@@ -241,15 +245,15 @@ public class CustFileAuditService extends BaseService<CustFileAduitMapper, CustF
      * @param paramNames
      * @return Map<workType, number>
      */
-    private Map<String, String> getTypeNumber(Map<String, String[]> paramMap, Enumeration<String> paramNames) {
-        Map<String, String> numMap = new HashMap<String, String>();
+    private Map<String, String> getTypeNumber(final Map<String, String[]> paramMap, final Enumeration<String> paramNames) {
+        final Map<String, String> numMap = new HashMap<String, String>();
         while (paramNames.hasMoreElements()) {
-            String paramName = paramNames.nextElement();
+            final String paramName = paramNames.nextElement();
             if (paramName.contains("type")) {
-                String key = paramMap.get(paramName)[0];
-                int beginPos = paramName.indexOf("[") + 1;
-                int endPos = paramName.indexOf("]");
-                String value = paramName.substring(beginPos, endPos);
+                final String key = paramMap.get(paramName)[0];
+                final int beginPos = paramName.indexOf("[") + 1;
+                final int endPos = paramName.indexOf("]");
+                final String value = paramName.substring(beginPos, endPos);
                 numMap.put(key, value);
             }
         }
@@ -265,17 +269,17 @@ public class CustFileAuditService extends BaseService<CustFileAduitMapper, CustF
      *            文件业务类型
      * @return
      */
-    public List<Long> findBatchNo(Long anCustNo, List<String> anFileBusinType) {
-        List<Long> batchNoList = new ArrayList<Long>();
-        for (CustFileAduit fileAduit : findCustFileInfo(anCustNo, anFileBusinType)) {
+    public List<Long> findBatchNo(final Long anCustNo, final List<String> anFileBusinType) {
+        final List<Long> batchNoList = new ArrayList<Long>();
+        for (final CustFileAduit fileAduit : findCustFileInfo(anCustNo, anFileBusinType)) {
             batchNoList.add(fileAduit.getId());
         }
 
         return batchNoList;
     }
 
-    private List<CustFileAduit> findCustFileInfo(Long anCustNo, List<String> anFileBusinType) {
-        Map<String, Object> map = new HashMap();
+    private List<CustFileAduit> findCustFileInfo(final Long anCustNo, final List<String> anFileBusinType) {
+        final Map<String, Object> map = new HashMap();
         map.put("custNo", anCustNo);
         map.put("workType", anFileBusinType);
 
@@ -289,19 +293,19 @@ public class CustFileAuditService extends BaseService<CustFileAduitMapper, CustF
      *            审批方数据
      * @return
      */
-    public boolean updateAuditFileGroup(AccountAduitData anAduitData) {
-        AuthDocumentStatus authoStatus = AuthDocumentStatus.checking(anAduitData.getAuditStatus());
-        Map map = new HashMap();
+    public boolean updateAuditFileGroup(final AccountAduitData anAduitData) {
+        final AuthDocumentStatus authoStatus = AuthDocumentStatus.checking(anAduitData.getAuditStatus());
+        final Map map = new HashMap();
         map.put("custNo", anAduitData.getCustNo());
         if (authoStatus != AuthDocumentStatus.AUTHED) {
-            List<String> tmpFileTypes = BetterStringUtils.splitTrim(anAduitData.getAttachFalseList());
+            final List<String> tmpFileTypes = BetterStringUtils.splitTrim(anAduitData.getAttachFalseList());
             map.put("workType", tmpFileTypes);
         }
-        List<CustFileAduit> tmpList = this.selectByProperty(map);
+        final List<CustFileAduit> tmpList = this.selectByProperty(map);
         if (Collections3.isEmpty(tmpList)) {
             return false;
         }
-        for (CustFileAduit fileAduit : tmpList) {
+        for (final CustFileAduit fileAduit : tmpList) {
             fileAduit.setAuditStatus(authoStatus.getValue());
             fileAduit.setAuthorTime(anAduitData.getAduitDate());
             this.updateByPrimaryKey(fileAduit);
@@ -309,72 +313,81 @@ public class CustFileAuditService extends BaseService<CustFileAduitMapper, CustF
 
         return true;
     }
-    
+
     /**
      * 查找客户认证材料缺少的文件业务类型
-     * @param anCustNo 客户编号
-     * @param anAgencyNo 合作伙伴代码
-     * @param anBusinFlag 业务类型
+     * 
+     * @param anCustNo
+     *            客户编号
+     * @param anAgencyNo
+     *            合作伙伴代码
+     * @param anBusinFlag
+     *            业务类型
      * @return
      */
-    public Set<String> findDeficiencyFileInfoList(Long anCustNo, String anAgencyNos, String anBusinFlag) {
-        Set<String> noticeMsg = new HashSet<String>();
+    public Set<String> findDeficiencyFileInfoList(final Long anCustNo, final String anAgencyNos, final String anBusinFlag) {
+        final Set<String> noticeMsg = new HashSet<String>();
         if (BetterStringUtils.isNotBlank(anAgencyNos)) {
-            List<AgencyAuthorFileGroup> agencyFileGroupList = this.agencyAuthFileGroupService.findAuthorFileGroup(anAgencyNos.split(","), anBusinFlag);
-            Map<String, CustFileAduit> custAduitFileMap = ReflectionUtils.listConvertToMap(findCustFileInfo(anCustNo, null), "workType");
-            Map<String, AuthorFileGroup> allAuthorFile = authorFileGroupService.findAllFileGroup();
+            final List<AgencyAuthorFileGroup> agencyFileGroupList = this.agencyAuthFileGroupService.findAuthorFileGroup(anAgencyNos.split(","),
+                    anBusinFlag);
+            final Map<String, CustFileAduit> custAduitFileMap = ReflectionUtils.listConvertToMap(findCustFileInfo(anCustNo, null), "workType");
+            final Map<String, AuthorFileGroup> allAuthorFile = authorFileGroupService.findAllFileGroup();
             AuthorFileGroup tmpFileGroup;
-            for (AgencyAuthorFileGroup authorFileGroup : agencyFileGroupList) {                
-                if (custAduitFileMap.containsKey( authorFileGroup.getFileInfoType()) == false){
-                   tmpFileGroup = allAuthorFile.get(authorFileGroup.getFileInfoType());
-                   if (tmpFileGroup != null){
-                      noticeMsg.add(tmpFileGroup.getDeficiencyInfo());
-                   }
+            for (final AgencyAuthorFileGroup authorFileGroup : agencyFileGroupList) {
+                if (custAduitFileMap.containsKey(authorFileGroup.getFileInfoType()) == false) {
+                    tmpFileGroup = allAuthorFile.get(authorFileGroup.getFileInfoType());
+                    if (tmpFileGroup != null) {
+                        noticeMsg.add(tmpFileGroup.getDeficiencyInfo());
+                    }
                 }
             }
         }
-        
+
         return noticeMsg;
     }
-    
+
     /***
      * 添加附件
+     * 
      * @param anCustFileAduit
      * @return
      */
-    public boolean addCustFileAduit(CustFileAduit anCustFileAduit){
-        return this.insert(anCustFileAduit)>0;
+    public boolean addCustFileAduit(final CustFileAduit anCustFileAduit) {
+        return this.insert(anCustFileAduit) > 0;
     }
-    
+
     /***
      * 删除附件关联审核表
+     * 
      * @param anId
      * @return
      */
-    public boolean delCustFileAduit(Long anId){
-        CustFileItem custFileItem=custFileItemService.findOne(anId);
-        if(custFileItem!=null){
-             return this.deleteByPrimaryKey(custFileItem.getBatchNo())>0;
-        }else{
+    public boolean delCustFileAduit(final Long anId) {
+        final CustFileItem custFileItem = custFileItemService.findOne(anId);
+        if (custFileItem != null) {
+            return this.deleteByPrimaryKey(custFileItem.getBatchNo()) > 0;
+        }
+        else {
             return false;
         }
     }
-    
+
     /****
      * 审核通过查询的附件来源为审核正式表
+     * 
      * @param anCustNo
      * @param anRelateCustNo
      * @return
      */
-    public List<CustFileItem> findCustFileAduit(Long anCustNo,Long anRelateCustNo){
-        List<CustFileItem>  custFileItemList=new ArrayList<CustFileItem>();
-        Map<String, Object> anMap=new HashMap<String, Object>();
+    public List<CustFileItem> findCustFileAduit(final Long anCustNo, final Long anRelateCustNo) {
+        final List<CustFileItem> custFileItemList = new ArrayList<CustFileItem>();
+        final Map<String, Object> anMap = new HashMap<String, Object>();
         anMap.put("custNo", anCustNo);
-        anMap.put("aduitCustNo", anRelateCustNo);   
-        anMap.put("auditStatus","1");
-        for(CustFileAduit custFileAduit:this.selectByProperty(anMap)){
-            CustFileItem custFileItem=custFileItemService.findOneByBatchNo(custFileAduit.getId(),custFileAduit.getWorkType());
-            if(custFileItem!=null){
+        anMap.put("aduitCustNo", anRelateCustNo);
+        anMap.put("auditStatus", "1");
+        for (final CustFileAduit custFileAduit : this.selectByProperty(anMap)) {
+            final CustFileItem custFileItem = custFileItemService.findOneByBatchNo(custFileAduit.getId(), custFileAduit.getWorkType());
+            if (custFileItem != null) {
                 custFileItem.setBusinStatus("1");
                 custFileItem.setFileDescription(agencyAuthFileGroupService.findAuthFileGroup(custFileItem.getFileInfoType()).getDescription());
                 custFileItemList.add(custFileItem);
@@ -383,9 +396,70 @@ public class CustFileAuditService extends BaseService<CustFileAduitMapper, CustF
         return custFileItemList;
     }
 
-    public static void main(String[] args) {
-        String tmpStr = "1, 123, 1231 , 231313";
-        for (String tt : BetterStringUtils.splitTrim(tmpStr)) {
+    /**
+     * 保存平台审批的资料的附件信息
+     * 
+     * @param anCustNo
+     *            客户编号
+     * @param anBatchNo
+     *            文件的批次号
+     */
+    public void savePlatformAduitFile(final Long anCustNo, final Long anBatchNo) {
+
+        final List<CustFileItem> fileItemList = this.custFileItemService.findCustFiles(anBatchNo);
+        final Map<String, AtomicInteger> tmpMap = new HashMap();
+        final CustFileItem workItem = Collections3.getFirst(fileItemList);
+        if (workItem == null) {
+            logger.warn("savePlatformAdduitFile anCustNo = " + anCustNo + ",  anBatchNo = " + anBatchNo + ", not find FileItemInfo");
+            return;
+        }
+
+        AtomicInteger workCount;
+        for (final CustFileItem fileItem : fileItemList) {
+            workCount = tmpMap.get(fileItem.getFileInfoType());
+            if (workCount == null) {
+                tmpMap.put(fileItem.getFileInfoType(), new AtomicInteger(1));
+            }
+            else {
+                workCount.incrementAndGet();
+            }
+        }
+
+        CustFileAduit tmpFileAduitInfo;
+        for (final Map.Entry<String, AtomicInteger> tmpEnt : tmpMap.entrySet()) {
+            destroyOldFileAduit(anCustNo, tmpEnt.getKey());
+            tmpFileAduitInfo = new CustFileAduit(anCustNo, anBatchNo, tmpEnt.getValue().intValue(), tmpEnt.getKey());
+            tmpFileAduitInfo.setOperNo(workItem.getRegOperName());
+            final CustInfo custInfo = UserUtils.getDefCustInfo();
+            if (custInfo != null) {
+                tmpFileAduitInfo.setAduitCustNo(custInfo.getCustNo());
+            }
+            else {
+                tmpFileAduitInfo.setAduitCustNo(0L);
+            }
+            tmpFileAduitInfo.setRegDate(workItem.getRegDate());
+            tmpFileAduitInfo.setRegTime(workItem.getRegTime());
+            this.insert(tmpFileAduitInfo);
+        }
+    }
+
+    /**
+     * 作废掉就的审批信息
+     * 
+     * @param anCustNo
+     * @param anFileType
+     */
+    private void destroyOldFileAduit(final Long anCustNo, final String anFileType) {
+        final Map<String, Object> termMap = QueryTermBuilder.newInstance().put("custNo", anCustNo).put("workType", anFileType).build();
+        for (CustFileAduit fileAduit : this.selectByProperty(termMap)) {
+            fileAduit = CustFileAduit.destroyFileAuditInfo(fileAduit);
+            this.updateByPrimaryKey(fileAduit);
+        }
+    }
+
+    public static void main(final String[] args) {
+        final String tmpStr = "1, 123, 1231 , 231313";
+        for (final String tt : BetterStringUtils.splitTrim(tmpStr)) {
             System.out.println(tt + ", " + tt.length());
         }
     }
