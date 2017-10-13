@@ -22,6 +22,7 @@ import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.modules.customer.constants.CustomerConstants;
 import com.betterjr.modules.customer.dao.CustMechBankAccountTmpMapper;
+import com.betterjr.modules.customer.data.ICustAuditEntityFace;
 import com.betterjr.modules.customer.entity.CustChangeApply;
 import com.betterjr.modules.customer.entity.CustInsteadRecord;
 import com.betterjr.modules.customer.entity.CustMechBankAccount;
@@ -107,12 +108,13 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
 
         bankAccountTmp.initAddValue(anBankAccount, CustomerConstants.TMP_TYPE_INITDATA, CustomerConstants.TMP_STATUS_USED);
         bankAccountTmp.setVersion(VersionHelper.generateVersion(this.mapper, anBankAccount.getCustNo()));
-        bankAccountTmp.setRefId(anBankAccount.getId());//引用编号
+        bankAccountTmp.setRefId(anBankAccount.getId());// 引用编号
 
         this.insert(bankAccountTmp);
 
         return bankAccountTmp;
     }
+
     /**
      * 添加修改变更记录
      */
@@ -133,13 +135,15 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
         if (tempBankAccountTmp == null) {
             anBankAccountTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW, CustomerConstants.TMP_TYPE_CHANGE, null);
             anBankAccountTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
-            anBankAccountTmp.setBatchNo(fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, anBankAccountTmp.getBatchNo(), UserUtils.getOperatorInfo()));
+            anBankAccountTmp.setBatchNo(
+                    fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, anBankAccountTmp.getBatchNo(), UserUtils.getOperatorInfo()));
             return addBankAccountTmp(anBankAccountTmp);
         }
         else {
             tempBankAccountTmp.initModifyValue(anBankAccountTmp);
             tempBankAccountTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
-            tempBankAccountTmp.setBatchNo(fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, tempBankAccountTmp.getBatchNo(), UserUtils.getOperatorInfo()));
+            tempBankAccountTmp.setBatchNo(
+                    fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, tempBankAccountTmp.getBatchNo(), UserUtils.getOperatorInfo()));
             return saveBankAccountTmp(tempBankAccountTmp);
         }
     }
@@ -260,7 +264,7 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
         BTAssert.isTrue(Collections3.isEmpty(bankAccountTmps) == false, "至少需要一个默认银行账户");
 
         int defaultCount = 0;
-        for (final CustMechBankAccountTmp bankAccountTmp: bankAccountTmps) {
+        for (final CustMechBankAccountTmp bankAccountTmp : bankAccountTmps) {
             if (bankAccountTmp.getIsDefault()) {
                 defaultCount++;
             }
@@ -272,8 +276,8 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
     /**
      * 存储未修改的记录
      */
-    private void saveNormalBankAccounts(final Collection<CustMechBankAccount> anBankAccounts, final Collection<CustMechBankAccountTmp> anBankAccountTmps,
-            final CustChangeApply anChangeApply, final String anTmpType) {
+    private void saveNormalBankAccounts(final Collection<CustMechBankAccount> anBankAccounts,
+            final Collection<CustMechBankAccountTmp> anBankAccountTmps, final CustChangeApply anChangeApply, final String anTmpType) {
         final Long parentId = anChangeApply.getId();
         for (final CustMechBankAccount bankAccount : anBankAccounts) {
             if (checkIsNormalBankAccount(bankAccount, anBankAccountTmps) == true) {
@@ -318,7 +322,7 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
         final String tempTmpIds = (String) anParam.get("tmpIds");
 
         COMMA_PATTERN.splitAsStream(tempTmpIds).map(Long::valueOf)
-        .forEach(tmpId -> saveBankAccountTmpParentIdAndStatus(tmpId, anApplyId, CustomerConstants.TMP_STATUS_USEING));
+                .forEach(tmpId -> saveBankAccountTmpParentIdAndStatus(tmpId, anApplyId, CustomerConstants.TMP_STATUS_USEING));
 
         changeApplyService.saveChangeApply(anApplyId, tempTmpIds);
 
@@ -411,6 +415,7 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
         tempBankAccountTmp.setBatchNo(fileItemService.updateCustFileItemInfo(anFileList, tempBankAccountTmp.getBatchNo()));
         return saveBankAccountTmp(tempBankAccountTmp);
     }
+
     public CustMechBankAccountTmp saveBankAccountTmp(final CustMechBankAccountTmp anBankAccountTmp) {
         BTAssert.notNull(anBankAccountTmp, "公司银行账户流水信息不允许为空！");
         this.updateByPrimaryKeySelective(anBankAccountTmp);
@@ -438,13 +443,12 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
      *
      * @param anInsteadRecordId
      */
-    public CustMechBankAccountTmp addInsteadBankAccountTmp(final CustMechBankAccountTmp anBankAccountTmp, final Long anInsteadRecordId, final String anFileList) {
+    public CustMechBankAccountTmp addInsteadBankAccountTmp(final CustMechBankAccountTmp anBankAccountTmp, final Long anInsteadRecordId,
+            final String anFileList) {
         BTAssert.notNull(anBankAccountTmp, "公司银行账户流水信息不允许为空！");
 
-        checkInsteadRecord(anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_NEW,
-                CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN,
-                CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT,
-                CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_REJECT);
+        checkInsteadRecord(anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_NEW, CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN,
+                CustomerConstants.INSTEAD_RECORD_STATUS_REVIEW_REJECT, CustomerConstants.INSTEAD_RECORD_STATUS_CONFIRM_REJECT);
 
         final Long refId = anBankAccountTmp.getRefId();
 
@@ -466,7 +470,8 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
     /**
      * 添加修改代录流水
      */
-    public CustMechBankAccountTmp saveSaveInsteadBankAccountTmp(final CustMechBankAccountTmp anBankAccountTmp, final Long anInsteadRecordId, final String anFileList) {
+    public CustMechBankAccountTmp saveSaveInsteadBankAccountTmp(final CustMechBankAccountTmp anBankAccountTmp, final Long anInsteadRecordId,
+            final String anFileList) {
         BTAssert.notNull(anBankAccountTmp, "公司银行账户流水信息不允许为空！");
 
         final CustInsteadRecord insteadRecord = checkInsteadRecord(anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_NEW,
@@ -488,13 +493,15 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
             anBankAccountTmp.initAddValue(CustomerConstants.TMP_STATUS_NEW, CustomerConstants.TMP_TYPE_INSTEAD, null);
             anBankAccountTmp.setParentId(anInsteadRecordId);
             anBankAccountTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
-            anBankAccountTmp.setBatchNo(fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, anBankAccountTmp.getBatchNo(), UserUtils.getOperatorInfo()));
+            anBankAccountTmp.setBatchNo(
+                    fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, anBankAccountTmp.getBatchNo(), UserUtils.getOperatorInfo()));
             return addBankAccountTmp(anBankAccountTmp);
         }
         else {
             tempBankAccountTmp.initModifyValue(anBankAccountTmp);
             tempBankAccountTmp.setTmpOperType(CustomerConstants.TMP_OPER_TYPE_MODIFY);
-            tempBankAccountTmp.setBatchNo(fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, tempBankAccountTmp.getBatchNo(), UserUtils.getOperatorInfo()));
+            tempBankAccountTmp.setBatchNo(
+                    fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, tempBankAccountTmp.getBatchNo(), UserUtils.getOperatorInfo()));
             return saveBankAccountTmp(tempBankAccountTmp);
         }
     }
@@ -576,7 +583,7 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
         final String tempTmpIds = (String) anParam.get("tmpIds");
 
         COMMA_PATTERN.splitAsStream(tempTmpIds).map(Long::valueOf)
-        .forEach(tmpId -> saveBankAccountTmpParentIdAndStatus(tmpId, insteadRecord.getId(), CustomerConstants.TMP_STATUS_USEING));
+                .forEach(tmpId -> saveBankAccountTmpParentIdAndStatus(tmpId, insteadRecord.getId(), CustomerConstants.TMP_STATUS_USEING));
 
         insteadRecordService.saveInsteadRecordStatus(anInsteadRecordId, CustomerConstants.INSTEAD_RECORD_STATUS_TYPE_IN);
 
@@ -595,7 +602,7 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
         final String tempTmpIds = (String) anParam.get("tmpIds");
 
         COMMA_PATTERN.splitAsStream(tempTmpIds).map(Long::valueOf)
-        .forEach(tmpId -> saveBankAccountTmpParentIdAndStatus(tmpId, insteadRecord.getId(), CustomerConstants.TMP_STATUS_USEING));
+                .forEach(tmpId -> saveBankAccountTmpParentIdAndStatus(tmpId, insteadRecord.getId(), CustomerConstants.TMP_STATUS_USEING));
 
         insteadRecordService.saveInsteadRecord(anInsteadRecordId, tempTmpIds);
 
@@ -715,6 +722,12 @@ public class CustMechBankAccountTmpService extends BaseService<CustMechBankAccou
         }
 
         return (tempSet.size() == anChangeIds.size());
+    }
+
+    @Override
+    public ICustAuditEntityFace findSaveDataByParentId(final Long anParentId) {
+
+        return Collections3.getFirst(this.selectByProperty("parentId", anParentId));
     }
 
 }

@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Resource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.config.annotation.Service;
@@ -27,9 +28,9 @@ import com.betterjr.modules.document.service.CustFileItemService;
 import com.betterjr.modules.document.service.CustResolveFileService;
 import com.betterjr.modules.document.utils.CustFileUtils;
 
-@Service(interfaceClass=ICustFileService.class)
-public class CustFileDubboService implements ICustFileService{
-    
+@Service(interfaceClass = ICustFileService.class)
+public class CustFileDubboService implements ICustFileService {
+
     @Autowired
     private CustFileAuditService custFileAuditService;
     @Autowired
@@ -41,47 +42,49 @@ public class CustFileDubboService implements ICustFileService{
     private CustResolveFileService resolveFileService;
     @Resource
     private RocketMQProducer betterProducer;
-    
+
     @Override
-    public String webUpdateCustFileAuditInfo(Map<String, String[]> anParamMap, Enumeration<String> anParamNames, Long anCustNo) {
+    public String webUpdateCustFileAuditInfo(final Map<String, String[]> anParamMap, final Enumeration<String> anParamNames, final Long anCustNo) {
 
         custFileAuditService.updateCustFileAuditInfo(anParamMap, anParamNames, anCustNo);
         return AjaxObject.newOk("新增用户认证文件审核信息成功").toJson();
     }
 
     @Override
-    public String webFindCustFileAuditInfo(Long anCustNo) {
+    public String webFindCustFileAuditInfo(final Long anCustNo) {
 
-        List<CustFileAduit> auditList = custFileAuditService.findCustFileAuditInfo(anCustNo);
+        final List<CustFileAduit> auditList = custFileAuditService.findCustFileAuditInfo(anCustNo);
         return AjaxObject.newOk("查询用户认证文件审核信息成功", auditList).toJson();
     }
 
     @Override
-    public List<Long> findBatchNo(Long anCustNo, List<String> anFileBusinType) {
+    public List<Long> findBatchNo(final Long anCustNo, final List<String> anFileBusinType) {
 
         return custFileAuditService.findBatchNo(anCustNo, anFileBusinType);
     }
 
     @Override
-    public boolean updateAuditFileGroup(AccountAduitData anAduitData) {
+    public boolean updateAuditFileGroup(final AccountAduitData anAduitData) {
 
         return custFileAuditService.updateAuditFileGroup(anAduitData);
     }
-    
+
     /***
      * 添加客户审核附件
+     * 
      * @param anCustFileAduit
      * @return
      */
-    public boolean addCustFileAduit(CustFileAduit anCustFileAduit){
+    @Override
+    public boolean addCustFileAduit(final CustFileAduit anCustFileAduit) {
         return custFileAuditService.addCustFileAduit(anCustFileAduit);
     }
 
     @Override
-    public String webFindDeficiencyFileInfoList(Long anCustNo, String anAgencyNos) {
+    public String webFindDeficiencyFileInfoList(final Long anCustNo, final String anAgencyNos) {
 
-        String businFlag = "01";
-        Set<String> noticeMsg = custFileAuditService.findDeficiencyFileInfoList(anCustNo, anAgencyNos, businFlag);
+        final String businFlag = "01";
+        final Set<String> noticeMsg = custFileAuditService.findDeficiencyFileInfoList(anCustNo, anAgencyNos, businFlag);
         if (Collections3.isEmpty(noticeMsg)) {
             return AjaxObject.newOk("ok", noticeMsg).toJson();
         }
@@ -91,203 +94,213 @@ public class CustFileDubboService implements ICustFileService{
     }
 
     @Override
-    public List<CustFileItem> findUploadFileByAgency(String anRequestNo, String anBusinFlag, String anAgecyNo) {
+    public List<CustFileItem> findUploadFileByAgency(final String anRequestNo, final String anBusinFlag, final String anAgecyNo) {
 
         return custFileInfoService.findUploadFileByAgency(anRequestNo, anBusinFlag, anAgecyNo);
     }
 
     @Override
-    public List<CustFileItem> findUploadFiles(String anRequestNo, String anBusinFlag) {
+    public List<CustFileItem> findUploadFiles(final String anRequestNo, final String anBusinFlag) {
 
         return custFileInfoService.findUploadFiles(anRequestNo, anBusinFlag);
     }
 
     @Override
-    public List<CustFileItem> findUploadFileByCustNo(Long custNo, String anBusinFlag) {
+    public List<CustFileItem> findUploadFileByCustNo(final Long custNo, final String anBusinFlag) {
 
         return custFileInfoService.findUploadFileByCustNo(custNo, anBusinFlag);
     }
 
     @Override
-    public CustFileItem findOne(Long id) {
+    public CustFileItem findOne(final Long id) {
 
         return custFileItemService.findOne(id);
     }
 
     @Override
-    public boolean updateFileItems(Long batchNo, Long fileItemId) {
+    public boolean updateFileItems(final Long batchNo, final Long fileItemId) {
 
         return custFileItemService.updateFileItems(batchNo, fileItemId);
     }
 
     @Override
-    public Long updateCustFileItemInfo(String anFileList, Long anBatchNo) {
+    public Long updateCustFileItemInfo(final String anFileList, final Long anBatchNo) {
 
         return custFileItemService.updateCustFileItemInfo(anFileList, anBatchNo);
     }
 
     @Override
-    public CustFileItem findOneByBatchNo(Long anBatchNo) {
+    public CustFileItem findOneByBatchNo(final Long anBatchNo) {
 
-        return custFileItemService.findOneByBatchNo(anBatchNo,"");
+        return custFileItemService.findOneByBatchNo(anBatchNo, "");
     }
 
     @Override
-    public Map<String, CustFileItem> findItems(Map<String, Long> anMap) {
+    public Map<String, CustFileItem> findItems(final Map<String, Long> anMap) {
 
         return custFileItemService.findItems(anMap);
     }
 
     @Override
-    public List<CustFileItem> findCustFiles(Long anBatchNo) {
+    public List<CustFileItem> findCustFiles(final Long anBatchNo) {
 
         return custFileItemService.findCustFiles(anBatchNo);
     }
 
     @Override
-    public List<CustFileItem> findCustFilesByBatch(List<Long> anBatchNoList, List<String> anbusinTypeList) {
+    public List<CustFileItem> findCustFilesByBatch(final List<Long> anBatchNoList, final List<String> anbusinTypeList) {
 
-        return custFileItemService.findCustFilesByBatch(anBatchNoList,anbusinTypeList);
+        return custFileItemService.findCustFilesByBatch(anBatchNoList, anbusinTypeList);
     }
 
     @Override
-    public List<CustFileItem> findCustFilesByBatch(List<Long> anBatchNoList) {
+    public List<CustFileItem> findCustFilesByBatch(final List<Long> anBatchNoList) {
 
         return custFileItemService.findCustFilesByBatch(anBatchNoList);
     }
 
     @Override
-    public String webDeleteFileItem(Long anId, Long anBatchNo) {
+    public String webDeleteFileItem(final Long anId, final Long anBatchNo) {
 
-        boolean result= custFileItemService.deleteFileItem(anId, anBatchNo);
-        if(result){
+        final boolean result = custFileItemService.deleteFileItem(anId, anBatchNo);
+        if (result) {
             return AjaxObject.newOk("文件删除成功").toJson();
         }
         return AjaxObject.newOk("文件删除失败").toJson();
     }
-    
+
     @Override
-    public boolean deleteFileItem(Long anId, Long anBatchNo) {
+    public boolean deleteFileItem(final Long anId, final Long anBatchNo) {
 
         return custFileItemService.deleteFileItem(anId, anBatchNo);
     }
 
     @Override
-    public CustFileItem saveAndUpdateFileItem(String filePath,Long fileLength, String anWorkType, String anFileName, FileStoreType anStoreType, boolean anWithBatchNo) {
+    public CustFileItem saveAndUpdateFileItem(final String filePath, final Long fileLength, final String anWorkType, final String anFileName,
+            final FileStoreType anStoreType, final boolean anWithBatchNo) {
 
-        CustFileItem fileItem = CustFileUtils.createDefFileItemForStore(filePath,fileLength, anWorkType, anFileName);
+        final CustFileItem fileItem = CustFileUtils.createDefFileItemForStore(filePath, fileLength, anWorkType, anFileName);
         fileItem.setStoreType(anStoreType.getValue());
-        if (anWithBatchNo){
-            fileItem.setBatchNo( CustFileUtils.findBatchNo() );
+        if (anWithBatchNo) {
+            fileItem.setBatchNo(CustFileUtils.findBatchNo());
         }
-        
-        if (this.custFileItemService.saveAndUpdateFileItem(fileItem, UserUtils.getOperatorInfo())){
-           return fileItem; 
+
+        if (this.custFileItemService.saveAndUpdateFileItem(fileItem, UserUtils.getOperatorInfo())) {
+            return fileItem;
         }
-        else{
+        else {
             return null;
         }
     }
-    
-    @Override
-    public String webSaveAndUpdateFileItem(String filePath,Long fileLength, String anWorkType, String anFileName, FileStoreType anStoreType) {
 
-        CustFileItem fileItem = CustFileUtils.createDefFileItemForStore(filePath,fileLength, anWorkType, anFileName);
+    @Override
+    public String webSaveAndUpdateFileItem(final String filePath, final Long fileLength, final String anWorkType, final String anFileName,
+            final FileStoreType anStoreType) {
+
+        final CustFileItem fileItem = CustFileUtils.createDefFileItemForStore(filePath, fileLength, anWorkType, anFileName);
         fileItem.setStoreType(anStoreType.getValue());
-        boolean result=this.custFileItemService.saveAndUpdateFileItem(fileItem, UserUtils.getOperatorInfo());
-        if(result){
+        final boolean result = this.custFileItemService.saveAndUpdateFileItem(fileItem, UserUtils.getOperatorInfo());
+        if (result) {
             return AjaxObject.newOk("上传文件成功", fileItem).toJson();
         }
         return AjaxObject.newOk("上传文件失败").toJson();
     }
 
     @Override
-    public Long updateAndDelCustFileItemInfo(String anFileList, Long anBatchNo) {
+    public Long updateAndDelCustFileItemInfo(final String anFileList, final Long anBatchNo) {
         return this.custFileItemService.updateAndDelCustFileItemInfo(anFileList, anBatchNo);
     }
-    
+
     /***
      * 删除审核表中的附件关联
+     * 
      * @param anId
      * @return
      */
-    public boolean delCustFileAduit(Long anId){
+    @Override
+    public boolean delCustFileAduit(final Long anId) {
         return this.custFileAuditService.delCustFileAduit(anId);
     }
-    
+
     /****
      * 审核通过查询的附件来源为审核正式表
+     * 
      * @param anCustNo
      * @param anRelateCustNo
      * @return
      */
-    public List<CustFileItem> findCustFileAduit(Long anCustNo,Long anRelateCustNo){
-        return this.custFileAuditService.findCustFileAduit(anCustNo, anRelateCustNo);
-    }
-    
- 
     @Override
-    public List<CustFileItem> findFileListByIds(String[] anIds) {
-       return this.custFileItemService.findFileListByIds(anIds);
+    public List<CustFileItem> findCustFileAduit(final Long anCustNo, final Long anRelateCustNo) {
+        return this.custFileAuditService.findCustFileAduit(anCustNo, anRelateCustNo);
     }
 
     @Override
-    public CustResolveFile webSaveAddResolveFile(CustResolveFile anResolveFile) {
-        
-        //AjaxObject.newOk("文件解析日志插入成功", resolveFileService.saveAddResolveFile(anResolveFile)).toJson();
+    public List<CustFileItem> findFileListByIds(final String[] anIds) {
+        return this.custFileItemService.findFileListByIds(anIds);
+    }
+
+    @Override
+    public CustResolveFile webSaveAddResolveFile(final CustResolveFile anResolveFile) {
+
+        // AjaxObject.newOk("文件解析日志插入成功", resolveFileService.saveAddResolveFile(anResolveFile)).toJson();
         return resolveFileService.saveAddResolveFile(anResolveFile);
     }
-    
+
     @Override
-    public String webfindResolveFile(Long anResolveFileId) {
+    public String webfindResolveFile(final Long anResolveFileId) {
 
         return AjaxObject.newOk(resolveFileService.findOne(anResolveFileId)).toJson();
     }
 
     @Override
-    public boolean sendResolveMessage(CustResolveFile anResolveFile) {
-        
-     // 发消息
+    public boolean sendResolveMessage(final CustResolveFile anResolveFile) {
+
+        // 发消息
         final MQMessage anMessage = new MQMessage("FILE_RESOLVE_CUST_TOPIC");
 
         try {
             anMessage.setObject(anResolveFile);
-            anMessage.addHead("id", anResolveFile.getId()); 
+            anMessage.addHead("id", anResolveFile.getId());
             anMessage.addHead("infoType", anResolveFile.getInfoType());
             betterProducer.sendMessage(anMessage);
             return true;
         }
-        catch (Exception e) {
-            
+        catch (final Exception e) {
+
             return false;
         }
-        
+
     }
 
     @Override
-    public void saveModifyResolveFile(Map<String, Object> anResolveFileMap) {
-        
+    public void saveModifyResolveFile(final Map<String, Object> anResolveFileMap) {
+
         resolveFileService.saveUpdateOnlyStatus(anResolveFileMap);
     }
-    
+
     @Override
-    public void saveModifyResolveFile(CustResolveFile anResolveFile) {
-        
-        BTAssert.notNull(anResolveFile,"修改记录失败，数据为空");
-        BTAssert.notNull(anResolveFile.getId(),"修改记录失败，数据为空");
+    public void saveModifyResolveFile(final CustResolveFile anResolveFile) {
+
+        BTAssert.notNull(anResolveFile, "修改记录失败，数据为空");
+        BTAssert.notNull(anResolveFile.getId(), "修改记录失败，数据为空");
         resolveFileService.updateByPrimaryKeySelective(anResolveFile);
-        
+
     }
 
     @Override
-    public CustFileItem findOneAndButchId(Long anId) {
-        CustFileItem fileItem = custFileItemService.findOne(anId);
-        if(fileItem.getBatchNo()==null || fileItem.getBatchNo()<0){
-            Long butchId = custFileItemService.updateCustFileItemInfo(anId+"", 0l);
+    public CustFileItem findOneAndButchId(final Long anId) {
+        final CustFileItem fileItem = custFileItemService.findOne(anId);
+        if (fileItem.getBatchNo() == null || fileItem.getBatchNo() < 0) {
+            final Long butchId = custFileItemService.updateCustFileItemInfo(anId + "", 0l);
             fileItem.setBatchNo(butchId);
         }
         return fileItem;
     }
 
-    
+    @Override
+    public void savePlatformAduitFile(final Long anCustNo, final Long anBatchNo) {
+
+        custFileAuditService.savePlatformAduitFile(anCustNo, anBatchNo);
+    }
+
 }
