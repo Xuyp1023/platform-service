@@ -43,7 +43,8 @@ public class OpenAccountHandlerService {
             final CustOpenAccountTmp openAccountTmp = (CustOpenAccountTmp) message.getObject();// 开户实体
 
             logger.debug("当前开户用户：" + openAccountTmp.getCustName());
-            final Long platformCustNo = Long.valueOf(Collections3.getFirst(DictUtils.getDictList("PlatformGroup")).getItemValue());
+            final Long platformCustNo = Long
+                    .valueOf(Collections3.getFirst(DictUtils.getDictList("PlatformGroup")).getItemValue());
             final CustInfo customer = accountService.findCustInfo(platformCustNo);
 
             if (StringUtils.equals("1", type)) { // 开户审核通过通知
@@ -52,16 +53,14 @@ public class OpenAccountHandlerService {
                 builder.addReceiveEmail(openAccountTmp.getOperEmail());
                 builder.addReceiveMobile(openAccountTmp.getOperMobile());
                 notificationSendService.sendNotification(builder.build());
-            }
-            else if (StringUtils.equals("0", type)) { // 开户审核驳回通知
+            } else if (StringUtils.equals("0", type)) { // 开户审核驳回通知
                 final Builder builder = NotificationModel.newBuilder("开户审核驳回通知", customer, operator);
                 builder.setEntity(openAccountTmp);
                 builder.addReceiveEmail(openAccountTmp.getOperEmail());
                 builder.addReceiveMobile(openAccountTmp.getOperMobile());
                 builder.addParam("auditOpinion", message.getHead("auditOpinion"));
                 notificationSendService.sendNotification(builder.build());
-            }
-            else {
+            } else {
                 logger.error("消息类型不正确！");
             }
         }

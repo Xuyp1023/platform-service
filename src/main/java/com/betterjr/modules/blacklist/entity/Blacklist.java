@@ -7,12 +7,13 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.betterjr.common.annotation.MetaData;
 import com.betterjr.common.entity.BetterjrEntity;
 import com.betterjr.common.mapper.CustDateJsonSerializer;
 import com.betterjr.common.selectkey.SerialGenerator;
 import com.betterjr.common.utils.BetterDateUtils;
-import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.modules.blacklist.constant.BlacklistConstants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -454,30 +455,51 @@ public class Blacklist implements BetterjrEntity {
         }
         Blacklist other = (Blacklist) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-                && (this.getCustType() == null ? other.getCustType() == null : this.getCustType().equals(other.getCustType()))
+                && (this.getCustType() == null ? other.getCustType() == null
+                        : this.getCustType().equals(other.getCustType()))
                 && (this.getName() == null ? other.getName() == null : this.getName().equals(other.getName()))
-                && (this.getIdentNo() == null ? other.getIdentNo() == null : this.getIdentNo().equals(other.getIdentNo()))
-                && (this.getLawName() == null ? other.getLawName() == null : this.getLawName().equals(other.getLawName()))
-                && (this.getDisBehavior() == null ? other.getDisBehavior() == null : this.getDisBehavior().equals(other.getDisBehavior()))
-                && (this.getRegOperId() == null ? other.getRegOperId() == null : this.getRegOperId().equals(other.getRegOperId()))
-                && (this.getRegOperName() == null ? other.getRegOperName() == null : this.getRegOperName().equals(other.getRegOperName()))
-                && (this.getRegDate() == null ? other.getRegDate() == null : this.getRegDate().equals(other.getRegDate()))
-                && (this.getRegTime() == null ? other.getRegTime() == null : this.getRegTime().equals(other.getRegTime()))
-                && (this.getModiOperId() == null ? other.getModiOperId() == null : this.getModiOperId().equals(other.getModiOperId()))
-                && (this.getModiOperName() == null ? other.getModiOperName() == null : this.getModiOperName().equals(other.getModiOperName()))
-                && (this.getModiDate() == null ? other.getModiDate() == null : this.getModiDate().equals(other.getModiDate()))
-                && (this.getModiTime() == null ? other.getModiTime() == null : this.getModiTime().equals(other.getModiTime()))
-                && (this.getActivateOperId() == null ? other.getActivateOperId() == null : this.getActivateOperId().equals(other.getActivateOperId()))
+                && (this.getIdentNo() == null ? other.getIdentNo() == null
+                        : this.getIdentNo().equals(other.getIdentNo()))
+                && (this.getLawName() == null ? other.getLawName() == null
+                        : this.getLawName().equals(other.getLawName()))
+                && (this.getDisBehavior() == null ? other.getDisBehavior() == null
+                        : this.getDisBehavior().equals(other.getDisBehavior()))
+                && (this.getRegOperId() == null ? other.getRegOperId() == null
+                        : this.getRegOperId().equals(other.getRegOperId()))
+                && (this.getRegOperName() == null ? other.getRegOperName() == null
+                        : this.getRegOperName().equals(other.getRegOperName()))
+                && (this.getRegDate() == null ? other.getRegDate() == null
+                        : this.getRegDate().equals(other.getRegDate()))
+                && (this.getRegTime() == null ? other.getRegTime() == null
+                        : this.getRegTime().equals(other.getRegTime()))
+                && (this.getModiOperId() == null ? other.getModiOperId() == null
+                        : this.getModiOperId().equals(other.getModiOperId()))
+                && (this.getModiOperName() == null ? other.getModiOperName() == null
+                        : this.getModiOperName().equals(other.getModiOperName()))
+                && (this.getModiDate() == null ? other.getModiDate() == null
+                        : this.getModiDate().equals(other.getModiDate()))
+                && (this.getModiTime() == null ? other.getModiTime() == null
+                        : this.getModiTime().equals(other.getModiTime()))
+                && (this.getActivateOperId() == null ? other.getActivateOperId() == null
+                        : this.getActivateOperId().equals(other.getActivateOperId()))
                 && (this.getActivateOperName() == null ? other.getActivateOperName() == null
                         : this.getActivateOperName().equals(other.getActivateOperName()))
-                && (this.getActivateDate() == null ? other.getActivateDate() == null : this.getActivateDate().equals(other.getActivateDate()))
-                && (this.getActivateTime() == null ? other.getActivateTime() == null : this.getActivateTime().equals(other.getActivateTime()))
-                && (this.getCancelOperId() == null ? other.getCancelOperId() == null : this.getCancelOperId().equals(other.getCancelOperId()))
-                && (this.getCancelOperName() == null ? other.getCancelOperName() == null : this.getCancelOperName().equals(other.getCancelOperName()))
-                && (this.getCancelDate() == null ? other.getCancelDate() == null : this.getCancelDate().equals(other.getCancelDate()))
-                && (this.getCancelTime() == null ? other.getCancelTime() == null : this.getCancelTime().equals(other.getCancelTime()))
-                && (this.getBusinStatus() == null ? other.getBusinStatus() == null : this.getBusinStatus().equals(other.getBusinStatus()))
-                && (this.getOperOrg() == null ? other.getOperOrg() == null : this.getOperOrg().equals(other.getOperOrg()))
+                && (this.getActivateDate() == null ? other.getActivateDate() == null
+                        : this.getActivateDate().equals(other.getActivateDate()))
+                && (this.getActivateTime() == null ? other.getActivateTime() == null
+                        : this.getActivateTime().equals(other.getActivateTime()))
+                && (this.getCancelOperId() == null ? other.getCancelOperId() == null
+                        : this.getCancelOperId().equals(other.getCancelOperId()))
+                && (this.getCancelOperName() == null ? other.getCancelOperName() == null
+                        : this.getCancelOperName().equals(other.getCancelOperName()))
+                && (this.getCancelDate() == null ? other.getCancelDate() == null
+                        : this.getCancelDate().equals(other.getCancelDate()))
+                && (this.getCancelTime() == null ? other.getCancelTime() == null
+                        : this.getCancelTime().equals(other.getCancelTime()))
+                && (this.getBusinStatus() == null ? other.getBusinStatus() == null
+                        : this.getBusinStatus().equals(other.getBusinStatus()))
+                && (this.getOperOrg() == null ? other.getOperOrg() == null
+                        : this.getOperOrg().equals(other.getOperOrg()))
                 && (this.getCustNo() == null ? other.getCustNo() == null : this.getCustNo().equals(other.getCustNo()));
     }
 
@@ -561,7 +583,7 @@ public class Blacklist implements BetterjrEntity {
 
     public void initLawName(String anCustType) {
         // 是否个人黑名单:custType,0-个人,1-机构
-        if (BetterStringUtils.equals(anCustType, BlacklistConstants.BLACKLIST_TYPE_PERSONAL) == true) {
+        if (StringUtils.equals(anCustType, BlacklistConstants.BLACKLIST_TYPE_PERSONAL) == true) {
             this.lawName = " ";
         }
     }

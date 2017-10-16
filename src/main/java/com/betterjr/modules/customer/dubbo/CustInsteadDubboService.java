@@ -26,14 +26,17 @@ public class CustInsteadDubboService implements ICustInsteadService {
         final Map<String, Object> param = RuleServiceDubboFilterInvoker.getInputObj();
         return AjaxObject.newOk("申请代录成功", insteadService.addInsteadApply(param, anFileList)).toJson();
     }
-    
+
     @Override
     public String webAddOpenAccountInsteadApply(final String anCustName, final Long anOperId, final String anFileList) {
-        return AjaxObject.newOk("PC申请代录开户成功", insteadService.addOpenAccountInsteadApply(anCustName, anOperId, anFileList)).toJson();
+        return AjaxObject
+                .newOk("PC申请代录开户成功", insteadService.addOpenAccountInsteadApply(anCustName, anOperId, anFileList))
+                .toJson();
     }
 
     @Override
-    public String webSaveInsteadApply(final Map<String, Object> anParam, final Long anApplyId, final String anFileList) {
+    public String webSaveInsteadApply(final Map<String, Object> anParam, final Long anApplyId,
+            final String anFileList) {
         final Map<String, Object> param = RuleServiceDubboFilterInvoker.getInputObj();
         return AjaxObject.newOk("代录申请 修改申请 成功", insteadService.saveInsteadApply(param, anApplyId, anFileList)).toJson();
     }
@@ -44,33 +47,43 @@ public class CustInsteadDubboService implements ICustInsteadService {
     }
 
     @Override
-    public String webQueryInsteadApplyList(final Map<String, Object> anParam, final int anFlag, final int anPageNum, final int anPageSize) {
+    public String webQueryInsteadApplyList(final Map<String, Object> anParam, final int anFlag, final int anPageNum,
+            final int anPageSize) {
         final Map<String, Object> param = RuleServiceDubboFilterInvoker.getInputObj();
-        return AjaxObject.newOkWithPage("代录申请 代录列表 查询成功", insteadService.queryInsteadApplyList(param, anFlag, anPageNum, anPageSize)).toJson();
+        return AjaxObject.newOkWithPage("代录申请 代录列表 查询成功",
+                insteadService.queryInsteadApplyList(param, anFlag, anPageNum, anPageSize)).toJson();
     }
 
     @Override
-    public String webQueryInsteadApplyOwnList(final Map<String, Object> anParam, final int anFlag, final int anPageNum, final int anPageSize) {
+    public String webQueryInsteadApplyOwnList(final Map<String, Object> anParam, final int anFlag, final int anPageNum,
+            final int anPageSize) {
         final Map<String, Object> param = RuleServiceDubboFilterInvoker.getInputObj();
-        return AjaxObject.newOkWithPage("代录申请 拥有列表 查询成功", insteadService.queryInsteadApplyOwnList(param, anFlag, anPageNum, anPageSize)).toJson();
+        return AjaxObject.newOkWithPage("代录申请 拥有列表 查询成功",
+                insteadService.queryInsteadApplyOwnList(param, anFlag, anPageNum, anPageSize)).toJson();
     }
 
     @Override
-    public String webQueryInsteadApplyAuditList(final Map<String, Object> anParam, final int anFlag, final int anPageNum, final int anPageSize) {
+    public String webQueryInsteadApplyAuditList(final Map<String, Object> anParam, final int anFlag,
+            final int anPageNum, final int anPageSize) {
         final Map<String, Object> param = RuleServiceDubboFilterInvoker.getInputObj();
-        return AjaxObject.newOkWithPage("代录申请 审核列表 查询成功", insteadService.queryInsteadApplyAuditList(param, anFlag, anPageNum, anPageSize)).toJson();
+        return AjaxObject.newOkWithPage("代录申请 审核列表 查询成功",
+                insteadService.queryInsteadApplyAuditList(param, anFlag, anPageNum, anPageSize)).toJson();
     }
 
     @Override
-    public String webQueryInsteadApplyReviewList(final Map<String, Object> anParam, final int anFlag, final int anPageNum, final int anPageSize) {
+    public String webQueryInsteadApplyReviewList(final Map<String, Object> anParam, final int anFlag,
+            final int anPageNum, final int anPageSize) {
         final Map<String, Object> param = RuleServiceDubboFilterInvoker.getInputObj();
-        return AjaxObject.newOkWithPage("代录申请 复核列表 查询成功", insteadService.queryInsteadApplyReviewList(param, anFlag, anPageNum, anPageSize)).toJson();
+        return AjaxObject.newOkWithPage("代录申请 复核列表 查询成功",
+                insteadService.queryInsteadApplyReviewList(param, anFlag, anPageNum, anPageSize)).toJson();
     }
 
     @Override
-    public String webQueryInsteadApplyConfirmList(final Map<String, Object> anParam, final int anFlag, final int anPageNum, final int anPageSize) {
+    public String webQueryInsteadApplyConfirmList(final Map<String, Object> anParam, final int anFlag,
+            final int anPageNum, final int anPageSize) {
         final Map<String, Object> param = RuleServiceDubboFilterInvoker.getInputObj();
-        return AjaxObject.newOkWithPage("代录申请 确认列表 查询成功", insteadService.queryInsteadApplyConfirmList(param, anFlag, anPageNum, anPageSize)).toJson();
+        return AjaxObject.newOkWithPage("代录申请 确认列表 查询成功",
+                insteadService.queryInsteadApplyConfirmList(param, anFlag, anPageNum, anPageSize)).toJson();
     }
 
     @Override
@@ -153,7 +166,7 @@ public class CustInsteadDubboService implements ICustInsteadService {
         // TODO @@@@@@
         return null;
     }
-    
+
     @Override
     public String webWechatAddInsteadApply(final Map<String, Object> anMap, final Long anId, final String anFileList) {
         try {
@@ -164,7 +177,7 @@ public class CustInsteadDubboService implements ICustInsteadService {
             return AjaxObject.newError(e.getMessage()).toJson();
         }
     }
-    
+
     @Override
     public String webFindInsteadApplyByAccountTmpId(final Long anId) {
         try {
@@ -186,6 +199,5 @@ public class CustInsteadDubboService implements ICustInsteadService {
             return AjaxObject.newError(e.getMessage()).toJson();
         }
     }
-
 
 }

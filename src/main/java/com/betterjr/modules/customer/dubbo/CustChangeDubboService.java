@@ -18,7 +18,9 @@ public class CustChangeDubboService implements ICustChangeService {
     @Override
     public String webQueryChangeApplyList(Map<String, Object> anParam, int anFlag, int anPageNum, int anPageSize) {
         Map<String, Object> param = RuleServiceDubboFilterInvoker.getInputObj();
-        return AjaxObject.newOkWithPage("变更申请列表查询成功！", changeService.queryChangeApplyList(param, anFlag, anPageNum, anPageSize)).toJson();
+        return AjaxObject
+                .newOkWithPage("变更申请列表查询成功！", changeService.queryChangeApplyList(param, anFlag, anPageNum, anPageSize))
+                .toJson();
     }
 
     @Override

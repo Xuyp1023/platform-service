@@ -5,5 +5,4 @@ import com.betterjr.mapper.common.Mapper;
 import com.betterjr.modules.workflow.entity.CustFlowStepApprovers;
 
 @BetterjrMapper
-public interface CustFlowStepApproversMapper extends Mapper<CustFlowStepApprovers> {
-}
+public interface CustFlowStepApproversMapper extends Mapper<CustFlowStepApprovers> {}

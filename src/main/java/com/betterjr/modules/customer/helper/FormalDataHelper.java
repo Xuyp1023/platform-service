@@ -38,28 +38,28 @@ public final class FormalDataHelper {
         IFormalDataService saveFormalData = null;
         switch (anItem) {
         case CustomerConstants.ITEM_BASE:
-            saveFormalData = (IFormalDataService) SpringContextHolder.getBean(CustMechBaseTmpService.class);
+            saveFormalData = SpringContextHolder.getBean(CustMechBaseTmpService.class);
             break;
         case CustomerConstants.ITEM_LAW:
-            saveFormalData = (IFormalDataService) SpringContextHolder.getBean(CustMechLawTmpService.class);
+            saveFormalData = SpringContextHolder.getBean(CustMechLawTmpService.class);
             break;
         case CustomerConstants.ITEM_SHAREHOLDER:
-            saveFormalData = (IFormalDataService) SpringContextHolder.getBean(CustMechShareholderTmpService.class);
+            saveFormalData = SpringContextHolder.getBean(CustMechShareholderTmpService.class);
             break;
         case CustomerConstants.ITEM_MANAGER:
-            saveFormalData = (IFormalDataService) SpringContextHolder.getBean(CustMechManagerTmpService.class);
+            saveFormalData = SpringContextHolder.getBean(CustMechManagerTmpService.class);
             break;
         case CustomerConstants.ITEM_BUSINLICENCE:
-            saveFormalData = (IFormalDataService) SpringContextHolder.getBean(CustMechBusinLicenceTmpService.class);
+            saveFormalData = SpringContextHolder.getBean(CustMechBusinLicenceTmpService.class);
             break;
         case CustomerConstants.ITEM_CONTACTER:
-            saveFormalData = (IFormalDataService) SpringContextHolder.getBean(CustMechContacterTmpService.class);
+            saveFormalData = SpringContextHolder.getBean(CustMechContacterTmpService.class);
             break;
         case CustomerConstants.ITEM_BANKACCOUNT:
-            saveFormalData = (IFormalDataService) SpringContextHolder.getBean(CustMechBankAccountTmpService.class);
+            saveFormalData = SpringContextHolder.getBean(CustMechBankAccountTmpService.class);
             break;
         case CustomerConstants.ITEM_OPENACCOUNT:
-            saveFormalData = (IFormalDataService) SpringContextHolder.getBean(CustOpenAccountTmpService.class);
+            saveFormalData = SpringContextHolder.getBean(CustOpenAccountTmpService.class);
             break;
         default:
 

@@ -5,5 +5,4 @@ import com.betterjr.mapper.common.Mapper;
 import com.betterjr.modules.document.entity.CustFileInfo;
 
 @BetterjrMapper
-public interface CustFileInfoMapper extends Mapper<CustFileInfo> {
-}
+public interface CustFileInfoMapper extends Mapper<CustFileInfo> {}

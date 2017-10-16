@@ -5,12 +5,12 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.exception.BytterTradeException;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
-import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.modules.customer.constants.CustomerConstants;
 import com.betterjr.modules.customer.dao.CustInsteadRecordMapper;
@@ -25,39 +25,36 @@ import com.betterjr.modules.customer.entity.CustInsteadRecord;
  */
 @Service
 public class CustInsteadRecordService extends BaseService<CustInsteadRecordMapper, CustInsteadRecord> {
-    
+
     private final static Pattern INSTEAD_ITEMS_PATTERN = Pattern.compile("^([01],){6}[01]$");
     private final static Pattern INSTEAD_ITEMS_INC_PATTERN = Pattern.compile("^.*1+.*$");
-    
-    
+
     @Resource
     private CustInsteadApplyService insteadApplyService;
-    
+
     /**
      * 根据代录申请类型，代录项目生成代录记录
      */
     public void addInsteadRecord(CustInsteadApply anInsteadApply, String anInsteadType, String anInsteadItems) {
         // 0 开户代录 1 变更代录
-        if (BetterStringUtils.equals(anInsteadType, CustomerConstants.INSTEAD_APPLY_TYPE_OPENACCOUNT)) {
+        if (StringUtils.equals(anInsteadType, CustomerConstants.INSTEAD_APPLY_TYPE_OPENACCOUNT)) {
             this.addInsteadRecord(anInsteadApply, CustomerConstants.ITEM_OPENACCOUNT);
-        }
-        else {
+        } else {
             BTAssert.notNull(anInsteadItems, "代录项目不能为空");
-            
+
             if (INSTEAD_ITEMS_PATTERN.matcher(anInsteadItems).matches() == true) {
                 if (INSTEAD_ITEMS_INC_PATTERN.matcher(anInsteadItems).matches() == true) {
-                    final String[] tempInsteadItems = BetterStringUtils.split(anInsteadItems, ",");
+                    final String[] tempInsteadItems = StringUtils.split(anInsteadItems, ",");
                     int insteadItemIndex = 0;
                     // 代录项目: 0公司基本信息，1法人信息，2股东信息，3高管信息，4营业执照，5联系人信息，6银行账户, 7开户代录
                     for (String insteadItem : tempInsteadItems) {
-                        if (BetterStringUtils.equals(insteadItem, CustomerConstants.ITEM_ENABLED) == true) {
+                        if (StringUtils.equals(insteadItem, CustomerConstants.ITEM_ENABLED) == true) {
                             // 代录项目: 0公司基本信息，1法人信息，2股东信息，3高管信息，4营业执照，5联系人信息，6银行账户, 7开户代录
                             this.addInsteadRecord(anInsteadApply, String.valueOf(insteadItemIndex));
                         }
                         insteadItemIndex++;
                     }
-                }
-                else {
+                } else {
                     throw new BytterTradeException(20006, "至少需要一个代录项");
                 }
             } else {
@@ -65,7 +62,7 @@ public class CustInsteadRecordService extends BaseService<CustInsteadRecordMappe
             }
         }
     }
-    
+
     /**
      * 根据代录申请类型，代录项目生成代录记录
      */
@@ -73,25 +70,25 @@ public class CustInsteadRecordService extends BaseService<CustInsteadRecordMappe
         // 0 开户代录 1 变更代录
         // 先把之前的代录记录找出来
         List<CustInsteadRecord> insteadRecords = this.queryInsteadRecord(anInsteadApply.getId());
-        
-        if (BetterStringUtils.equals(anInsteadType, CustomerConstants.INSTEAD_APPLY_TYPE_OPENACCOUNT)) {
-            CustInsteadRecord insteadRecord = checkExistsInInsteadRecords(CustomerConstants.ITEM_OPENACCOUNT, insteadRecords);
+
+        if (StringUtils.equals(anInsteadType, CustomerConstants.INSTEAD_APPLY_TYPE_OPENACCOUNT)) {
+            CustInsteadRecord insteadRecord = checkExistsInInsteadRecords(CustomerConstants.ITEM_OPENACCOUNT,
+                    insteadRecords);
             if (insteadRecord == null) {
                 this.addInsteadRecord(anInsteadApply, CustomerConstants.ITEM_OPENACCOUNT);
             } else {
                 insteadRecords.remove(insteadRecord);
             }
-        }
-        else {
+        } else {
             BTAssert.notNull(anInsteadItems, "代录项目不能为空");
-            
+
             if (INSTEAD_ITEMS_PATTERN.matcher(anInsteadItems).matches() == true) {
                 if (INSTEAD_ITEMS_INC_PATTERN.matcher(anInsteadItems).matches() == true) {
-                    final String[] tempInsteadItems = BetterStringUtils.split(anInsteadItems, ",");
+                    final String[] tempInsteadItems = StringUtils.split(anInsteadItems, ",");
                     int insteadItemIndex = 0;
                     // 代录项目: 0公司基本信息，1法人信息，2股东信息，3高管信息，4营业执照，5联系人信息，6银行账户, 7开户代录
                     for (String tempInsteadItem : tempInsteadItems) {
-                        if (BetterStringUtils.equals(tempInsteadItem, CustomerConstants.ITEM_ENABLED) == true) {
+                        if (StringUtils.equals(tempInsteadItem, CustomerConstants.ITEM_ENABLED) == true) {
                             // 代录项目: 0公司基本信息，1法人信息，2股东信息，3高管信息，4营业执照，5联系人信息，6银行账户, 7开户代录
                             String insteadItem = String.valueOf(insteadItemIndex);
                             CustInsteadRecord insteadRecord = checkExistsInInsteadRecords(insteadItem, insteadRecords);
@@ -103,18 +100,17 @@ public class CustInsteadRecordService extends BaseService<CustInsteadRecordMappe
                         }
                         insteadItemIndex++;
                     }
-                }
-                else {
+                } else {
                     throw new BytterTradeException(20006, "至少需要一个代录项");
                 }
             } else {
                 throw new BytterTradeException(20005, "代录项目数据不正确");
             }
         }
-        
+
         // 删除未使用的数据
         if (Collections3.isEmpty(insteadRecords) == false) {
-            for (CustInsteadRecord insteadRecord: insteadRecords) {
+            for (CustInsteadRecord insteadRecord : insteadRecords) {
                 this.deleteByPrimaryKey(insteadRecord.getId());
             }
         }
@@ -129,15 +125,14 @@ public class CustInsteadRecordService extends BaseService<CustInsteadRecordMappe
 
         final Long applyId = anInsteadApply.getId();
         final Long custNo = anInsteadApply.getCustNo();
-        
+
         final CustInsteadRecord custInsteadRecord = new CustInsteadRecord();
         custInsteadRecord.initAddValue(applyId, custNo, anInsteadItem);
 
         this.insert(custInsteadRecord);
         return custInsteadRecord;
     }
-    
-    
+
     /**
      * 查找代录项目
      */
@@ -145,24 +140,24 @@ public class CustInsteadRecordService extends BaseService<CustInsteadRecordMappe
         BTAssert.notNull(anId, "代录记录编号不能为空！");
         return this.selectByPrimaryKey(anId);
     }
-    
+
     /**
      * 根据代录申请编号找到代录记录 不检查代录申请
      */
     public List<CustInsteadRecord> queryInsteadRecord(Long anApplyId) {
         return this.selectByProperty("applyId", anApplyId);
     }
-    
+
     /**
      * 根据代录申请编号找到代录记录
      */
     public List<CustInsteadRecord> queryInsteadRecordByApplyId(Long anApplyId) {
         // 检查代录申请是否正确
         checkInsteadApply(anApplyId);
-        
+
         return this.selectByProperty("applyId", anApplyId);
     }
-    
+
     /**
      * 保存代录项目
      */
@@ -178,7 +173,7 @@ public class CustInsteadRecordService extends BaseService<CustInsteadRecordMappe
         this.updateByPrimaryKeySelective(tempCustInsteadRecord);
         return tempCustInsteadRecord;
     }
-    
+
     /**
      * 保存代录项目-修改状态
      */
@@ -200,16 +195,17 @@ public class CustInsteadRecordService extends BaseService<CustInsteadRecordMappe
      */
     private CustInsteadApply checkInsteadApply(Long anApplyId) {
         BTAssert.notNull(anApplyId, "代录申请编号不能为空！");
-        
+
         final CustInsteadApply insteadApply = insteadApplyService.findCustInsteadApply(anApplyId);
         BTAssert.notNull(insteadApply, "没有找到对应代录申请!");
-        
+
         return insteadApply;
     }
-    
-    private CustInsteadRecord checkExistsInInsteadRecords(String anInsteadItem, List<CustInsteadRecord> anInsteadRecords) {
-        for (CustInsteadRecord insteadRecord: anInsteadRecords) {
-            if (BetterStringUtils.equals(insteadRecord.getInsteadItem(), anInsteadItem) == true) {
+
+    private CustInsteadRecord checkExistsInInsteadRecords(String anInsteadItem,
+            List<CustInsteadRecord> anInsteadRecords) {
+        for (CustInsteadRecord insteadRecord : anInsteadRecords) {
+            if (StringUtils.equals(insteadRecord.getInsteadItem(), anInsteadItem) == true) {
                 return insteadRecord;
             }
         }

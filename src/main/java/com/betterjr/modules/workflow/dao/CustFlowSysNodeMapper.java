@@ -5,5 +5,4 @@ import com.betterjr.mapper.common.Mapper;
 import com.betterjr.modules.workflow.entity.CustFlowSysNode;
 
 @BetterjrMapper
-public interface CustFlowSysNodeMapper extends Mapper<CustFlowSysNode> {
-}
+public interface CustFlowSysNodeMapper extends Mapper<CustFlowSysNode> {}

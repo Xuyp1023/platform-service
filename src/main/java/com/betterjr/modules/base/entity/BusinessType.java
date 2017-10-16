@@ -18,65 +18,65 @@ public class BusinessType implements BetterjrEntity {
      * 编号
      */
     @Id
-    @Column(name = "ID",  columnDefinition="INTEGER" )
-    @MetaData( value="编号", comments = "编号")
+    @Column(name = "ID", columnDefinition = "INTEGER")
+    @MetaData(value = "编号", comments = "编号")
     private Long id;
 
     /**
      * 业务类型编码
      */
     @Id
-    @Column(name = "C_CODE",  columnDefinition="VARCHAR" )
-    @MetaData( value="业务类型编码", comments = "业务类型编码")
+    @Column(name = "C_CODE", columnDefinition = "VARCHAR")
+    @MetaData(value = "业务类型编码", comments = "业务类型编码")
     private String code;
 
     /**
      * 业务类型名称
      */
-    @Column(name = "C_NAME",  columnDefinition="VARCHAR" )
-    @MetaData( value="业务类型名称", comments = "业务类型名称")
+    @Column(name = "C_NAME", columnDefinition = "VARCHAR")
+    @MetaData(value = "业务类型名称", comments = "业务类型名称")
     private String name;
 
     /**
      * 授信标志
      */
-    @Column(name = "C_CREDIT_FLAG",  columnDefinition="CHAR" )
-    @MetaData( value="授信标志", comments = "授信标志")
+    @Column(name = "C_CREDIT_FLAG", columnDefinition = "CHAR")
+    @MetaData(value = "授信标志", comments = "授信标志")
     private String creditFlag;
 
     /**
      * 备注
      */
-    @Column(name = "C_COMMENTS",  columnDefinition="VARCHAR" )
-    @MetaData( value="备注", comments = "备注")
+    @Column(name = "C_COMMENTS", columnDefinition = "VARCHAR")
+    @MetaData(value = "备注", comments = "备注")
     private String comments;
 
     /**
      * 预览数据编号
      */
-    @Column(name = "L_MOCK_DATA_ID",  columnDefinition="INTEGER" )
-    @MetaData( value="预览数据编号", comments = "预览数据编号")
+    @Column(name = "L_MOCK_DATA_ID", columnDefinition = "INTEGER")
+    @MetaData(value = "预览数据编号", comments = "预览数据编号")
     private Long mockDataId;
 
     /**
      * 业务状态
      */
-    @Column(name = "C_BUSIN_STATUS",  columnDefinition="CHAR" )
-    @MetaData( value="业务状态", comments = "业务状态")
+    @Column(name = "C_BUSIN_STATUS", columnDefinition = "CHAR")
+    @MetaData(value = "业务状态", comments = "业务状态")
     private String businStatus;
 
     /**
      * 文档状态
      */
-    @Column(name = "C_DOC_STATUS",  columnDefinition="CHAR" )
-    @MetaData( value="文档状态", comments = "文档状态")
+    @Column(name = "C_DOC_STATUS", columnDefinition = "CHAR")
+    @MetaData(value = "文档状态", comments = "文档状态")
     private String docStatus;
 
     /**
      * 数据版本
      */
-    @Column(name = "N_VERSION",  columnDefinition="INTEGER" )
-    @MetaData( value="数据版本", comments = "数据版本")
+    @Column(name = "N_VERSION", columnDefinition = "INTEGER")
+    @MetaData(value = "数据版本", comments = "数据版本")
     private Long version;
 
     private static final long serialVersionUID = 1313331469273004690L;
@@ -188,12 +188,18 @@ public class BusinessType implements BetterjrEntity {
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
                 && (this.getCode() == null ? other.getCode() == null : this.getCode().equals(other.getCode()))
                 && (this.getName() == null ? other.getName() == null : this.getName().equals(other.getName()))
-                && (this.getCreditFlag() == null ? other.getCreditFlag() == null : this.getCreditFlag().equals(other.getCreditFlag()))
-                && (this.getComments() == null ? other.getComments() == null : this.getComments().equals(other.getComments()))
-                && (this.getMockDataId() == null ? other.getMockDataId() == null : this.getMockDataId().equals(other.getMockDataId()))
-                && (this.getBusinStatus() == null ? other.getBusinStatus() == null : this.getBusinStatus().equals(other.getBusinStatus()))
-                && (this.getDocStatus() == null ? other.getDocStatus() == null : this.getDocStatus().equals(other.getDocStatus()))
-                && (this.getVersion() == null ? other.getVersion() == null : this.getVersion().equals(other.getVersion()));
+                && (this.getCreditFlag() == null ? other.getCreditFlag() == null
+                        : this.getCreditFlag().equals(other.getCreditFlag()))
+                && (this.getComments() == null ? other.getComments() == null
+                        : this.getComments().equals(other.getComments()))
+                && (this.getMockDataId() == null ? other.getMockDataId() == null
+                        : this.getMockDataId().equals(other.getMockDataId()))
+                && (this.getBusinStatus() == null ? other.getBusinStatus() == null
+                        : this.getBusinStatus().equals(other.getBusinStatus()))
+                && (this.getDocStatus() == null ? other.getDocStatus() == null
+                        : this.getDocStatus().equals(other.getDocStatus()))
+                && (this.getVersion() == null ? other.getVersion() == null
+                        : this.getVersion().equals(other.getVersion()));
     }
 
     @Override

@@ -23,15 +23,19 @@ public class CustMechFinanceDubboService implements ICustMechFinanceService {
 
     @Autowired
     private CustMechFinanceRecordService custMechFinanceRecordService;
-    
+
     @Autowired
     private CustFileItemService custFileItemService;
-    
+
     @Override
     public String webAddFinanceInfo(Map<String, Object> anParam, Long anCustNo, String anFileList) {
-        CustMechFinanceRecord anCustMechFinanceRecord = (CustMechFinanceRecord) RuleServiceDubboFilterInvoker.getInputObj();
-        anCustMechFinanceRecord.setBatchNo(custFileItemService.updateCustFileItemInfo(anFileList, anCustMechFinanceRecord.getBatchNo()));
-        return AjaxObject.newOk("财务信息添加成功", custMechFinanceRecordService.addCustMechFinanceRecord(anCustMechFinanceRecord)).toJson();
+        CustMechFinanceRecord anCustMechFinanceRecord = (CustMechFinanceRecord) RuleServiceDubboFilterInvoker
+                .getInputObj();
+        anCustMechFinanceRecord.setBatchNo(
+                custFileItemService.updateCustFileItemInfo(anFileList, anCustMechFinanceRecord.getBatchNo()));
+        return AjaxObject
+                .newOk("财务信息添加成功", custMechFinanceRecordService.addCustMechFinanceRecord(anCustMechFinanceRecord))
+                .toJson();
     }
 
     @Override
@@ -41,19 +45,25 @@ public class CustMechFinanceDubboService implements ICustMechFinanceService {
 
     @Override
     public String webQueryFinanceList(Long anCustNo, String anFlag, int anPageNum, int anPageSize) {
-        return AjaxObject.newOkWithPage("财务上传记录查询成功", custMechFinanceRecordService.queryCustMechFinanceRecord(anCustNo, anFlag, anPageNum, anPageSize)).toJson(); 
+        return AjaxObject.newOkWithPage("财务上传记录查询成功",
+                custMechFinanceRecordService.queryCustMechFinanceRecord(anCustNo, anFlag, anPageNum, anPageSize))
+                .toJson();
     }
 
     @Override
     public String webSaveFinanceInfo(Map<String, Object> anParam, Long anCustNo, Long anId, String anFileList) {
-        CustMechFinanceRecord anCustMechFinanceRecord = (CustMechFinanceRecord) RuleServiceDubboFilterInvoker.getInputObj();
-        anCustMechFinanceRecord.setBatchNo(custFileItemService.updateCustFileItemInfo(anFileList, anCustMechFinanceRecord.getBatchNo()));
-        return AjaxObject.newOk("财务上传记录保存成功", custMechFinanceRecordService.saveCustMechFinanceRecord(anCustMechFinanceRecord, anId)).toJson();
+        CustMechFinanceRecord anCustMechFinanceRecord = (CustMechFinanceRecord) RuleServiceDubboFilterInvoker
+                .getInputObj();
+        anCustMechFinanceRecord.setBatchNo(
+                custFileItemService.updateCustFileItemInfo(anFileList, anCustMechFinanceRecord.getBatchNo()));
+        return AjaxObject.newOk("财务上传记录保存成功",
+                custMechFinanceRecordService.saveCustMechFinanceRecord(anCustMechFinanceRecord, anId)).toJson();
     }
-    
+
     @Override
     public String webSaveDeleteFinanceInfo(Long anId) {
-        return AjaxObject.newOk("财务上传记录删除成功", custMechFinanceRecordService.saveDeleteCustMechFinanceRecord(anId)).toJson();
+        return AjaxObject.newOk("财务上传记录删除成功", custMechFinanceRecordService.saveDeleteCustMechFinanceRecord(anId))
+                .toJson();
     }
 
 }

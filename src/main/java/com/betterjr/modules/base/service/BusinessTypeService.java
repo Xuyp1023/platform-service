@@ -37,7 +37,8 @@ public class BusinessTypeService extends BaseService<BusinessTypeMapper, Busines
      * @return
      */
     public List<SimpleDataEntity> querySimpleType() {
-        return this.selectAll().stream().map(businessType -> new SimpleDataEntity(businessType.getName(), businessType.getId().toString()))
+        return this.selectAll().stream()
+                .map(businessType -> new SimpleDataEntity(businessType.getName(), businessType.getId().toString()))
                 .collect(Collectors.toList());
     }
 }

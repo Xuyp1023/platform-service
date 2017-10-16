@@ -5,5 +5,4 @@ import com.betterjr.mapper.common.Mapper;
 import com.betterjr.modules.wechat.entity.WechatMedia;
 
 @BetterjrMapper
-public interface WechatMediaMapper extends Mapper<WechatMedia> {
-}
+public interface WechatMediaMapper extends Mapper<WechatMedia> {}

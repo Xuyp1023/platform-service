@@ -282,6 +282,7 @@ public class CustMechManagerTmp implements BetterjrEntity, ICustAuditEntityFace 
         this.position = position == null ? null : position.trim();
     }
 
+    @Override
     public Long getBatchNo() {
         return batchNo;
     }
@@ -378,6 +379,7 @@ public class CustMechManagerTmp implements BetterjrEntity, ICustAuditEntityFace 
         this.lastStatus = lastStatus == null ? null : lastStatus.trim();
     }
 
+    @Override
     public Long getCustNo() {
         return custNo;
     }
@@ -410,6 +412,7 @@ public class CustMechManagerTmp implements BetterjrEntity, ICustAuditEntityFace 
         this.tmpOperType = tmpOperType == null ? null : tmpOperType.trim();
     }
 
+    @Override
     public Long getParentId() {
         return parentId;
     }
@@ -468,31 +471,52 @@ public class CustMechManagerTmp implements BetterjrEntity, ICustAuditEntityFace 
         }
         final CustMechManagerTmp other = (CustMechManagerTmp) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-                && (this.getParentId() == null ? other.getParentId() == null : this.getParentId().equals(other.getParentId()))
-                && (this.getVersion() == null ? other.getVersion() == null : this.getVersion().equals(other.getVersion()))
+                && (this.getParentId() == null ? other.getParentId() == null
+                        : this.getParentId().equals(other.getParentId()))
+                && (this.getVersion() == null ? other.getVersion() == null
+                        : this.getVersion().equals(other.getVersion()))
                 && (this.getName() == null ? other.getName() == null : this.getName().equals(other.getName()))
-                && (this.getIdentType() == null ? other.getIdentType() == null : this.getIdentType().equals(other.getIdentType()))
-                && (this.getIdentNo() == null ? other.getIdentNo() == null : this.getIdentNo().equals(other.getIdentNo()))
+                && (this.getIdentType() == null ? other.getIdentType() == null
+                        : this.getIdentType().equals(other.getIdentType()))
+                && (this.getIdentNo() == null ? other.getIdentNo() == null
+                        : this.getIdentNo().equals(other.getIdentNo()))
                 && (this.getSex() == null ? other.getSex() == null : this.getSex().equals(other.getSex()))
-                && (this.getBirthdate() == null ? other.getBirthdate() == null : this.getBirthdate().equals(other.getBirthdate()))
-                && (this.getEduLevel() == null ? other.getEduLevel() == null : this.getEduLevel().equals(other.getEduLevel()))
-                && (this.getPosition() == null ? other.getPosition() == null : this.getPosition().equals(other.getPosition()))
-                && (this.getBatchNo() == null ? other.getBatchNo() == null : this.getBatchNo().equals(other.getBatchNo()))
-                && (this.getRegOperId() == null ? other.getRegOperId() == null : this.getRegOperId().equals(other.getRegOperId()))
-                && (this.getRegOperName() == null ? other.getRegOperName() == null : this.getRegOperName().equals(other.getRegOperName()))
-                && (this.getRegDate() == null ? other.getRegDate() == null : this.getRegDate().equals(other.getRegDate()))
-                && (this.getRegTime() == null ? other.getRegTime() == null : this.getRegTime().equals(other.getRegTime()))
-                && (this.getModiOperId() == null ? other.getModiOperId() == null : this.getModiOperId().equals(other.getModiOperId()))
-                && (this.getModiOperName() == null ? other.getModiOperName() == null : this.getModiOperName().equals(other.getModiOperName()))
-                && (this.getModiDate() == null ? other.getModiDate() == null : this.getModiDate().equals(other.getModiDate()))
-                && (this.getModiTime() == null ? other.getModiTime() == null : this.getModiTime().equals(other.getModiTime()))
-                && (this.getOperOrg() == null ? other.getOperOrg() == null : this.getOperOrg().equals(other.getOperOrg()))
-                && (this.getBusinStatus() == null ? other.getBusinStatus() == null : this.getBusinStatus().equals(other.getBusinStatus()))
-                && (this.getLastStatus() == null ? other.getLastStatus() == null : this.getLastStatus().equals(other.getLastStatus()))
+                && (this.getBirthdate() == null ? other.getBirthdate() == null
+                        : this.getBirthdate().equals(other.getBirthdate()))
+                && (this.getEduLevel() == null ? other.getEduLevel() == null
+                        : this.getEduLevel().equals(other.getEduLevel()))
+                && (this.getPosition() == null ? other.getPosition() == null
+                        : this.getPosition().equals(other.getPosition()))
+                && (this.getBatchNo() == null ? other.getBatchNo() == null
+                        : this.getBatchNo().equals(other.getBatchNo()))
+                && (this.getRegOperId() == null ? other.getRegOperId() == null
+                        : this.getRegOperId().equals(other.getRegOperId()))
+                && (this.getRegOperName() == null ? other.getRegOperName() == null
+                        : this.getRegOperName().equals(other.getRegOperName()))
+                && (this.getRegDate() == null ? other.getRegDate() == null
+                        : this.getRegDate().equals(other.getRegDate()))
+                && (this.getRegTime() == null ? other.getRegTime() == null
+                        : this.getRegTime().equals(other.getRegTime()))
+                && (this.getModiOperId() == null ? other.getModiOperId() == null
+                        : this.getModiOperId().equals(other.getModiOperId()))
+                && (this.getModiOperName() == null ? other.getModiOperName() == null
+                        : this.getModiOperName().equals(other.getModiOperName()))
+                && (this.getModiDate() == null ? other.getModiDate() == null
+                        : this.getModiDate().equals(other.getModiDate()))
+                && (this.getModiTime() == null ? other.getModiTime() == null
+                        : this.getModiTime().equals(other.getModiTime()))
+                && (this.getOperOrg() == null ? other.getOperOrg() == null
+                        : this.getOperOrg().equals(other.getOperOrg()))
+                && (this.getBusinStatus() == null ? other.getBusinStatus() == null
+                        : this.getBusinStatus().equals(other.getBusinStatus()))
+                && (this.getLastStatus() == null ? other.getLastStatus() == null
+                        : this.getLastStatus().equals(other.getLastStatus()))
                 && (this.getCustNo() == null ? other.getCustNo() == null : this.getCustNo().equals(other.getCustNo()))
                 && (this.getRefId() == null ? other.getRefId() == null : this.getRefId().equals(other.getRefId()))
-                && (this.getTmpType() == null ? other.getTmpType() == null : this.getTmpType().equals(other.getTmpType()))
-                && (this.getTmpOperType() == null ? other.getTmpOperType() == null : this.getTmpOperType().equals(other.getTmpOperType()));
+                && (this.getTmpType() == null ? other.getTmpType() == null
+                        : this.getTmpType().equals(other.getTmpType()))
+                && (this.getTmpOperType() == null ? other.getTmpOperType() == null
+                        : this.getTmpOperType().equals(other.getTmpOperType()));
     }
 
     @Override
@@ -582,7 +606,8 @@ public class CustMechManagerTmp implements BetterjrEntity, ICustAuditEntityFace 
         this.batchNo = anCustMechManagerTmp.getBatchNo();
     }
 
-    public void initModifyValue(final CustMechManagerTmp anCustMechManagerTmp, final String anBusinStatus, final Long anVersion) {
+    public void initModifyValue(final CustMechManagerTmp anCustMechManagerTmp, final String anBusinStatus,
+            final Long anVersion) {
         this.initModifyValue(anCustMechManagerTmp);
 
         this.businStatus = anBusinStatus;

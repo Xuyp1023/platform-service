@@ -5,6 +5,6 @@ import com.betterjr.mapper.common.Mapper;
 import com.betterjr.modules.customer.entity.SysNapsBankCode;
 
 @BetterjrMapper
-public interface SysNapsBankCodeMapper extends Mapper<SysNapsBankCode>{
+public interface SysNapsBankCodeMapper extends Mapper<SysNapsBankCode> {
 
 }

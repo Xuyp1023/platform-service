@@ -44,7 +44,8 @@ public class CustFileDubboService implements ICustFileService {
     private RocketMQProducer betterProducer;
 
     @Override
-    public String webUpdateCustFileAuditInfo(final Map<String, String[]> anParamMap, final Enumeration<String> anParamNames, final Long anCustNo) {
+    public String webUpdateCustFileAuditInfo(final Map<String, String[]> anParamMap,
+            final Enumeration<String> anParamNames, final Long anCustNo) {
 
         custFileAuditService.updateCustFileAuditInfo(anParamMap, anParamNames, anCustNo);
         return AjaxObject.newOk("新增用户认证文件审核信息成功").toJson();
@@ -87,14 +88,14 @@ public class CustFileDubboService implements ICustFileService {
         final Set<String> noticeMsg = custFileAuditService.findDeficiencyFileInfoList(anCustNo, anAgencyNos, businFlag);
         if (Collections3.isEmpty(noticeMsg)) {
             return AjaxObject.newOk("ok", noticeMsg).toJson();
-        }
-        else {
+        } else {
             return AjaxObject.newOk("fail", noticeMsg).toJson();
         }
     }
 
     @Override
-    public List<CustFileItem> findUploadFileByAgency(final String anRequestNo, final String anBusinFlag, final String anAgecyNo) {
+    public List<CustFileItem> findUploadFileByAgency(final String anRequestNo, final String anBusinFlag,
+            final String anAgecyNo) {
 
         return custFileInfoService.findUploadFileByAgency(anRequestNo, anBusinFlag, anAgecyNo);
     }
@@ -176,10 +177,11 @@ public class CustFileDubboService implements ICustFileService {
     }
 
     @Override
-    public CustFileItem saveAndUpdateFileItem(final String filePath, final Long fileLength, final String anWorkType, final String anFileName,
-            final FileStoreType anStoreType, final boolean anWithBatchNo) {
+    public CustFileItem saveAndUpdateFileItem(final String filePath, final Long fileLength, final String anWorkType,
+            final String anFileName, final FileStoreType anStoreType, final boolean anWithBatchNo) {
 
-        final CustFileItem fileItem = CustFileUtils.createDefFileItemForStore(filePath, fileLength, anWorkType, anFileName);
+        final CustFileItem fileItem = CustFileUtils.createDefFileItemForStore(filePath, fileLength, anWorkType,
+                anFileName);
         fileItem.setStoreType(anStoreType.getValue());
         if (anWithBatchNo) {
             fileItem.setBatchNo(CustFileUtils.findBatchNo());
@@ -187,17 +189,17 @@ public class CustFileDubboService implements ICustFileService {
 
         if (this.custFileItemService.saveAndUpdateFileItem(fileItem, UserUtils.getOperatorInfo())) {
             return fileItem;
-        }
-        else {
+        } else {
             return null;
         }
     }
 
     @Override
-    public String webSaveAndUpdateFileItem(final String filePath, final Long fileLength, final String anWorkType, final String anFileName,
-            final FileStoreType anStoreType) {
+    public String webSaveAndUpdateFileItem(final String filePath, final Long fileLength, final String anWorkType,
+            final String anFileName, final FileStoreType anStoreType) {
 
-        final CustFileItem fileItem = CustFileUtils.createDefFileItemForStore(filePath, fileLength, anWorkType, anFileName);
+        final CustFileItem fileItem = CustFileUtils.createDefFileItemForStore(filePath, fileLength, anWorkType,
+                anFileName);
         fileItem.setStoreType(anStoreType.getValue());
         final boolean result = this.custFileItemService.saveAndUpdateFileItem(fileItem, UserUtils.getOperatorInfo());
         if (result) {

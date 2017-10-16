@@ -3,15 +3,14 @@ package com.betterjr.modules.customer.dubbo;
 import static com.betterjr.common.web.AjaxObject.newOk;
 import static com.betterjr.common.web.AjaxObject.newOkWithPage;
 
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.alibaba.dubbo.config.annotation.Service;
-import com.betterjr.common.data.SimpleDataEntity;
 import com.betterjr.common.utils.BTAssert;
-import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.customer.ICustMechBankAccountService;
 import com.betterjr.modules.customer.constants.CustomerConstants;
@@ -46,10 +45,9 @@ public class CustMechBankAccountDubboService implements ICustMechBankAccountServ
 
     @Resource
     private CustMechBankAccountTmpService bankAccountTmpService;
-    
+
     @Resource
     private SysNapsBankCodeService sysNapsBankCodeService;
-    
 
     @Override
     public String webQueryBankAccount(final Long anCustNo) {
@@ -61,10 +59,10 @@ public class CustMechBankAccountDubboService implements ICustMechBankAccountServ
         final CustMechBankAccount bankAccount = bankAccountService.findDefaultCustMechBankAccount(anCustNo);
         return bankAccount;
     }
-    
+
     @Override
     public String webQueryBankAccountKeyAndValue(final Long anCustNo) {
-    	 return newOk("查询公司银行账户列表成功", bankAccountService.querBankAccountKeyAndValue(anCustNo)).toJson();
+        return newOk("查询公司银行账户列表成功", bankAccountService.querBankAccountKeyAndValue(anCustNo)).toJson();
     }
 
     @Override
@@ -82,19 +80,22 @@ public class CustMechBankAccountDubboService implements ICustMechBankAccountServ
     @Override
     public String webSaveBankAccountTmp(final Map<String, Object> anParam, final Long anId, final String anFileList) {
         final CustMechBankAccountTmp bankAccountTmp = RuleServiceDubboFilterInvoker.getInputObj();
-        return newOk("公司银行账户-流水信息 修改成功", bankAccountTmpService.saveBankAccountTmp(bankAccountTmp, anId, anFileList)).toJson();
+        return newOk("公司银行账户-流水信息 修改成功", bankAccountTmpService.saveBankAccountTmp(bankAccountTmp, anId, anFileList))
+                .toJson();
     }
 
     @Override
     public String webAddChangeBankAccountTmp(final Map<String, Object> anMap, final String anFileList) {
         final CustMechBankAccountTmp custMechBankAccountTmp = RuleServiceDubboFilterInvoker.getInputObj();
-        return newOk("公司银行账户-流水信息 变更添加成功", bankAccountTmpService.addChangeBankAccountTmp(custMechBankAccountTmp, anFileList)).toJson();
+        return newOk("公司银行账户-流水信息 变更添加成功",
+                bankAccountTmpService.addChangeBankAccountTmp(custMechBankAccountTmp, anFileList)).toJson();
     }
 
     @Override
     public String webSaveChangeBankAccountTmp(final Map<String, Object> anParam, final String anFileList) {
         final CustMechBankAccountTmp custMechBankAccountTmp = RuleServiceDubboFilterInvoker.getInputObj();
-        return newOk("公司银行账户-流水信息 变更修改成功", bankAccountTmpService.saveSaveChangeBankAccountTmp(custMechBankAccountTmp, anFileList)).toJson();
+        return newOk("公司银行账户-流水信息 变更修改成功",
+                bankAccountTmpService.saveSaveChangeBankAccountTmp(custMechBankAccountTmp, anFileList)).toJson();
     }
 
     @Override
@@ -117,7 +118,6 @@ public class CustMechBankAccountDubboService implements ICustMechBankAccountServ
         return newOk("公司银行账户-流水信息 列表查询成功", bankAccountTmpService.queryChangeBankAccountTmp(anApplyId)).toJson();
     }
 
-
     @Override
     public String webAddChangeApply(final Map<String, Object> anParam, final Long anCustNo) {
         return newOk("公司银行账户-变更申请 成功", bankAccountTmpService.addChangeApply(anParam, anCustNo)).toJson();
@@ -129,22 +129,24 @@ public class CustMechBankAccountDubboService implements ICustMechBankAccountServ
     }
 
     @Override
-    public String webQueryChangeApply(final Long anCustNo, final int anFlag, final int anPageNum, final int anPageSize) {
-        final Page<CustChangeApply> changeApplys = changeService.queryChangeApply(anCustNo, CustomerConstants.ITEM_BANKACCOUNT, anFlag, anPageNum,
-                anPageSize);
+    public String webQueryChangeApply(final Long anCustNo, final int anFlag, final int anPageNum,
+            final int anPageSize) {
+        final Page<CustChangeApply> changeApplys = changeService.queryChangeApply(anCustNo,
+                CustomerConstants.ITEM_BANKACCOUNT, anFlag, anPageNum, anPageSize);
         return newOkWithPage("银行账户信息-变更列表查询 成功", changeApplys).toJson();
     }
 
     @Override
     public String webFindChangeApply(final Long anApplyId, final Long anTmpId) {
-        final CustChangeApply changeApply = changeService.findChangeApply(anApplyId, CustomerConstants.ITEM_BANKACCOUNT);
+        final CustChangeApply changeApply = changeService.findChangeApply(anApplyId,
+                CustomerConstants.ITEM_BANKACCOUNT);
 
         final CustMechBankAccountTmp nowData = bankAccountTmpService.findBankAccountTmp(anTmpId);
         final CustMechBankAccountTmp befData = bankAccountTmpService.findBankAccountTmpPrevVersion(nowData);
 
         final ChangeDetailBean<CustMechBankAccountTmp> changeDetailBean = new ChangeDetailBean<>();
         changeDetailBean.setChangeApply(changeApply);
-        if (BetterStringUtils.equals(nowData.getTmpOperType(), CustomerConstants.TMP_OPER_TYPE_DELETE) == false) {
+        if (StringUtils.equals(nowData.getTmpOperType(), CustomerConstants.TMP_OPER_TYPE_DELETE) == false) {
             changeDetailBean.setNowData(nowData);
         }
         changeDetailBean.setBefData(befData);
@@ -153,26 +155,33 @@ public class CustMechBankAccountDubboService implements ICustMechBankAccountServ
     }
 
     @Override
-    public String webAddInsteadBankAccountTmp(final Map<String, Object> anMap, final Long anInsteadRecordId, final String anFileList) {
+    public String webAddInsteadBankAccountTmp(final Map<String, Object> anMap, final Long anInsteadRecordId,
+            final String anFileList) {
         final CustMechBankAccountTmp bankAccountTmp = RuleServiceDubboFilterInvoker.getInputObj();
-        return newOk("公司银行账户-流水信息 代录添加成功", bankAccountTmpService.addInsteadBankAccountTmp(bankAccountTmp, anInsteadRecordId, anFileList)).toJson();
+        return newOk("公司银行账户-流水信息 代录添加成功",
+                bankAccountTmpService.addInsteadBankAccountTmp(bankAccountTmp, anInsteadRecordId, anFileList)).toJson();
     }
 
     @Override
-    public String webSaveInsteadBankAccountTmp(final Map<String, Object> anParam, final Long anInsteadRecordId, final String anFileList) {
+    public String webSaveInsteadBankAccountTmp(final Map<String, Object> anParam, final Long anInsteadRecordId,
+            final String anFileList) {
         final CustMechBankAccountTmp bankAccountTmp = RuleServiceDubboFilterInvoker.getInputObj();
-        return newOk("公司银行账户-流水信息 代录修改成功", bankAccountTmpService.saveSaveInsteadBankAccountTmp(bankAccountTmp, anInsteadRecordId, anFileList)).toJson();
+        return newOk("公司银行账户-流水信息 代录修改成功",
+                bankAccountTmpService.saveSaveInsteadBankAccountTmp(bankAccountTmp, anInsteadRecordId, anFileList))
+                        .toJson();
 
     }
 
     @Override
     public String webDeleteInsteadBankAccountTmp(final Long anRefId, final Long anInsteadRecordId) {
-        return newOk("公司银行账户-流水信息 代录删除成功", bankAccountTmpService.saveDeleteInsteadBankAccountTmp(anRefId, anInsteadRecordId)).toJson();
+        return newOk("公司银行账户-流水信息 代录删除成功",
+                bankAccountTmpService.saveDeleteInsteadBankAccountTmp(anRefId, anInsteadRecordId)).toJson();
     }
 
     @Override
     public String webCancelInsteadBankAccountTmp(final Long anId, final Long anInsteadRecordId) {
-        return newOk("公司银行账户-流水信息 代录删除成功", bankAccountTmpService.saveCancelInsteadBankAccountTmp(anId, anInsteadRecordId)).toJson();
+        return newOk("公司银行账户-流水信息 代录删除成功",
+                bankAccountTmpService.saveCancelInsteadBankAccountTmp(anId, anInsteadRecordId)).toJson();
     }
 
     @Override
@@ -200,19 +209,19 @@ public class CustMechBankAccountDubboService implements ICustMechBankAccountServ
     public CustMechBankAccount findCustMechBankAccount(final String anBankAcco, final String anBankAccoName) {
         return bankAccountService.findCustMechBankAccount(anBankAcco, anBankAccoName);
     }
-    
+
     @Override
     public String webFindCustMechBankAccount(final String anBankAcco) {
-        return newOk("公司银行账户-查询成功",  bankAccountService.findBankAccountByAcco(anBankAcco)).toJson();
+        return newOk("公司银行账户-查询成功", bankAccountService.findBankAccountByAcco(anBankAcco)).toJson();
     }
-    
+
     @Override
-    public CustMechBankAccount findCustMechBankAccount( String anBankAcco) {
+    public CustMechBankAccount findCustMechBankAccount(String anBankAcco) {
         return bankAccountService.findBankAccountByAcco(anBankAcco);
     }
 
     @Override
-    public String webFindSysBankCodeList(Map<String, Object> anParam){
+    public String webFindSysBankCodeList(Map<String, Object> anParam) {
         return newOkWithPage("查询联行号", sysNapsBankCodeService.findSysBankCodeList(anParam)).toJson();
     }
 }

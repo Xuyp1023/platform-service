@@ -27,30 +27,30 @@ public class Notice implements BetterjrEntity {
      * 编号
      */
     @Id
-    @Column(name = "ID",  columnDefinition="INTEGER" )
-    @MetaData( value="编号", comments = "编号")
+    @Column(name = "ID", columnDefinition = "INTEGER")
+    @MetaData(value = "编号", comments = "编号")
     private Long id;
 
     /**
      * 数据版本号
      */
     @JsonIgnore
-    @Column(name = "N_VERSION",  columnDefinition="INTEGER" )
-    @MetaData( value="数据版本号", comments = "数据版本号")
+    @Column(name = "N_VERSION", columnDefinition = "INTEGER")
+    @MetaData(value = "数据版本号", comments = "数据版本号")
     private Long version;
 
     /**
      * 标题
      */
-    @Column(name = "C_SUBJECT",  columnDefinition="VARCHAR" )
-    @MetaData( value="标题", comments = "标题")
+    @Column(name = "C_SUBJECT", columnDefinition = "VARCHAR")
+    @MetaData(value = "标题", comments = "标题")
     private String subject;
 
     /**
      * 内容
      */
-    @Column(name = "C_CONTENT",  columnDefinition="VARCHAR" )
-    @MetaData( value="内容", comments = "内容")
+    @Column(name = "C_CONTENT", columnDefinition = "VARCHAR")
+    @MetaData(value = "内容", comments = "内容")
     private String content;
 
     /**
@@ -58,8 +58,8 @@ public class Notice implements BetterjrEntity {
      */
     @JsonSerialize(using = CustDateJsonSerializer.class)
     @OrderBy("DESC")
-    @Column(name = "D_PUBLISH_DATE",  columnDefinition="VARCHAR" )
-    @MetaData( value="发布日期", comments = "发布日期")
+    @Column(name = "D_PUBLISH_DATE", columnDefinition = "VARCHAR")
+    @MetaData(value = "发布日期", comments = "发布日期")
     private String publishDate;
 
     /**
@@ -67,128 +67,127 @@ public class Notice implements BetterjrEntity {
      */
     @JsonSerialize(using = CustTimeJsonSerializer.class)
     @OrderBy("DESC")
-    @Column(name = "T_PUBLISH_TIME",  columnDefinition="VARCHAR" )
-    @MetaData( value="发布时间", comments = "发布时间")
+    @Column(name = "T_PUBLISH_TIME", columnDefinition = "VARCHAR")
+    @MetaData(value = "发布时间", comments = "发布时间")
     private String publishTime;
 
     /**
      * 附件
      */
-    @Column(name = "N_BATCHNO",  columnDefinition="INTEGER" )
-    @MetaData( value="附件", comments = "附件")
+    @Column(name = "N_BATCHNO", columnDefinition = "INTEGER")
+    @MetaData(value = "附件", comments = "附件")
     private Long batchNo;
 
     /**
      * 创建人(操作员)ID号
      */
     @JsonIgnore
-    @Column(name = "L_REG_OPERID",  columnDefinition="INTEGER" )
-    @MetaData( value="创建人(操作员)ID号", comments = "创建人(操作员)ID号")
+    @Column(name = "L_REG_OPERID", columnDefinition = "INTEGER")
+    @MetaData(value = "创建人(操作员)ID号", comments = "创建人(操作员)ID号")
     private Long regOperId;
 
     /**
      * 创建人(操作员)姓名
      */
     @JsonIgnore
-    @Column(name = "C_REG_OPERNAME",  columnDefinition="VARCHAR" )
-    @MetaData( value="创建人(操作员)姓名", comments = "创建人(操作员)姓名")
+    @Column(name = "C_REG_OPERNAME", columnDefinition = "VARCHAR")
+    @MetaData(value = "创建人(操作员)姓名", comments = "创建人(操作员)姓名")
     private String regOperName;
 
     /**
      * 创建日期
      */
     @JsonIgnore
-    @Column(name = "D_REG_DATE",  columnDefinition="VARCHAR" )
-    @MetaData( value="创建日期", comments = "创建日期")
+    @Column(name = "D_REG_DATE", columnDefinition = "VARCHAR")
+    @MetaData(value = "创建日期", comments = "创建日期")
     private String regDate;
 
     /**
      * 创建时间
      */
     @JsonIgnore
-    @Column(name = "T_REG_TIME",  columnDefinition="VARCHAR" )
-    @MetaData( value="创建时间", comments = "创建时间")
+    @Column(name = "T_REG_TIME", columnDefinition = "VARCHAR")
+    @MetaData(value = "创建时间", comments = "创建时间")
     private String regTime;
 
     /**
      * 修改人(操作员)ID号
      */
     @JsonIgnore
-    @Column(name = "L_MODI_OPERID",  columnDefinition="INTEGER" )
-    @MetaData( value="修改人(操作员)ID号", comments = "修改人(操作员)ID号")
+    @Column(name = "L_MODI_OPERID", columnDefinition = "INTEGER")
+    @MetaData(value = "修改人(操作员)ID号", comments = "修改人(操作员)ID号")
     private Long modiOperId;
 
     /**
      * 修改人(操作员)姓名
      */
     @JsonIgnore
-    @Column(name = "C_MODI_OPERNAME",  columnDefinition="VARCHAR" )
-    @MetaData( value="修改人(操作员)姓名", comments = "修改人(操作员)姓名")
+    @Column(name = "C_MODI_OPERNAME", columnDefinition = "VARCHAR")
+    @MetaData(value = "修改人(操作员)姓名", comments = "修改人(操作员)姓名")
     private String modiOperName;
 
     /**
      * 修改日期
      */
     @JsonIgnore
-    @Column(name = "D_MODI_DATE",  columnDefinition="VARCHAR" )
-    @MetaData( value="修改日期", comments = "修改日期")
+    @Column(name = "D_MODI_DATE", columnDefinition = "VARCHAR")
+    @MetaData(value = "修改日期", comments = "修改日期")
     private String modiDate;
 
     /**
      * 修改时间
      */
     @JsonIgnore
-    @Column(name = "T_MODI_TIME",  columnDefinition="VARCHAR" )
-    @MetaData( value="修改时间", comments = "修改时间")
+    @Column(name = "T_MODI_TIME", columnDefinition = "VARCHAR")
+    @MetaData(value = "修改时间", comments = "修改时间")
     private String modiTime;
 
     /**
      * 操作机构
      */
     @JsonIgnore
-    @Column(name = "C_OPERORG",  columnDefinition="VARCHAR" )
-    @MetaData( value="操作机构", comments = "操作机构")
+    @Column(name = "C_OPERORG", columnDefinition = "VARCHAR")
+    @MetaData(value = "操作机构", comments = "操作机构")
     private String operOrg;
 
     /**
      * 状态：0暂存，1已发布，2已撤回，3已删除
      */
-    @Column(name = "C_BUSIN_STATUS",  columnDefinition="CHAR" )
-    @MetaData( value="状态：0暂存", comments = "状态：0暂存，1已发布，2已撤回，3已删除")
+    @Column(name = "C_BUSIN_STATUS", columnDefinition = "CHAR")
+    @MetaData(value = "状态：0暂存", comments = "状态：0暂存，1已发布，2已撤回，3已删除")
     private String businStatus;
 
     @JsonIgnore
-    @Column(name = "C_LAST_STATUS",  columnDefinition="CHAR" )
-    @MetaData( value="", comments = "")
+    @Column(name = "C_LAST_STATUS", columnDefinition = "CHAR")
+    @MetaData(value = "", comments = "")
     private String lastStatus;
 
     /**
      * 发布客户编号
      */
-    @Column(name = "L_CUSTNO",  columnDefinition="INTEGER" )
-    @MetaData( value="发布客户编号", comments = "发布客户编号")
+    @Column(name = "L_CUSTNO", columnDefinition = "INTEGER")
+    @MetaData(value = "发布客户编号", comments = "发布客户编号")
     private Long custNo;
 
     /**
      * 发布客户名称
      */
-    @Column(name = "C_CUSTNAME",  columnDefinition="VARCHAR" )
-    @MetaData( value="发布客户名称", comments = "发布客户名称")
+    @Column(name = "C_CUSTNAME", columnDefinition = "VARCHAR")
+    @MetaData(value = "发布客户名称", comments = "发布客户名称")
     private String custName;
-    
+
     /**
      * 公告范围  目标列表  为空表示所有，  平台 保理公司，核心企业，供应商，经销商  ，非平台用户，列表内为客户列表 
      */
-    @Column(name = "C_TARGET_CUST",  columnDefinition="VARCHAR" )
-    @MetaData( value="公告范围", comments = "公告范围  目标列表  为空表示所有，  平台 保理公司，核心企业，供应商，经销商  ，非平台用户，列表内为客户列表 ")
+    @Column(name = "C_TARGET_CUST", columnDefinition = "VARCHAR")
+    @MetaData(value = "公告范围", comments = "公告范围  目标列表  为空表示所有，  平台 保理公司，核心企业，供应商，经销商  ，非平台用户，列表内为客户列表 ")
     private String targetCust;
-    
+
     @Transient
     private Long receiveCustNo;
-    
+
     @Transient
     private String receiveCustName;
-    
 
     private static final long serialVersionUID = 1468812783876L;
 
@@ -351,7 +350,7 @@ public class Notice implements BetterjrEntity {
     public void setCustName(String custName) {
         this.custName = custName == null ? null : custName.trim();
     }
-    
+
     public String getTargetCust() {
         return targetCust;
     }
@@ -359,7 +358,7 @@ public class Notice implements BetterjrEntity {
     public void setTargetCust(String anTargetCust) {
         targetCust = anTargetCust;
     }
-    
+
     public Long getReceiveCustNo() {
         return receiveCustNo;
     }
@@ -375,7 +374,7 @@ public class Notice implements BetterjrEntity {
     public void setReceiveCustName(String anReceiveCustName) {
         receiveCustName = anReceiveCustName;
     }
-    
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -421,26 +420,45 @@ public class Notice implements BetterjrEntity {
         }
         Notice other = (Notice) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-            && (this.getVersion() == null ? other.getVersion() == null : this.getVersion().equals(other.getVersion()))
-            && (this.getSubject() == null ? other.getSubject() == null : this.getSubject().equals(other.getSubject()))
-            && (this.getContent() == null ? other.getContent() == null : this.getContent().equals(other.getContent()))
-            && (this.getPublishDate() == null ? other.getPublishDate() == null : this.getPublishDate().equals(other.getPublishDate()))
-            && (this.getPublishTime() == null ? other.getPublishTime() == null : this.getPublishTime().equals(other.getPublishTime()))
-            && (this.getBatchNo() == null ? other.getBatchNo() == null : this.getBatchNo().equals(other.getBatchNo()))
-            && (this.getTargetCust() == null ? other.getTargetCust() == null : this.getTargetCust().equals(other.getTargetCust()))
-            && (this.getRegOperId() == null ? other.getRegOperId() == null : this.getRegOperId().equals(other.getRegOperId()))
-            && (this.getRegOperName() == null ? other.getRegOperName() == null : this.getRegOperName().equals(other.getRegOperName()))
-            && (this.getRegDate() == null ? other.getRegDate() == null : this.getRegDate().equals(other.getRegDate()))
-            && (this.getRegTime() == null ? other.getRegTime() == null : this.getRegTime().equals(other.getRegTime()))
-            && (this.getModiOperId() == null ? other.getModiOperId() == null : this.getModiOperId().equals(other.getModiOperId()))
-            && (this.getModiOperName() == null ? other.getModiOperName() == null : this.getModiOperName().equals(other.getModiOperName()))
-            && (this.getModiDate() == null ? other.getModiDate() == null : this.getModiDate().equals(other.getModiDate()))
-            && (this.getModiTime() == null ? other.getModiTime() == null : this.getModiTime().equals(other.getModiTime()))
-            && (this.getOperOrg() == null ? other.getOperOrg() == null : this.getOperOrg().equals(other.getOperOrg()))
-            && (this.getBusinStatus() == null ? other.getBusinStatus() == null : this.getBusinStatus().equals(other.getBusinStatus()))
-            && (this.getLastStatus() == null ? other.getLastStatus() == null : this.getLastStatus().equals(other.getLastStatus()))
-            && (this.getCustNo() == null ? other.getCustNo() == null : this.getCustNo().equals(other.getCustNo()))
-            && (this.getCustName() == null ? other.getCustName() == null : this.getCustName().equals(other.getCustName()));
+                && (this.getVersion() == null ? other.getVersion() == null
+                        : this.getVersion().equals(other.getVersion()))
+                && (this.getSubject() == null ? other.getSubject() == null
+                        : this.getSubject().equals(other.getSubject()))
+                && (this.getContent() == null ? other.getContent() == null
+                        : this.getContent().equals(other.getContent()))
+                && (this.getPublishDate() == null ? other.getPublishDate() == null
+                        : this.getPublishDate().equals(other.getPublishDate()))
+                && (this.getPublishTime() == null ? other.getPublishTime() == null
+                        : this.getPublishTime().equals(other.getPublishTime()))
+                && (this.getBatchNo() == null ? other.getBatchNo() == null
+                        : this.getBatchNo().equals(other.getBatchNo()))
+                && (this.getTargetCust() == null ? other.getTargetCust() == null
+                        : this.getTargetCust().equals(other.getTargetCust()))
+                && (this.getRegOperId() == null ? other.getRegOperId() == null
+                        : this.getRegOperId().equals(other.getRegOperId()))
+                && (this.getRegOperName() == null ? other.getRegOperName() == null
+                        : this.getRegOperName().equals(other.getRegOperName()))
+                && (this.getRegDate() == null ? other.getRegDate() == null
+                        : this.getRegDate().equals(other.getRegDate()))
+                && (this.getRegTime() == null ? other.getRegTime() == null
+                        : this.getRegTime().equals(other.getRegTime()))
+                && (this.getModiOperId() == null ? other.getModiOperId() == null
+                        : this.getModiOperId().equals(other.getModiOperId()))
+                && (this.getModiOperName() == null ? other.getModiOperName() == null
+                        : this.getModiOperName().equals(other.getModiOperName()))
+                && (this.getModiDate() == null ? other.getModiDate() == null
+                        : this.getModiDate().equals(other.getModiDate()))
+                && (this.getModiTime() == null ? other.getModiTime() == null
+                        : this.getModiTime().equals(other.getModiTime()))
+                && (this.getOperOrg() == null ? other.getOperOrg() == null
+                        : this.getOperOrg().equals(other.getOperOrg()))
+                && (this.getBusinStatus() == null ? other.getBusinStatus() == null
+                        : this.getBusinStatus().equals(other.getBusinStatus()))
+                && (this.getLastStatus() == null ? other.getLastStatus() == null
+                        : this.getLastStatus().equals(other.getLastStatus()))
+                && (this.getCustNo() == null ? other.getCustNo() == null : this.getCustNo().equals(other.getCustNo()))
+                && (this.getCustName() == null ? other.getCustName() == null
+                        : this.getCustName().equals(other.getCustName()));
     }
 
     @Override
@@ -470,10 +488,10 @@ public class Notice implements BetterjrEntity {
         result = prime * result + ((getCustName() == null) ? 0 : getCustName().hashCode());
         return result;
     }
-    
+
     public void initAddValue(String anCustName, String anBusinStatus) {
         this.id = SerialGenerator.getLongValue("Notice.id");
-        
+
         this.modiOperId = UserUtils.getOperatorInfo().getId();
         this.modiOperName = UserUtils.getOperatorInfo().getName();
         this.modiDate = BetterDateUtils.getNumDate();
@@ -483,16 +501,16 @@ public class Notice implements BetterjrEntity {
         this.regOperName = UserUtils.getOperatorInfo().getName();
         this.regDate = BetterDateUtils.getNumDate();
         this.regTime = BetterDateUtils.getNumTime();
-        
+
         this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
-        
+
         this.custName = anCustName;
         this.businStatus = anBusinStatus;
     }
 
     public void initModifyValue(Notice anNotice, String anBusinStatus) {
         initModifyValue(anBusinStatus);
-        
+
         this.subject = anNotice.subject;
         this.content = anNotice.content;
         this.targetCust = anNotice.targetCust;
@@ -504,7 +522,7 @@ public class Notice implements BetterjrEntity {
         this.modiOperName = UserUtils.getOperatorInfo().getName();
         this.modiDate = BetterDateUtils.getNumDate();
         this.modiTime = BetterDateUtils.getNumTime();
-        
+
         this.businStatus = anBusinStatus;
     }
 }

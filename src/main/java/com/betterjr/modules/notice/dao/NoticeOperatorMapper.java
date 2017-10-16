@@ -14,8 +14,7 @@ import com.betterjr.modules.notice.entity.NoticeOperator;
 @BetterjrMapper
 public interface NoticeOperatorMapper extends Mapper<NoticeOperator> {
 
-    @Select("SELECT distinct(snc.L_CUSTNO) as custNo, snc.C_CUSTNAME as custName "
-            + "FROM t_sys_notice_cust snc "
+    @Select("SELECT distinct(snc.L_CUSTNO) as custNo, snc.C_CUSTNAME as custName " + "FROM t_sys_notice_cust snc "
             + "WHERE snc.L_NOTICE_ID = #{noticeId}")
     @ResultType(NoticeCustomer.class)
     public List<NoticeCustomer> selectNoticeCustomerByNoticeId(@Param("noticeId") Long noticeId);

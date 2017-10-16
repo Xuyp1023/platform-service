@@ -6,6 +6,7 @@ import javax.annotation.Resource;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Service;
 import com.betterjr.common.data.NotificationAttachment;
 import com.betterjr.common.mq.annotation.RocketMQListener;
 import com.betterjr.common.mq.message.MQMessage;
-import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.MailUtils;
 import com.betterjr.modules.notification.constants.NotificationConstants;
 import com.betterjr.modules.notification.entity.Notification;
@@ -45,9 +45,11 @@ public class NotificationEmailHandlerService {
 
         final List<NotificationAttachment> attachments = notificationService.buildAttachments(batchNo);
 
-        final MimeMessage mimeMessage = MailUtils.createMessage(session, notification.getSubject(), notification.getContent(), attachments);
+        final MimeMessage mimeMessage = MailUtils.createMessage(session, notification.getSubject(),
+                notification.getContent(), attachments);
 
-        final List<NotificationCustomer> notificationCustomers = notificationCustomerService.queryNotifiCustomerByNotifiId(notification.getId());
+        final List<NotificationCustomer> notificationCustomers = notificationCustomerService
+                .queryNotifiCustomerByNotifiId(notification.getId());
 
         notificationCustomers.forEach(notificationCustomer -> {
             sendMail(session, mimeMessage, notificationCustomer);
@@ -59,14 +61,16 @@ public class NotificationEmailHandlerService {
     /**
      * 发送邮件
      */
-    private void sendMail(final Session anSession, final MimeMessage anMimeMessage, final NotificationCustomer anNotificationCustomer) {
+    private void sendMail(final Session anSession, final MimeMessage anMimeMessage,
+            final NotificationCustomer anNotificationCustomer) {
         final String email = anNotificationCustomer.getSendNo();
-        if (BetterStringUtils.isNotBlank(email) == true) {
+        if (StringUtils.isNotBlank(email) == true) {
             if (MailUtils.sendMail(anSession, anMimeMessage, email) == true) {
-                notificationCustomerService.saveNotificationCustomerStatus(anNotificationCustomer.getId(), NotificationConstants.SEND_STATUS_SUCCESS);
-            }
-            else {
-                notificationCustomerService.saveNotificationCustomerStatus(anNotificationCustomer.getId(), NotificationConstants.SEND_STATUS_FAIL);
+                notificationCustomerService.saveNotificationCustomerStatus(anNotificationCustomer.getId(),
+                        NotificationConstants.SEND_STATUS_SUCCESS);
+            } else {
+                notificationCustomerService.saveNotificationCustomerStatus(anNotificationCustomer.getId(),
+                        NotificationConstants.SEND_STATUS_FAIL);
             }
         }
     }

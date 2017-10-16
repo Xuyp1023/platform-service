@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.data.PlatformBaseRuleType;
@@ -16,7 +17,6 @@ import com.betterjr.common.exception.BytterTradeException;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterDateUtils;
-import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.mapper.pagehelper.PageHelper;
@@ -57,14 +57,15 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
     /**
      * 未读消息
      */
-    public Page<Notice> queryUnreadNotice(final Map<String, Object> anParam, final int anFlag, final int anPageNum, final int anPageSize) {
+    public Page<Notice> queryUnreadNotice(final Map<String, Object> anParam, final int anFlag, final int anPageNum,
+            final int anPageSize) {
         final CustOperatorInfo operator = UserUtils.getOperatorInfo();
 
         PageHelper.startPage(anPageNum, anPageSize, anFlag == 1);
 
         // 处理 LIKEsubject
         final String LIKEsubject = (String) anParam.get("LIKEsubject");
-        if (BetterStringUtils.isNotBlank(LIKEsubject)) {
+        if (StringUtils.isNotBlank(LIKEsubject)) {
             anParam.put("LIKEsubject", "%" + LIKEsubject + "%");
         }
         final Page<Notice> notices = this.mapper.selectUnreadNotice(operator.getId(), anParam);
@@ -74,13 +75,14 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
     /**
      * 已读消息
      */
-    public Page<Notice> queryReadNotice(final Map<String, Object> anParam, final int anFlag, final int anPageNum, final int anPageSize) {
+    public Page<Notice> queryReadNotice(final Map<String, Object> anParam, final int anFlag, final int anPageNum,
+            final int anPageSize) {
         final CustOperatorInfo operator = UserUtils.getOperatorInfo();
 
         PageHelper.startPage(anPageNum, anPageSize, anFlag == 1);
         // 处理 LIKEsubject
         final String LIKEsubject = (String) anParam.get("LIKEsubject");
-        if (BetterStringUtils.isNotBlank(LIKEsubject)) {
+        if (StringUtils.isNotBlank(LIKEsubject)) {
             anParam.put("LIKEsubject", "%" + LIKEsubject + "%");
         }
         final Page<Notice> notices = this.mapper.selectReadNotice(operator.getId(), anParam);
@@ -127,10 +129,11 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
      * @return
      */
     private boolean checkOwnCust(final CustOperatorInfo anOperator, final Notice anNotice) {
-        final Collection<CustInfo> custInfos = accountService.findCustInfoByOperator(anOperator.getId(), anOperator.getOperOrg());
+        final Collection<CustInfo> custInfos = accountService.findCustInfoByOperator(anOperator.getId(),
+                anOperator.getOperOrg());
 
         final Long noticeCustNo = anNotice.getCustNo();
-        for (final CustInfo custInfo: custInfos) {
+        for (final CustInfo custInfo : custInfos) {
             if (noticeCustNo.equals(custInfo.getCustNo())) {
                 return true;
             }
@@ -141,19 +144,19 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
     /**
      * 查询本机构发布公告列表
      */
-    public Page<Notice> queryNotice(final Map<String, Object> anParam, final int anFlag, final int anPageNum, final int anPageSize) {
+    public Page<Notice> queryNotice(final Map<String, Object> anParam, final int anFlag, final int anPageNum,
+            final int anPageSize) {
         BTAssert.notNull(anParam, "参数不允许为空!");
         final CustOperatorInfo operator = UserUtils.getOperatorInfo();
         final Object subject = anParam.get("LIKEsubject");
-        if (subject == null || BetterStringUtils.isBlank((String) subject)) {
+        if (subject == null || StringUtils.isBlank((String) subject)) {
             anParam.remove("LIKEsubject");
-        }
-        else {
+        } else {
             anParam.put("LIKEsubject", "%" + subject + "%");
         }
 
-        anParam.put("businStatus", new String[] { NoticeConstants.NOTICE_STATUS_CANCELED, NoticeConstants.NOTICE_STATUS_PUBLISHED,
-                NoticeConstants.NOTICE_STATUS_STORED });
+        anParam.put("businStatus", new String[] { NoticeConstants.NOTICE_STATUS_CANCELED,
+                NoticeConstants.NOTICE_STATUS_PUBLISHED, NoticeConstants.NOTICE_STATUS_STORED });
         anParam.put("operOrg", operator.getOperOrg());
 
         return this.selectPropertyByPage(anParam, anPageNum, anPageSize, anFlag == 1);
@@ -162,7 +165,8 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
     /**
      * 添加
      */
-    public Notice addNotice(final Notice anNotice, final String anTargetCust, final String anFileList, final String anBusinStatus) {
+    public Notice addNotice(final Notice anNotice, final String anTargetCust, final String anFileList,
+            final String anBusinStatus) {
         BTAssert.notNull(anNotice, "公告内容不允许为空!");
 
         final Long custNo = anNotice.getCustNo();
@@ -190,30 +194,27 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
     private String[] findTargetCusts(final Long anCustNo, final String anTargetCust) {
         String[] targetCusts = null;
 
-        if (BetterStringUtils.isBlank(anTargetCust) == true) {
+        if (StringUtils.isBlank(anTargetCust) == true) {
             // 取所有接口
             if (UserUtils.platformUser() == true) { // 平台面向所有客户发送公告
-                final List<String> custNoList = accountService.queryValidCustInfo().stream().map(custInfo -> String.valueOf(custInfo.getCustNo()))
-                        .collect(Collectors.toList());
+                final List<String> custNoList = accountService.queryValidCustInfo().stream()
+                        .map(custInfo -> String.valueOf(custInfo.getCustNo())).collect(Collectors.toList());
                 targetCusts = custNoList.toArray(new String[custNoList.size()]);
-            }
-            else { // 当前机构面向所有关系客户发送公告
+            } else { // 当前机构面向所有关系客户发送公告
                 final PlatformBaseRuleType role = UserUtils.getPrincipal().getInnerRules().iterator().next();
-                final List<String> custNoList = relationService.queryCustRelation(anCustNo, role).stream().map(data -> data.getValue())
-                        .collect(Collectors.toList());
+                final List<String> custNoList = relationService.queryCustRelation(anCustNo, role).stream()
+                        .map(data -> data.getValue()).collect(Collectors.toList());
                 targetCusts = custNoList.toArray(new String[custNoList.size()]);
             }
-        }
-        else {
+        } else {
             if (UserUtils.platformUser() == true) { // 平台面向指定类型客户发送公告
-                final String[] roles = BetterStringUtils.split(anTargetCust, DELIMITER_COMMA);
+                final String[] roles = StringUtils.split(anTargetCust, DELIMITER_COMMA);
                 final Set<String> operOrgSet = custCertService.queryOperOrgByRoles(roles);
                 final List<String> custNoList = accountService.queryCustInfoByOperOrgSet(operOrgSet).stream()
                         .map(custInfo -> String.valueOf(custInfo.getCustNo())).collect(Collectors.toList());
                 targetCusts = custNoList.toArray(new String[custNoList.size()]);
-            }
-            else { // 当前机构面向指定关系客户发送公告
-                targetCusts = BetterStringUtils.split(anTargetCust, DELIMITER_COMMA);
+            } else { // 当前机构面向指定关系客户发送公告
+                targetCusts = StringUtils.split(anTargetCust, DELIMITER_COMMA);
             }
         }
         return targetCusts;
@@ -224,7 +225,8 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
      *
      * @param anBusinStatus
      */
-    public Notice saveNotice(final Notice anNotice, final Long anId, final String anTargetCust, final String anFileList, final String anBusinStatus) {
+    public Notice saveNotice(final Notice anNotice, final Long anId, final String anTargetCust, final String anFileList,
+            final String anBusinStatus) {
         BTAssert.notNull(anNotice, "公告内容不允许为空!");
 
         final Long custNo = anNotice.getCustNo();
@@ -237,10 +239,11 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
 
         BTAssert.notEmpty(targetCusts, "公告客户列表不允许为空!");
 
-        final Notice tempNotice = checkNoticeStatus(anId, NoticeConstants.NOTICE_STATUS_STORED, NoticeConstants.NOTICE_STATUS_CANCELED);
+        final Notice tempNotice = checkNoticeStatus(anId, NoticeConstants.NOTICE_STATUS_STORED,
+                NoticeConstants.NOTICE_STATUS_CANCELED);
 
         final String tempBusinStatus = tempNotice.getBusinStatus();
-        if (BetterStringUtils.equals(tempBusinStatus, NoticeConstants.NOTICE_STATUS_PUBLISHED) == true) {
+        if (StringUtils.equals(tempBusinStatus, NoticeConstants.NOTICE_STATUS_PUBLISHED) == true) {
             throw new BytterTradeException("本条公告已经发布,不允许修改!");
         }
 
@@ -286,7 +289,8 @@ public class NoticeService extends BaseService<NoticeMapper, Notice> {
      * 删除
      */
     public Notice saveDeleteNotice(final Long anId) {
-        final Notice tempNotice = checkNoticeStatus(anId, NoticeConstants.NOTICE_STATUS_CANCELED, NoticeConstants.NOTICE_STATUS_STORED);
+        final Notice tempNotice = checkNoticeStatus(anId, NoticeConstants.NOTICE_STATUS_CANCELED,
+                NoticeConstants.NOTICE_STATUS_STORED);
 
         tempNotice.initModifyValue(NoticeConstants.NOTICE_STATUS_DELETED);
 

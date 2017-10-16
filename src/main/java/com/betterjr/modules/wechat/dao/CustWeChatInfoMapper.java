@@ -5,5 +5,4 @@ import com.betterjr.mapper.common.Mapper;
 import com.betterjr.modules.wechat.entity.CustWeChatInfo;
 
 @BetterjrMapper
-public interface CustWeChatInfoMapper extends Mapper<CustWeChatInfo> {
-}
+public interface CustWeChatInfoMapper extends Mapper<CustWeChatInfo> {}

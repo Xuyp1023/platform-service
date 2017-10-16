@@ -1,9 +1,14 @@
 package com.betterjr.modules.customer.entity;
 
-import com.betterjr.common.annotation.*;
-import com.betterjr.common.entity.BetterjrEntity;
+import javax.persistence.Access;
+import javax.persistence.AccessType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
-import javax.persistence.*;
+import com.betterjr.common.annotation.MetaData;
+import com.betterjr.common.entity.BetterjrEntity;
 
 @Access(AccessType.FIELD)
 @Entity
@@ -202,29 +207,29 @@ public class PlatformAgencyInfo implements BetterjrEntity {
     /**
      * 直销网点编码定义
      */
-    @Column(name = "C_NETNO",  columnDefinition="VARCHAR" )
-    @MetaData( value="网点编码", comments = "网点编码")
+    @Column(name = "C_NETNO", columnDefinition = "VARCHAR")
+    @MetaData(value = "网点编码", comments = "网点编码")
     private String netNo;
 
     /**
      * 清算日期
      */
-    @Column(name = "D_CLEARDATE",  columnDefinition="VARCHAR" )
-    @MetaData( value="清算日期", comments = "清算日期，即该机构已经清算的数据日期，将根据该日期计算存量情况！")
+    @Column(name = "D_CLEARDATE", columnDefinition = "VARCHAR")
+    @MetaData(value = "清算日期", comments = "清算日期，即该机构已经清算的数据日期，将根据该日期计算存量情况！")
     private String clearDate;
 
     /**
      * 基金公司销售人代码
      */
-    @Column(name = "C_SALE_AGENCYNO",  columnDefinition="VARCHAR" )
-    @MetaData( value="基金公司销售人代码", comments = "基金公司销售人代码！")
+    @Column(name = "C_SALE_AGENCYNO", columnDefinition = "VARCHAR")
+    @MetaData(value = "基金公司销售人代码", comments = "基金公司销售人代码！")
     private String saleAgencyNo;
 
     /**
      * 基金公司网址
      */
-    @Column(name = "C_URL",  columnDefinition="VARCHAR" )
-    @MetaData( value="基金公司网址", comments = "基金公司网址！")
+    @Column(name = "C_URL", columnDefinition = "VARCHAR")
+    @MetaData(value = "基金公司网址", comments = "基金公司网址！")
     private String saleUrl;
 
     /**
@@ -274,7 +279,7 @@ public class PlatformAgencyInfo implements BetterjrEntity {
     public void setZipCode(String zipCode) {
         this.zipCode = zipCode == null ? null : zipCode.trim();
     }
- 
+
     public String getPhone() {
         return phone;
     }
@@ -561,37 +566,59 @@ public class PlatformAgencyInfo implements BetterjrEntity {
         }
         PlatformAgencyInfo other = (PlatformAgencyInfo) that;
         return (this.getTano() == null ? other.getTano() == null : this.getTano().equals(other.getTano()))
-                && (this.getShortName() == null ? other.getShortName() == null : this.getShortName().equals(other.getShortName()))
+                && (this.getShortName() == null ? other.getShortName() == null
+                        : this.getShortName().equals(other.getShortName()))
                 && (this.getName() == null ? other.getName() == null : this.getName().equals(other.getName()))
-                && (this.getZipCode() == null ? other.getZipCode() == null : this.getZipCode().equals(other.getZipCode()))
-                && (this.getContName() == null ? other.getContName() == null : this.getContName().equals(other.getContName()))
+                && (this.getZipCode() == null ? other.getZipCode() == null
+                        : this.getZipCode().equals(other.getZipCode()))
+                && (this.getContName() == null ? other.getContName() == null
+                        : this.getContName().equals(other.getContName()))
                 && (this.getPhone() == null ? other.getPhone() == null : this.getPhone().equals(other.getPhone()))
-                && (this.getMobileNo() == null ? other.getMobileNo() == null : this.getMobileNo().equals(other.getMobileNo()))
+                && (this.getMobileNo() == null ? other.getMobileNo() == null
+                        : this.getMobileNo().equals(other.getMobileNo()))
                 && (this.getFaxNo() == null ? other.getFaxNo() == null : this.getFaxNo().equals(other.getFaxNo()))
                 && (this.getEmail() == null ? other.getEmail() == null : this.getEmail().equals(other.getEmail()))
-                && (this.getAddress() == null ? other.getAddress() == null : this.getAddress().equals(other.getAddress()))
+                && (this.getAddress() == null ? other.getAddress() == null
+                        : this.getAddress().equals(other.getAddress()))
                 && (this.getBankNo() == null ? other.getBankNo() == null : this.getBankNo().equals(other.getBankNo()))
-                && (this.getBankAccount() == null ? other.getBankAccount() == null : this.getBankAccount().equals(other.getBankAccount()))
-                && (this.getBankName() == null ? other.getBankName() == null : this.getBankName().equals(other.getBankName()))
-                && (this.getClearOrg() == null ? other.getClearOrg() == null : this.getClearOrg().equals(other.getClearOrg()))
+                && (this.getBankAccount() == null ? other.getBankAccount() == null
+                        : this.getBankAccount().equals(other.getBankAccount()))
+                && (this.getBankName() == null ? other.getBankName() == null
+                        : this.getBankName().equals(other.getBankName()))
+                && (this.getClearOrg() == null ? other.getClearOrg() == null
+                        : this.getClearOrg().equals(other.getClearOrg()))
                 && (this.getStatus() == null ? other.getStatus() == null : this.getStatus().equals(other.getStatus()))
                 && (this.getTaType() == null ? other.getTaType() == null : this.getTaType().equals(other.getTaType()))
-                && (this.getModiDate() == null ? other.getModiDate() == null : this.getModiDate().equals(other.getModiDate()))
-                && (this.getRegDate() == null ? other.getRegDate() == null : this.getRegDate().equals(other.getRegDate()))
-                && (this.getChkMode() == null ? other.getChkMode() == null : this.getChkMode().equals(other.getChkMode()))
-                && (this.getBusinFlag() == null ? other.getBusinFlag() == null : this.getBusinFlag().equals(other.getBusinFlag()))
-                && (this.getClearStatus() == null ? other.getClearStatus() == null : this.getClearStatus().equals(other.getClearStatus()))
-                && (this.getShareValid() == null ? other.getShareValid() == null : this.getShareValid().equals(other.getShareValid()))
-                && (this.getCsrcTano() == null ? other.getCsrcTano() == null : this.getCsrcTano().equals(other.getCsrcTano()))
-                && (this.getBankAcountName() == null ? other.getBankAcountName() == null : this.getBankAcountName().equals(other.getBankAcountName()))
-                && (this.getErrMode() == null ? other.getErrMode() == null : this.getErrMode().equals(other.getErrMode()))
-                && (this.getFirstBasis() == null ? other.getFirstBasis() == null : this.getFirstBasis().equals(other.getFirstBasis()))
-            && (this.getOperNo() == null ? other.getOperNo() == null : this.getOperNo().equals(other.getOperNo()))
-            && (this.getNetNo() == null ? other.getNetNo() == null : this.getNetNo().equals(other.getNetNo()))
-        && (this.getClearDate() == null ? other.getClearDate() == null : this.getClearDate().equals(other.getClearDate()))
-        && (this.getPayCenterNo() == null ? other.getPayCenterNo() == null : this.getPayCenterNo().equals(other.getPayCenterNo()))
-        && (this.getRelaCustNo() == null ? other.getRelaCustNo() == null : this.getRelaCustNo().equals(other.getRelaCustNo()))
-        && (this.getSaleAgencyNo() == null ? other.getSaleAgencyNo() == null : this.getSaleAgencyNo().equals(other.getSaleAgencyNo()));
+                && (this.getModiDate() == null ? other.getModiDate() == null
+                        : this.getModiDate().equals(other.getModiDate()))
+                && (this.getRegDate() == null ? other.getRegDate() == null
+                        : this.getRegDate().equals(other.getRegDate()))
+                && (this.getChkMode() == null ? other.getChkMode() == null
+                        : this.getChkMode().equals(other.getChkMode()))
+                && (this.getBusinFlag() == null ? other.getBusinFlag() == null
+                        : this.getBusinFlag().equals(other.getBusinFlag()))
+                && (this.getClearStatus() == null ? other.getClearStatus() == null
+                        : this.getClearStatus().equals(other.getClearStatus()))
+                && (this.getShareValid() == null ? other.getShareValid() == null
+                        : this.getShareValid().equals(other.getShareValid()))
+                && (this.getCsrcTano() == null ? other.getCsrcTano() == null
+                        : this.getCsrcTano().equals(other.getCsrcTano()))
+                && (this.getBankAcountName() == null ? other.getBankAcountName() == null
+                        : this.getBankAcountName().equals(other.getBankAcountName()))
+                && (this.getErrMode() == null ? other.getErrMode() == null
+                        : this.getErrMode().equals(other.getErrMode()))
+                && (this.getFirstBasis() == null ? other.getFirstBasis() == null
+                        : this.getFirstBasis().equals(other.getFirstBasis()))
+                && (this.getOperNo() == null ? other.getOperNo() == null : this.getOperNo().equals(other.getOperNo()))
+                && (this.getNetNo() == null ? other.getNetNo() == null : this.getNetNo().equals(other.getNetNo()))
+                && (this.getClearDate() == null ? other.getClearDate() == null
+                        : this.getClearDate().equals(other.getClearDate()))
+                && (this.getPayCenterNo() == null ? other.getPayCenterNo() == null
+                        : this.getPayCenterNo().equals(other.getPayCenterNo()))
+                && (this.getRelaCustNo() == null ? other.getRelaCustNo() == null
+                        : this.getRelaCustNo().equals(other.getRelaCustNo()))
+                && (this.getSaleAgencyNo() == null ? other.getSaleAgencyNo() == null
+                        : this.getSaleAgencyNo().equals(other.getSaleAgencyNo()));
     }
 
     @Override

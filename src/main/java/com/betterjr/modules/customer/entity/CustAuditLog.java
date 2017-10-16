@@ -44,14 +44,13 @@ public class CustAuditLog implements BetterjrEntity {
     @Column(name = "C_STEP_NODE", columnDefinition = "CHAR")
     @MetaData(value = "审核步骤", comments = "审核步骤 0 auditStep  1 reviewStep 2 confirmStep")
     private String stepNode;
-    
+
     /**
      * 审核类型 0开户审核 1代录申请审核 2代录审核 3变更审核 4客户关系审核
      */
     @Column(name = "C_AUDIT_TYPE", columnDefinition = "CHAR")
     @MetaData(value = "审核类型", comments = "审核类型 0开户审核 1代录申请审核 2代录审核 3变更审核 4客户关系审核")
     private String auditType;
-
 
     /**
      * 业务编号
@@ -355,7 +354,7 @@ public class CustAuditLog implements BetterjrEntity {
     public void setCustNo(Long custNo) {
         this.custNo = custNo;
     }
-    
+
     public String getStepNode() {
         return stepNode;
     }
@@ -410,27 +409,45 @@ public class CustAuditLog implements BetterjrEntity {
         }
         CustAuditLog other = (CustAuditLog) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-                && (this.getVersion() == null ? other.getVersion() == null : this.getVersion().equals(other.getVersion()))
-                && (this.getAuditType() == null ? other.getAuditType() == null : this.getAuditType().equals(other.getAuditType()))
-                && (this.getBusinId() == null ? other.getBusinId() == null : this.getBusinId().equals(other.getBusinId()))
-                && (this.getAuditItem() == null ? other.getAuditItem() == null : this.getAuditItem().equals(other.getAuditItem()))
-                && (this.getAuditDate() == null ? other.getAuditDate() == null : this.getAuditDate().equals(other.getAuditDate()))
-                && (this.getAuditTime() == null ? other.getAuditTime() == null : this.getAuditTime().equals(other.getAuditTime()))
+                && (this.getVersion() == null ? other.getVersion() == null
+                        : this.getVersion().equals(other.getVersion()))
+                && (this.getAuditType() == null ? other.getAuditType() == null
+                        : this.getAuditType().equals(other.getAuditType()))
+                && (this.getBusinId() == null ? other.getBusinId() == null
+                        : this.getBusinId().equals(other.getBusinId()))
+                && (this.getAuditItem() == null ? other.getAuditItem() == null
+                        : this.getAuditItem().equals(other.getAuditItem()))
+                && (this.getAuditDate() == null ? other.getAuditDate() == null
+                        : this.getAuditDate().equals(other.getAuditDate()))
+                && (this.getAuditTime() == null ? other.getAuditTime() == null
+                        : this.getAuditTime().equals(other.getAuditTime()))
                 && (this.getResult() == null ? other.getResult() == null : this.getResult().equals(other.getResult()))
                 && (this.getReason() == null ? other.getReason() == null : this.getReason().equals(other.getReason()))
-                && (this.getRegOperId() == null ? other.getRegOperId() == null : this.getRegOperId().equals(other.getRegOperId()))
-                && (this.getRegOperName() == null ? other.getRegOperName() == null : this.getRegOperName().equals(other.getRegOperName()))
-                && (this.getRegDate() == null ? other.getRegDate() == null : this.getRegDate().equals(other.getRegDate()))
-                && (this.getRegTime() == null ? other.getRegTime() == null : this.getRegTime().equals(other.getRegTime()))
-                && (this.getModiOperId() == null ? other.getModiOperId() == null : this.getModiOperId().equals(other.getModiOperId()))
-                && (this.getModiOperName() == null ? other.getModiOperName() == null : this.getModiOperName().equals(other.getModiOperName()))
-                && (this.getModiDate() == null ? other.getModiDate() == null : this.getModiDate().equals(other.getModiDate()))
-                && (this.getModiTime() == null ? other.getModiTime() == null : this.getModiTime().equals(other.getModiTime()))
-                && (this.getOperOrg() == null ? other.getOperOrg() == null : this.getOperOrg().equals(other.getOperOrg()))
-                && (this.getBusinStatus() == null ? other.getBusinStatus() == null : this.getBusinStatus().equals(other.getBusinStatus()))
-                && (this.getLastStatus() == null ? other.getLastStatus() == null : this.getLastStatus().equals(other.getLastStatus()))
+                && (this.getRegOperId() == null ? other.getRegOperId() == null
+                        : this.getRegOperId().equals(other.getRegOperId()))
+                && (this.getRegOperName() == null ? other.getRegOperName() == null
+                        : this.getRegOperName().equals(other.getRegOperName()))
+                && (this.getRegDate() == null ? other.getRegDate() == null
+                        : this.getRegDate().equals(other.getRegDate()))
+                && (this.getRegTime() == null ? other.getRegTime() == null
+                        : this.getRegTime().equals(other.getRegTime()))
+                && (this.getModiOperId() == null ? other.getModiOperId() == null
+                        : this.getModiOperId().equals(other.getModiOperId()))
+                && (this.getModiOperName() == null ? other.getModiOperName() == null
+                        : this.getModiOperName().equals(other.getModiOperName()))
+                && (this.getModiDate() == null ? other.getModiDate() == null
+                        : this.getModiDate().equals(other.getModiDate()))
+                && (this.getModiTime() == null ? other.getModiTime() == null
+                        : this.getModiTime().equals(other.getModiTime()))
+                && (this.getOperOrg() == null ? other.getOperOrg() == null
+                        : this.getOperOrg().equals(other.getOperOrg()))
+                && (this.getBusinStatus() == null ? other.getBusinStatus() == null
+                        : this.getBusinStatus().equals(other.getBusinStatus()))
+                && (this.getLastStatus() == null ? other.getLastStatus() == null
+                        : this.getLastStatus().equals(other.getLastStatus()))
                 && (this.getCustNo() == null ? other.getCustNo() == null : this.getCustNo().equals(other.getCustNo()))
-                && (this.getStepNode() == null ? other.getStepNode() == null : this.getStepNode().equals(other.getStepNode()));
+                && (this.getStepNode() == null ? other.getStepNode() == null
+                        : this.getStepNode().equals(other.getStepNode()));
     }
 
     @Override
@@ -462,7 +479,8 @@ public class CustAuditLog implements BetterjrEntity {
         return result;
     }
 
-    public void initAddValue(String anAuditType, String anStepNode, Long anBusinId, String anAuditResult, String anReason, String anAuditItem, Long anCustNo) {
+    public void initAddValue(String anAuditType, String anStepNode, Long anBusinId, String anAuditResult,
+            String anReason, String anAuditItem, Long anCustNo) {
         this.id = SerialGenerator.getLongValue("CustAuditLog.id");
 
         this.regOperId = UserUtils.getOperatorInfo().getId();
@@ -477,9 +495,9 @@ public class CustAuditLog implements BetterjrEntity {
 
         this.auditDate = BetterDateUtils.getNumDate();;
         this.auditTime = BetterDateUtils.getNumTime();
-        
+
         this.auditItem = anAuditItem;
-        
+
         this.auditType = anAuditType;
         this.stepNode = anStepNode;
         this.businId = anBusinId;

@@ -5,5 +5,4 @@ import com.betterjr.mapper.common.Mapper;
 import com.betterjr.modules.customer.entity.CustMechBase;
 
 @BetterjrMapper
-public interface CustMechBaseMapper extends Mapper<CustMechBase> {
-}
+public interface CustMechBaseMapper extends Mapper<CustMechBase> {}

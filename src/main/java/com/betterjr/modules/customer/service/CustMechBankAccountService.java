@@ -42,19 +42,20 @@ public class CustMechBankAccountService extends BaseService<CustMechBankAccountM
 
         return this.selectByProperty("custNo", anCustNo);
     }
-    
+
     /**
      * 查询银行跟账号用于下拉
      * @param anCustNo
      * @return
      */
-    public List<SimpleDataEntity> querBankAccountKeyAndValue(final Long anCustNo){
-    	List<CustMechBankAccount> accountList = this.queryCustMechBankAccount(anCustNo);
-    	List<SimpleDataEntity> result = new ArrayList<SimpleDataEntity>();
-    	for (CustMechBankAccount account : accountList) {
-    		result.add(new SimpleDataEntity(account.getBankAcco()+"-" +account.getBankName(), String.valueOf(account.getBankAcco())));
-		}
-    	return result;
+    public List<SimpleDataEntity> querBankAccountKeyAndValue(final Long anCustNo) {
+        List<CustMechBankAccount> accountList = this.queryCustMechBankAccount(anCustNo);
+        List<SimpleDataEntity> result = new ArrayList<SimpleDataEntity>();
+        for (CustMechBankAccount account : accountList) {
+            result.add(new SimpleDataEntity(account.getBankAcco() + "-" + account.getBankName(),
+                    String.valueOf(account.getBankAcco())));
+        }
+        return result;
     }
 
     /**
@@ -79,7 +80,6 @@ public class CustMechBankAccountService extends BaseService<CustMechBankAccountM
         this.insert(bankAccount);
         return bankAccount;
     }
-
 
     /**
      * 添加银行账户信息
@@ -153,7 +153,7 @@ public class CustMechBankAccountService extends BaseService<CustMechBankAccountM
         conditionMap.put("bankAccoName", anBankAccoName);
         return Collections3.getFirst(this.selectByProperty(conditionMap));
     }
-    
+
     /**
      * @param anTmpAcco
      * @return
@@ -163,6 +163,5 @@ public class CustMechBankAccountService extends BaseService<CustMechBankAccountM
         conditionMap.put("bankAcco", anBankAcco);
         return Collections3.getFirst(this.selectByProperty(conditionMap));
     }
-
 
 }

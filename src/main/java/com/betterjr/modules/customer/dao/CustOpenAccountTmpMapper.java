@@ -5,5 +5,4 @@ import com.betterjr.mapper.common.Mapper;
 import com.betterjr.modules.customer.entity.CustOpenAccountTmp;
 
 @BetterjrMapper
-public interface CustOpenAccountTmpMapper extends Mapper<CustOpenAccountTmp> {
-}
+public interface CustOpenAccountTmpMapper extends Mapper<CustOpenAccountTmp> {}

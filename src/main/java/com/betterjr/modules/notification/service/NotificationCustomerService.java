@@ -10,7 +10,6 @@ import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.mapper.pagehelper.PageHelper;
-import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.betterjr.modules.notification.constants.NotificationConstants;
 import com.betterjr.modules.notification.dao.NotificationCustomerMapper;
@@ -21,7 +20,8 @@ public class NotificationCustomerService extends BaseService<NotificationCustome
     /**
      * 添加 NotificationCustomer
      */
-    public NotificationCustomer addNotificationCustomer(final NotificationCustomer anNotificationCustomer, final CustOperatorInfo anSendOperator) {
+    public NotificationCustomer addNotificationCustomer(final NotificationCustomer anNotificationCustomer,
+            final CustOperatorInfo anSendOperator) {
         BTAssert.notNull(anNotificationCustomer, "通知内容不允许为空!");
 
         anNotificationCustomer.initAddValue(anSendOperator);
@@ -42,7 +42,8 @@ public class NotificationCustomerService extends BaseService<NotificationCustome
     /**
      * 查找操作员接收的消息 通过 消息编号 操作员编号
      */
-    public NotificationCustomer findNotifiCustomerByNotifiIdAndOperId(final Long anNotifiId, final Long anOperId, final String anChannel) {
+    public NotificationCustomer findNotifiCustomerByNotifiIdAndOperId(final Long anNotifiId, final Long anOperId,
+            final String anChannel) {
         BTAssert.notNull(anNotifiId, "通知编号不允许为空!");
         BTAssert.notNull(anOperId, "操作员编号不允许为空!");
 
@@ -60,7 +61,8 @@ public class NotificationCustomerService extends BaseService<NotificationCustome
         BTAssert.notNull(anNotifiId, "通知编号不允许为空!");
         BTAssert.notNull(anOperId, "操作员编号不允许为空!");
 
-        final NotificationCustomer notificationCustomer = findNotifiCustomerByNotifiIdAndOperId(anNotifiId, anOperId, NotificationConstants.CHANNEL_INBOX);
+        final NotificationCustomer notificationCustomer = findNotifiCustomerByNotifiIdAndOperId(anNotifiId, anOperId,
+                NotificationConstants.CHANNEL_INBOX);
         notificationCustomer.initModifyValue(NotificationConstants.IS_READ_TRUE);
 
         return this.updateByPrimaryKeySelective(notificationCustomer);

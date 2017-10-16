@@ -13,7 +13,6 @@ import com.betterjr.common.selectkey.SerialGenerator;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.Collections3;
-import com.betterjr.common.utils.UserUtils;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.betterjr.modules.account.service.CustAndOperatorRelaService;
 import com.betterjr.modules.account.service.CustOperatorService;
@@ -21,7 +20,6 @@ import com.betterjr.modules.workflow.dao.CustFlowBaseMapper;
 import com.betterjr.modules.workflow.data.FlowNodeRole;
 import com.betterjr.modules.workflow.entity.CustFlowBase;
 import com.betterjr.modules.workflow.entity.CustFlowMoney;
-import com.betterjr.modules.workflow.entity.CustFlowNode;
 import com.betterjr.modules.workflow.entity.CustFlowStep;
 import com.betterjr.modules.workflow.entity.CustFlowStepApprovers;
 import com.betterjr.modules.workflow.utils.SnakerProcessModelGenerator;
@@ -95,7 +93,7 @@ public class CustFlowBaseService extends BaseService<CustFlowBaseMapper, CustFlo
         return generator.buildProcessModel();
 
     }
-    
+
     /**
      * 读取流程配置，更加流程类型
      * 
@@ -107,8 +105,8 @@ public class CustFlowBaseService extends BaseService<CustFlowBaseMapper, CustFlo
         if (Collections3.isEmpty(baseList)) {
             return null;
         }
-        
-        CustFlowBase base=Collections3.getFirst(baseList);
+
+        CustFlowBase base = Collections3.getFirst(baseList);
         List<CustFlowStep> stepList = this.stepService.selectByProperty("flowBaseId", base.getId());
 
         for (CustFlowStep step : stepList) {
@@ -126,35 +124,35 @@ public class CustFlowBaseService extends BaseService<CustFlowBaseMapper, CustFlo
      */
     public void saveProcess(CustFlowBase base) {
         // base
-        Long baseId=SerialGenerator.getLongValue(CustFlowBase.selectKey);
-        baseId=(Long)this.insertOrUpdateWithPkId(base, baseId);
-        
-        List<CustFlowStep> oriStepList=this.stepService.selectByProperty("flowBaseId", baseId);
-        if(!Collections3.isEmpty(oriStepList)){
-            for(CustFlowStep oriStep:oriStepList){
+        Long baseId = SerialGenerator.getLongValue(CustFlowBase.selectKey);
+        baseId = (Long) this.insertOrUpdateWithPkId(base, baseId);
+
+        List<CustFlowStep> oriStepList = this.stepService.selectByProperty("flowBaseId", baseId);
+        if (!Collections3.isEmpty(oriStepList)) {
+            for (CustFlowStep oriStep : oriStepList) {
                 this.stepAppService.deleteByProperty("stepId", oriStep.getId());
             }
             this.stepService.deleteByProperty("flowBaseId", baseId);
         }
-        
+
         // steps --> approvers
-        int stepIndex=1;
+        int stepIndex = 1;
         if (!Collections3.isEmpty(base.getStepList())) {
             for (CustFlowStep step : base.getStepList()) {
-                Long stepId=SerialGenerator.getLongValue(CustFlowStep.selectKey);
+                Long stepId = SerialGenerator.getLongValue(CustFlowStep.selectKey);
                 step.setFlowBaseId(base.getId());
                 step.setOrderNum(stepIndex);
-                if(step.getId()==null){
+                if (step.getId() == null) {
                     step.setId(stepId);
                 }
                 stepIndex++;
                 this.stepService.insert(step);
-                
+
                 if (!Collections3.isEmpty(step.getStepApprovers())) {
                     for (CustFlowStepApprovers app : step.getStepApprovers()) {
-                        Long appId=SerialGenerator.getLongValue(CustFlowStepApprovers.selectKey);
+                        Long appId = SerialGenerator.getLongValue(CustFlowStepApprovers.selectKey);
                         app.setStepId(step.getId());
-                        if(app.getId()==null){
+                        if (app.getId() == null) {
                             app.setId(appId);
                         }
                         this.stepAppService.insert(app);
@@ -203,10 +201,10 @@ public class CustFlowBaseService extends BaseService<CustFlowBaseMapper, CustFlo
                 app.setAuditOperName(oper.getName());
                 app.setAuditMoneyId(CustFlowMoney.DefaultMoney);
                 app.setWeight(CustFlowStepApprovers.MaxWeight);
-                this.stepAppService.insertOrUpdateWithPkId(app, SerialGenerator.getLongValue(CustFlowStepApprovers.selectKey));
+                this.stepAppService.insertOrUpdateWithPkId(app,
+                        SerialGenerator.getLongValue(CustFlowStepApprovers.selectKey));
             }
         }
     }
-
 
 }

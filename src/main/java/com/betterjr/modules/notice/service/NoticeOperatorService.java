@@ -38,7 +38,7 @@ public class NoticeOperatorService extends BaseService<NoticeOperatorMapper, Not
         conditionMap.put("operId", anOperId);
         return Collections3.getFirst(this.selectByProperty(conditionMap));
     }
-    
+
     /**
      * 置已删除  从已读->已删除
      */
@@ -47,25 +47,27 @@ public class NoticeOperatorService extends BaseService<NoticeOperatorMapper, Not
         BTAssert.notNull(anCustomer, "客户不允许为空!");
         BTAssert.notNull(anOperator, "操作员不允许为空!");
 
-        NoticeOperator noticeOperator = this.findNoticeOperatorByCondition(anNoticeId, anCustomer.getCustNo(), anOperator.getId());
-        
+        NoticeOperator noticeOperator = this.findNoticeOperatorByCondition(anNoticeId, anCustomer.getCustNo(),
+                anOperator.getId());
+
         if (noticeOperator != null) {
             // 置为已删
             noticeOperator.initModifyValue();
             noticeOperator.setIsDeleted(Boolean.TRUE);
             this.updateByPrimaryKeySelective(noticeOperator);
-            
+
             return noticeOperator;
         } else {
             // 为此条消息，创建一个已删 记录， 将已读状态置为true;
             noticeOperator = new NoticeOperator();
-            noticeOperator.initAddValue(anNoticeId, anCustomer.getCustNo(), anCustomer.getCustName(), anOperator.getId(), anOperator.getName());
+            noticeOperator.initAddValue(anNoticeId, anCustomer.getCustNo(), anCustomer.getCustName(),
+                    anOperator.getId(), anOperator.getName());
             noticeOperator.setIsRead(Boolean.TRUE);
             noticeOperator.setIsDeleted(Boolean.TRUE);
             this.insert(noticeOperator);
             return noticeOperator;
         }
-        
+
     }
 
     /**
@@ -75,19 +77,21 @@ public class NoticeOperatorService extends BaseService<NoticeOperatorMapper, Not
         BTAssert.notNull(anNoticeId, "公告编号不允许为空!");
         BTAssert.notNull(anCustomer, "客户不允许为空!");
         BTAssert.notNull(anOperator, "操作员不允许为空!");
-        
-        NoticeOperator noticeOperator = this.findNoticeOperatorByCondition(anNoticeId, anCustomer.getCustNo(), anOperator.getId());
+
+        NoticeOperator noticeOperator = this.findNoticeOperatorByCondition(anNoticeId, anCustomer.getCustNo(),
+                anOperator.getId());
         if (noticeOperator != null) {
             // 置为已读
             noticeOperator.initModifyValue();
             noticeOperator.setIsRead(Boolean.TRUE);
             this.updateByPrimaryKeySelective(noticeOperator);
-            
+
             return noticeOperator;
         } else {
             // 为此条消息，创建一个已读 记录， 将已读状态置为true;
             noticeOperator = new NoticeOperator();
-            noticeOperator.initAddValue(anNoticeId, anCustomer.getCustNo(), anCustomer.getCustName(), anOperator.getId(), anOperator.getName());
+            noticeOperator.initAddValue(anNoticeId, anCustomer.getCustNo(), anCustomer.getCustName(),
+                    anOperator.getId(), anOperator.getName());
             noticeOperator.setIsRead(Boolean.TRUE);
             this.insert(noticeOperator);
             return noticeOperator;

@@ -62,19 +62,20 @@ public class NotificationSubscribeService extends BaseService<NotificationSubscr
      * @param anPageSize
      * @return
      */
-    public Page<ProfileSubscribeModel> queryProfileSubscribe(final Long anCustNo, final int anFlag, final int anPageNum, final int anPageSize) {
+    public Page<ProfileSubscribeModel> queryProfileSubscribe(final Long anCustNo, final int anFlag, final int anPageNum,
+            final int anPageSize) {
         BTAssert.notNull(anCustNo, "公司编号不允许为空!");
 
         final Map<String, Object> param = new HashMap<>();
 
         final PlatformBaseRuleType role = UserUtils.getPrincipal().getInnerRules().iterator().next();
         // 取关系客户
-        final Set<String> custNoSet = relationService.queryCustRelation(anCustNo, role).stream().map(data -> data.getValue())
-                .collect(Collectors.toSet());
+        final Set<String> custNoSet = relationService.queryCustRelation(anCustNo, role).stream()
+                .map(data -> data.getValue()).collect(Collectors.toSet());
         // 取平台
         final List<CustCertRule> certRules = certRuleService.queryCertRuleListByRule("PLATFORM_USER");
         final Set<String> operOrgSet = new HashSet<>();
-        for (final CustCertRule certRule: certRules) {
+        for (final CustCertRule certRule : certRules) {
             final CustCertInfo certInfo = certService.findBySerialNo(certRule.getSerialNo());
             if (certInfo != null) {
                 operOrgSet.add(certInfo.getOperOrg());
@@ -82,7 +83,8 @@ public class NotificationSubscribeService extends BaseService<NotificationSubscr
         }
         if (Collections3.isEmpty(operOrgSet) == false) {
             final List<CustInfo> custInfos = accountService.queryCustInfoByOperOrgSet(operOrgSet);
-            custNoSet.addAll(custInfos.stream().map(custInfo->String.valueOf(custInfo.getCustNo())).collect(Collectors.toSet()));
+            custNoSet.addAll(custInfos.stream().map(custInfo -> String.valueOf(custInfo.getCustNo()))
+                    .collect(Collectors.toSet()));
         }
 
         param.put("customers", custNoSet);
@@ -91,7 +93,8 @@ public class NotificationSubscribeService extends BaseService<NotificationSubscr
         final Page<ProfileSubscribeModel> profileSubscribes = this.mapper.selectProfileSubscribe(param);
 
         profileSubscribes.forEach(profileSubscribe -> {
-            profileSubscribe.setChannels(queryChannelSubscribe(anCustNo, profileSubscribe.getCustNo(), profileSubscribe.getProfileName()));
+            profileSubscribe.setChannels(
+                    queryChannelSubscribe(anCustNo, profileSubscribe.getCustNo(), profileSubscribe.getProfileName()));
         });
         return profileSubscribes;
     }
@@ -104,9 +107,11 @@ public class NotificationSubscribeService extends BaseService<NotificationSubscr
      * @param anProfileId
      * @return
      */
-    private List<ChannelSubscribeModel> queryChannelSubscribe(final Long anCustNo, final Long anSourceCustNo, final String anProfileName) {
+    private List<ChannelSubscribeModel> queryChannelSubscribe(final Long anCustNo, final Long anSourceCustNo,
+            final String anProfileName) {
         // Long operId, Long custNo, Long sourceCustNo, Long profileId
-        final List<ChannelSubscribeModel> channelSubscribes = this.mapper.selectChannelSubscribe(anCustNo, anSourceCustNo, anProfileName);
+        final List<ChannelSubscribeModel> channelSubscribes = this.mapper.selectChannelSubscribe(anCustNo,
+                anSourceCustNo, anProfileName);
 
         channelSubscribes.forEach(channelSubscribe -> {
             channelSubscribe.setCustNo(anCustNo);
@@ -117,20 +122,23 @@ public class NotificationSubscribeService extends BaseService<NotificationSubscr
     }
 
     // 确认订阅 删数据
-    public void saveConfirmSubscribe(final Long anCustNo, final Long anSourceCustNo, final String anProfileName, final String anChannel) {
+    public void saveConfirmSubscribe(final Long anCustNo, final Long anSourceCustNo, final String anProfileName,
+            final String anChannel) {
         BTAssert.notNull(anCustNo, "公司编号不允许为空!");
         BTAssert.notNull(anSourceCustNo, "模板所属公司编号不允许为空！");
         BTAssert.notNull(anProfileName, "模板名称不允许为空！");
 
-        final NotificationProfile profile = profileService.findDefaultProfileByProfileNameAndCustNo(anProfileName, anSourceCustNo);
+        final NotificationProfile profile = profileService.findDefaultProfileByProfileNameAndCustNo(anProfileName,
+                anSourceCustNo);
         BTAssert.notNull(profile, "没有找到消息通知模板!");
 
-        final NotificationChannelProfile channelProfile = channelProfileService.findChannelProfileByProfileIdAndChannel(profile.getId(), anChannel);
+        final NotificationChannelProfile channelProfile = channelProfileService
+                .findChannelProfileByProfileIdAndChannel(profile.getId(), anChannel);
         BTAssert.notNull(channelProfile, "没有找到对应的通道模板!");
 
         final Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("custNo", anCustNo);
-        conditionMap.put("sourceCustNo",anSourceCustNo);
+        conditionMap.put("sourceCustNo", anSourceCustNo);
         conditionMap.put("profileName", anProfileName);
         conditionMap.put("channel", anChannel);
 
@@ -141,17 +149,20 @@ public class NotificationSubscribeService extends BaseService<NotificationSubscr
     }
 
     // 撤销订阅 加数据
-    public void saveCancelSubscribe(final Long anCustNo, final Long anSourceCustNo, final String anProfileName, final String anChannel) {
+    public void saveCancelSubscribe(final Long anCustNo, final Long anSourceCustNo, final String anProfileName,
+            final String anChannel) {
         BTAssert.notNull(anCustNo, "公司编号不允许为空!");
         BTAssert.notNull(anSourceCustNo, "模板所属公司编号不允许为空！");
         BTAssert.notNull(anProfileName, "模板名称不允许为空！");
         final CustInfo customer = accountService.findCustInfo(anCustNo);
         final CustOperatorInfo operator = UserUtils.getOperatorInfo();
 
-        final NotificationProfile profile = profileService.findDefaultProfileByProfileNameAndCustNo(anProfileName, anSourceCustNo);
+        final NotificationProfile profile = profileService.findDefaultProfileByProfileNameAndCustNo(anProfileName,
+                anSourceCustNo);
         BTAssert.notNull(profile, "没有找到消息通知模板!");
 
-        final NotificationChannelProfile channelProfile = channelProfileService.findChannelProfileByProfileIdAndChannel(profile.getId(), anChannel);
+        final NotificationChannelProfile channelProfile = channelProfileService
+                .findChannelProfileByProfileIdAndChannel(profile.getId(), anChannel);
         BTAssert.notNull(channelProfile, "没有找到对应的通道模板!");
 
         final Map<String, Object> conditionMap = new HashMap<>();
@@ -179,7 +190,8 @@ public class NotificationSubscribeService extends BaseService<NotificationSubscr
      * @param anCustNo
      * @return
      */
-    public boolean checkSubscribe(final Long anProfileId, final Long anChannelProfileId, final CustInfo anRight, final CustOperatorInfo anLeft, final Long anCustNo) {
+    public boolean checkSubscribe(final Long anProfileId, final Long anChannelProfileId, final CustInfo anRight,
+            final CustOperatorInfo anLeft, final Long anCustNo) {
         // TODO Auto-generated method stub
         return false;
     }

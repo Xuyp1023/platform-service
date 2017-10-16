@@ -7,9 +7,10 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.alibaba.dubbo.config.annotation.Service;
 import com.betterjr.common.utils.BTAssert;
-import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.customer.ICustMechShareholderService;
 import com.betterjr.modules.customer.constants.CustomerConstants;
@@ -64,19 +65,22 @@ public class CustMechShareholderDubboService implements ICustMechShareholderServ
     @Override
     public String webSaveShareholderTmp(Map<String, Object> anParam, Long anId, String anFileList) {
         final CustMechShareholderTmp custMechShareholderTmp = RuleServiceDubboFilterInvoker.getInputObj();
-        return newOk("公司股东-流水信息 修改成功", shareholderTmpService.saveShareholderTmp(custMechShareholderTmp, anId, anFileList)).toJson();
+        return newOk("公司股东-流水信息 修改成功",
+                shareholderTmpService.saveShareholderTmp(custMechShareholderTmp, anId, anFileList)).toJson();
     }
 
     @Override
     public String webAddChangeShareholderTmp(Map<String, Object> anMap, String anFileList) {
         final CustMechShareholderTmp custMechShareholderTmp = RuleServiceDubboFilterInvoker.getInputObj();
-        return newOk("公司股东-流水信息 变更添加成功", shareholderTmpService.addChangeShareholderTmp(custMechShareholderTmp, anFileList)).toJson();
+        return newOk("公司股东-流水信息 变更添加成功",
+                shareholderTmpService.addChangeShareholderTmp(custMechShareholderTmp, anFileList)).toJson();
     }
 
     @Override
     public String webSaveChangeShareholderTmp(Map<String, Object> anParam, String anFileList) {
         final CustMechShareholderTmp custMechShareholderTmp = RuleServiceDubboFilterInvoker.getInputObj();
-        return newOk("公司股东-流水信息 变更修改成功", shareholderTmpService.saveSaveChangeShareholderTmp(custMechShareholderTmp, anFileList)).toJson();
+        return newOk("公司股东-流水信息 变更修改成功",
+                shareholderTmpService.saveSaveChangeShareholderTmp(custMechShareholderTmp, anFileList)).toJson();
     }
 
     @Override
@@ -111,21 +115,22 @@ public class CustMechShareholderDubboService implements ICustMechShareholderServ
 
     @Override
     public String webQueryChangeApply(Long anCustNo, int anFlag, int anPageNum, int anPageSize) {
-        final Page<CustChangeApply> changeApplys = changeService.queryChangeApply(anCustNo, CustomerConstants.ITEM_SHAREHOLDER, anFlag, anPageNum,
-                anPageSize);
+        final Page<CustChangeApply> changeApplys = changeService.queryChangeApply(anCustNo,
+                CustomerConstants.ITEM_SHAREHOLDER, anFlag, anPageNum, anPageSize);
         return newOkWithPage("股东信息-变更列表查询 成功", changeApplys).toJson();
     }
 
     @Override
     public String webFindChangeApply(Long anApplyId, Long anTmpId) {
-        final CustChangeApply changeApply = changeService.findChangeApply(anApplyId, CustomerConstants.ITEM_SHAREHOLDER);
+        final CustChangeApply changeApply = changeService.findChangeApply(anApplyId,
+                CustomerConstants.ITEM_SHAREHOLDER);
 
         final CustMechShareholderTmp nowData = shareholderTmpService.findShareholderTmp(anTmpId);
         final CustMechShareholderTmp befData = shareholderTmpService.findShareholderTmpPrevVersion(nowData);
 
         ChangeDetailBean<CustMechShareholderTmp> changeDetailBean = new ChangeDetailBean<>();
         changeDetailBean.setChangeApply(changeApply);
-        if (BetterStringUtils.equals(nowData.getTmpOperType(), CustomerConstants.TMP_OPER_TYPE_DELETE) == false) {
+        if (StringUtils.equals(nowData.getTmpOperType(), CustomerConstants.TMP_OPER_TYPE_DELETE) == false) {
             changeDetailBean.setNowData(nowData);
         }
         changeDetailBean.setBefData(befData);
@@ -136,24 +141,29 @@ public class CustMechShareholderDubboService implements ICustMechShareholderServ
     @Override
     public String webAddInsteadShareholderTmp(Map<String, Object> anMap, Long anInsteadRecordId, String anFileList) {
         final CustMechShareholderTmp custMechShareholderTmp = RuleServiceDubboFilterInvoker.getInputObj();
-        return newOk("公司股东-流水信息 代录添加成功", shareholderTmpService.addInsteadShareholderTmp(custMechShareholderTmp, anInsteadRecordId, anFileList)).toJson();
+        return newOk("公司股东-流水信息 代录添加成功",
+                shareholderTmpService.addInsteadShareholderTmp(custMechShareholderTmp, anInsteadRecordId, anFileList))
+                        .toJson();
     }
 
     @Override
     public String webSaveInsteadShareholderTmp(Map<String, Object> anParam, Long anInsteadRecordId, String anFileList) {
         final CustMechShareholderTmp custMechShareholderTmp = RuleServiceDubboFilterInvoker.getInputObj();
-        return newOk("公司股东-流水信息 代录修改成功", shareholderTmpService.saveSaveInsteadShareholderTmp(custMechShareholderTmp, anInsteadRecordId, anFileList)).toJson();
+        return newOk("公司股东-流水信息 代录修改成功", shareholderTmpService.saveSaveInsteadShareholderTmp(custMechShareholderTmp,
+                anInsteadRecordId, anFileList)).toJson();
 
     }
 
     @Override
     public String webDeleteInsteadShareholderTmp(Long anRefId, Long anInsteadRecordId) {
-        return newOk("公司股东-流水信息 代录删除成功", shareholderTmpService.saveDeleteInsteadShareholderTmp(anRefId, anInsteadRecordId)).toJson();
+        return newOk("公司股东-流水信息 代录删除成功",
+                shareholderTmpService.saveDeleteInsteadShareholderTmp(anRefId, anInsteadRecordId)).toJson();
     }
 
     @Override
     public String webCancelInsteadShareholderTmp(Long anId, Long anInsteadRecordId) {
-        return newOk("公司股东-流水信息 代录删除成功", shareholderTmpService.saveCancelInsteadShareholderTmp(anId, anInsteadRecordId)).toJson();
+        return newOk("公司股东-流水信息 代录删除成功", shareholderTmpService.saveCancelInsteadShareholderTmp(anId, anInsteadRecordId))
+                .toJson();
     }
 
     @Override

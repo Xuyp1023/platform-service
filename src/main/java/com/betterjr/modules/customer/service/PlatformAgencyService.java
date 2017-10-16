@@ -1,17 +1,19 @@
 package com.betterjr.modules.customer.service;
 
-import com.betterjr.common.config.ConfigServiceFace;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+
 import com.betterjr.common.config.ParamNames;
 import com.betterjr.common.service.BaseService;
-import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.reflection.ReflectionUtils;
 import com.betterjr.modules.customer.dao.PlatformAgencyInfoMapper;
 import com.betterjr.modules.customer.entity.PlatformAgencyInfo;
-
-import java.util.*;
-
-import org.springframework.stereotype.Service;
 
 @Service
 public class PlatformAgencyService extends BaseService<PlatformAgencyInfoMapper, PlatformAgencyInfo> {
@@ -22,7 +24,7 @@ public class PlatformAgencyService extends BaseService<PlatformAgencyInfoMapper,
         List<PlatformAgencyInfo> saleList = this.selectAll();
         saleMap = ReflectionUtils.listConvertToMap(saleList, "saleAgencyNo");
         for (PlatformAgencyInfo taInfo : saleList) {
-            if (BetterStringUtils.isNotBlank(taInfo.getRelaCustNo())) {
+            if (StringUtils.isNotBlank(taInfo.getRelaCustNo())) {
                 saleMap.put(taInfo.getRelaCustNo(), taInfo);
             }
         }
@@ -41,13 +43,13 @@ public class PlatformAgencyService extends BaseService<PlatformAgencyInfoMapper,
      */
     public PlatformAgencyInfo findSaleAgency(String anSaleAgencyNo) {
         PlatformAgencyInfo agencyInfo = null;
-        if (BetterStringUtils.isNotBlank(anSaleAgencyNo)){
+        if (StringUtils.isNotBlank(anSaleAgencyNo)) {
             agencyInfo = Collections3.getFirst(selectByProperty("relaCustNo", anSaleAgencyNo));
-            if (agencyInfo == null){
-               agencyInfo = Collections3.getFirst(selectByProperty("saleAgencyNo", anSaleAgencyNo));
+            if (agencyInfo == null) {
+                agencyInfo = Collections3.getFirst(selectByProperty("saleAgencyNo", anSaleAgencyNo));
             }
         }
-        
+
         return agencyInfo;
     }
 

@@ -5,5 +5,4 @@ import com.betterjr.mapper.common.Mapper;
 import com.betterjr.modules.customer.entity.CustOperateRecord;
 
 @BetterjrMapper
-public interface CustOperateRecordMapper extends Mapper<CustOperateRecord> {
-}
+public interface CustOperateRecordMapper extends Mapper<CustOperateRecord> {}

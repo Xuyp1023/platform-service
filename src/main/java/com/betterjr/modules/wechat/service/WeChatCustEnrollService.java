@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +13,6 @@ import com.betterjr.common.selectkey.SerialGenerator;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterDateUtils;
-import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.QueryTermBuilder;
 import com.betterjr.common.utils.UserUtils;
@@ -110,22 +110,26 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         final CustTempEnrollInfo custEnrollInfo = new CustTempEnrollInfo();
         // 构架核心企业查询条件
         final Map<String, Object> coreMap = QueryTermBuilder.newInstance().put("custNo", custNo)
-                .put("relateType", CustomerConstants.RELATE_TYPE_SUPPLIER_CORE).put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT).build();
+                .put("relateType", CustomerConstants.RELATE_TYPE_SUPPLIER_CORE)
+                .put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT).build();
         final CustRelation coreRelation = Collections3.getFirst(custRelationService.selectByProperty(coreMap));
         // 核心企业编号
         custEnrollInfo.setCoreCustNo(coreRelation == null ? null : coreRelation.getRelateCustno());
         // 核心企业名称
-        custEnrollInfo.setCoreCustName(coreRelation == null ? null : custAccountService.queryCustName(coreRelation.getRelateCustno()));
+        custEnrollInfo.setCoreCustName(
+                coreRelation == null ? null : custAccountService.queryCustName(coreRelation.getRelateCustno()));
         // 开户企业编号
         custEnrollInfo.setCustNo(custNo);
         // 开户企业名称
         custEnrollInfo.setCustName(custAccountService.queryCustName(custNo));
         // 营业执照
         final Map<String, Object> custMap = QueryTermBuilder.newInstance().put("custNo", custNo).build();
-        final CustMechBusinLicence licence = Collections3.getFirst(custMechBusinLicenceService.selectByProperty(custMap));
+        final CustMechBusinLicence licence = Collections3
+                .getFirst(custMechBusinLicenceService.selectByProperty(custMap));
         custEnrollInfo.setIdentNo(licence.getRegNo());
         // 获取银行账户信息
-        final CustMechBankAccount bankAccount = Collections3.getFirst(custMechBankAccountService.selectByProperty(custMap));
+        final CustMechBankAccount bankAccount = Collections3
+                .getFirst(custMechBankAccountService.selectByProperty(custMap));
         // 银行账号
         custEnrollInfo.setBankAccount(bankAccount.getBankAcco());
         // 开户银行名称
@@ -141,7 +145,8 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         // 实际经营地址
         custEnrollInfo.setPremisesAddress(custMechBaseService.selectByPrimaryKey(custNo).getAddress());
         // 附件信息
-        custEnrollInfo.setBatchNo(Collections3.getFirst(custOpenAccountTmpService.selectByProperty(custMap)).getBatchNo());
+        custEnrollInfo
+                .setBatchNo(Collections3.getFirst(custOpenAccountTmpService.selectByProperty(custMap)).getBatchNo());
 
         return custEnrollInfo;
     }
@@ -155,7 +160,8 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
      * @param anFileList
      * @return
      */
-    public CustTempEnrollInfo addCustEnroll(final CustTempEnrollInfo anCustEnrollInfo, final String anOpenId, final String anFileList) {
+    public CustTempEnrollInfo addCustEnroll(final CustTempEnrollInfo anCustEnrollInfo, final String anOpenId,
+            final String anFileList) {
         // 检查入参
         checkParameter(anOpenId, "请关注微信公众号[qiejftest]后再进行开户!");
         checkParameter(anFileList, "请上传附件!");
@@ -174,7 +180,8 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         final CustInfo custInfo = custAccountService.selectByPrimaryKey(anValidAccountData.getCustNo());
 
         // 获取操作员信息
-        final CustOperatorInfo operator = Collections3.getFirst(custOperatorService.queryOperatorInfoByCustNo(custInfo.getCustNo()));
+        final CustOperatorInfo operator = Collections3
+                .getFirst(custOperatorService.queryOperatorInfoByCustNo(custInfo.getCustNo()));
 
         // 创建客户与核心企业关系
         addCustAndCoreRelation(anCustEnrollInfo, custInfo, operator);
@@ -205,10 +212,10 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         BTAssert.notNull(anOpenAccountInfo, "无法获取客户开户资料信息");
         // 检查开户资料合法性
         custOpenAccountTmpService.checkAccountInfoValid(anOpenAccountInfo);
-        if (BetterStringUtils.equals(anOpenAccountInfo.getBusinStatus(), CustomerConstants.TMP_STATUS_USEING)) {
+        if (StringUtils.equals(anOpenAccountInfo.getBusinStatus(), CustomerConstants.TMP_STATUS_USEING)) {
             // 生成开户数据
-            createWeChatValidAccount(anOpenAccountInfo, anOpenAccountInfo.getRegOperId(), anOpenAccountInfo.getRegOperName(),
-                    anOpenAccountInfo.getOperOrg(), anFileList);
+            createWeChatValidAccount(anOpenAccountInfo, anOpenAccountInfo.getRegOperId(),
+                    anOpenAccountInfo.getRegOperName(), anOpenAccountInfo.getOperOrg(), anFileList);
             // 设置状态为已使用
             anOpenAccountInfo.setBusinStatus(CustomerConstants.TMP_STATUS_USED);
             anOpenAccountInfo.setLastStatus(CustomerConstants.TMP_STATUS_USED);
@@ -223,8 +230,8 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         return anOpenAccountInfo;
     }
 
-    private void createWeChatValidAccount(final CustOpenAccountTmp anOpenAccountInfo, final Long anOperId, final String anOperName,
-            final String anOperOrg, final String anFileList) {
+    private void createWeChatValidAccount(final CustOpenAccountTmp anOpenAccountInfo, final Long anOperId,
+            final String anOperName, final String anOperOrg, final String anFileList) {
         // 数据存盘,客户资料
         final CustInfo custInfo = addCustInfo(anOpenAccountInfo, anOperId, anOperName, anOperOrg);
 
@@ -253,7 +260,8 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         anOpenAccountInfo.setCustNo(custInfo.getCustNo());
     }
 
-    private CustInfo addCustInfo(final CustOpenAccountTmp anOpenAccountInfo, final Long anOperId, final String anOperName, final String anOperOrg) {
+    private CustInfo addCustInfo(final CustOpenAccountTmp anOpenAccountInfo, final Long anOperId,
+            final String anOperName, final String anOperOrg) {
         final CustInfo anCustInfo = new CustInfo();
         anCustInfo.setRegOperId(anOperId);
         anCustInfo.setRegOperName(anOperName);
@@ -276,8 +284,8 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         return anCustInfo;
     }
 
-    private void addCustMechBase(final CustOpenAccountTmp anOpenAccountInfo, final Long anCustNo, final Long anOperId, final String anOperName,
-            final String anOperOrg) {
+    private void addCustMechBase(final CustOpenAccountTmp anOpenAccountInfo, final Long anCustNo, final Long anOperId,
+            final String anOperName, final String anOperOrg) {
         final CustMechBase anCustMechBaseInfo = new CustMechBase();
         anCustMechBaseInfo.setRegOperId(anOperId);
         anCustMechBaseInfo.setRegOperName(anOperName);
@@ -297,8 +305,8 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         custMechBaseService.addCustMechBase(anCustMechBaseInfo, anCustNo);
     }
 
-    private void addCustMechLaw(final CustOpenAccountTmp anOpenAccountInfo, final Long anCustNo, final Long anOperId, final String anOperName,
-            final String anOperOrg) {
+    private void addCustMechLaw(final CustOpenAccountTmp anOpenAccountInfo, final Long anCustNo, final Long anOperId,
+            final String anOperName, final String anOperOrg) {
         final CustMechLaw anCustMechLawInfo = new CustMechLaw();
         anCustMechLawInfo.setCustNo(anCustNo);
         anCustMechLawInfo.setRegOperId(anOperId);
@@ -308,12 +316,13 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         anCustMechLawInfo.setIdentType(anOpenAccountInfo.getLawIdentType());
         anCustMechLawInfo.setIdentNo(anOpenAccountInfo.getLawIdentNo());
         anCustMechLawInfo.setValidDate(anOpenAccountInfo.getLawValidDate());
-        // anCustMechLawInfo.setSex(IdcardUtils.getGenderByIdCard(anOpenAccountInfo.getLawIdentNo(), anOpenAccountInfo.getLawIdentType()));
+        // anCustMechLawInfo.setSex(IdcardUtils.getGenderByIdCard(anOpenAccountInfo.getLawIdentNo(),
+        // anOpenAccountInfo.getLawIdentType()));
         // anCustMechLawInfo.setBirthdate(IdcardUtils.getBirthByIdCard(anOpenAccountInfo.getLawIdentNo()));
         anCustMechLawInfo.setVersion(0l);
 
-        final List<CustFileAduit> custFile = custFileAuditService
-                .selectByProperty(QueryTermBuilder.newInstance().put("custNo", anCustNo).put("workType", "representIdFile").build());
+        final List<CustFileAduit> custFile = custFileAuditService.selectByProperty(
+                QueryTermBuilder.newInstance().put("custNo", anCustNo).put("workType", "representIdFile").build());
         if (Collections3.isEmpty(custFile) == false) {
             anCustMechLawInfo.setBatchNo(Collections3.getFirst(custFile).getId());
         }
@@ -321,8 +330,8 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         custMechLawService.addCustMechLaw(anCustMechLawInfo, anCustNo);
     }
 
-    private void addCustMechBankAccount(final CustOpenAccountTmp anOpenAccountInfo, final Long anCustNo, final Long anOperId, final String anOperName,
-            final String anOperOrg) {
+    private void addCustMechBankAccount(final CustOpenAccountTmp anOpenAccountInfo, final Long anCustNo,
+            final Long anOperId, final String anOperName, final String anOperOrg) {
         final CustMechBankAccount anCustMechBankAccountInfo = new CustMechBankAccount();
         anCustMechBankAccountInfo.setCustNo(anCustNo);
         anCustMechBankAccountInfo.setRegOperId(anOperId);
@@ -352,8 +361,8 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         custMechBankAccountService.addCustMechBankAccount(anCustMechBankAccountInfo, anCustNo);
     }
 
-    private void addCustMechBusinLicence(final CustOpenAccountTmp anOpenAccountInfo, final Long anCustNo, final Long anOperId,
-            final String anOperName, final String anOperOrg) {
+    private void addCustMechBusinLicence(final CustOpenAccountTmp anOpenAccountInfo, final Long anCustNo,
+            final Long anOperId, final String anOperName, final String anOperOrg) {
         final CustMechBusinLicence anCustMechBusinLicenceInfo = new CustMechBusinLicence();
         anCustMechBusinLicenceInfo.setCustNo(anCustNo);
         anCustMechBusinLicenceInfo.setRegOperId(anOperId);
@@ -365,8 +374,8 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         anCustMechBusinLicenceInfo.setLawName(anOpenAccountInfo.getLawName());
         anCustMechBusinLicenceInfo.setEndDate(anOpenAccountInfo.getBusinLicenceValidDate());
 
-        final List<CustFileAduit> custFile = custFileAuditService
-                .selectByProperty(QueryTermBuilder.newInstance().put("custNo", anCustNo).put("workType", "bizLicenseFile").build());
+        final List<CustFileAduit> custFile = custFileAuditService.selectByProperty(
+                QueryTermBuilder.newInstance().put("custNo", anCustNo).put("workType", "bizLicenseFile").build());
         if (Collections3.isEmpty(custFile) == false) {
             anCustMechBusinLicenceInfo.setBatchNo(Collections3.getFirst(custFile).getId());
         }
@@ -374,8 +383,8 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         custMechBusinLicenceService.addBusinLicence(anCustMechBusinLicenceInfo, anCustNo);
     }
 
-    private void addWeChatCustOperatorInfo(final CustOpenAccountTmp anOpenAccountInfo, final Long anCustNo, final Long anOperId,
-            final String anOperName, final String anOperOrg) {
+    private void addWeChatCustOperatorInfo(final CustOpenAccountTmp anOpenAccountInfo, final Long anCustNo,
+            final Long anOperId, final String anOperName, final String anOperOrg) {
         final CustOperatorInfo anCustOperatorInfo = new CustOperatorInfo();
         anCustOperatorInfo.setOperOrg(anOperOrg);
         anCustOperatorInfo.setId(anOperId);
@@ -388,7 +397,8 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         anCustOperatorInfo.setValidDate(anOpenAccountInfo.getOperValiddate());
         anCustOperatorInfo.setStatus("1");
         anCustOperatorInfo.setLastStatus("1");
-        // anCustOperatorInfo.setSex(IdcardUtils.getGenderByIdCard(anCustOperatorInfo.getIdentNo(), anCustOperatorInfo.getIdentType()));
+        // anCustOperatorInfo.setSex(IdcardUtils.getGenderByIdCard(anCustOperatorInfo.getIdentNo(),
+        // anCustOperatorInfo.getIdentType()));
         anCustOperatorInfo.setRegDate(BetterDateUtils.getNumDate());
         anCustOperatorInfo.setModiDate(BetterDateUtils.getNumDateTime());
         anCustOperatorInfo.setFaxNo(anOpenAccountInfo.getOperFaxNo());
@@ -403,7 +413,8 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
 
     private void initCustCertinfo(final CustTempEnrollInfo anCustEnrollInfo, final CustOperatorInfo anOperator) {
         final CustCertInfo certInfo = new CustCertInfo();
-        certInfo.setSerialNo(Long.toUnsignedString(System.currentTimeMillis() * 10000 + SerialGenerator.randomInt(10000)));
+        certInfo.setSerialNo(
+                Long.toUnsignedString(System.currentTimeMillis() * 10000 + SerialGenerator.randomInt(10000)));
         certInfo.setCustNo(anCustEnrollInfo.getCustNo());
         certInfo.setCustName(anCustEnrollInfo.getCustName());
         certInfo.setIdentNo(anCustEnrollInfo.getIdentNo());
@@ -437,7 +448,8 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         custCertService.addCustCertInfo(certInfo);
     }
 
-    private CustOpenAccountTmp addCustOpenAccountTmp(final CustTempEnrollInfo anCustEnrollInfo, final String anFileList) {
+    private CustOpenAccountTmp addCustOpenAccountTmp(final CustTempEnrollInfo anCustEnrollInfo,
+            final String anFileList) {
         final CustOpenAccountTmp anOpenAccountInfo = new CustOpenAccountTmp();
         anOpenAccountInfo.setParentId(0l);
         anOpenAccountInfo.setApplyDate(BetterDateUtils.getNumDate());
@@ -491,7 +503,8 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         anOpenAccountInfo.setOperOrg(anCustEnrollInfo.getCustName() + SerialGenerator.randomBase62(10));
 
         // 处理附件
-        anOpenAccountInfo.setBatchNo(custFileItemService.updateCustFileItemInfo(anFileList, anOpenAccountInfo.getBatchNo()));
+        anOpenAccountInfo
+                .setBatchNo(custFileItemService.updateCustFileItemInfo(anFileList, anOpenAccountInfo.getBatchNo()));
 
         custOpenAccountTmpService.insert(anOpenAccountInfo);
 
@@ -501,9 +514,11 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
     /**
      * 增加客户与核心企业关系
      */
-    private void addCustAndCoreRelation(final CustTempEnrollInfo anCustEnrollInfo, final CustInfo anCustInfo, final CustOperatorInfo anOperator) {
+    private void addCustAndCoreRelation(final CustTempEnrollInfo anCustEnrollInfo, final CustInfo anCustInfo,
+            final CustOperatorInfo anOperator) {
         // 写入T_CUST_RELATION
-        final CustRelation custRelation = custRelationService.addWeChatCustAndCoreRelation(anCustInfo, anCustEnrollInfo.getCoreCustNo(), anOperator);
+        final CustRelation custRelation = custRelationService.addWeChatCustAndCoreRelation(anCustInfo,
+                anCustEnrollInfo.getCoreCustNo(), anOperator);
         custRelation.setBankAcco(anCustEnrollInfo.getBankAccount());
         custRelation.setBankAccoName(anCustEnrollInfo.getCustName());
         custRelationService.updateByPrimaryKeySelective(custRelation);
@@ -556,23 +571,25 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
             final CustFileItem fileItem = custFileItemService.selectByPrimaryKey(Long.valueOf(fileId.trim()));
             final String fileInfoType = fileItem.getFileInfoType();
             // 企业营业执照
-            if (BetterStringUtils.equals(fileInfoType, "bizLicenseFile")) {
+            if (StringUtils.equals(fileInfoType, "bizLicenseFile")) {
                 licenseList.add(fileItem);
             }
             // 法人身份证件
-            if (BetterStringUtils.equals(fileInfoType, "representIdFile")) {
+            if (StringUtils.equals(fileInfoType, "representIdFile")) {
                 representList.add(fileItem);
             }
         }
         // 处理企业营业执照附件,写入认证表
         final Long licenseBatchNo = CustFileUtils.findBatchNo();
-        addCustFileAduit(anCustInfo.getCustNo(), licenseBatchNo, licenseList.size(), "bizLicenseFile", anCustInfo.getOperOrg());
+        addCustFileAduit(anCustInfo.getCustNo(), licenseBatchNo, licenseList.size(), "bizLicenseFile",
+                anCustInfo.getOperOrg());
         for (final CustFileItem fileItem : licenseList) {
             addCustFileItem(fileItem, licenseBatchNo);
         }
         // 处理法人身份证附件,写入认证表
         final Long representBatchNo = CustFileUtils.findBatchNo();
-        addCustFileAduit(anCustInfo.getCustNo(), representBatchNo, representList.size(), "representIdFile", anCustInfo.getOperOrg());
+        addCustFileAduit(anCustInfo.getCustNo(), representBatchNo, representList.size(), "representIdFile",
+                anCustInfo.getOperOrg());
         for (final CustFileItem fileItem : representList) {
             addCustFileItem(fileItem, representBatchNo);
         }
@@ -613,7 +630,7 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
      * 经办人与当前微信绑定
      */
     private void addBindWeChat(final CustInfo anCustInfo, final CustOperatorInfo anOperator, final String anOpenId) {
-        BTAssert.isTrue(BetterStringUtils.isNotBlank(anOpenId), "openid 不允许为空");
+        BTAssert.isTrue(StringUtils.isNotBlank(anOpenId), "openid 不允许为空");
         final CustWeChatInfo weChatInfo = custWeChatService.selectByPrimaryKey(anOpenId);
         BTAssert.notNull(weChatInfo, "没有找到微信用户信息！");
         weChatInfo.setOperId(anOperator.getId());
@@ -628,8 +645,8 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
         custWeChatService.updateByPrimaryKeySelective(weChatInfo);
     }
 
-    private void addCustFileAduit(final Long anCustNo, final Long anBatchNo, final int anFileCount, final String anFileInfoType,
-            final String anOperCode) {
+    private void addCustFileAduit(final Long anCustNo, final Long anBatchNo, final int anFileCount,
+            final String anFileInfoType, final String anOperCode) {
         final CustFileAduit anFileAudit = new CustFileAduit();
         anFileAudit.setId(anBatchNo);
         anFileAudit.setCustNo(anCustNo);
@@ -645,35 +662,35 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
 
     private void checkEnrollInfo(final CustTempEnrollInfo anCustEnrollInfo) {
         BTAssert.notNull(anCustEnrollInfo, "请填写开户信息!");
-        if (BetterStringUtils.isBlank(anCustEnrollInfo.getCustName())) {
+        if (StringUtils.isBlank(anCustEnrollInfo.getCustName())) {
             logger.warn("请填写客户名称！");
             throw new BytterTradeException(40001, "请填写客户名称！");
         }
-        if (BetterStringUtils.isBlank(anCustEnrollInfo.getIdentNo())) {
+        if (StringUtils.isBlank(anCustEnrollInfo.getIdentNo())) {
             logger.warn("请填写营业执照号码！");
             throw new BytterTradeException(40001, "请填写营业执照号码！");
         }
-        if (BetterStringUtils.isBlank(anCustEnrollInfo.getBankAccount())) {
+        if (StringUtils.isBlank(anCustEnrollInfo.getBankAccount())) {
             logger.warn("请填写与核心企业往来银行账号！");
             throw new BytterTradeException(40001, "请填写与核心企业往来银行账号！");
         }
-        if (BetterStringUtils.isBlank(anCustEnrollInfo.getBankName())) {
+        if (StringUtils.isBlank(anCustEnrollInfo.getBankName())) {
             logger.warn("请填写开户银行名称！");
             throw new BytterTradeException(40001, "请填写开户银行名称！");
         }
-        if (BetterStringUtils.isBlank(anCustEnrollInfo.getContName())) {
+        if (StringUtils.isBlank(anCustEnrollInfo.getContName())) {
             logger.warn("请填写经办人！");
             throw new BytterTradeException(40001, "请填写经办人！");
         }
-        if (BetterStringUtils.isBlank(anCustEnrollInfo.getContMobileNo())) {
+        if (StringUtils.isBlank(anCustEnrollInfo.getContMobileNo())) {
             logger.warn("请填写经办人手机号码！");
             throw new BytterTradeException(40001, "请填写经办人手机号码！");
         }
-        if (BetterStringUtils.isBlank(anCustEnrollInfo.getContEmail())) {
+        if (StringUtils.isBlank(anCustEnrollInfo.getContEmail())) {
             logger.warn("请填写经办人邮箱！");
             throw new BytterTradeException(40001, "请填写经办人邮箱！");
         }
-        if (BetterStringUtils.isBlank(anCustEnrollInfo.getPremisesAddress())) {
+        if (StringUtils.isBlank(anCustEnrollInfo.getPremisesAddress())) {
             logger.warn("请填写经营地址！");
             throw new BytterTradeException(40001, "请填写经营地址！");
         }
@@ -685,7 +702,7 @@ public class WeChatCustEnrollService extends BaseService<CustTempEnrollInfoMappe
     }
 
     private void checkParameter(final String anKey, final String anMessage) {
-        if (BetterStringUtils.isBlank(anKey)) {
+        if (StringUtils.isBlank(anKey)) {
             logger.warn(anMessage);
             throw new BytterTradeException(40001, anMessage);
         }

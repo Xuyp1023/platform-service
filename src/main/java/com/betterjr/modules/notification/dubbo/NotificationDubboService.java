@@ -18,15 +18,19 @@ public class NotificationDubboService implements INotificationService {
     private NotificationService notificationService;
 
     @Override
-    public String webQueryUnreadNotification(final Map<String, Object> anParam, final int anFlag, final int anPageNum, final int anPageSize) {
+    public String webQueryUnreadNotification(final Map<String, Object> anParam, final int anFlag, final int anPageNum,
+            final int anPageSize) {
         final Map<String, Object> param = RuleServiceDubboFilterInvoker.getInputObj();
-        return newOkWithPage("未读消息-列表查询 成功", notificationService.queryUnreadNotification(param, anFlag, anPageNum, anPageSize)).toJson();
+        return newOkWithPage("未读消息-列表查询 成功",
+                notificationService.queryUnreadNotification(param, anFlag, anPageNum, anPageSize)).toJson();
     }
 
     @Override
-    public String webQueryReadNotification(final Map<String, Object> anParam, final int anFlag, final int anPageNum, final int anPageSize) {
+    public String webQueryReadNotification(final Map<String, Object> anParam, final int anFlag, final int anPageNum,
+            final int anPageSize) {
         final Map<String, Object> param = RuleServiceDubboFilterInvoker.getInputObj();
-        return newOkWithPage("已读消息-列表查询 成功", notificationService.queryReadNotification(param, anFlag, anPageNum, anPageSize)).toJson();
+        return newOkWithPage("已读消息-列表查询 成功",
+                notificationService.queryReadNotification(param, anFlag, anPageNum, anPageSize)).toJson();
     }
 
     @Override

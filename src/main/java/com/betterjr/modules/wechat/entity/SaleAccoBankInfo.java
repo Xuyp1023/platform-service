@@ -1,18 +1,23 @@
 package com.betterjr.modules.wechat.entity;
 
-import com.betterjr.common.annotation.*;
+import javax.persistence.Access;
+import javax.persistence.AccessType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.betterjr.common.annotation.MetaData;
 import com.betterjr.common.entity.BetterjrEntity;
 import com.betterjr.common.mapper.BeanMapper;
 import com.betterjr.common.selectkey.SerialGenerator;
 import com.betterjr.common.utils.AreaUtils;
 import com.betterjr.common.utils.BetterDateUtils;
-
-import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.modules.account.entity.SaleAccoRequestInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import javax.persistence.*;
 
 @Access(AccessType.FIELD)
 @Entity
@@ -555,31 +560,50 @@ public class SaleAccoBankInfo implements BetterjrEntity {
             return false;
         }
         SaleAccoBankInfo other = (SaleAccoBankInfo) that;
-        return (this.getMoneyAccount() == null ? other.getMoneyAccount() == null : this.getMoneyAccount().equals(other.getMoneyAccount()))
+        return (this.getMoneyAccount() == null ? other.getMoneyAccount() == null
+                : this.getMoneyAccount().equals(other.getMoneyAccount()))
                 && (this.getCustNo() == null ? other.getCustNo() == null : this.getCustNo().equals(other.getCustNo()))
-                && (this.getTradeAccount() == null ? other.getTradeAccount() == null : this.getTradeAccount().equals(other.getTradeAccount()))
+                && (this.getTradeAccount() == null ? other.getTradeAccount() == null
+                        : this.getTradeAccount().equals(other.getTradeAccount()))
                 && (this.getBankNo() == null ? other.getBankNo() == null : this.getBankNo().equals(other.getBankNo()))
-                && (this.getBankName() == null ? other.getBankName() == null : this.getBankName().equals(other.getBankName()))
-                && (this.getBankAccount() == null ? other.getBankAccount() == null : this.getBankAccount().equals(other.getBankAccount()))
-                && (this.getBankAcountName() == null ? other.getBankAcountName() == null : this.getBankAcountName().equals(other.getBankAcountName()))
-                && (this.getBranchBank() == null ? other.getBranchBank() == null : this.getBranchBank().equals(other.getBranchBank()))
+                && (this.getBankName() == null ? other.getBankName() == null
+                        : this.getBankName().equals(other.getBankName()))
+                && (this.getBankAccount() == null ? other.getBankAccount() == null
+                        : this.getBankAccount().equals(other.getBankAccount()))
+                && (this.getBankAcountName() == null ? other.getBankAcountName() == null
+                        : this.getBankAcountName().equals(other.getBankAcountName()))
+                && (this.getBranchBank() == null ? other.getBranchBank() == null
+                        : this.getBranchBank().equals(other.getBranchBank()))
                 && (this.getStatus() == null ? other.getStatus() == null : this.getStatus().equals(other.getStatus()))
-                && (this.getLastStatus() == null ? other.getLastStatus() == null : this.getLastStatus().equals(other.getLastStatus()))
+                && (this.getLastStatus() == null ? other.getLastStatus() == null
+                        : this.getLastStatus().equals(other.getLastStatus()))
                 && (this.getNetNo() == null ? other.getNetNo() == null : this.getNetNo().equals(other.getNetNo()))
-                && (this.getPayCenterNo() == null ? other.getPayCenterNo() == null : this.getPayCenterNo().equals(other.getPayCenterNo()))
+                && (this.getPayCenterNo() == null ? other.getPayCenterNo() == null
+                        : this.getPayCenterNo().equals(other.getPayCenterNo()))
                 && (this.getCityNo() == null ? other.getCityNo() == null : this.getCityNo().equals(other.getCityNo()))
-                && (this.getEndFrozenDate() == null ? other.getEndFrozenDate() == null : this.getEndFrozenDate().equals(other.getEndFrozenDate()))
-                && (this.getContractNo() == null ? other.getContractNo() == null : this.getContractNo().equals(other.getContractNo()))
-                && (this.getAuthStatus() == null ? other.getAuthStatus() == null : this.getAuthStatus().equals(other.getAuthStatus()))
-                && (this.getSignStatus() == null ? other.getSignStatus() == null : this.getSignStatus().equals(other.getSignStatus()))
-                && (this.getIdentType() == null ? other.getIdentType() == null : this.getIdentType().equals(other.getIdentType()))
-                && (this.getIdentNo() == null ? other.getIdentNo() == null : this.getIdentNo().equals(other.getIdentNo()))
+                && (this.getEndFrozenDate() == null ? other.getEndFrozenDate() == null
+                        : this.getEndFrozenDate().equals(other.getEndFrozenDate()))
+                && (this.getContractNo() == null ? other.getContractNo() == null
+                        : this.getContractNo().equals(other.getContractNo()))
+                && (this.getAuthStatus() == null ? other.getAuthStatus() == null
+                        : this.getAuthStatus().equals(other.getAuthStatus()))
+                && (this.getSignStatus() == null ? other.getSignStatus() == null
+                        : this.getSignStatus().equals(other.getSignStatus()))
+                && (this.getIdentType() == null ? other.getIdentType() == null
+                        : this.getIdentType().equals(other.getIdentType()))
+                && (this.getIdentNo() == null ? other.getIdentNo() == null
+                        : this.getIdentNo().equals(other.getIdentNo()))
                 && (this.getFlag() == null ? other.getFlag() == null : this.getFlag().equals(other.getFlag()))
-                && (this.getBackupAccount() == null ? other.getBackupAccount() == null : this.getBackupAccount().equals(other.getBackupAccount()))
-                && (this.getRegDate() == null ? other.getRegDate() == null : this.getRegDate().equals(other.getRegDate()))
-                && (this.getModiDate() == null ? other.getModiDate() == null : this.getModiDate().equals(other.getModiDate()))
-                && (this.getCountyName() == null ? other.getCountyName() == null : this.getCountyName().equals(other.getCountyName()))
-                && (this.getCityName() == null ? other.getCityName() == null : this.getCityName().equals(other.getCityName()));
+                && (this.getBackupAccount() == null ? other.getBackupAccount() == null
+                        : this.getBackupAccount().equals(other.getBackupAccount()))
+                && (this.getRegDate() == null ? other.getRegDate() == null
+                        : this.getRegDate().equals(other.getRegDate()))
+                && (this.getModiDate() == null ? other.getModiDate() == null
+                        : this.getModiDate().equals(other.getModiDate()))
+                && (this.getCountyName() == null ? other.getCountyName() == null
+                        : this.getCountyName().equals(other.getCountyName()))
+                && (this.getCityName() == null ? other.getCityName() == null
+                        : this.getCityName().equals(other.getCityName()));
     }
 
     @Override
@@ -625,11 +649,11 @@ public class SaleAccoBankInfo implements BetterjrEntity {
         this.regOperId = UserUtils.getOperatorInfo().getId();
         this.regOperName = UserUtils.getOperatorInfo().getName();
         this.regTime = BetterDateUtils.getNumTime();
-        
+
         this.modiOperId = UserUtils.getOperatorInfo().getId();
         this.modiOperName = UserUtils.getOperatorInfo().getName();
         this.modiTime = BetterDateUtils.getNumTime();
-        
+
         this.setStatus("4");
         this.setLastStatus(this.status);
         this.setAuthStatus("0");
@@ -639,7 +663,7 @@ public class SaleAccoBankInfo implements BetterjrEntity {
         this.setMoneyAccount(SerialGenerator.getMoneyAccountID());
         request.setMoneyAccount(this.moneyAccount);
         String tmpStr = AreaUtils.findAreaName(request.getCityNo());
-        if (BetterStringUtils.isNotBlank(tmpStr) && BetterStringUtils.isBlank(this.cityName)) {
+        if (StringUtils.isNotBlank(tmpStr) && StringUtils.isBlank(this.cityName)) {
             this.cityName = tmpStr;
         }
     }

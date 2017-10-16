@@ -1,7 +1,7 @@
 package com.betterjr.modules.customer.helper;
 
 public final class VersionHelper {
-    
+
     /**
      * 
      * @param anVersionMapper
@@ -10,14 +10,14 @@ public final class VersionHelper {
      */
     public static Long generateVersion(IVersionMapper anVersionMapper, Long anRefId) {
         Long maxVersion = anVersionMapper.selectMaxVersion(anRefId);
-        
+
         if (maxVersion == null) {
             maxVersion = 1L;
         } else {
             maxVersion += 1;
         }
-        
+
         return maxVersion;
     }
-        
+
 }

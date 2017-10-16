@@ -27,7 +27,6 @@ import com.betterjr.common.mq.message.MQMessage;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterDateUtils;
-import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.DictUtils;
 import com.betterjr.common.utils.MathExtend;
@@ -133,12 +132,13 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         final List<DictItemInfo> anFactorDict = DictUtils.getDictList("ScfFactorGroup");
         for (final String anRelateType : anOperatorInnerRuleList) {
             for (final DictItemInfo anDictItem : anFactorDict) {
-                final CustRelation anCustRelation = findCustRelation(anCustNo, Long.valueOf(anDictItem.getItemValue()), anRelateType);
+                final CustRelation anCustRelation = findCustRelation(anCustNo, Long.valueOf(anDictItem.getItemValue()),
+                        anRelateType);
                 if (null == anCustRelation) {
                     relateIndex++;
-                }
-                else {
-                    if (BetterStringUtils.equals(anCustRelation.getBusinStatus(), CustomerConstants.RELATE_STATUS_REFUSE)) {
+                } else {
+                    if (StringUtils.equals(anCustRelation.getBusinStatus(),
+                            CustomerConstants.RELATE_STATUS_REFUSE)) {
                         refuseIndex++;
                     }
                 }
@@ -172,14 +172,15 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         }
         final Map<String, Object> anMap = new HashMap<String, Object>();
         anMap.put("custNo", anCustNo);
-        anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_CORE, CustomerConstants.RELATE_TYPE_SELLER_CORE });
+        anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_CORE,
+                CustomerConstants.RELATE_TYPE_SELLER_CORE });
         anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
         for (final CustRelation relation : this.selectByProperty(anMap)) {
             result.add(new SimpleDataEntity(relation.getRelateCustname(), String.valueOf(relation.getRelateCustno())));
         }
         return result;
     }
-    
+
     /**
      * 供应商查询核心企业
      *
@@ -192,7 +193,8 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         }
         final Map<String, Object> anMap = new HashMap<String, Object>();
         anMap.put("custNo", anCustNo);
-        anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_CORE, CustomerConstants.RELATE_TYPE_SELLER_CORE });
+        anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_CORE,
+                CustomerConstants.RELATE_TYPE_SELLER_CORE });
         anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
         return this.selectByProperty(anMap);
     }
@@ -280,11 +282,9 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
 
         if (PlatformBaseRuleType.CORE_USER.equals(anRole)) {
             anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_CORE_FACTOR });
-        }
-        else if (PlatformBaseRuleType.SUPPLIER_USER.equals(anRole)) {
+        } else if (PlatformBaseRuleType.SUPPLIER_USER.equals(anRole)) {
             anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR });
-        }
-        else if (PlatformBaseRuleType.SELLER_USER.equals(anRole)) {
+        } else if (PlatformBaseRuleType.SELLER_USER.equals(anRole)) {
             anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SELLER_FACTOR });
         }
 
@@ -334,7 +334,8 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
             anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
             anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_CORE_FACTOR });
             for (final CustRelation relation : this.selectByProperty(anMap)) {
-                final SimpleDataEntity entity = new SimpleDataEntity(relation.getRelateCustname(), String.valueOf(relation.getRelateCustno()));
+                final SimpleDataEntity entity = new SimpleDataEntity(relation.getRelateCustname(),
+                        String.valueOf(relation.getRelateCustno()));
                 if (!result.contains(entity)) {
                     result.add(entity);
                 }
@@ -343,9 +344,11 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
             anMap = new HashMap<String, Object>();
             anMap.put("relateCustno", anCustNo);
             anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
-            anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_CORE, CustomerConstants.RELATE_TYPE_SELLER_CORE });
+            anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_CORE,
+                    CustomerConstants.RELATE_TYPE_SELLER_CORE });
             for (final CustRelation relation : this.selectByProperty(anMap)) {
-                final SimpleDataEntity entity = new SimpleDataEntity(relation.getCustName(), String.valueOf(relation.getCustNo()));
+                final SimpleDataEntity entity = new SimpleDataEntity(relation.getCustName(),
+                        String.valueOf(relation.getCustNo()));
                 if (!result.contains(entity)) {
                     result.add(entity);
                 }
@@ -357,7 +360,8 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
             anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
             anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR });
             for (final CustRelation relation : this.selectByProperty(anMap)) {
-                final SimpleDataEntity entity = new SimpleDataEntity(relation.getRelateCustname(), String.valueOf(relation.getRelateCustno()));
+                final SimpleDataEntity entity = new SimpleDataEntity(relation.getRelateCustname(),
+                        String.valueOf(relation.getRelateCustno()));
                 if (!result.contains(entity)) {
                     result.add(entity);
                 }
@@ -368,7 +372,8 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
             anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
             anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_CORE });
             for (final CustRelation relation : this.selectByProperty(anMap)) {
-                final SimpleDataEntity entity = new SimpleDataEntity(relation.getCustName(), String.valueOf(relation.getCustNo()));
+                final SimpleDataEntity entity = new SimpleDataEntity(relation.getCustName(),
+                        String.valueOf(relation.getCustNo()));
                 if (!result.contains(entity)) {
                     result.add(entity);
                 }
@@ -379,7 +384,8 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
             anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
             anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SELLER_FACTOR });
             for (final CustRelation relation : this.selectByProperty(anMap)) {
-                final SimpleDataEntity entity = new SimpleDataEntity(relation.getRelateCustname(), String.valueOf(relation.getRelateCustno()));
+                final SimpleDataEntity entity = new SimpleDataEntity(relation.getRelateCustname(),
+                        String.valueOf(relation.getRelateCustno()));
                 if (!result.contains(entity)) {
                     result.add(entity);
                 }
@@ -390,7 +396,8 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
             anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
             anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SELLER_CORE });
             for (final CustRelation relation : this.selectByProperty(anMap)) {
-                final SimpleDataEntity entity = new SimpleDataEntity(relation.getCustName(), String.valueOf(relation.getCustNo()));
+                final SimpleDataEntity entity = new SimpleDataEntity(relation.getCustName(),
+                        String.valueOf(relation.getCustNo()));
                 if (!result.contains(entity)) {
                     result.add(entity);
                 }
@@ -415,19 +422,19 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         final Map<String, Object> anMap = new HashMap<String, Object>();
         anMap.put("relateCustno", anFactorNo);
         anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
-        if (BetterStringUtils.equals(anCreditType, "1")) {
+        if (StringUtils.equals(anCreditType, "1")) {
             anMap.put("relateType", CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR);
             for (final CustRelation relation : this.selectByProperty(anMap)) {
                 result.add(new SimpleDataEntity(relation.getCustName(), String.valueOf(relation.getCustNo())));
             }
         }
-        if (BetterStringUtils.equals(anCreditType, "2")) {
+        if (StringUtils.equals(anCreditType, "2")) {
             anMap.put("relateType", CustomerConstants.RELATE_TYPE_SELLER_FACTOR);
             for (final CustRelation relation : this.selectByProperty(anMap)) {
                 result.add(new SimpleDataEntity(relation.getCustName(), String.valueOf(relation.getCustNo())));
             }
         }
-        if (BetterStringUtils.equals(anCreditType, "3")) {
+        if (StringUtils.equals(anCreditType, "3")) {
             anMap.put("relateType", CustomerConstants.RELATE_TYPE_CORE_FACTOR);
             for (final CustRelation relation : this.selectByProperty(anMap)) {
                 result.add(new SimpleDataEntity(relation.getCustName(), String.valueOf(relation.getCustNo())));
@@ -450,8 +457,8 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         final Map<String, Object> anMap = new HashMap<String, Object>();
         anMap.put("relateCustno", anFactorNo);
         anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
-        anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR, CustomerConstants.RELATE_TYPE_SELLER_FACTOR,
-                CustomerConstants.RELATE_TYPE_CORE_FACTOR });
+        anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR,
+                CustomerConstants.RELATE_TYPE_SELLER_FACTOR, CustomerConstants.RELATE_TYPE_CORE_FACTOR });
         for (final CustRelation relation : this.selectByProperty(anMap, "relateType, custNo")) {
             result.add(new SimpleDataEntity(relation.getCustName(), String.valueOf(relation.getCustNo())));
         }
@@ -467,16 +474,17 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
      * @param anPageSize
      * @return
      */
-    public Page<CustRelation> queryRelationAccept(final String anBusinStatus, final String anFlag, final int anPageNum, final int anPageSize) {
+    public Page<CustRelation> queryRelationAccept(final String anBusinStatus, final String anFlag, final int anPageNum,
+            final int anPageSize) {
         final Long factorNo = findCustNoByOperator();
         final Map<String, Object> anMap = new HashMap<String, Object>();
         anMap.put("relateCustno", factorNo);
-        anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR, CustomerConstants.RELATE_TYPE_CORE_FACTOR,
-                CustomerConstants.RELATE_TYPE_SELLER_FACTOR });
-        if (BetterStringUtils.isBlank(anBusinStatus) == true) {
-            anMap.put("businStatus", new String[] { CustomerConstants.RELATE_STATUS_APPLY, CustomerConstants.RELATE_STATUS_ACCEPT });
-        }
-        else {
+        anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR,
+                CustomerConstants.RELATE_TYPE_CORE_FACTOR, CustomerConstants.RELATE_TYPE_SELLER_FACTOR });
+        if (StringUtils.isBlank(anBusinStatus) == true) {
+            anMap.put("businStatus",
+                    new String[] { CustomerConstants.RELATE_STATUS_APPLY, CustomerConstants.RELATE_STATUS_ACCEPT });
+        } else {
             anMap.put("businStatus", anBusinStatus);
         }
         return this.selectPropertyByPage(CustRelation.class, anMap, anPageNum, anPageSize, "1".equals(anFlag));
@@ -491,13 +499,14 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
      * @param anPageSize
      * @return
      */
-    public Page<CustRelation> queryCustRelationInfo(final Map<String, Object> anMap, final String anFlag, final int anPageNum, final int anPageSize) {
+    public Page<CustRelation> queryCustRelationInfo(final Map<String, Object> anMap, final String anFlag,
+            final int anPageNum, final int anPageSize) {
         return this.selectPropertyByPage(CustRelation.class, anMap, anPageNum, anPageSize, "1".equals(anFlag));
     }
 
-
-    public Page<CustRelation> findCustRelationInfo(final Long anCustNo, final String anRelateType, final PlatformBaseRuleType anRole) {
-        if (BetterStringUtils.isNotBlank(anRelateType)) {
+    public Page<CustRelation> findCustRelationInfo(final Long anCustNo, final String anRelateType,
+            final PlatformBaseRuleType anRole) {
+        if (StringUtils.isNotBlank(anRelateType)) {
             return mapper.findCustRelationListByRelateType(anCustNo, anRelateType);
         }
         // TODO 需要改
@@ -512,8 +521,6 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         return null;
 
     }
-    
-    
 
     /**
      * 客户白名单受理
@@ -526,14 +533,15 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         BTAssert.notNull(anId, "请选择客户");
         BTAssert.notNull(anAuditOpinion, "请填写处理意见");
         final CustRelation anCustRelation = this.selectByPrimaryKey(anId);
-        if (BetterStringUtils.equals(anCustRelation.getBusinStatus(), "1") == false) {
+        if (StringUtils.equals(anCustRelation.getBusinStatus(), "1") == false) {
             logger.warn("当前状态不允许执行受理操作");
             throw new BytterTradeException("当前状态不允许执行受理操作");
         }
         anCustRelation.setBusinStatus(CustomerConstants.RELATE_STATUS_ACCEPT);
         anCustRelation.setLastStatus(CustomerConstants.RELATE_STATUS_ACCEPT);
         this.updateByPrimaryKeySelective(anCustRelation);
-        custRelationAuditService.addAuditCustRelation(anCustRelation, anCustRelation.getRelateCustname(), anAuditOpinion, "保理公司受理");
+        custRelationAuditService.addAuditCustRelation(anCustRelation, anCustRelation.getRelateCustname(),
+                anAuditOpinion, "保理公司受理");
         return anCustRelation;
     }
 
@@ -548,14 +556,15 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         BTAssert.notNull(anId, "请选客户");
         BTAssert.notNull(anAuditOpinion, "请填写处理意见");
         final CustRelation anCustRelation = this.selectByPrimaryKey(anId);
-        if (BetterStringUtils.equals(anCustRelation.getBusinStatus(), "1") == false) {
+        if (StringUtils.equals(anCustRelation.getBusinStatus(), "1") == false) {
             logger.warn("当前状态不允许执行受理操作");
             throw new BytterTradeException("当前状态不允许执行受理操作");
         }
         anCustRelation.setBusinStatus(CustomerConstants.RELATE_STATUS_REFUSE);
         anCustRelation.setLastStatus(CustomerConstants.RELATE_STATUS_REFUSE);
         this.updateByPrimaryKeySelective(anCustRelation);
-        custRelationAuditService.addRefuseCustRelation(anCustRelation, anCustRelation.getRelateCustname(), anAuditOpinion, "保理公司受理");
+        custRelationAuditService.addRefuseCustRelation(anCustRelation, anCustRelation.getRelateCustname(),
+                anAuditOpinion, "保理公司受理");
         return anCustRelation;
     }
 
@@ -568,18 +577,19 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
      * @param anPageSize
      * @return
      */
-    public Page<CustRelation> queryRelationAudit(final String anBusinStatus, final String anFlag, final int anPageNum, final int anPageSize) {
+    public Page<CustRelation> queryRelationAudit(final String anBusinStatus, final String anFlag, final int anPageNum,
+            final int anPageSize) {
         final Long operId = UserUtils.getOperatorInfo().getId();
         final String operOrg = UserUtils.getOperatorInfo().getOperOrg();
         final Long factorNo = Collections3.getFirst(custAndOperatorRelaService.findCustNoList(operId, operOrg));
         final Map<String, Object> anMap = new HashMap<String, Object>();
         anMap.put("relateCustno", factorNo);
-        anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR, CustomerConstants.RELATE_TYPE_CORE_FACTOR,
-                CustomerConstants.RELATE_TYPE_SELLER_FACTOR });
-        if (BetterStringUtils.isBlank(anBusinStatus) == true) {
-            anMap.put("businStatus", new String[] { CustomerConstants.RELATE_STATUS_ACCEPT, CustomerConstants.RELATE_STATUS_AUDIT });
-        }
-        else {
+        anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR,
+                CustomerConstants.RELATE_TYPE_CORE_FACTOR, CustomerConstants.RELATE_TYPE_SELLER_FACTOR });
+        if (StringUtils.isBlank(anBusinStatus) == true) {
+            anMap.put("businStatus",
+                    new String[] { CustomerConstants.RELATE_STATUS_ACCEPT, CustomerConstants.RELATE_STATUS_AUDIT });
+        } else {
             anMap.put("businStatus", anBusinStatus);
         }
         return this.selectPropertyByPage(CustRelation.class, anMap, anPageNum, anPageSize, "1".equals(anFlag));
@@ -596,15 +606,17 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         BTAssert.notNull(anId, "请选客户");
         BTAssert.notNull(anAuditOpinion, "请填写处理意见");
         final CustRelation anCustRelation = this.selectByPrimaryKey(anId);
-        if (BetterStringUtils.equals(anCustRelation.getBusinStatus(), "2") == false) {
+        if (StringUtils.equals(anCustRelation.getBusinStatus(), "2") == false) {
             logger.warn("当前状态不允许执行审批操作");
             throw new BytterTradeException("当前状态不允许执行审批操作");
         }
         anCustRelation.setBusinStatus(CustomerConstants.RELATE_STATUS_AUDIT);
         anCustRelation.setLastStatus(CustomerConstants.RELATE_STATUS_AUDIT);
-        anCustRelation.setRelateCustCorp(DictUtils.getDictCode("ScfFactorGroup", String.valueOf(anCustRelation.getRelateCustno())));
+        anCustRelation.setRelateCustCorp(
+                DictUtils.getDictCode("ScfFactorGroup", String.valueOf(anCustRelation.getRelateCustno())));
         this.updateByPrimaryKeySelective(anCustRelation);
-        custRelationAuditService.addAuditCustRelation(anCustRelation, anCustRelation.getRelateCustname(), anAuditOpinion, "保理公司审批");
+        custRelationAuditService.addAuditCustRelation(anCustRelation, anCustRelation.getRelateCustname(),
+                anAuditOpinion, "保理公司审批");
         return anCustRelation;
     }
 
@@ -619,14 +631,15 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         BTAssert.notNull(anId, "请选客户");
         BTAssert.notNull(anAuditOpinion, "请填写处理意见");
         final CustRelation anCustRelation = this.selectByPrimaryKey(anId);
-        if (BetterStringUtils.equals(anCustRelation.getBusinStatus(), "2") == false) {
+        if (StringUtils.equals(anCustRelation.getBusinStatus(), "2") == false) {
             logger.warn("当前状态不允许执行审批操作");
             throw new BytterTradeException("当前状态不允许执行审批操作");
         }
         anCustRelation.setBusinStatus(CustomerConstants.RELATE_STATUS_REFUSE);
         anCustRelation.setLastStatus(CustomerConstants.RELATE_STATUS_REFUSE);
         this.updateByPrimaryKeySelective(anCustRelation);
-        custRelationAuditService.addRefuseCustRelation(anCustRelation, anCustRelation.getRelateCustname(), anAuditOpinion, "保理公司审批");
+        custRelationAuditService.addRefuseCustRelation(anCustRelation, anCustRelation.getRelateCustname(),
+                anAuditOpinion, "保理公司审批");
         return anCustRelation;
     }
 
@@ -639,7 +652,8 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
      * @param anPostscript
      * @return
      */
-    public String saveCustRelation(final Long anCustNo, final String anProviderCustList, final String anFactorCustList, final String anPostscript) {
+    public String saveCustRelation(final Long anCustNo, final String anProviderCustList, final String anFactorCustList,
+            final String anPostscript) {
         try {
             BTAssert.notNull(anCustNo, "请选择操作机构");
             BTAssert.notNull(anProviderCustList, "请选择电子合同服务商");
@@ -701,47 +715,54 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         for (final String anProviderCustNo : anProviderCustNoList) {
             final Long anRelateCustNo = Long.valueOf(anProviderCustNo);
             // 检查是否已存在关联关系
-            final CustRelation anCustRelation = findCustRelation(anCustInfo.getCustNo(), anRelateCustNo, CustomerConstants.RELATE_TYPE_ELEC_CONTRACT);
+            final CustRelation anCustRelation = findCustRelation(anCustInfo.getCustNo(), anRelateCustNo,
+                    CustomerConstants.RELATE_TYPE_ELEC_CONTRACT);
             if (null == anCustRelation) {
-                addCustRelation(anCustInfo, anRelateCustNo, CustomerConstants.RELATE_TYPE_ELEC_CONTRACT, CustomerConstants.RELATE_STATUS_AUDIT);
+                addCustRelation(anCustInfo, anRelateCustNo, CustomerConstants.RELATE_TYPE_ELEC_CONTRACT,
+                        CustomerConstants.RELATE_STATUS_AUDIT);
             }
         }
     }
 
-    private void saveFactorRelation(final CustInfo anCustInfo, final String anFactorCustList, final String anPostscript) {
+    private void saveFactorRelation(final CustInfo anCustInfo, final String anFactorCustList,
+            final String anPostscript) {
         final String[] anFactorCustNoList = anFactorCustList.split(",");
         final List<String> anOperatorInnerRuleList = findOperatorInnerRuleList();
         for (final String anFactorCustNo : anFactorCustNoList) {
             final Long anRelateCustNo = Long.valueOf(anFactorCustNo);
             for (final String anRelateType : anOperatorInnerRuleList) {
                 // 检查是否已存在关联关系
-                final CustRelation anTempCustRelation = findCustRelation(anCustInfo.getCustNo(), anRelateCustNo, anRelateType);
+                final CustRelation anTempCustRelation = findCustRelation(anCustInfo.getCustNo(), anRelateCustNo,
+                        anRelateType);
                 if (null == anTempCustRelation) {
                     final CustRelation anCustRelation = addCustRelation(anCustInfo, anRelateCustNo, anRelateType,
                             CustomerConstants.RELATE_STATUS_APPLY);
                     String message = anPostscript;
-                    if (BetterStringUtils.isNotBlank(anPostscript)) {
+                    if (StringUtils.isNotBlank(anPostscript)) {
                         message = "申请对象：" + anCustRelation.getRelateCustname() + ", 附言：" + message;
                     }
-                    custRelationAuditService.addAuditCustRelation(anCustRelation, anCustInfo.getCustName(), message, "企业开户申请");
-                }
-                else {
-                    if (BetterStringUtils.equals(anTempCustRelation.getBusinStatus(), CustomerConstants.RELATE_STATUS_REFUSE) == true) {
+                    custRelationAuditService.addAuditCustRelation(anCustRelation, anCustInfo.getCustName(), message,
+                            "企业开户申请");
+                } else {
+                    if (StringUtils.equals(anTempCustRelation.getBusinStatus(),
+                            CustomerConstants.RELATE_STATUS_REFUSE) == true) {
                         anTempCustRelation.setBusinStatus(CustomerConstants.RELATE_STATUS_APPLY);
                         anTempCustRelation.setLastStatus(CustomerConstants.RELATE_STATUS_APPLY);
                         this.updateByPrimaryKeySelective(anTempCustRelation);
                         String message = anPostscript;
-                        if (BetterStringUtils.isNotBlank(anPostscript)) {
+                        if (StringUtils.isNotBlank(anPostscript)) {
                             message = "申请对象：" + anTempCustRelation.getRelateCustname() + ", 附言：" + message;
                         }
-                        custRelationAuditService.addAuditCustRelation(anTempCustRelation, anCustInfo.getCustName(), anPostscript, "企业开户申请");
+                        custRelationAuditService.addAuditCustRelation(anTempCustRelation, anCustInfo.getCustName(),
+                                anPostscript, "企业开户申请");
                     }
                 }
             }
         }
     }
 
-    public CustRelation addCustRelation(final CustInfo anCustInfo, final Long anRelateCustNo, final String anRelateType, final String anBusinStatus) {
+    public CustRelation addCustRelation(final CustInfo anCustInfo, final Long anRelateCustNo, final String anRelateType,
+            final String anBusinStatus) {
         final CustRelation relation = new CustRelation();
         relation.initAddValue();
         relation.setCustNo(anCustInfo.getCustNo());
@@ -820,18 +841,17 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         String relateType = "";
         if (UserUtils.supplierUser()) {
             relateType = CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR;
-        }
-        else if (UserUtils.sellerUser()) {
+        } else if (UserUtils.sellerUser()) {
             relateType = CustomerConstants.RELATE_TYPE_SELLER_FACTOR;
-        }
-        else if (UserUtils.coreUser()) {
+        } else if (UserUtils.coreUser()) {
             relateType = CustomerConstants.RELATE_TYPE_CORE_FACTOR;
         }
-        if (BetterStringUtils.isNotBlank(relateType)) {
+        if (StringUtils.isNotBlank(relateType)) {
             anMap.put("relateType", relateType);
             final List<CustRelation> relations = this.selectByProperty(anMap);
             for (final CustRelation relation : relations) {
-                result.add(new SimpleDataEntity(relation.getRelateCustname(), String.valueOf(relation.getRelateCustno())));
+                result.add(
+                        new SimpleDataEntity(relation.getRelateCustname(), String.valueOf(relation.getRelateCustno())));
             }
         }
         return result;
@@ -849,14 +869,12 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         String relateType = "";
         if (UserUtils.supplierUser()) {
             relateType = CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR;
-        }
-        else if (UserUtils.sellerUser()) {
+        } else if (UserUtils.sellerUser()) {
             relateType = CustomerConstants.RELATE_TYPE_SELLER_FACTOR;
-        }
-        else if (UserUtils.coreUser()) {
+        } else if (UserUtils.coreUser()) {
             relateType = CustomerConstants.RELATE_TYPE_CORE_FACTOR;
         }
-        if (BetterStringUtils.isNotBlank(relateType)) {
+        if (StringUtils.isNotBlank(relateType)) {
             anMap.put("relateType", relateType);
             final List<CustRelation> relations = this.selectByProperty(anMap);
             return relations;
@@ -878,8 +896,8 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         }
         anMap.put("custNo", custNo);
         anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
-        anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR, CustomerConstants.RELATE_TYPE_SELLER_FACTOR,
-                CustomerConstants.RELATE_TYPE_CORE_FACTOR });
+        anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR,
+                CustomerConstants.RELATE_TYPE_SELLER_FACTOR, CustomerConstants.RELATE_TYPE_CORE_FACTOR });
         final List<CustRelation> relations = this.selectByProperty(anMap);
         for (final CustRelation relation : relations) {
             result.add(new SimpleDataEntity(relation.getRelateCustname(), String.valueOf(relation.getRelateCustno())));
@@ -900,13 +918,13 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
      */
     public CustRelation findOneRelation(final Long anCustNo, final Long anRelateCustno, final String anPartnerCustNo) {
         final String relateTypes = "0,2,3";
-        final List<CustRelation> dataList = this.mapper.findOneRelation(anCustNo, anRelateCustno, anPartnerCustNo, relateTypes);
+        final List<CustRelation> dataList = this.mapper.findOneRelation(anCustNo, anRelateCustno, anPartnerCustNo,
+                relateTypes);
         if (!Collections3.isEmpty(dataList)) {
             return Collections3.getFirst(dataList);
-        }
-        else {
-            logger.error("[Not exists record: anCustNo = " + anCustNo + ", anRelateCustno =" + anRelateCustno + ", anPartnerCustNo ="
-                    + anPartnerCustNo + ", relateTypes =" + relateTypes + "]");
+        } else {
+            logger.error("[Not exists record: anCustNo = " + anCustNo + ", anRelateCustno =" + anRelateCustno
+                    + ", anPartnerCustNo =" + anPartnerCustNo + ", relateTypes =" + relateTypes + "]");
             throw new BytterWebServiceException(WebServiceErrorCode.E1006);
         }
     }
@@ -919,7 +937,8 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
      * @param anStatus
      * @param anFactorNo
      */
-    public boolean saveFactorRelationStatus(final Long anCustNo, final String anScfId, final String anStatus, final String anFactorNo) {
+    public boolean saveFactorRelationStatus(final Long anCustNo, final String anScfId, final String anStatus,
+            final String anFactorNo) {
         final CustRelation factorRel = findRelationWithCustCorp(anCustNo, anScfId, anFactorNo);
         if (factorRel != null) {
             factorRel.setBusinStatus(anStatus);
@@ -947,8 +966,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         final CustRelation custRelation = Collections3.getFirst(this.selectByProperty(anMap));
         if (custRelation != null) {
             return custRelation.getCustNo();
-        }
-        else {
+        } else {
             return 0L;
         }
     }
@@ -967,7 +985,8 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
      *            核心企业编码
      * @return
      */
-    public boolean saveAndCheckCust(final Map<String, Object> anValues, final String anCoreCustName, final Long anCoreCustNo) {
+    public boolean saveAndCheckCust(final Map<String, Object> anValues, final String anCoreCustName,
+            final Long anCoreCustNo) {
         final Map<String, Object> termMap = QueryTermBuilder.newInstance().put("coreCustNo", anCoreCustNo)
                 .put("relateType", CustomerConstants.RELATE_TYPE_SUPPLIER_CORE).build();
         final String btNo = (String) anValues.get("btNo");
@@ -979,17 +998,15 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
             dataValue = anValues.get(tmpKey);
             if ("custNo".equals(tmpKey)) {
                 isok = (MathExtend.smallValue((Long) dataValue) == false);
-            }
-            else {
-                isok = BetterStringUtils.isNotBlank((String) dataValue);
+            } else {
+                isok = StringUtils.isNotBlank((String) dataValue);
             }
 
             if (isok) {
                 termMap.put(tmpKey, dataValue);
                 if (saveUploadModifyValue(termMap, btNo, custNo)) {
                     return true;
-                }
-                else {
+                } else {
                     termMap.remove(tmpKey);
                 }
             }
@@ -1004,7 +1021,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         final List<CustRelation> tmpList = this.selectByProperty(anTermMap);
         final CustRelation custRelation = Collections3.getFirst(tmpList);
         if (custRelation != null) {
-            if (BetterStringUtils.isNotBlank(anBtNo)) {
+            if (StringUtils.isNotBlank(anBtNo)) {
                 custRelation.setBtNo(anBtNo);
             }
             if (MathExtend.smallValue(anCustNo) == false) {
@@ -1020,7 +1037,8 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         return false;
     }
 
-    public CustRelation addWeChatCustAndCoreRelation(final CustInfo anCustInfo, final Long anRelateCustNo, final CustOperatorInfo anOperator) {
+    public CustRelation addWeChatCustAndCoreRelation(final CustInfo anCustInfo, final Long anRelateCustNo,
+            final CustOperatorInfo anOperator) {
         final CustRelation relation = new CustRelation();
         relation.initWeChatValue(anOperator);
         relation.setCustNo(anCustInfo.getCustNo());
@@ -1041,9 +1059,12 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
      * @param anRelation
      */
     public void saveOrUpdateCustFactor(final CustRelation anRelation) {
-        final Map termMap = QueryTermBuilder.newInstance().put("custNo", anRelation.getCustNo()).put("relateCustCorp", anRelation.getRelateCustCorp())
-                .put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR, CustomerConstants.RELATE_TYPE_CORE_FACTOR,
-                        CustomerConstants.RELATE_TYPE_SELLER_FACTOR })
+        final Map termMap = QueryTermBuilder.newInstance().put("custNo", anRelation.getCustNo())
+                .put("relateCustCorp", anRelation.getRelateCustCorp())
+                .put("relateType",
+                        new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR,
+                                CustomerConstants.RELATE_TYPE_CORE_FACTOR,
+                                CustomerConstants.RELATE_TYPE_SELLER_FACTOR })
                 .build();
         final List<CustRelation> tmpList = this.selectByProperty(termMap);
         final CustRelation tmpRelation = Collections3.getFirst(tmpList);
@@ -1051,7 +1072,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         final PlatformAgencyInfo agencyInfo = agencyService.findSaleAgency(anRelation.getRelateCustCorp());
         if (agencyInfo != null) {
             anRelation.setRelateCustname(agencyInfo.getName());
-            if (BetterStringUtils.isNotBlank(agencyInfo.getRelaCustNo())) {
+            if (StringUtils.isNotBlank(agencyInfo.getRelaCustNo())) {
                 anRelation.setRelateCustno(Long.parseLong(agencyInfo.getRelaCustNo()));
             }
         }
@@ -1059,8 +1080,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         if (tmpRelation != null) {
             anRelation.initModifyValue(tmpRelation);
             this.updateByPrimaryKey(anRelation);
-        }
-        else {
+        } else {
             anRelation.initAddValue();
             anRelation.setBusinStatus("2");
             this.insert(anRelation);
@@ -1085,8 +1105,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         if (Collections3.isEmpty(workScfFactorList)) {
             logger.info("not find CustNoByScfId");
             return 0L;
-        }
-        else {
+        } else {
             return Collections3.getFirst(workScfFactorList).getCustNo();
         }
     }
@@ -1111,8 +1130,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         if (workCustRelation == null) {
             logger.info("not find findScfIdByCustNo");
             return " ";
-        }
-        else {
+        } else {
             return workCustRelation.getPartnerCustNo();
         }
     }
@@ -1150,7 +1168,8 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
      * @return
      */
     public List<CustRelation> findAppAccountRequest() {
-        final Map termMap = QueryTermBuilder.newInstance().put("businStatus", "1").put("relateType", new String[] { "0", "1", "2" }).build();
+        final Map termMap = QueryTermBuilder.newInstance().put("businStatus", "1")
+                .put("relateType", new String[] { "0", "1", "2" }).build();
 
         return selectByProperty(termMap);
     }
@@ -1193,7 +1212,9 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
                 .put("businStatus",
                         new String[] { CustomerConstants.RELATE_STATUS_APPLY, CustomerConstants.RELATE_STATUS_ACCEPT,
                                 CustomerConstants.RELATE_STATUS_AUDIT })
-                .put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_CORE, CustomerConstants.RELATE_TYPE_SELLER_CORE }).build();
+                .put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_CORE,
+                        CustomerConstants.RELATE_TYPE_SELLER_CORE })
+                .build();
         List<CustRelation> tmpList = this.selectByProperty(termMap);
         final Set<Long> tmpCustNoSet = new HashSet<>();
         for (final CustRelation tmpRelation : tmpList) {
@@ -1202,9 +1223,10 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         if (Collections3.isEmpty(tmpCustNoSet)) {
             return "";
         }
-        termMap = QueryTermBuilder.newInstance().put("custNo", tmpCustNoSet)
-                .put("relateCustCorp", anAgencyNo).put("businStatus", new String[] { CustomerConstants.RELATE_STATUS_APPLY,
-                        CustomerConstants.RELATE_STATUS_ACCEPT, CustomerConstants.RELATE_STATUS_AUDIT })
+        termMap = QueryTermBuilder.newInstance().put("custNo", tmpCustNoSet).put("relateCustCorp", anAgencyNo)
+                .put("businStatus",
+                        new String[] { CustomerConstants.RELATE_STATUS_APPLY, CustomerConstants.RELATE_STATUS_ACCEPT,
+                                CustomerConstants.RELATE_STATUS_AUDIT })
                 .put("relateType", CustomerConstants.RELATE_TYPE_CORE_FACTOR).build();
         tmpList = this.selectByProperty(termMap);
         final StringBuilder sb = new StringBuilder();
@@ -1232,8 +1254,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         final List tmpList = this.selectByProperty(termMap);
         if (Collections3.isEmpty(tmpList)) {
             return "1";
-        }
-        else {
+        } else {
             return "2";
         }
     }
@@ -1272,7 +1293,7 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         final List<Long> custNoList = UserUtils.findCustNoList();
         String tmpFactorNo = "-1";
         if (Collections3.isEmpty(custNoList) == false) {
-            tmpFactorNo = BetterStringUtils.join(custNoList.toArray(), ",");
+            tmpFactorNo = StringUtils.join(custNoList.toArray(), ",");
         }
         for (final CustRelation relation : mapper.findDataByFactorAndCore(anCoreCustNo, tmpFactorNo)) {
             result.add(new SimpleDataEntity(relation.getCustName(), String.valueOf(relation.getCustNo())));
@@ -1294,26 +1315,28 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         final Map<String, Object> anMap = new HashMap<String, Object>();
         anMap.put("relateCustno", anCoreCustNo);
         anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
-        anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_CORE, CustomerConstants.RELATE_TYPE_SELLER_CORE });
+        anMap.put("relateType", new String[] { CustomerConstants.RELATE_TYPE_SUPPLIER_CORE,
+                CustomerConstants.RELATE_TYPE_SELLER_CORE });
         for (final CustRelation relation : this.selectByProperty(anMap)) {
-            final SimpleDataEntity entity = new SimpleDataEntity(relation.getCustName(), String.valueOf(relation.getCustNo()));
+            final SimpleDataEntity entity = new SimpleDataEntity(relation.getCustName(),
+                    String.valueOf(relation.getCustNo()));
             if (!result.contains(entity)) {
                 result.add(entity);
             }
         }
         return result;
     }
-    
+
     /**
      * 查询所有供应商和核心企业
      * @return
      */
     public List<SimpleDataEntity> queryAllCust() {
         final List<SimpleDataEntity> result = new ArrayList<SimpleDataEntity>();
-        
-        
+
         for (final CustRelation relation : this.mapper.queryAllCust()) {
-            final SimpleDataEntity entity = new SimpleDataEntity(relation.getCustName(), String.valueOf(relation.getCustNo()));
+            final SimpleDataEntity entity = new SimpleDataEntity(relation.getCustName(),
+                    String.valueOf(relation.getCustNo()));
             if (!result.contains(entity)) {
                 result.add(entity);
             }
@@ -1332,9 +1355,10 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
      *            关联方客户号
      * @return
      */
-    public CustRelation findRelationWithCustCorp(final Long anCustNo, final String anPartnerCustNo, final String anCustCorp) {
-        final Map<String, Object> tmpMap = QueryTermBuilder.newInstance().put("custNo", anCustNo).put("relateCustCorp", anCustCorp)
-                .put("partnerCustNo", anPartnerCustNo).build();
+    public CustRelation findRelationWithCustCorp(final Long anCustNo, final String anPartnerCustNo,
+            final String anCustCorp) {
+        final Map<String, Object> tmpMap = QueryTermBuilder.newInstance().put("custNo", anCustNo)
+                .put("relateCustCorp", anCustCorp).put("partnerCustNo", anPartnerCustNo).build();
         final List<CustRelation> tmpList = this.selectByProperty(tmpMap);
 
         return Collections3.getFirst(tmpList);
@@ -1343,20 +1367,18 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
     /**
      * 保理公司查询客户信息
      */
-    public Page<CustRelation> queryCustInfoByFactor(final String anRelateType,String businStatus, final String anFlag, final int anPageNum, final int anPageSize) {
+    public Page<CustRelation> queryCustInfoByFactor(final String anRelateType, String businStatus, final String anFlag,
+            final int anPageNum, final int anPageSize) {
         if (!UserUtils.factorUser()) {
             throw new BytterTradeException("无相应权限操作！");
         }
-        final Map<String, Object> anMap = QueryTermBuilder.newInstance()
-                .put("relateType", anRelateType.split(","))
-                .put("relateCustno", custOperatorDubboClientService.findCustNo())
-                .put("businStatus", businStatus)
+        final Map<String, Object> anMap = QueryTermBuilder.newInstance().put("relateType", anRelateType.split(","))
+                .put("relateCustno", custOperatorDubboClientService.findCustNo()).put("businStatus", businStatus)
                 .build();
         final Page<CustRelation> result = this.selectPropertyByPage(anMap, anPageNum, anPageSize, "1".equals(anFlag));
         return result;
     }
-    
-    
+
     /**
      * 通过核心企业查询保理公司 并且 是内部结算中心
      * @param anCoreCustNo
@@ -1372,13 +1394,14 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         anMap.put("relateType", CustomerConstants.RELATE_TYPE_CORE_FACTOR);
         anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
         for (final CustRelation relation : this.selectByProperty(anMap)) {
-            if(StringUtils.isNoneBlank(relation.getIsInside()) && "1".equals(relation.getIsInside())){
-                result.add(new SimpleDataEntity(relation.getRelateCustname(), String.valueOf(relation.getRelateCustno())));
+            if (StringUtils.isNoneBlank(relation.getIsInside()) && "1".equals(relation.getIsInside())) {
+                result.add(
+                        new SimpleDataEntity(relation.getRelateCustname(), String.valueOf(relation.getRelateCustno())));
             }
         }
         return result;
     }
-    
+
     /**
      * 通过核心企业查询保理公司列表
      * @param anCoreCustNo
@@ -1395,13 +1418,13 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         anMap.put("businStatus", CustomerConstants.RELATE_STATUS_AUDIT);
         for (final CustRelation relation : this.selectByProperty(anMap)) {
             result.add(relation.getRelateCustno());
-            
-            //result.add(new SimpleDataEntity(relation.getRelateCustname(), String.valueOf(relation.getRelateCustno())));
-            
+
+            // result.add(new SimpleDataEntity(relation.getRelateCustname(),
+            // String.valueOf(relation.getRelateCustno())));
+
         }
         return result;
     }
-    
 
     /**
      * 企业合作银行下拉列表查询
@@ -1423,5 +1446,5 @@ public class CustRelationService extends BaseService<CustRelationMapper, CustRel
         }
         return result;
     }
-    
+
 }

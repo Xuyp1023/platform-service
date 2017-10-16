@@ -32,7 +32,8 @@ public class CustOpenAccountAuditService extends BaseService<CustOpenAccountAudi
      */
     public List<CustOpenAccountAudit> queryAuditWorkflow(Long anCustNo) {
         BTAssert.notNull(anCustNo, "请选择机构");
-        CustOpenAccountTmp anOpenAccountInfo = Collections3.getFirst(custOpenAccountTmpService.selectByProperty("custNo", anCustNo));
+        CustOpenAccountTmp anOpenAccountInfo = Collections3
+                .getFirst(custOpenAccountTmpService.selectByProperty("custNo", anCustNo));
         BTAssert.notNull(anOpenAccountInfo, "无法获取客户开户资料信息");
         return queryAuditWorkflow(anOpenAccountInfo.getId());
     }
@@ -69,7 +70,8 @@ public class CustOpenAccountAuditService extends BaseService<CustOpenAccountAudi
     }
 
     private void initCustInfo(CustOpenAccountAudit anOpenAccountAudit) {
-        CustInfo custInfo = Collections3.getFirst(custAccountService.selectByProperty("operOrg", UserUtils.getOperatorInfo().getOperOrg()));
+        CustInfo custInfo = Collections3
+                .getFirst(custAccountService.selectByProperty("operOrg", UserUtils.getOperatorInfo().getOperOrg()));
         anOpenAccountAudit.setAuditCustNo(custInfo.getCustNo());
         anOpenAccountAudit.setAuditCustname(custInfo.getCustName());
     }

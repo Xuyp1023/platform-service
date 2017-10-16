@@ -5,5 +5,4 @@ import com.betterjr.mapper.common.Mapper;
 import com.betterjr.modules.document.entity.CustFileAduitTemp;
 
 @BetterjrMapper
-public interface CustFileAduitTempMapper extends Mapper<CustFileAduitTemp> {
-}
+public interface CustFileAduitTempMapper extends Mapper<CustFileAduitTemp> {}

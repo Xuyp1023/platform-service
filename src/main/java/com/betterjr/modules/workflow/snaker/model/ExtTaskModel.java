@@ -9,10 +9,10 @@ import org.snaker.engine.model.TaskModel;
  */
 public class ExtTaskModel extends TaskModel {
     private String assigneeDisplay;
-    
+
     private Integer weight;
     private boolean hasWeight;
-    
+
     public String getAssigneeDisplay() {
         return assigneeDisplay;
     }

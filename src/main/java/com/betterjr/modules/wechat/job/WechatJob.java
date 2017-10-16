@@ -51,7 +51,8 @@ public class WechatJob extends AbstractSimpleElasticJob {
 
     private void worker() {
         final List<Follower2> users = new ArrayList<>();
-        final Map<String, CustWeChatInfo> tmpCustWeChatMap = ReflectionUtils.listConvertToMap(wechatService.findPendingWeChat(), "openId");
+        final Map<String, CustWeChatInfo> tmpCustWeChatMap = ReflectionUtils
+                .listConvertToMap(wechatService.findPendingWeChat(), "openId");
         try {
             if (Collections3.isEmpty(tmpCustWeChatMap) == false) {
                 final Collection<String> tmpSet = tmpCustWeChatMap.keySet();
@@ -66,8 +67,7 @@ public class WechatJob extends AbstractSimpleElasticJob {
                     }
                     if (ff.getSubscribe() == 0) {
                         tmpWeChatInfo.modifySubscribe("0", 0L);
-                    }
-                    else {
+                    } else {
                         tmpWeChatInfo.modifySubscribe("1", ff.getSubscribeTime());
                         tmpWeChatInfo.setCityName(ff.getCity());
                         tmpWeChatInfo.setProvinceName(ff.getProvince());

@@ -9,11 +9,11 @@ import com.betterjr.common.utils.BTAssert;
 import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.betterjr.modules.notification.dao.NotificationProfileVariableMapper;
-import com.betterjr.modules.notification.entity.NotificationChannelProfile;
 import com.betterjr.modules.notification.entity.NotificationProfileVariable;
 
 @Service
-public class NotificationProfileVariableService extends BaseService<NotificationProfileVariableMapper, NotificationProfileVariable> {
+public class NotificationProfileVariableService
+        extends BaseService<NotificationProfileVariableMapper, NotificationProfileVariable> {
 
     /**
      * 查询 variable 列表
@@ -27,7 +27,8 @@ public class NotificationProfileVariableService extends BaseService<Notification
     /**
      * 将基础数据copy到新的数据上
      */
-    public void saveCopyBaseDataToTargetData(Long anBaseChannelProfileId, Long anTargetChannelProfileId, CustInfo anCustInfo, CustOperatorInfo anOperator) {
+    public void saveCopyBaseDataToTargetData(Long anBaseChannelProfileId, Long anTargetChannelProfileId,
+            CustInfo anCustInfo, CustOperatorInfo anOperator) {
         List<NotificationProfileVariable> profileVariables = queryVariableByProfileId(anBaseChannelProfileId);
 
         for (NotificationProfileVariable profileVariable : profileVariables) {

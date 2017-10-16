@@ -10,12 +10,12 @@ import com.betterjr.modules.customer.entity.CustMechBusinLicenceTmp;
 import com.betterjr.modules.customer.helper.IVersionMapper;
 
 @BetterjrMapper
-public interface CustMechBusinLicenceTmpMapper extends Mapper<CustMechBusinLicenceTmp>,IVersionMapper {
+public interface CustMechBusinLicenceTmpMapper extends Mapper<CustMechBusinLicenceTmp>, IVersionMapper {
     @Select("select max(N_VERSION) FROM t_cust_mech_busin_licence_tmp WHERE L_REF_ID=#{refId}")
     @ResultType(Long.class)
     @Override
     public Long selectMaxVersion(@Param("refId") Long refId);
-    
+
     /**
      * 取比当前版本低,并且被使用的流水
      */

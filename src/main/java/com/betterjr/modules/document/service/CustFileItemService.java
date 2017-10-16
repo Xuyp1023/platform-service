@@ -8,12 +8,12 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterDateUtils;
-import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
@@ -26,8 +26,8 @@ public class CustFileItemService extends BaseService<CustFileItemMapper, CustFil
 
     private static final Pattern COMMA_PATTERN = Pattern.compile(",");
 
-    private static String[] queryConds = new String[] { "bizLicenseFile", "orgCodeFile", "taxRegistFile", "representIdFile", "bankAcctAckFile",
-    "brokerIdFile" };
+    private static String[] queryConds = new String[] { "bizLicenseFile", "orgCodeFile", "taxRegistFile",
+            "representIdFile", "bankAcctAckFile", "brokerIdFile" };
 
     /**
      * 根据文件ID号，查询单个文件信息
@@ -58,7 +58,8 @@ public class CustFileItemService extends BaseService<CustFileItemMapper, CustFil
      * @param anFileItemId
      * @return
      */
-    private boolean updateAndDuplicateConflictFileItems(final Long anBatchNo, final Long anFileItemId, final CustOperatorInfo anOperator) {
+    private boolean updateAndDuplicateConflictFileItems(final Long anBatchNo, final Long anFileItemId,
+            final CustOperatorInfo anOperator) {
         final CustFileItem fileItem = this.selectByPrimaryKey(anFileItemId);
 
         if (fileItem != null) {
@@ -82,8 +83,9 @@ public class CustFileItemService extends BaseService<CustFileItemMapper, CustFil
      * @param anBatchNo
      * @return
      */
-    public Long updateAndDuplicateConflictFileItemInfo(final String anFileList, Long anBatchNo, final CustOperatorInfo anOperator) {
-        if (BetterStringUtils.isBlank(anFileList)) {
+    public Long updateAndDuplicateConflictFileItemInfo(final String anFileList, Long anBatchNo,
+            final CustOperatorInfo anOperator) {
+        if (StringUtils.isBlank(anFileList)) {
 
             return anBatchNo;
         }
@@ -92,12 +94,14 @@ public class CustFileItemService extends BaseService<CustFileItemMapper, CustFil
             anBatchNo = CustFileUtils.findBatchNo();
         }
 
-        final List<Long> fileItems = COMMA_PATTERN.splitAsStream(anFileList).map(Long::valueOf).collect(Collectors.toList());
+        final List<Long> fileItems = COMMA_PATTERN.splitAsStream(anFileList).map(Long::valueOf)
+                .collect(Collectors.toList());
 
         return updateAndDuplicateConflictFileItemInfo(fileItems, anBatchNo, anOperator);
     }
 
-    public Long updateAndDuplicateConflictFileItemInfo(final List<Long> fileItems, Long anBatchNo, final CustOperatorInfo anOperator) {
+    public Long updateAndDuplicateConflictFileItemInfo(final List<Long> fileItems, Long anBatchNo,
+            final CustOperatorInfo anOperator) {
         if (Collections3.isEmpty(fileItems) == true) {
             return anBatchNo;
         }
@@ -120,7 +124,7 @@ public class CustFileItemService extends BaseService<CustFileItemMapper, CustFil
      * @return 返回文件批次号
      */
     public Long updateCustFileItemInfo(final String anFileList, Long anBatchNo) {
-        if (BetterStringUtils.isBlank(anFileList)) {
+        if (StringUtils.isBlank(anFileList)) {
 
             return anBatchNo;
         }
@@ -130,9 +134,9 @@ public class CustFileItemService extends BaseService<CustFileItemMapper, CustFil
         }
 
         logger.info("fileList:" + anFileList);
-        final String[] fileItems = BetterStringUtils.split(anFileList, ",");
+        final String[] fileItems = StringUtils.split(anFileList, ",");
         for (final String item : fileItems) {
-            if (BetterStringUtils.isNotBlank(item)) {
+            if (StringUtils.isNotBlank(item)) {
                 final Long fileId = Long.valueOf(item.trim());
                 updateFileItems(anBatchNo, fileId);
             }
@@ -140,7 +144,7 @@ public class CustFileItemService extends BaseService<CustFileItemMapper, CustFil
 
         return anBatchNo;
     }
-    
+
     /**
      * 更新文件列表的批次号，如果批次号不存在，则创建批次号
      * @param anFileList 以逗号分隔的文件编号
@@ -149,15 +153,15 @@ public class CustFileItemService extends BaseService<CustFileItemMapper, CustFil
      */
     public Long updateDuplicateCustFileItemInfo(final Long anFileItemId, final CustOperatorInfo anOperator) {
         BTAssert.notNull(anFileItemId, "文件编号不允许为空！");
-        
+
         final CustFileItem fileItem = this.selectByPrimaryKey(anFileItemId);
-        
+
         Long anBatchNo = CustFileUtils.findBatchNo();
-        
+
         if (fileItem != null) {
             if (fileItem.getBatchNo().equals(0L) == true) {
                 fileItem.setBatchNo(anBatchNo);
-                this.updateByPrimaryKeySelective(fileItem) ;
+                this.updateByPrimaryKeySelective(fileItem);
             } else if (fileItem.getBatchNo().equals(anBatchNo) == false) {
                 final CustFileItem tempFileItem = new CustFileItem();
                 tempFileItem.initDuplicateConflictValue(fileItem);
@@ -165,7 +169,7 @@ public class CustFileItemService extends BaseService<CustFileItemMapper, CustFil
                 this.saveAndUpdateFileItem(tempFileItem, anOperator);
             }
         }
-        
+
         return anBatchNo;
     }
 
@@ -177,7 +181,7 @@ public class CustFileItemService extends BaseService<CustFileItemMapper, CustFil
      */
     public Long updateAndDelCustFileItemInfo(final String anFileList, Long anBatchNo) {
         /*if (BetterStringUtils.isBlank(anFileList)) {
-
+        
             return anBatchNo;
         }*/
 
@@ -188,9 +192,9 @@ public class CustFileItemService extends BaseService<CustFileItemMapper, CustFil
 
         final List<CustFileItem> fileItems = this.selectByProperty("batchNo", anBatchNo);
 
-        final String[] strFileItems = BetterStringUtils.split(anFileList, ",");
+        final String[] strFileItems = StringUtils.split(anFileList, ",");
         for (final String item : strFileItems) {
-            if (BetterStringUtils.isNotBlank(item)) {
+            if (StringUtils.isNotBlank(item)) {
                 final Long fileId = Long.valueOf(item.trim());
 
                 final CustFileItem fileItem = checkFileItem(fileId, fileItems);
@@ -202,7 +206,7 @@ public class CustFileItemService extends BaseService<CustFileItemMapper, CustFil
             }
         }
 
-        for (final CustFileItem fileItem: fileItems) {
+        for (final CustFileItem fileItem : fileItems) {
             deleteFileItem(fileItem.getId(), fileItem.getBatchNo());
         }
 
@@ -229,10 +233,10 @@ public class CustFileItemService extends BaseService<CustFileItemMapper, CustFil
      * @param anBatchNo
      * @return
      */
-    public CustFileItem findOneByBatchNo(final Long anBatchNo,final String anFileInfoType) {
-        Map<String,Object> anMap=new HashMap<String,Object>();
+    public CustFileItem findOneByBatchNo(final Long anBatchNo, final String anFileInfoType) {
+        Map<String, Object> anMap = new HashMap<String, Object>();
         anMap.put("batchNo", anBatchNo);
-        if(BetterStringUtils.isNotBlank(anFileInfoType)){
+        if (StringUtils.isNotBlank(anFileInfoType)) {
             anMap.put("fileInfoType", anFileInfoType);
         }
         final List<CustFileItem> fileList = this.selectByProperty(anMap);
@@ -258,13 +262,13 @@ public class CustFileItemService extends BaseService<CustFileItemMapper, CustFil
      * @return
      */
     public List<CustFileItem> findCustFiles(final Long anBatchNo) {
-        if(anBatchNo != null && anBatchNo > 0){
+        if (anBatchNo != null && anBatchNo > 0) {
             final Map<String, Object> conditionMap = new HashMap<>();
             conditionMap.put("batchNo", anBatchNo);
             conditionMap.put("GTid", 0L);
             return this.selectByProperty(conditionMap);
-        }else{
-            return Collections.EMPTY_LIST; 
+        } else {
+            return Collections.EMPTY_LIST;
         }
     }
 
@@ -289,7 +293,8 @@ public class CustFileItemService extends BaseService<CustFileItemMapper, CustFil
         return findCustFilesByBatch(anBatchNoList, null, false);
     }
 
-    private List<CustFileItem> findCustFilesByBatch(final List<Long> anBatchNoList, final List<String> anbusinTypeList, final boolean anMust) {
+    private List<CustFileItem> findCustFilesByBatch(final List<Long> anBatchNoList, final List<String> anbusinTypeList,
+            final boolean anMust) {
 
         // 如果出现条件为null，不能查询
         if (Collections3.isEmpty(anbusinTypeList) && anMust || Collections3.isEmpty(anBatchNoList)) {
@@ -311,11 +316,10 @@ public class CustFileItemService extends BaseService<CustFileItemMapper, CustFil
      */
     public boolean saveAndUpdateFileItem(final CustFileItem anFileItem, final CustOperatorInfo anOperator) {
         final CustFileItem tmpFileItem = this.selectByPrimaryKey(anFileItem.getId());
-        if (tmpFileItem == null){
+        if (tmpFileItem == null) {
             anFileItem.initAddValue(anOperator);
             this.insert(anFileItem);
-        }
-        else {
+        } else {
             anFileItem.initModifyValue(anOperator);
             this.updateByPrimaryKey(anFileItem);
         }
@@ -350,7 +354,7 @@ public class CustFileItemService extends BaseService<CustFileItemMapper, CustFil
         }
 
         final CustOperatorInfo operator = UserUtils.getOperatorInfo();
-        if (BetterStringUtils.equals(operator.getOperOrg(), item.getOperOrg()) == false) {
+        if (StringUtils.equals(operator.getOperOrg(), item.getOperOrg()) == false) {
             logger.error("不是同一OperOrg的数据,不允许删除! operUser=" + operator.getName());
             return false;
         }
@@ -374,8 +378,7 @@ public class CustFileItemService extends BaseService<CustFileItemMapper, CustFil
         anFileItem.setRegTime(BetterDateUtils.getNumTime());
         if (tmpFileItem == null) {
             this.insert(anFileItem);
-        }
-        else {
+        } else {
             this.updateByPrimaryKey(anFileItem);
         }
 

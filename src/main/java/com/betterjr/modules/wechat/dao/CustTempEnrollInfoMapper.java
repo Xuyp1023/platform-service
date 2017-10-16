@@ -5,5 +5,4 @@ import com.betterjr.mapper.common.Mapper;
 import com.betterjr.modules.wechat.entity.CustTempEnrollInfo;
 
 @BetterjrMapper
-public interface CustTempEnrollInfoMapper extends Mapper<CustTempEnrollInfo> {
-}
+public interface CustTempEnrollInfoMapper extends Mapper<CustTempEnrollInfo> {}

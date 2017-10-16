@@ -5,5 +5,4 @@ import com.betterjr.mapper.common.Mapper;
 import com.betterjr.modules.wechat.entity.SaleAccoBankInfo;
 
 @BetterjrMapper
-public interface SaleAccoBankInfoMapper extends Mapper<SaleAccoBankInfo> {
-}
+public interface SaleAccoBankInfoMapper extends Mapper<SaleAccoBankInfo> {}

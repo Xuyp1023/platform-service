@@ -54,10 +54,10 @@ public class CustMechBaseDubboService implements ICustMechBaseService {
 
     @Resource
     private CustAccountService accountService;
-    
+
     @Resource
     private CustInfoRoleService custInfoRoleService;
-    
+
     @Autowired
     private CustMajorService custMajorService;
 
@@ -65,24 +65,30 @@ public class CustMechBaseDubboService implements ICustMechBaseService {
      * @see com.betterjr.modules.customer.ICustMechBaseService#webQueryValidCustInfo()
      */
     @Override
-    public String webQueryValidCustInfo(final Map<String, Object> anParam, final int anFlag, final int anPageNum, final int anPageSize) {
+    public String webQueryValidCustInfo(final Map<String, Object> anParam, final int anFlag, final int anPageNum,
+            final int anPageSize) {
         BTAssert.isTrue(UserUtils.platformUser(), "本接口只允许平台调用");
 
         final Map<String, Object> param = RuleServiceDubboFilterInvoker.getInputObj();
 
-        return AjaxObject.newOkWithPage("查询所有有效客户成功", accountService.queryValidCustInfo(param, anFlag, anPageNum, anPageSize)).toJson();
+        return AjaxObject
+                .newOkWithPage("查询所有有效客户成功", accountService.queryValidCustInfo(param, anFlag, anPageNum, anPageSize))
+                .toJson();
     }
 
     /* (non-Javadoc)
      * @see com.betterjr.modules.customer.ICustMechBaseService#webQueryInvalidCustInfo()
      */
     @Override
-    public String webQueryInvalidCustInfo(final Map<String, Object> anParam, final int anFlag, final int anPageNum, final int anPageSize) {
+    public String webQueryInvalidCustInfo(final Map<String, Object> anParam, final int anFlag, final int anPageNum,
+            final int anPageSize) {
         BTAssert.isTrue(UserUtils.platformUser(), "本接口只允许平台调用");
 
         final Map<String, Object> param = RuleServiceDubboFilterInvoker.getInputObj();
 
-        return AjaxObject.newOkWithPage("查询所有未生效客户成功", accountService.queryInvalidCustInfo(param, anFlag, anPageNum, anPageSize)).toJson();
+        return AjaxObject
+                .newOkWithPage("查询所有未生效客户成功", accountService.queryInvalidCustInfo(param, anFlag, anPageNum, anPageSize))
+                .toJson();
     }
 
     @Override
@@ -115,15 +121,15 @@ public class CustMechBaseDubboService implements ICustMechBaseService {
     public String webGetCurrentRole() {
         String role = "";
         if (UserUtils.factorUser()) {
-            role =  "FACTOR_USER";
+            role = "FACTOR_USER";
         } else if (UserUtils.sellerUser()) {
-            role =  "SELLER_USER";
+            role = "SELLER_USER";
         } else if (UserUtils.coreUser()) {
-            role =  "CORE_USER";
+            role = "CORE_USER";
         } else if (UserUtils.supplierUser()) {
-            role =  "SUPPLIER_USER";
+            role = "SUPPLIER_USER";
         } else if (UserUtils.platformUser()) {
-            role =  "PLATFORM_USER";
+            role = "PLATFORM_USER";
         }
 
         return AjaxObject.newOk("检查机构类型成功", role).toJson();
@@ -148,7 +154,6 @@ public class CustMechBaseDubboService implements ICustMechBaseService {
     public Collection<CustInfo> queryCustInfoByOperId(final Long anOperId) {
         return baseService.queryCustInfoByOperId(anOperId);
     }
-
 
     @Override
     public String webFindBaseInfo(final Long anCustNo) {
@@ -180,9 +185,10 @@ public class CustMechBaseDubboService implements ICustMechBaseService {
     }
 
     @Override
-    public String webQueryChangeApply(final Long anCustNo, final int anFlag, final int anPageNum, final int anPageSize) {
-        final Page<CustChangeApply> changeApplys = changeService.queryChangeApply(anCustNo, CustomerConstants.ITEM_BASE, anFlag, anPageNum,
-                anPageSize);
+    public String webQueryChangeApply(final Long anCustNo, final int anFlag, final int anPageNum,
+            final int anPageSize) {
+        final Page<CustChangeApply> changeApplys = changeService.queryChangeApply(anCustNo, CustomerConstants.ITEM_BASE,
+                anFlag, anPageNum, anPageSize);
         return AjaxObject.newOkWithPage("公司基本信息-变更列表 成功", changeApplys).toJson();
     }
 
@@ -195,24 +201,31 @@ public class CustMechBaseDubboService implements ICustMechBaseService {
     @Override
     public String webSaveChangeApply(final Map<String, Object> anParam, final Long anApplyId, final String anFileList) {
         final CustMechBaseTmp custMechBaseTmp = (CustMechBaseTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return AjaxObject.newOk("公司基本信息-变更修改 成功", baseTmpService.saveChangeApply(custMechBaseTmp, anApplyId, anFileList)).toJson();
+        return AjaxObject
+                .newOk("公司基本信息-变更修改 成功", baseTmpService.saveChangeApply(custMechBaseTmp, anApplyId, anFileList))
+                .toJson();
     }
 
     @Override
     public String webFindInsteadRecord(final Long anInsteadRecordId) {
-        return AjaxObject.newOk("公司基本信息-代录详情 成功", baseTmpService.findCustMechBaseTmpByInsteadRecord(anInsteadRecordId)).toJson();
+        return AjaxObject.newOk("公司基本信息-代录详情 成功", baseTmpService.findCustMechBaseTmpByInsteadRecord(anInsteadRecordId))
+                .toJson();
     }
 
     @Override
-    public String webAddInsteadRecord(final Map<String, Object> anParam, final Long anInsteadRecordId, final String anFileList) {
+    public String webAddInsteadRecord(final Map<String, Object> anParam, final Long anInsteadRecordId,
+            final String anFileList) {
         final CustMechBaseTmp custMechBaseTmp = (CustMechBaseTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return AjaxObject.newOk("公司基本信息-添加代录 成功", baseTmpService.addInsteadRecord(custMechBaseTmp, anInsteadRecordId, anFileList)).toJson();
+        return AjaxObject.newOk("公司基本信息-添加代录 成功",
+                baseTmpService.addInsteadRecord(custMechBaseTmp, anInsteadRecordId, anFileList)).toJson();
     }
 
     @Override
-    public String webSaveInsteadRecord(final Map<String, Object> anParam, final Long anInsteadRecordId, final String anFileList) {
+    public String webSaveInsteadRecord(final Map<String, Object> anParam, final Long anInsteadRecordId,
+            final String anFileList) {
         final CustMechBaseTmp custMechBaseTmp = (CustMechBaseTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return AjaxObject.newOk("公司基本信息-代录修改 成功", baseTmpService.saveInsteadRecord(custMechBaseTmp, anInsteadRecordId, anFileList)).toJson();
+        return AjaxObject.newOk("公司基本信息-代录修改 成功",
+                baseTmpService.saveInsteadRecord(custMechBaseTmp, anInsteadRecordId, anFileList)).toJson();
     }
 
     /* (non-Javadoc)
@@ -233,7 +246,7 @@ public class CustMechBaseDubboService implements ICustMechBaseService {
 
     @Override
     public Long findPlatCustNo() {
-        
+
         return custMajorService.findPlatCustMajor();
     }
 

@@ -7,12 +7,12 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.data.NotificationAttachment;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
-import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.mapper.pagehelper.Page;
@@ -38,7 +38,8 @@ public class NotificationService extends BaseService<NotificationMapper, Notific
     /**
      * 添加
      */
-    public Notification addNotification(final Notification anNotification, final CustOperatorInfo anOperator, final CustInfo anCustomer) {
+    public Notification addNotification(final Notification anNotification, final CustOperatorInfo anOperator,
+            final CustInfo anCustomer) {
         BTAssert.notNull(anNotification, "通知内容不允许为空!");
 
         anNotification.initAddValue(anOperator, anCustomer);
@@ -50,22 +51,25 @@ public class NotificationService extends BaseService<NotificationMapper, Notific
     /**
      * 查询未读消息
      */
-    public Page<Notification> queryUnreadNotification(final Map<String, Object> anParam, final int anFlag, final int anPageNum, final int anPageSize) {
+    public Page<Notification> queryUnreadNotification(final Map<String, Object> anParam, final int anFlag,
+            final int anPageNum, final int anPageSize) {
         final CustOperatorInfo operator = UserUtils.getOperatorInfo();
 
         PageHelper.startPage(anPageNum, anPageSize, anFlag == 1);
         // 处理 LIKEsubject
         final String LIKEsubject = (String) anParam.get("LIKEsubject");
-        if (BetterStringUtils.isNotBlank(LIKEsubject)) {
+        if (StringUtils.isNotBlank(LIKEsubject)) {
             anParam.put("LIKEsubject", "%" + LIKEsubject + "%");
         }
-        return this.mapper.selectNotificationByCondition(operator.getId(), NotificationConstants.IS_READ_FALSE, anParam);
+        return this.mapper.selectNotificationByCondition(operator.getId(), NotificationConstants.IS_READ_FALSE,
+                anParam);
     }
 
     /**
      * 查询已读消息
      */
-    public Page<Notification> queryReadNotification(final Map<String, Object> anParam, final int anFlag, final int anPageNum, final int anPageSize) {
+    public Page<Notification> queryReadNotification(final Map<String, Object> anParam, final int anFlag,
+            final int anPageNum, final int anPageSize) {
         final CustOperatorInfo operator = UserUtils.getOperatorInfo();
 
         PageHelper.startPage(anPageNum, anPageSize, anFlag == 1);
@@ -113,6 +117,7 @@ public class NotificationService extends BaseService<NotificationMapper, Notific
 
         return this.selectByPrimaryKey(anId);
     }
+
     /**
      * 设置消息已读
      */
@@ -129,11 +134,13 @@ public class NotificationService extends BaseService<NotificationMapper, Notific
     /**
      *
      */
-    private NotificationCustomer checkNotificationCustomer(final Long anId, final Long anOperId, final String anChannel) {
+    private NotificationCustomer checkNotificationCustomer(final Long anId, final Long anOperId,
+            final String anChannel) {
         BTAssert.notNull(anId, "编号不允许为空!");
         BTAssert.notNull(anOperId, "操作员编号不允许为空!");
 
-        final NotificationCustomer notificationCustomer = notificationCustomerService.findNotifiCustomerByNotifiIdAndOperId(anId, anOperId, anChannel);
+        final NotificationCustomer notificationCustomer = notificationCustomerService
+                .findNotifiCustomerByNotifiIdAndOperId(anId, anOperId, anChannel);
         BTAssert.notNull(notificationCustomer, "没有找到相应的站内消息接收记录!");
         return notificationCustomer;
     }
@@ -145,7 +152,8 @@ public class NotificationService extends BaseService<NotificationMapper, Notific
         final Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("channel", NotificationConstants.CHANNEL_SMS);
         conditionMap.put("NEimmediate", NotificationConstants.IMMEDIATE_TRUE); // immediate 不为 1
-        conditionMap.put("businStatus", new String[] { NotificationConstants.SEND_STATUS_FAIL, NotificationConstants.SEND_STATUS_NORMAL });
+        conditionMap.put("businStatus",
+                new String[] { NotificationConstants.SEND_STATUS_FAIL, NotificationConstants.SEND_STATUS_NORMAL });
         return this.selectPropertyByPage(conditionMap, 1, 50, false);
     }
 
