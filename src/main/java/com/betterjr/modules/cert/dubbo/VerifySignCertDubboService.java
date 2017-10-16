@@ -22,7 +22,7 @@ import com.betterjr.modules.rule.service.RuleServiceDubboFilterInvoker;
  * @author liuwl
  *
  */
-@Service(interfaceClass=IVerifySignCertService.class)
+@Service(interfaceClass = IVerifySignCertService.class)
 public class VerifySignCertDubboService implements IVerifySignCertService {
     @Resource
     private VerifySignCertService verifySignCertService;
@@ -31,10 +31,13 @@ public class VerifySignCertDubboService implements IVerifySignCertService {
      * @see com.betterjr.modules.cert.dubbo.interfaces.IVerifySignCertService#webQueryCertList(java.util.Map, int, int, int)
      */
     @Override
-    public String webQueryCertList(final Map<String, Object> anParam, final int anFlag, final int anPageNum, final int anPageSize) {
+    public String webQueryCertList(final Map<String, Object> anParam, final int anFlag, final int anPageNum,
+            final int anPageSize) {
         final Map<String, Object> param = RuleServiceDubboFilterInvoker.getInputObj();
 
-        return AjaxObject.newOkWithPage("证书列表查询成功！", verifySignCertService.queryCertList(param, anFlag, anPageNum, anPageSize)).toJson();
+        return AjaxObject
+                .newOkWithPage("证书列表查询成功！", verifySignCertService.queryCertList(param, anFlag, anPageNum, anPageSize))
+                .toJson();
     }
 
     /* (non-Javadoc)

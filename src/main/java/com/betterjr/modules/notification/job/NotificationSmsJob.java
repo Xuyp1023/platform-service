@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,34 +47,38 @@ public class NotificationSmsJob extends AbstractSimpleElasticJob {
         logger.debug("定时发送短信 : " + new Date());
 
         // TODO 处理批量发送
-        while(true) {
+        while (true) {
             final List<Notification> notifications = notificationService.queryUnsendSmsNotification();
             if (Collections3.isEmpty(notifications) == true) {
                 break;
             }
 
-            notifications.forEach(notification->{
-                final List<NotificationCustomer> customers = notificationCustomerService.queryNotifiCustomerByNotifiId(notification.getId());
+            notifications.forEach(notification -> {
+                final List<NotificationCustomer> customers = notificationCustomerService
+                        .queryNotifiCustomerByNotifiId(notification.getId());
 
-                final String sendNos = customers.stream().map(customer->customer.getSendNo()).filter(BetterStringUtils::isMobileNo).collect(Collectors.joining(",")).toString();
+                final String sendNos = customers.stream().map(customer -> customer.getSendNo())
+                        .filter(BetterStringUtils::isMobileNo).collect(Collectors.joining(",")).toString();
 
-                if (BetterStringUtils.isNotBlank(sendNos)) {
+                if (StringUtils.isNotBlank(sendNos)) {
                     logger.info("当前发送号码：" + sendNos);
                     final String result = SmsUtils.send(notification.getContent(), sendNos);
                     logger.info("发送结果：" + result);
 
-                    notificationService.saveNotificationStatus(notification.getId(), NotificationConstants.SEND_STATUS_SUCCESS);
+                    notificationService.saveNotificationStatus(notification.getId(),
+                            NotificationConstants.SEND_STATUS_SUCCESS);
                 }
             });
         }
 
-        while(true) {
-            final List<NotificationCustomer> customers = notificationCustomerService.queryUnsendSmsNotificationCustomer(smsRetry);
+        while (true) {
+            final List<NotificationCustomer> customers = notificationCustomerService
+                    .queryUnsendSmsNotificationCustomer(smsRetry);
             if (Collections3.isEmpty(customers) == true) {
                 break;
             }
 
-            for (final NotificationCustomer notificationCustomer: customers) {
+            for (final NotificationCustomer notificationCustomer : customers) {
                 final Long notificationId = notificationCustomer.getNotificationId();
                 final Notification notification = notificationService.findNotificationById(notificationId);
                 if (notification != null && BetterStringUtils.isMobileNo(notificationCustomer.getSendNo())) {
@@ -82,14 +87,12 @@ public class NotificationSmsJob extends AbstractSimpleElasticJob {
 
                     notificationCustomerService.saveNotificationCustomerStatus(notificationCustomer.getId(),
                             NotificationConstants.SEND_STATUS_SUCCESS);
-                }
-                else {
+                } else {
                     notificationCustomerService.saveNotificationCustomerAddRetry(notificationCustomer.getId());
                 }
             }
         }
         logger.info("定时发送短信完成 : " + new Date());
     }
-
 
 }

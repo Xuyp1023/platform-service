@@ -6,5 +6,5 @@ import com.betterjr.modules.workflow.entity.CustFlowBase;
 
 @BetterjrMapper
 public interface CustFlowBaseMapper extends Mapper<CustFlowBase> {
-    
+
 }

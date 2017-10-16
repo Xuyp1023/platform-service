@@ -7,9 +7,10 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.alibaba.dubbo.config.annotation.Service;
 import com.betterjr.common.utils.BTAssert;
-import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.customer.ICustMechManagerService;
 import com.betterjr.modules.customer.constants.CustomerConstants;
@@ -70,13 +71,15 @@ public class CustMechManagerDubboService implements ICustMechManagerService {
     @Override
     public String webAddChangeManagerTmp(Map<String, Object> anMap, String anFileList) {
         final CustMechManagerTmp custMechManagerTmp = (CustMechManagerTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return newOk("公司高管-流水信息 变更添加成功", managerTmpService.addChangeManagerTmp(custMechManagerTmp, anFileList)).toJson();
+        return newOk("公司高管-流水信息 变更添加成功", managerTmpService.addChangeManagerTmp(custMechManagerTmp, anFileList))
+                .toJson();
     }
 
     @Override
     public String webSaveChangeManagerTmp(Map<String, Object> anParam, String anFileList) {
         final CustMechManagerTmp custMechManagerTmp = (CustMechManagerTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return newOk("公司高管-流水信息 变更修改成功", managerTmpService.saveSaveChangeManagerTmp(custMechManagerTmp, anFileList)).toJson();
+        return newOk("公司高管-流水信息 变更修改成功", managerTmpService.saveSaveChangeManagerTmp(custMechManagerTmp, anFileList))
+                .toJson();
     }
 
     @Override
@@ -111,8 +114,8 @@ public class CustMechManagerDubboService implements ICustMechManagerService {
 
     @Override
     public String webQueryChangeApply(Long anCustNo, int anFlag, int anPageNum, int anPageSize) {
-        final Page<CustChangeApply> changeApplys = changeService.queryChangeApply(anCustNo, CustomerConstants.ITEM_MANAGER, anFlag, anPageNum,
-                anPageSize);
+        final Page<CustChangeApply> changeApplys = changeService.queryChangeApply(anCustNo,
+                CustomerConstants.ITEM_MANAGER, anFlag, anPageNum, anPageSize);
         return newOkWithPage("高管信息-变更列表查询 成功", changeApplys).toJson();
     }
 
@@ -125,7 +128,7 @@ public class CustMechManagerDubboService implements ICustMechManagerService {
 
         ChangeDetailBean<CustMechManagerTmp> changeDetailBean = new ChangeDetailBean<>();
         changeDetailBean.setChangeApply(changeApply);
-        if (BetterStringUtils.equals(nowData.getTmpOperType(), CustomerConstants.TMP_OPER_TYPE_DELETE) == false) {
+        if (StringUtils.equals(nowData.getTmpOperType(), CustomerConstants.TMP_OPER_TYPE_DELETE) == false) {
             changeDetailBean.setNowData(nowData);
         }
         changeDetailBean.setBefData(befData);
@@ -136,23 +139,28 @@ public class CustMechManagerDubboService implements ICustMechManagerService {
     @Override
     public String webAddInsteadManagerTmp(Map<String, Object> anMap, Long anInsteadRecordId, String anFileList) {
         final CustMechManagerTmp custMechManagerTmp = (CustMechManagerTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return newOk("公司高管-流水信息 代录添加成功", managerTmpService.addInsteadManagerTmp(custMechManagerTmp, anInsteadRecordId, anFileList)).toJson();
+        return newOk("公司高管-流水信息 代录添加成功",
+                managerTmpService.addInsteadManagerTmp(custMechManagerTmp, anInsteadRecordId, anFileList)).toJson();
     }
 
     @Override
     public String webSaveInsteadManagerTmp(Map<String, Object> anParam, Long anInsteadRecordId, String anFileList) {
         final CustMechManagerTmp custMechManagerTmp = (CustMechManagerTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return newOk("公司高管-流水信息 代录修改成功", managerTmpService.saveSaveInsteadManagerTmp(custMechManagerTmp, anInsteadRecordId, anFileList)).toJson();
+        return newOk("公司高管-流水信息 代录修改成功",
+                managerTmpService.saveSaveInsteadManagerTmp(custMechManagerTmp, anInsteadRecordId, anFileList))
+                        .toJson();
     }
 
     @Override
     public String webDeleteInsteadManagerTmp(Long anRefId, Long anInsteadRecordId) {
-        return newOk("公司高管-流水信息 代录删除成功", managerTmpService.saveDeleteInsteadManagerTmp(anRefId, anInsteadRecordId)).toJson();
+        return newOk("公司高管-流水信息 代录删除成功", managerTmpService.saveDeleteInsteadManagerTmp(anRefId, anInsteadRecordId))
+                .toJson();
     }
 
     @Override
     public String webCancelInsteadManagerTmp(Long anId, Long anInsteadRecordId) {
-        return newOk("公司高管-流水信息 代录删除成功", managerTmpService.saveCancelInsteadManagerTmp(anId, anInsteadRecordId)).toJson();
+        return newOk("公司高管-流水信息 代录删除成功", managerTmpService.saveCancelInsteadManagerTmp(anId, anInsteadRecordId))
+                .toJson();
     }
 
     @Override

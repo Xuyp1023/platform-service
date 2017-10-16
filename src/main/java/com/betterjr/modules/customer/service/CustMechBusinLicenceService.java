@@ -35,7 +35,7 @@ public class CustMechBusinLicenceService extends BaseService<CustMechBusinLicenc
      * @param anCustName
      */
     public void saveUpdateCustName(final Long anCustNo, final String anCustName) {
-        final CustMechBusinLicence businLicence= findBusinLicenceByCustNo(anCustNo);
+        final CustMechBusinLicence businLicence = findBusinLicenceByCustNo(anCustNo);
         BTAssert.notNull(businLicence, "没有找到相应的营业执照！");
         businLicence.setCustName(anCustName);
         this.updateByPrimaryKeySelective(businLicence);
@@ -98,7 +98,8 @@ public class CustMechBusinLicenceService extends BaseService<CustMechBusinLicenc
         BTAssert.notNull(anBusinLicence, "营业执照信息不允许为空！");
 
         final CustInfo custInfo = accountService.selectByPrimaryKey(anCustNo);
-        anBusinLicence.initAddValue(anCustNo, custInfo.getCustName(), custInfo.getRegOperId(), custInfo.getRegOperName(), custInfo.getOperOrg());
+        anBusinLicence.initAddValue(anCustNo, custInfo.getCustName(), custInfo.getRegOperId(),
+                custInfo.getRegOperName(), custInfo.getOperOrg());
         this.insert(anBusinLicence);
 
         // 建立初始流水记录

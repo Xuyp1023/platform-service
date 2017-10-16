@@ -17,7 +17,6 @@ import com.betterjr.common.utils.Collections3;
 import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.account.service.CustAccountService;
 import com.betterjr.modules.account.service.CustOperatorService;
-import com.betterjr.modules.notice.constants.NoticeConstants;
 import com.betterjr.modules.notice.dao.NoticeCustomerMapper;
 import com.betterjr.modules.notice.entity.Notice;
 import com.betterjr.modules.notice.entity.NoticeCustomer;
@@ -68,14 +67,16 @@ public class NoticeCustomerService extends BaseService<NoticeCustomerMapper, Not
             saveNoticeCustomer(noticeId, Long.valueOf(targetCust), saveNoticeCustomers);
         }
 
-        noticeCustomers.stream().filter(noticeCustomer -> checkExistInPublished(noticeCustomer, saveNoticeCustomers) == false)
+        noticeCustomers.stream()
+                .filter(noticeCustomer -> checkExistInPublished(noticeCustomer, saveNoticeCustomers) == false)
                 .forEach(noticeCustomer -> this.deleteByPrimaryKey(noticeCustomer.getId()));
     }
 
     /**
      * 检查是否存在于发布列表
      */
-    private boolean checkExistInPublished(NoticeCustomer anNoticeCustomer, List<Pair<Long, Long>> anSaveNoticeCustomers) {
+    private boolean checkExistInPublished(NoticeCustomer anNoticeCustomer,
+            List<Pair<Long, Long>> anSaveNoticeCustomers) {
         Long noticeId = anNoticeCustomer.getNoticeId();
         Long custNo = anNoticeCustomer.getCustNo();
 
@@ -101,8 +102,7 @@ public class NoticeCustomerService extends BaseService<NoticeCustomerMapper, Not
             final NoticeCustomer noticeCustomer = new NoticeCustomer();
             noticeCustomer.initAddValue(anNoticeId, anCustNo, custInfo.getCustName());
             this.insert(noticeCustomer);
-        }
-        else {
+        } else {
             this.updateByPrimaryKeySelective(tempNoticeCustomer);
         }
         anSaveNoticeCustomers.add(new ImmutablePair<Long, Long>(anNoticeId, anCustNo));

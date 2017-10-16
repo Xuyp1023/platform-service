@@ -37,9 +37,10 @@ public class NotificationWechatHandlerService {
         final Notification notification = (Notification) message.getObject();
         logger.info("NOTIFICATION_WECHAT_TOPIC: subject=" + notification.getSubject());
 
-        final List<NotificationCustomer> notificationCustomers = notificationCustomerService.queryNotifiCustomerByNotifiId(notification.getId());
+        final List<NotificationCustomer> notificationCustomers = notificationCustomerService
+                .queryNotifiCustomerByNotifiId(notification.getId());
 
-        for(final NotificationCustomer notificationCustomer: notificationCustomers) {
+        for (final NotificationCustomer notificationCustomer : notificationCustomers) {
             sendWechat(notification, notificationCustomer);
         }
 
@@ -52,6 +53,7 @@ public class NotificationWechatHandlerService {
      */
     private void sendWechat(final Notification anNotification, final NotificationCustomer anNotificationCustomer) {
         wechatService.sendWechatMessage(anNotificationCustomer.getOperId(), anNotification.getContent());
-        notificationCustomerService.saveNotificationCustomerStatus(anNotificationCustomer.getId(), NotificationConstants.SEND_STATUS_SUCCESS);
+        notificationCustomerService.saveNotificationCustomerStatus(anNotificationCustomer.getId(),
+                NotificationConstants.SEND_STATUS_SUCCESS);
     }
 }

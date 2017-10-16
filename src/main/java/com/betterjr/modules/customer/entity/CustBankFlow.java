@@ -24,208 +24,208 @@ public class CustBankFlow implements BetterjrEntity {
      * 编号
      */
     @Id
-    @Column(name = "ID",  columnDefinition="INTEGER" )
-    @MetaData( value="编号", comments = "编号")
+    @Column(name = "ID", columnDefinition = "INTEGER")
+    @MetaData(value = "编号", comments = "编号")
     private Long id;
 
     /**
      * 数据版本号
      */
     @JsonIgnore
-    @Column(name = "N_VERSION",  columnDefinition="INTEGER" )
-    @MetaData( value="数据版本号", comments = "数据版本号")
+    @Column(name = "N_VERSION", columnDefinition = "INTEGER")
+    @MetaData(value = "数据版本号", comments = "数据版本号")
     private Long version;
 
     /**
      * 银行流水号
      */
-    @Column(name = "C_REQUESTNO",  columnDefinition="VARCHAR" )
-    @MetaData( value="银行流水号", comments = "银行流水号")
+    @Column(name = "C_REQUESTNO", columnDefinition = "VARCHAR")
+    @MetaData(value = "银行流水号", comments = "银行流水号")
     private String requestNo;
 
     /**
      * 银行账户
      */
-    @Column(name = "C_BANK_ACCO",  columnDefinition="VARCHAR" )
-    @MetaData( value="银行账户", comments = "银行账户")
+    @Column(name = "C_BANK_ACCO", columnDefinition = "VARCHAR")
+    @MetaData(value = "银行账户", comments = "银行账户")
     private String bankAcco;
 
     /**
      * 银行全称
      */
-    @Column(name = "C_BANK_NAME",  columnDefinition="VARCHAR" )
-    @MetaData( value="银行全称", comments = "银行全称")
+    @Column(name = "C_BANK_NAME", columnDefinition = "VARCHAR")
+    @MetaData(value = "银行全称", comments = "银行全称")
     private String bankName;
 
     /**
      * 凭证代码
      */
-    @Column(name = "C_CERT_CODE",  columnDefinition="VARCHAR" )
-    @MetaData( value="凭证代码", comments = "凭证代码")
+    @Column(name = "C_CERT_CODE", columnDefinition = "VARCHAR")
+    @MetaData(value = "凭证代码", comments = "凭证代码")
     private String certCode;
 
     /**
      * 币种 CNY、HKD、USD、GBP、AED
      */
-    @Column(name = "C_CURRENCY",  columnDefinition="VARCHAR" )
-    @MetaData( value="币种 CNY、HKD、USD、GBP、AED", comments = "币种 CNY、HKD、USD、GBP、AED")
+    @Column(name = "C_CURRENCY", columnDefinition = "VARCHAR")
+    @MetaData(value = "币种 CNY、HKD、USD、GBP、AED", comments = "币种 CNY、HKD、USD、GBP、AED")
     private String currency;
 
     /**
      * 现/转(支付方式0现金 1转账)
      */
-    @Column(name = "C_PAY_TYPE",  columnDefinition="VARCHAR" )
-    @MetaData( value="现/转(支付方式0现金 1转账)", comments = "现/转(支付方式0现金 1转账)")
+    @Column(name = "C_PAY_TYPE", columnDefinition = "VARCHAR")
+    @MetaData(value = "现/转(支付方式0现金 1转账)", comments = "现/转(支付方式0现金 1转账)")
     private String payType;
 
     /**
      * 借方金额
      */
-    @Column(name = "F_DEBTOR_AMOUNT",  columnDefinition="DOUBLE" )
-    @MetaData( value="借方金额", comments = "借方金额")
+    @Column(name = "F_DEBTOR_AMOUNT", columnDefinition = "DOUBLE")
+    @MetaData(value = "借方金额", comments = "借方金额")
     private BigDecimal debtorAmount;
 
     /**
      * 贷方金额
      */
-    @Column(name = "F_LENDER_AMOUNT",  columnDefinition="DOUBLE" )
-    @MetaData( value="贷方金额", comments = "贷方金额")
+    @Column(name = "F_LENDER_AMOUNT", columnDefinition = "DOUBLE")
+    @MetaData(value = "贷方金额", comments = "贷方金额")
     private BigDecimal lenderAmount;
 
     /**
      * 账户余额
      */
-    @Column(name = "F_BALANCE",  columnDefinition="DOUBLE" )
-    @MetaData( value="账户余额", comments = "账户余额")
+    @Column(name = "F_BALANCE", columnDefinition = "DOUBLE")
+    @MetaData(value = "账户余额", comments = "账户余额")
     private BigDecimal balance;
 
     /**
      * 摘要
      */
-    @Column(name = "C_DESCRIPTION",  columnDefinition="VARCHAR" )
-    @MetaData( value="摘要", comments = "摘要")
+    @Column(name = "C_DESCRIPTION", columnDefinition = "VARCHAR")
+    @MetaData(value = "摘要", comments = "摘要")
     private String description;
 
     /**
      * 对方账号
      */
-    @Column(name = "C_TARGET_BANK_ACCO",  columnDefinition="VARCHAR" )
-    @MetaData( value="对方账号", comments = "对方账号")
+    @Column(name = "C_TARGET_BANK_ACCO", columnDefinition = "VARCHAR")
+    @MetaData(value = "对方账号", comments = "对方账号")
     private String targetBankAcco;
 
     /**
      * 对方户名
      */
-    @Column(name = "C_TARGET_BANK_ACCONAME",  columnDefinition="VARCHAR" )
-    @MetaData( value="对方户名", comments = "对方户名")
+    @Column(name = "C_TARGET_BANK_ACCONAME", columnDefinition = "VARCHAR")
+    @MetaData(value = "对方户名", comments = "对方户名")
     private String targetBankAccoName;
 
     /**
      * 对方银行
      */
-    @Column(name = "C_TARGET_BANK_NAME",  columnDefinition="VARCHAR" )
-    @MetaData( value="对方银行", comments = "对方银行")
+    @Column(name = "C_TARGET_BANK_NAME", columnDefinition = "VARCHAR")
+    @MetaData(value = "对方银行", comments = "对方银行")
     private String targetBankName;
 
     /**
      * 交易日期
      */
-    @Column(name = "D_DEAL_DATE",  columnDefinition="VARCHAR" )
-    @MetaData( value="交易日期", comments = "交易日期")
+    @Column(name = "D_DEAL_DATE", columnDefinition = "VARCHAR")
+    @MetaData(value = "交易日期", comments = "交易日期")
     private String dealDate;
 
     /**
      * 用途
      */
-    @Column(name = "C_PURPOSE",  columnDefinition="VARCHAR" )
-    @MetaData( value="用途", comments = "用途")
+    @Column(name = "C_PURPOSE", columnDefinition = "VARCHAR")
+    @MetaData(value = "用途", comments = "用途")
     private String purpose;
 
     /**
      * 创建人(操作员)ID号
      */
     @JsonIgnore
-    @Column(name = "L_REG_OPERID",  columnDefinition="INTEGER" )
-    @MetaData( value="创建人(操作员)ID号", comments = "创建人(操作员)ID号")
+    @Column(name = "L_REG_OPERID", columnDefinition = "INTEGER")
+    @MetaData(value = "创建人(操作员)ID号", comments = "创建人(操作员)ID号")
     private Long regOperId;
 
     /**
      * 创建人(操作员)姓名
      */
     @JsonIgnore
-    @Column(name = "C_REG_OPERNAME",  columnDefinition="VARCHAR" )
-    @MetaData( value="创建人(操作员)姓名", comments = "创建人(操作员)姓名")
+    @Column(name = "C_REG_OPERNAME", columnDefinition = "VARCHAR")
+    @MetaData(value = "创建人(操作员)姓名", comments = "创建人(操作员)姓名")
     private String regOperName;
 
     /**
      * 创建日期
      */
     @JsonIgnore
-    @Column(name = "D_REG_DATE",  columnDefinition="VARCHAR" )
-    @MetaData( value="创建日期", comments = "创建日期")
+    @Column(name = "D_REG_DATE", columnDefinition = "VARCHAR")
+    @MetaData(value = "创建日期", comments = "创建日期")
     private String regDate;
 
     /**
      * 创建时间
      */
     @JsonIgnore
-    @Column(name = "T_REG_TIME",  columnDefinition="VARCHAR" )
-    @MetaData( value="创建时间", comments = "创建时间")
+    @Column(name = "T_REG_TIME", columnDefinition = "VARCHAR")
+    @MetaData(value = "创建时间", comments = "创建时间")
     private String regTime;
 
     /**
      * 修改人(操作员)ID号
      */
     @JsonIgnore
-    @Column(name = "L_MODI_OPERID",  columnDefinition="INTEGER" )
-    @MetaData( value="修改人(操作员)ID号", comments = "修改人(操作员)ID号")
+    @Column(name = "L_MODI_OPERID", columnDefinition = "INTEGER")
+    @MetaData(value = "修改人(操作员)ID号", comments = "修改人(操作员)ID号")
     private Long modiOperId;
 
     /**
      * 修改人(操作员)姓名
      */
     @JsonIgnore
-    @Column(name = "C_MODI_OPERNAME",  columnDefinition="VARCHAR" )
-    @MetaData( value="修改人(操作员)姓名", comments = "修改人(操作员)姓名")
+    @Column(name = "C_MODI_OPERNAME", columnDefinition = "VARCHAR")
+    @MetaData(value = "修改人(操作员)姓名", comments = "修改人(操作员)姓名")
     private String modiOperName;
 
     /**
      * 修改日期
      */
     @JsonIgnore
-    @Column(name = "D_MODI_DATE",  columnDefinition="VARCHAR" )
-    @MetaData( value="修改日期", comments = "修改日期")
+    @Column(name = "D_MODI_DATE", columnDefinition = "VARCHAR")
+    @MetaData(value = "修改日期", comments = "修改日期")
     private String modiDate;
 
     /**
      * 修改时间
      */
     @JsonIgnore
-    @Column(name = "T_MODI_TIME",  columnDefinition="VARCHAR" )
-    @MetaData( value="修改时间", comments = "修改时间")
+    @Column(name = "T_MODI_TIME", columnDefinition = "VARCHAR")
+    @MetaData(value = "修改时间", comments = "修改时间")
     private String modiTime;
 
     /**
      * 操作机构
      */
     @JsonIgnore
-    @Column(name = "C_OPERORG",  columnDefinition="VARCHAR" )
-    @MetaData( value="操作机构", comments = "操作机构")
+    @Column(name = "C_OPERORG", columnDefinition = "VARCHAR")
+    @MetaData(value = "操作机构", comments = "操作机构")
     private String operOrg;
 
-    @Column(name = "C_BUSIN_STATUS",  columnDefinition="CHAR" )
-    @MetaData( value="", comments = "")
+    @Column(name = "C_BUSIN_STATUS", columnDefinition = "CHAR")
+    @MetaData(value = "", comments = "")
     private String businStatus;
 
-    @Column(name = "C_LAST_STATUS",  columnDefinition="CHAR" )
-    @MetaData( value="", comments = "")
+    @Column(name = "C_LAST_STATUS", columnDefinition = "CHAR")
+    @MetaData(value = "", comments = "")
     private String lastStatus;
 
     /**
      * 客户编号
      */
-    @Column(name = "L_CUSTNO",  columnDefinition="INTEGER" )
-    @MetaData( value="客户编号", comments = "客户编号")
+    @Column(name = "L_CUSTNO", columnDefinition = "INTEGER")
+    @MetaData(value = "客户编号", comments = "客户编号")
     private Long custNo;
 
     private static final long serialVersionUID = 1468812783840L;
@@ -515,34 +515,61 @@ public class CustBankFlow implements BetterjrEntity {
         }
         CustBankFlow other = (CustBankFlow) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-            && (this.getVersion() == null ? other.getVersion() == null : this.getVersion().equals(other.getVersion()))
-            && (this.getRequestNo() == null ? other.getRequestNo() == null : this.getRequestNo().equals(other.getRequestNo()))
-            && (this.getBankAcco() == null ? other.getBankAcco() == null : this.getBankAcco().equals(other.getBankAcco()))
-            && (this.getBankName() == null ? other.getBankName() == null : this.getBankName().equals(other.getBankName()))
-            && (this.getCertCode() == null ? other.getCertCode() == null : this.getCertCode().equals(other.getCertCode()))
-            && (this.getCurrency() == null ? other.getCurrency() == null : this.getCurrency().equals(other.getCurrency()))
-            && (this.getPayType() == null ? other.getPayType() == null : this.getPayType().equals(other.getPayType()))
-            && (this.getDebtorAmount() == null ? other.getDebtorAmount() == null : this.getDebtorAmount().equals(other.getDebtorAmount()))
-            && (this.getLenderAmount() == null ? other.getLenderAmount() == null : this.getLenderAmount().equals(other.getLenderAmount()))
-            && (this.getBalance() == null ? other.getBalance() == null : this.getBalance().equals(other.getBalance()))
-            && (this.getDescription() == null ? other.getDescription() == null : this.getDescription().equals(other.getDescription()))
-            && (this.getTargetBankAcco() == null ? other.getTargetBankAcco() == null : this.getTargetBankAcco().equals(other.getTargetBankAcco()))
-            && (this.getTargetBankAccoName() == null ? other.getTargetBankAccoName() == null : this.getTargetBankAccoName().equals(other.getTargetBankAccoName()))
-            && (this.getTargetBankName() == null ? other.getTargetBankName() == null : this.getTargetBankName().equals(other.getTargetBankName()))
-            && (this.getDealDate() == null ? other.getDealDate() == null : this.getDealDate().equals(other.getDealDate()))
-            && (this.getPurpose() == null ? other.getPurpose() == null : this.getPurpose().equals(other.getPurpose()))
-            && (this.getRegOperId() == null ? other.getRegOperId() == null : this.getRegOperId().equals(other.getRegOperId()))
-            && (this.getRegOperName() == null ? other.getRegOperName() == null : this.getRegOperName().equals(other.getRegOperName()))
-            && (this.getRegDate() == null ? other.getRegDate() == null : this.getRegDate().equals(other.getRegDate()))
-            && (this.getRegTime() == null ? other.getRegTime() == null : this.getRegTime().equals(other.getRegTime()))
-            && (this.getModiOperId() == null ? other.getModiOperId() == null : this.getModiOperId().equals(other.getModiOperId()))
-            && (this.getModiOperName() == null ? other.getModiOperName() == null : this.getModiOperName().equals(other.getModiOperName()))
-            && (this.getModiDate() == null ? other.getModiDate() == null : this.getModiDate().equals(other.getModiDate()))
-            && (this.getModiTime() == null ? other.getModiTime() == null : this.getModiTime().equals(other.getModiTime()))
-            && (this.getOperOrg() == null ? other.getOperOrg() == null : this.getOperOrg().equals(other.getOperOrg()))
-            && (this.getBusinStatus() == null ? other.getBusinStatus() == null : this.getBusinStatus().equals(other.getBusinStatus()))
-            && (this.getLastStatus() == null ? other.getLastStatus() == null : this.getLastStatus().equals(other.getLastStatus()))
-            && (this.getCustNo() == null ? other.getCustNo() == null : this.getCustNo().equals(other.getCustNo()));
+                && (this.getVersion() == null ? other.getVersion() == null
+                        : this.getVersion().equals(other.getVersion()))
+                && (this.getRequestNo() == null ? other.getRequestNo() == null
+                        : this.getRequestNo().equals(other.getRequestNo()))
+                && (this.getBankAcco() == null ? other.getBankAcco() == null
+                        : this.getBankAcco().equals(other.getBankAcco()))
+                && (this.getBankName() == null ? other.getBankName() == null
+                        : this.getBankName().equals(other.getBankName()))
+                && (this.getCertCode() == null ? other.getCertCode() == null
+                        : this.getCertCode().equals(other.getCertCode()))
+                && (this.getCurrency() == null ? other.getCurrency() == null
+                        : this.getCurrency().equals(other.getCurrency()))
+                && (this.getPayType() == null ? other.getPayType() == null
+                        : this.getPayType().equals(other.getPayType()))
+                && (this.getDebtorAmount() == null ? other.getDebtorAmount() == null
+                        : this.getDebtorAmount().equals(other.getDebtorAmount()))
+                && (this.getLenderAmount() == null ? other.getLenderAmount() == null
+                        : this.getLenderAmount().equals(other.getLenderAmount()))
+                && (this.getBalance() == null ? other.getBalance() == null
+                        : this.getBalance().equals(other.getBalance()))
+                && (this.getDescription() == null ? other.getDescription() == null
+                        : this.getDescription().equals(other.getDescription()))
+                && (this.getTargetBankAcco() == null ? other.getTargetBankAcco() == null
+                        : this.getTargetBankAcco().equals(other.getTargetBankAcco()))
+                && (this.getTargetBankAccoName() == null ? other.getTargetBankAccoName() == null
+                        : this.getTargetBankAccoName().equals(other.getTargetBankAccoName()))
+                && (this.getTargetBankName() == null ? other.getTargetBankName() == null
+                        : this.getTargetBankName().equals(other.getTargetBankName()))
+                && (this.getDealDate() == null ? other.getDealDate() == null
+                        : this.getDealDate().equals(other.getDealDate()))
+                && (this.getPurpose() == null ? other.getPurpose() == null
+                        : this.getPurpose().equals(other.getPurpose()))
+                && (this.getRegOperId() == null ? other.getRegOperId() == null
+                        : this.getRegOperId().equals(other.getRegOperId()))
+                && (this.getRegOperName() == null ? other.getRegOperName() == null
+                        : this.getRegOperName().equals(other.getRegOperName()))
+                && (this.getRegDate() == null ? other.getRegDate() == null
+                        : this.getRegDate().equals(other.getRegDate()))
+                && (this.getRegTime() == null ? other.getRegTime() == null
+                        : this.getRegTime().equals(other.getRegTime()))
+                && (this.getModiOperId() == null ? other.getModiOperId() == null
+                        : this.getModiOperId().equals(other.getModiOperId()))
+                && (this.getModiOperName() == null ? other.getModiOperName() == null
+                        : this.getModiOperName().equals(other.getModiOperName()))
+                && (this.getModiDate() == null ? other.getModiDate() == null
+                        : this.getModiDate().equals(other.getModiDate()))
+                && (this.getModiTime() == null ? other.getModiTime() == null
+                        : this.getModiTime().equals(other.getModiTime()))
+                && (this.getOperOrg() == null ? other.getOperOrg() == null
+                        : this.getOperOrg().equals(other.getOperOrg()))
+                && (this.getBusinStatus() == null ? other.getBusinStatus() == null
+                        : this.getBusinStatus().equals(other.getBusinStatus()))
+                && (this.getLastStatus() == null ? other.getLastStatus() == null
+                        : this.getLastStatus().equals(other.getLastStatus()))
+                && (this.getCustNo() == null ? other.getCustNo() == null : this.getCustNo().equals(other.getCustNo()));
     }
 
     @Override
@@ -580,32 +607,32 @@ public class CustBankFlow implements BetterjrEntity {
         result = prime * result + ((getCustNo() == null) ? 0 : getCustNo().hashCode());
         return result;
     }
-    
+
     public void initAddValue() {
         this.id = SerialGenerator.getLongValue("CustBankFlow.id");
-        
+
         this.regOperId = UserUtils.getOperatorInfo().getId();
         this.regOperName = UserUtils.getOperatorInfo().getName();
         this.regDate = BetterDateUtils.getNumDate();
         this.regTime = BetterDateUtils.getNumTime();
-        
+
         this.modiOperId = UserUtils.getOperatorInfo().getId();
         this.modiOperName = UserUtils.getOperatorInfo().getName();
         this.modiDate = BetterDateUtils.getNumDate();
         this.modiTime = BetterDateUtils.getNumTime();
-        
+
         this.operOrg = UserUtils.getOperatorInfo().getOperOrg();
         this.businStatus = "0";
     }
 
     public void initModifyValue(final CustBankFlow anCustBankFlow) {
         this.id = anCustBankFlow.getId();
-/*
+        /*
         this.regOperId = anCustMechBaseTmp.getRegOperId();
         this.regOperName = anCustMechBaseTmp.getRegOperName();
         this.regDate = anCustMechBaseTmp.getRegDate();
         this.regTime = anCustMechBaseTmp.getRegTime();
-*/
+        */
         this.modiOperId = UserUtils.getOperatorInfo().getId();
         this.modiOperName = UserUtils.getOperatorInfo().getName();
         this.modiDate = BetterDateUtils.getNumDate();

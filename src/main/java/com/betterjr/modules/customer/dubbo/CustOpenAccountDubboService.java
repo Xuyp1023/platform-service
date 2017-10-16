@@ -45,7 +45,9 @@ public class CustOpenAccountDubboService implements ICustOpenAccountService {
 
         final CustOpenAccountTmp anOpenAccountInfo = (CustOpenAccountTmp) RuleServiceDubboFilterInvoker.getInputObj();
 
-        return AjaxObject.newOk("开户资料暂存成功", custOpenAccountTmpService.saveOpenAccountInfo(anOpenAccountInfo, anId, anFileList)).toJson();
+        return AjaxObject
+                .newOk("开户资料暂存成功", custOpenAccountTmpService.saveOpenAccountInfo(anOpenAccountInfo, anId, anFileList))
+                .toJson();
     }
 
     @Override
@@ -53,40 +55,47 @@ public class CustOpenAccountDubboService implements ICustOpenAccountService {
 
         final CustOpenAccountTmp anOpenAccountInfo = (CustOpenAccountTmp) RuleServiceDubboFilterInvoker.getInputObj();
 
-        return AjaxObject.newOk("开户申请提交成功", custOpenAccountTmpService.saveOpenAccountApply(anOpenAccountInfo, anId, anFileList)).toJson();
+        return AjaxObject
+                .newOk("开户申请提交成功", custOpenAccountTmpService.saveOpenAccountApply(anOpenAccountInfo, anId, anFileList))
+                .toJson();
     }
 
     @Override
     public String webQueryOpenAccountApply(final String anFlag, final int anPageNum, final int anPageSize) {
 
-        return AjaxObject.newOkWithPage("开户申请待审批列表查询成功", custOpenAccountTmpService.queryOpenAccountApply(anFlag, anPageNum, anPageSize)).toJson();
+        return AjaxObject.newOkWithPage("开户申请待审批列表查询成功",
+                custOpenAccountTmpService.queryOpenAccountApply(anFlag, anPageNum, anPageSize)).toJson();
     }
 
     @Override
     public String webSaveAuditOpenAccountApply(final Long anId, final String anAuditOpinion) {
 
-        return AjaxObject.newOk("开户审核生效", custOpenAccountTmpService.saveAuditOpenAccountApply(anId, anAuditOpinion)).toJson();
+        return AjaxObject.newOk("开户审核生效", custOpenAccountTmpService.saveAuditOpenAccountApply(anId, anAuditOpinion))
+                .toJson();
     }
 
     @Override
     public String webSaveRefuseOpenAccountApply(final Long anId, final String anAuditOpinion) {
 
-        return AjaxObject.newOk("开户申请驳回", custOpenAccountTmpService.saveRefuseOpenAccountApply(anId, anAuditOpinion)).toJson();
+        return AjaxObject.newOk("开户申请驳回", custOpenAccountTmpService.saveRefuseOpenAccountApply(anId, anAuditOpinion))
+                .toJson();
     }
 
     @Override
-    public String webSaveOpenAccountInfoByInstead(final Map<String, Object> anMap, final Long anInsteadRecordId, final String anFileList) {
+    public String webSaveOpenAccountInfoByInstead(final Map<String, Object> anMap, final Long anInsteadRecordId,
+            final String anFileList) {
 
         final CustOpenAccountTmp anOpenAccountInfo = (CustOpenAccountTmp) RuleServiceDubboFilterInvoker.getInputObj();
 
-        return AjaxObject.newOk("代录开户资料提交成功", custOpenAccountTmpService.saveOpenAccountInfoByInstead(anOpenAccountInfo, anInsteadRecordId, anFileList))
-                .toJson();
+        return AjaxObject.newOk("代录开户资料提交成功", custOpenAccountTmpService.saveOpenAccountInfoByInstead(anOpenAccountInfo,
+                anInsteadRecordId, anFileList)).toJson();
     }
 
     @Override
     public String webFindOpenAccountInfoByInsteadId(final Long anInsteadId) {
 
-        return AjaxObject.newOk("代录开户资料读取成功", custOpenAccountTmpService.findOpenAccountInfoByInsteadId(anInsteadId)).toJson();
+        return AjaxObject.newOk("代录开户资料读取成功", custOpenAccountTmpService.findOpenAccountInfoByInsteadId(anInsteadId))
+                .toJson();
     }
 
     @Override
@@ -98,50 +107,63 @@ public class CustOpenAccountDubboService implements ICustOpenAccountService {
     @Override
     public String webQueryAuditWorkflowById(final Long anOpenAccountId) {
 
-        return AjaxObject.newOk("开户审批流程查询成功", custOpenAccountAuditService.queryAuditWorkflowById(anOpenAccountId)).toJson();
+        return AjaxObject.newOk("开户审批流程查询成功", custOpenAccountAuditService.queryAuditWorkflowById(anOpenAccountId))
+                .toJson();
     }
 
     @Override
-    public Map<String, Object> findOpenTempAccountInfo(final Long anCustNo){
+    public Map<String, Object> findOpenTempAccountInfo(final Long anCustNo) {
 
         return custOpenAccountTmpService.findOpenTempAccountInfo(anCustNo);
     }
 
     @Override
     public String webCheckCustExistsByCustName(final String anCustName) {
-        return AjaxObject.newOk("检查申请机构名称是否存在成功", custOpenAccountTmpService.checkCustExistsByCustName(anCustName) ? "1" : "0").toJson();
+        return AjaxObject
+                .newOk("检查申请机构名称是否存在成功", custOpenAccountTmpService.checkCustExistsByCustName(anCustName) ? "1" : "0")
+                .toJson();
     }
 
     @Override
     public String webCheckCustExistsByIdentNo(final String anIdentNo) {
-        return AjaxObject.newOk("检查组织机构代码证是否存在", custOpenAccountTmpService.checkCustExistsByOrgCode(anIdentNo) ? "1" : "0").toJson();
+        return AjaxObject
+                .newOk("检查组织机构代码证是否存在", custOpenAccountTmpService.checkCustExistsByOrgCode(anIdentNo) ? "1" : "0")
+                .toJson();
     }
 
     @Override
     public String webCheckCustExistsByBusinLicence(final String anBusinLicence) {
-        return AjaxObject.newOk("检查营业执照号码是否存在", custOpenAccountTmpService.checkCustExistsByBusinLicence(anBusinLicence) ? "1" : "0").toJson();
+        return AjaxObject.newOk("检查营业执照号码是否存在",
+                custOpenAccountTmpService.checkCustExistsByBusinLicence(anBusinLicence) ? "1" : "0").toJson();
     }
 
     @Override
     public String webCheckCustExistsByBankAccount(final String anBankAccount) {
-        return AjaxObject.newOk("检查银行账号是否存在", custOpenAccountTmpService.checkCustExistsByBankAccount(anBankAccount) ? "1" : "0").toJson();
+        return AjaxObject
+                .newOk("检查银行账号是否存在", custOpenAccountTmpService.checkCustExistsByBankAccount(anBankAccount) ? "1" : "0")
+                .toJson();
     }
 
     @Override
     public String webCheckCustExistsByEmail(final String anEmail) {
-        return AjaxObject.newOk("检查电子邮箱是否存在", custOpenAccountTmpService.checkCustExistsByEmail(anEmail) ? "1" : "0").toJson();
+        return AjaxObject.newOk("检查电子邮箱是否存在", custOpenAccountTmpService.checkCustExistsByEmail(anEmail) ? "1" : "0")
+                .toJson();
     }
 
     @Override
     public String webCheckCustExistsByMobileNo(final String anMobileNo) {
-        return AjaxObject.newOk("检查手机号码是否存在", custOpenAccountTmpService.checkCustExistsByMobileNo(anMobileNo) ? "1" : "0").toJson();
+        return AjaxObject
+                .newOk("检查手机号码是否存在", custOpenAccountTmpService.checkCustExistsByMobileNo(anMobileNo) ? "1" : "0")
+                .toJson();
     }
 
     @Override
-    public String webSaveOpenAccountApplySubmit(final Map<String, Object> anMap, final Long anOperId, final String anFileList) {
+    public String webSaveOpenAccountApplySubmit(final Map<String, Object> anMap, final Long anOperId,
+            final String anFileList) {
         final CustOpenAccountTmp anOpenAccountInfo = (CustOpenAccountTmp) RuleServiceDubboFilterInvoker.getInputObj();
         try {
-            final CustOpenAccountTmp info = custOpenAccountTmpService.saveOpenAccountApplySubmit(anOpenAccountInfo, anOperId, anFileList);
+            final CustOpenAccountTmp info = custOpenAccountTmpService.saveOpenAccountApplySubmit(anOpenAccountInfo,
+                    anOperId, anFileList);
             return AjaxObject.newOk("提交成功", info).toJson();
         }
         catch (final Exception e) {
@@ -219,7 +241,8 @@ public class CustOpenAccountDubboService implements ICustOpenAccountService {
 
     @Override
     public String webQueryCustInfoByPlatform(final String anFlag, final int anPageNum, final int anPageSize) {
-        return AjaxObject.newOkWithPage("平台查询客户信息成功", custOpenAccountTmpService.queryCustInfoByPlatform(anFlag, anPageNum, anPageSize)).toJson();
+        return AjaxObject.newOkWithPage("平台查询客户信息成功",
+                custOpenAccountTmpService.queryCustInfoByPlatform(anFlag, anPageNum, anPageSize)).toJson();
     }
 
     /* (non-Javadoc)
@@ -227,6 +250,6 @@ public class CustOpenAccountDubboService implements ICustOpenAccountService {
      */
     @Override
     public String webCustInfoByPlatformSelect() {
-        return  AjaxObject.newOk("平台查询客户信息成功", custOpenAccountTmpService.queryCustInfoByPlatformSelect()).toJson();
+        return AjaxObject.newOk("平台查询客户信息成功", custOpenAccountTmpService.queryCustInfoByPlatformSelect()).toJson();
     }
 }

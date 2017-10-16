@@ -49,7 +49,7 @@ public class CustMechBaseService extends BaseService<CustMechBaseMapper, CustMec
 
     @Resource
     private CustInfoRoleService custInfoRoleService;
-    
+
     /**
      * 公司基本信息-查询详情
      *
@@ -109,7 +109,8 @@ public class CustMechBaseService extends BaseService<CustMechBaseMapper, CustMec
         BTAssert.isNull(tempCustMechBase, "客户基本信息已存在，不允许重复录入！");
 
         final CustInfo custInfo = accountService.selectByPrimaryKey(anCustNo);
-        anCustMechBase.initAddValue(anCustNo, custInfo.getCustName(), custInfo.getRegOperId(), custInfo.getRegOperName(), custInfo.getOperOrg());
+        anCustMechBase.initAddValue(anCustNo, custInfo.getCustName(), custInfo.getRegOperId(),
+                custInfo.getRegOperName(), custInfo.getOperOrg());
         this.insert(anCustMechBase);
 
         // 建立初始流水
@@ -139,7 +140,8 @@ public class CustMechBaseService extends BaseService<CustMechBaseMapper, CustMec
         custInfos = custInfoRoleService.custInfoFilter(custInfos);
         final Collection<SimpleDataEntity> custInfoSelects = new ArrayList<>();
 
-        custInfos.forEach(custInfo -> custInfoSelects.add(new SimpleDataEntity(custInfo.getCustName(), String.valueOf(custInfo.getCustNo()))));
+        custInfos.forEach(custInfo -> custInfoSelects
+                .add(new SimpleDataEntity(custInfo.getCustName(), String.valueOf(custInfo.getCustNo()))));
 
         return custInfoSelects;
     }

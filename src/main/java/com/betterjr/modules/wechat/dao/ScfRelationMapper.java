@@ -5,5 +5,4 @@ import com.betterjr.mapper.common.Mapper;
 import com.betterjr.modules.wechat.entity.ScfRelation;
 
 @BetterjrMapper
-public interface ScfRelationMapper extends Mapper<ScfRelation> {
-}
+public interface ScfRelationMapper extends Mapper<ScfRelation> {}

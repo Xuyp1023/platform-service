@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +53,8 @@ public class CustFileAuditService extends BaseService<CustFileAduitMapper, CustF
      * 
      * @param request
      */
-    public void updateCustFileAuditInfo(final Map<String, String[]> anParamMap, final Enumeration<String> anParamNames, final Long anCustNo) {
+    public void updateCustFileAuditInfo(final Map<String, String[]> anParamMap, final Enumeration<String> anParamNames,
+            final Long anCustNo) {
         logger.info("Begin to update customer file audit information.");
         logger.debug("Get param map:" + anParamMap);
         final Map<String, String> numMap = getTypeNumber(anParamMap, anParamNames);
@@ -72,8 +74,7 @@ public class CustFileAuditService extends BaseService<CustFileAduitMapper, CustF
                     logger.debug("insert new audit information:" + fileAudit.toString());
                     this.insert(fileAudit);
                 }
-            }
-            else {
+            } else {
                 if (!dbAuditInfo.getAuditStatus().equals("0")) {
                     logger.error("Customer:" + anCustNo + " type:" + type + " can't modify for status.");
                     continue;
@@ -82,8 +83,7 @@ public class CustFileAuditService extends BaseService<CustFileAduitMapper, CustF
                 if (fileAudit.getFileCount() == 0) {
                     logger.debug("delete audit information:" + fileAudit.toString());
                     this.deleteByPrimaryKey(fileAudit.getId());
-                }
-                else {
+                } else {
                     logger.debug("update audit information:" + fileAudit.toString());
                     this.updateByPrimaryKey(fileAudit);
                 }
@@ -129,14 +129,15 @@ public class CustFileAuditService extends BaseService<CustFileAduitMapper, CustF
      * @param custNo
      * @return
      */
-    private List<CustFileAduit> getUploadFileAuditInfo(final Map<String, String[]> paramMap, final Map<String, String> numMap, final Long custNo) {
+    private List<CustFileAduit> getUploadFileAuditInfo(final Map<String, String[]> paramMap,
+            final Map<String, String> numMap, final Long custNo) {
         logger.info("Begin to get upload file audit information to customer:" + custNo);
         final List<CustFileAduit> fileAuditInfos = new ArrayList<CustFileAduit>();
         final List<AuthorFileGroup> fileGroups = authorFileGroupService.findCustFileGroupList();
         for (final AuthorFileGroup fileGroup : fileGroups) {
             final String fileInfoType = fileGroup.getFileInfoType();
             final String number = numMap.get(fileInfoType);
-            if (BetterStringUtils.isBlank(number)) {
+            if (StringUtils.isBlank(number)) {
                 logger.error("请求参数中无类型为" + fileInfoType + "的数据");
                 continue;
                 // throw new BytterTradeException(40001, "认证资料不全，请检查。");
@@ -146,7 +147,7 @@ public class CustFileAuditService extends BaseService<CustFileAduitMapper, CustF
             logger.debug("type:" + fileInfoType + " id:" + itemIds);
             final String[] itArray = itemIds.split(",");
             int count = itArray.length;
-            if (BetterStringUtils.isBlank(itemIds)) {
+            if (StringUtils.isBlank(itemIds)) {
                 logger.debug("Customer:" + custNo + " file type:" + fileInfoType + " don't have audit file upload.");
                 count = 0;
             }
@@ -193,11 +194,12 @@ public class CustFileAuditService extends BaseService<CustFileAduitMapper, CustF
      * @param dbFileItems
      * @param currentIds
      */
-    private void getDelFileItemIds(final List<Long> delItemIds, final List<CustFileItem> dbFileItems, final String[] currentIds) {
+    private void getDelFileItemIds(final List<Long> delItemIds, final List<CustFileItem> dbFileItems,
+            final String[] currentIds) {
         for (final CustFileItem item : dbFileItems) {
             boolean isExist = false;
             for (final String currentID : currentIds) {
-                if (BetterStringUtils.isBlank(currentID)) {
+                if (StringUtils.isBlank(currentID)) {
                     continue;
                 }
                 if (currentID.equals(item.getId().toString())) {
@@ -221,7 +223,7 @@ public class CustFileAuditService extends BaseService<CustFileAduitMapper, CustF
     private List<Long> getAddFileItemIds(final List<CustFileItem> dbFileItems, final String[] currentIds) {
         final List<Long> addItemIds = new ArrayList<Long>();
         for (final String currentID : currentIds) {
-            if (BetterStringUtils.isBlank(currentID)) {
+            if (StringUtils.isBlank(currentID)) {
                 continue;
             }
             boolean isExist = false;
@@ -245,7 +247,8 @@ public class CustFileAuditService extends BaseService<CustFileAduitMapper, CustF
      * @param paramNames
      * @return Map<workType, number>
      */
-    private Map<String, String> getTypeNumber(final Map<String, String[]> paramMap, final Enumeration<String> paramNames) {
+    private Map<String, String> getTypeNumber(final Map<String, String[]> paramMap,
+            final Enumeration<String> paramNames) {
         final Map<String, String> numMap = new HashMap<String, String>();
         while (paramNames.hasMoreElements()) {
             final String paramName = paramNames.nextElement();
@@ -325,12 +328,14 @@ public class CustFileAuditService extends BaseService<CustFileAduitMapper, CustF
      *            业务类型
      * @return
      */
-    public Set<String> findDeficiencyFileInfoList(final Long anCustNo, final String anAgencyNos, final String anBusinFlag) {
+    public Set<String> findDeficiencyFileInfoList(final Long anCustNo, final String anAgencyNos,
+            final String anBusinFlag) {
         final Set<String> noticeMsg = new HashSet<String>();
-        if (BetterStringUtils.isNotBlank(anAgencyNos)) {
-            final List<AgencyAuthorFileGroup> agencyFileGroupList = this.agencyAuthFileGroupService.findAuthorFileGroup(anAgencyNos.split(","),
-                    anBusinFlag);
-            final Map<String, CustFileAduit> custAduitFileMap = ReflectionUtils.listConvertToMap(findCustFileInfo(anCustNo, null), "workType");
+        if (StringUtils.isNotBlank(anAgencyNos)) {
+            final List<AgencyAuthorFileGroup> agencyFileGroupList = this.agencyAuthFileGroupService
+                    .findAuthorFileGroup(anAgencyNos.split(","), anBusinFlag);
+            final Map<String, CustFileAduit> custAduitFileMap = ReflectionUtils
+                    .listConvertToMap(findCustFileInfo(anCustNo, null), "workType");
             final Map<String, AuthorFileGroup> allAuthorFile = authorFileGroupService.findAllFileGroup();
             AuthorFileGroup tmpFileGroup;
             for (final AgencyAuthorFileGroup authorFileGroup : agencyFileGroupList) {
@@ -366,8 +371,7 @@ public class CustFileAuditService extends BaseService<CustFileAduitMapper, CustF
         final CustFileItem custFileItem = custFileItemService.findOne(anId);
         if (custFileItem != null) {
             return this.deleteByPrimaryKey(custFileItem.getBatchNo()) > 0;
-        }
-        else {
+        } else {
             return false;
         }
     }
@@ -386,10 +390,12 @@ public class CustFileAuditService extends BaseService<CustFileAduitMapper, CustF
         anMap.put("aduitCustNo", anRelateCustNo);
         anMap.put("auditStatus", "1");
         for (final CustFileAduit custFileAduit : this.selectByProperty(anMap)) {
-            final CustFileItem custFileItem = custFileItemService.findOneByBatchNo(custFileAduit.getId(), custFileAduit.getWorkType());
+            final CustFileItem custFileItem = custFileItemService.findOneByBatchNo(custFileAduit.getId(),
+                    custFileAduit.getWorkType());
             if (custFileItem != null) {
                 custFileItem.setBusinStatus("1");
-                custFileItem.setFileDescription(agencyAuthFileGroupService.findAuthFileGroup(custFileItem.getFileInfoType()).getDescription());
+                custFileItem.setFileDescription(
+                        agencyAuthFileGroupService.findAuthFileGroup(custFileItem.getFileInfoType()).getDescription());
                 custFileItemList.add(custFileItem);
             }
         }
@@ -410,7 +416,8 @@ public class CustFileAuditService extends BaseService<CustFileAduitMapper, CustF
         final Map<String, AtomicInteger> tmpMap = new HashMap();
         final CustFileItem workItem = Collections3.getFirst(fileItemList);
         if (workItem == null) {
-            logger.warn("savePlatformAdduitFile anCustNo = " + anCustNo + ",  anBatchNo = " + anBatchNo + ", not find FileItemInfo");
+            logger.warn("savePlatformAdduitFile anCustNo = " + anCustNo + ",  anBatchNo = " + anBatchNo
+                    + ", not find FileItemInfo");
             return;
         }
 
@@ -419,8 +426,7 @@ public class CustFileAuditService extends BaseService<CustFileAduitMapper, CustF
             workCount = tmpMap.get(fileItem.getFileInfoType());
             if (workCount == null) {
                 tmpMap.put(fileItem.getFileInfoType(), new AtomicInteger(1));
-            }
-            else {
+            } else {
                 workCount.incrementAndGet();
             }
         }
@@ -433,8 +439,7 @@ public class CustFileAuditService extends BaseService<CustFileAduitMapper, CustF
             final CustInfo custInfo = UserUtils.getDefCustInfo();
             if (custInfo != null) {
                 tmpFileAduitInfo.setAduitCustNo(custInfo.getCustNo());
-            }
-            else {
+            } else {
                 tmpFileAduitInfo.setAduitCustNo(0L);
             }
             tmpFileAduitInfo.setRegDate(workItem.getRegDate());
@@ -450,7 +455,8 @@ public class CustFileAuditService extends BaseService<CustFileAduitMapper, CustF
      * @param anFileType
      */
     private void destroyOldFileAduit(final Long anCustNo, final String anFileType) {
-        final Map<String, Object> termMap = QueryTermBuilder.newInstance().put("custNo", anCustNo).put("workType", anFileType).build();
+        final Map<String, Object> termMap = QueryTermBuilder.newInstance().put("custNo", anCustNo)
+                .put("workType", anFileType).build();
         for (CustFileAduit fileAduit : this.selectByProperty(termMap)) {
             fileAduit = CustFileAduit.destroyFileAuditInfo(fileAduit);
             this.updateByPrimaryKey(fileAduit);

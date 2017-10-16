@@ -1,6 +1,5 @@
 package com.betterjr.modules.workflow.snaker.model;
 
-
 import org.snaker.engine.model.NodeModel;
 import org.snaker.engine.parser.impl.TaskParser;
 import org.w3c.dom.Element;
@@ -12,10 +11,11 @@ import org.w3c.dom.Element;
  */
 public class ExtTaskParser extends TaskParser {
     private static final String ATTR_ASSIGNEEDISPLAY = "assigneeDisplay";
+
     @Override
     protected void parseNode(NodeModel node, Element element) {
         super.parseNode(node, element);
-        ExtTaskModel task = (ExtTaskModel)node;
+        ExtTaskModel task = (ExtTaskModel) node;
         task.setAssigneeDisplay(element.getAttribute(ATTR_ASSIGNEEDISPLAY));
     }
 

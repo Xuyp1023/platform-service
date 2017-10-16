@@ -13,7 +13,7 @@ import com.betterjr.modules.wechat.service.WeChatCustEnrollService;
 
 @Service(interfaceClass = IWeChatCustEnrollService.class)
 public class WeChatCustEnrollDubboService implements IWeChatCustEnrollService {
-    
+
     @Autowired
     private WeChatCustEnrollService weChatCustEnrollService;
 
@@ -24,10 +24,12 @@ public class WeChatCustEnrollDubboService implements IWeChatCustEnrollService {
 
     @Override
     public String webAddCustEnroll(Map<String, Object> anMap, String anOpenId, String anFileList) {
-        
+
         CustTempEnrollInfo anCustTempEnrollInfo = (CustTempEnrollInfo) RuleServiceDubboFilterInvoker.getInputObj();
-        
-        return AjaxObject.newOk("开户成功", weChatCustEnrollService.addCustEnroll(anCustTempEnrollInfo, anOpenId, anFileList)).toJson();
+
+        return AjaxObject
+                .newOk("开户成功", weChatCustEnrollService.addCustEnroll(anCustTempEnrollInfo, anOpenId, anFileList))
+                .toJson();
     }
 
 }

@@ -8,11 +8,11 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
-import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.mapper.pagehelper.Page;
@@ -48,7 +48,7 @@ public class NotificationProfileService extends BaseService<NotificationProfileM
         BTAssert.notNull(anProfileName, "模板名称不允许为空!");
         BTAssert.notNull(anCustNo, "客户编号不允许为空!");
 
-        //BTAssert.isTrue(UserUtils.containsCustNo(anCustNo), "此操作员不具备访问此公司权限！");
+        // BTAssert.isTrue(UserUtils.containsCustNo(anCustNo), "此操作员不具备访问此公司权限！");
 
         final Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("profileName", anProfileName);
@@ -65,24 +65,25 @@ public class NotificationProfileService extends BaseService<NotificationProfileM
         return profile;
     }
 
-    public NotificationProfile findDefaultProfileByProfileNameAndCustNo(final String anProfileName, final Long anCustNo) {
+    public NotificationProfile findDefaultProfileByProfileNameAndCustNo(final String anProfileName,
+            final Long anCustNo) {
         BTAssert.notNull(anProfileName, "模板名称不允许为空!");
         BTAssert.notNull(anCustNo, "客户编号不允许为空!");
 
-        //BTAssert.isTrue(UserUtils.containsCustNo(anCustNo), "此操作员不具备访问此公司权限！");
+        // BTAssert.isTrue(UserUtils.containsCustNo(anCustNo), "此操作员不具备访问此公司权限！");
 
         final List<String> rules = getCustRulesByCustNo(anCustNo); // 公司类型
 
         final Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("profileName", anProfileName);
-        conditionMap.put("LTid", 0);                    // 编号小于0
-        conditionMap.put("NEcustom", NotificationConstants.PROFILE_CUSTOM);              // NotEqual非custom
-        conditionMap.put("profileRule", rules);         // 公司类型需要匹配
+        conditionMap.put("LTid", 0); // 编号小于0
+        conditionMap.put("NEcustom", NotificationConstants.PROFILE_CUSTOM); // NotEqual非custom
+        conditionMap.put("profileRule", rules); // 公司类型需要匹配
 
         return Collections3.getFirst(this.selectByProperty(conditionMap));
     }
 
-    // 模板类型  0:平台,1:保理公司,2:核心企业,3:供应商,4:经销商
+    // 模板类型 0:平台,1:保理公司,2:核心企业,3:供应商,4:经销商
     public List<String> getCustRulesByCustNo(final Long anCustNo) {
         final List<String> rules = new ArrayList<>();
 
@@ -98,7 +99,7 @@ public class NotificationProfileService extends BaseService<NotificationProfileM
 
         final List<CustCertRule> certRules = certRuleService.queryCertRuleListBySerialNo(certInfo.getSerialNo());
 
-        rules.addAll(certRules.stream().map(certRule->certRule.getRule()).collect(Collectors.toList()));
+        rules.addAll(certRules.stream().map(certRule -> certRule.getRule()).collect(Collectors.toList()));
 
         return rules;
 
@@ -107,12 +108,13 @@ public class NotificationProfileService extends BaseService<NotificationProfileM
     /**
      * 根据客户编号查询消息模板列表
      */
-    public Page<NotificationProfile> queryNotificationProfile(final Long anCustNo, final int anFlag, final int anPageNum, final int anPageSize) {
+    public Page<NotificationProfile> queryNotificationProfile(final Long anCustNo, final int anFlag,
+            final int anPageNum, final int anPageSize) {
         BTAssert.notNull(anCustNo, "客户编号不允许为空!");
 
         BTAssert.isTrue(UserUtils.containsCustNo(anCustNo), "此操作员不具备访问此公司权限！");
 
-        final List<String> rules = getCustRulesByCustNo(anCustNo);  // 公司类型
+        final List<String> rules = getCustRulesByCustNo(anCustNo); // 公司类型
         final String custName = accountService.queryCustName(anCustNo);
 
         final Map<String, Object> conditionMap = new HashMap<>();
@@ -120,10 +122,12 @@ public class NotificationProfileService extends BaseService<NotificationProfileM
         conditionMap.put("NEcustom", NotificationConstants.PROFILE_CUSTOM);
         conditionMap.put("profileRule", rules);
 
-        final Page<NotificationProfile> profilePage = this.selectPropertyByPage(conditionMap, anPageNum, anPageSize, anFlag == 1);
+        final Page<NotificationProfile> profilePage = this.selectPropertyByPage(conditionMap, anPageNum, anPageSize,
+                anFlag == 1);
 
-        for (final NotificationProfile profile: profilePage) {
-            final NotificationProfile tempProfile = findProfileByProfileNameAndCustNo(profile.getProfileName(), anCustNo);
+        for (final NotificationProfile profile : profilePage) {
+            final NotificationProfile tempProfile = findProfileByProfileNameAndCustNo(profile.getProfileName(),
+                    anCustNo);
             profile.setCustNo(anCustNo);
             profile.setCustName(custName);
             profile.setBusinStatus(tempProfile.getBusinStatus());
@@ -135,7 +139,8 @@ public class NotificationProfileService extends BaseService<NotificationProfileM
      * 设置消息模板状态
      * @param anCustNo
      */
-    public NotificationProfile saveSetNotificationProfileStatus(final Long anProfileId, final Long anCustNo, final String anBusinStatus) {
+    public NotificationProfile saveSetNotificationProfileStatus(final Long anProfileId, final Long anCustNo,
+            final String anBusinStatus) {
         BTAssert.notNull(anProfileId, "模板编号不允许为空!");
         BTAssert.notNull(anBusinStatus, "状态不允许为空!");
 
@@ -144,7 +149,7 @@ public class NotificationProfileService extends BaseService<NotificationProfileM
         NotificationProfile tempProfile = this.selectByPrimaryKey(anProfileId);
         BTAssert.notNull(tempProfile, "没有找到对应的消息模板");
 
-        if (checkDefaultProfile(tempProfile) == true) {  // default
+        if (checkDefaultProfile(tempProfile) == true) { // default
             tempProfile = findProfileByProfileNameAndCustNo(tempProfile.getProfileName(), anCustNo);
             if (checkDefaultProfile(tempProfile) == true) { // 只有 default
                 tempProfile = saveCopyBaseDataToTargetData(tempProfile, anCustNo); // 同步一个
@@ -160,7 +165,8 @@ public class NotificationProfileService extends BaseService<NotificationProfileM
      * @param anTempProfile
      * @param anCustNo
      */
-    public NotificationProfile saveCopyBaseDataToTargetData(final NotificationProfile anTempProfile, final Long anCustNo) {
+    public NotificationProfile saveCopyBaseDataToTargetData(final NotificationProfile anTempProfile,
+            final Long anCustNo) {
         final NotificationProfile tempNotificationProfile = new NotificationProfile();
 
         final CustInfo custInfo = accountService.findCustInfo(anCustNo);
@@ -168,7 +174,8 @@ public class NotificationProfileService extends BaseService<NotificationProfileM
         tempNotificationProfile.initAddValue(anTempProfile, custInfo, operator);
 
         this.insert(tempNotificationProfile);
-        channelProfileService.saveCopyBaseDataToTargetData(anTempProfile.getId(), tempNotificationProfile.getId(), custInfo, operator);
+        channelProfileService.saveCopyBaseDataToTargetData(anTempProfile.getId(), tempNotificationProfile.getId(),
+                custInfo, operator);
 
         return tempNotificationProfile;
     }
@@ -178,7 +185,8 @@ public class NotificationProfileService extends BaseService<NotificationProfileM
      * @return
      */
     public boolean checkDefaultProfile(final NotificationProfile anTempProfile) {
-        if (BetterStringUtils.equals(anTempProfile.getCustom(), NotificationConstants.PROFILE_CUSTOM) == false && anTempProfile.getId() < 0) {
+        if (StringUtils.equals(anTempProfile.getCustom(), NotificationConstants.PROFILE_CUSTOM) == false
+                && anTempProfile.getId() < 0) {
             return true;
         }
         return false;

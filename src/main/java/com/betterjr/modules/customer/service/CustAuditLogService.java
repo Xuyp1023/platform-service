@@ -4,14 +4,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.exception.BytterTradeException;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
-import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
-import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.customer.constants.CustomerConstants;
 import com.betterjr.modules.customer.dao.CustAuditLogMapper;
 import com.betterjr.modules.customer.entity.CustAuditLog;
@@ -29,12 +28,12 @@ public class CustAuditLogService extends BaseService<CustAuditLogMapper, CustAud
     /**
      * 添加一条审核记录
      */
-    public CustAuditLog addCustAuditLog(String anAuditType, String anStepNode, Long anBusinId, String anAuditResult, String anReason, String anAuditItem,
-            Long anCustNo) {
-        if (BetterStringUtils.isBlank(anAuditType) == true) {
+    public CustAuditLog addCustAuditLog(String anAuditType, String anStepNode, Long anBusinId, String anAuditResult,
+            String anReason, String anAuditItem, Long anCustNo) {
+        if (StringUtils.isBlank(anAuditType) == true) {
             throw new BytterTradeException(20030, "审核类型不允许为空！");
         }
-        if (BetterStringUtils.isBlank(anAuditResult) == true) {
+        if (StringUtils.isBlank(anAuditResult) == true) {
             throw new BytterTradeException(20030, "审核结果不允许为空！");
         }
 
@@ -60,7 +59,7 @@ public class CustAuditLogService extends BaseService<CustAuditLogMapper, CustAud
         List<CustAuditLog> auditLogs = this.selectByProperty(conditionMap);
         return Collections3.getFirst(auditLogs);
     }
-    
+
     /**
      * 
      */
@@ -79,10 +78,10 @@ public class CustAuditLogService extends BaseService<CustAuditLogMapper, CustAud
      */
     public CustAuditLog findCustAuditLog(Long anId) {
         BTAssert.notNull(anId, "审核日志编号不允许为空!");
-        
+
         final CustAuditLog custAuditLog = this.selectByPrimaryKey(anId);
         BTAssert.notNull(custAuditLog, "没有找到对应的审核日志!");
-        
+
         return custAuditLog;
     }
 }

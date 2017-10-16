@@ -10,12 +10,12 @@ import com.betterjr.modules.workflow.entity.CustFlowSysNode;
 
 @Service
 public class CustFlowSysNodeService extends BaseService<CustFlowSysNodeMapper, CustFlowSysNode> {
-    
+
     /**
      * 根据流程类型，得到系统节点
      */
     public List<CustFlowSysNode> findFlowSysNodesByType(String flowType) {
-         return this.selectByProperty("flowType", flowType);
+        return this.selectByProperty("flowType", flowType);
     }
 
 }

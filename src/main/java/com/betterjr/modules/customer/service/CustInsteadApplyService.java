@@ -6,13 +6,13 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.exception.BytterTradeException;
 import com.betterjr.common.selectkey.SerialGenerator;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
-import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.mapper.pagehelper.Page;
@@ -52,16 +52,16 @@ public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper,
      * @param anCustInsteadApply
      * @return
      */
-    public CustInsteadApply addCustInsteadApply(final String anInsteadType, final Long anCustNo, final String anFileList) {
-        if (BetterStringUtils.isBlank(anInsteadType) == true) {
+    public CustInsteadApply addCustInsteadApply(final String anInsteadType, final Long anCustNo,
+            final String anFileList) {
+        if (StringUtils.isBlank(anInsteadType) == true) {
             throw new BytterTradeException(20061, "代录申请类型不允许为空！");
         }
 
         final CustInsteadApply custInsteadApply = new CustInsteadApply();
         if (anInsteadType.equals(CustomerConstants.INSTEAD_APPLY_TYPE_OPENACCOUNT) == true) {
             custInsteadApply.initAddValue(anInsteadType, null, null);
-        }
-        else {// 变更代录 需要 custNo 和 custName
+        } else {// 变更代录 需要 custNo 和 custName
 
             // TODO @@@@@@@@ 检查是否有正在进行的变更 代录
 
@@ -77,11 +77,11 @@ public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper,
 
         final CustCertInfo certInfo = custCertService.findCertByOperOrg(UserUtils.getOperatorInfo().getOperOrg());
 
-//        BTAssert.notNull(certInfo, "证书信息不允许为空!");
+        // BTAssert.notNull(certInfo, "证书信息不允许为空!");
 
-//        custInsteadApply.setOrgName(certInfo.getCustName());
-        //微信
-        if(null != certInfo) {
+        // custInsteadApply.setOrgName(certInfo.getCustName());
+        // 微信
+        if (null != certInfo) {
             custInsteadApply.setOrgName(certInfo.getCustName());
         }
 
@@ -90,49 +90,50 @@ public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper,
         this.insert(custInsteadApply);
         return custInsteadApply;
     }
-    
+
     /**
      * 微信端代录申请,无证书
      * !!-- 在此处生成operId、OperName、OperOrg --!!
      */
-    public CustInsteadApply addWeChatCustInsteadApply(final String anInsteadType, final String anCustName, final String anFileList) {
-        if (BetterStringUtils.isBlank(anInsteadType) == true) {
+    public CustInsteadApply addWeChatCustInsteadApply(final String anInsteadType, final String anCustName,
+            final String anFileList) {
+        if (StringUtils.isBlank(anInsteadType) == true) {
             throw new BytterTradeException(20061, "代录申请类型不允许为空！");
         }
         final CustInsteadApply custInsteadApply = new CustInsteadApply();
-        
+
         if (anInsteadType.equals(CustomerConstants.INSTEAD_APPLY_TYPE_OPENACCOUNT) == true) {
             custInsteadApply.initAddValue(anInsteadType, null, null);
         }
-        
-        //更新custName,生成相应微信不存在信息
+
+        // 更新custName,生成相应微信不存在信息
         custInsteadApply.setOperOrg(custInsteadApply.getCustName() + SerialGenerator.randomBase62(10));
         custInsteadApply.setCustName(anCustName);
         custInsteadApply.setRegOperId(SerialGenerator.getLongValue(SerialGenerator.OPERATOR_ID));
         custInsteadApply.setRegOperName(anCustName);
-        //将文件拷贝再拷贝一份保存
+        // 将文件拷贝再拷贝一份保存
         copyOpenAccountFile(custInsteadApply, anFileList);
-        
-        //微信生成默认operOrg和operName
+
+        // 微信生成默认operOrg和operName
         custInsteadApply.setOperOrg(custInsteadApply.getCustName() + SerialGenerator.randomBase62(10));
         custInsteadApply.setOrgName(custInsteadApply.getCustName());
 
         this.insert(custInsteadApply);
         return custInsteadApply;
     }
-    
 
     /**
      * 将文件拷贝再拷贝一分保存
      */
     private void copyOpenAccountFile(CustInsteadApply anCustInsteadApply, String anFileList) {
-        //构造操作员信息，作为调用接口使用
+        // 构造操作员信息，作为调用接口使用
         CustOperatorInfo anOperator = new CustOperatorInfo();
         anOperator.setName(anCustInsteadApply.getRegOperName());
         anOperator.setId(anCustInsteadApply.getRegOperId());
         anOperator.setOperOrg(anCustInsteadApply.getOperOrg());
-        
-        Long anBatchNo = fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList, anCustInsteadApply.getBatchNo(), anOperator);
+
+        Long anBatchNo = fileItemService.updateAndDuplicateConflictFileItemInfo(anFileList,
+                anCustInsteadApply.getBatchNo(), anOperator);
         anCustInsteadApply.setBatchNo(anBatchNo);
     }
 
@@ -147,12 +148,9 @@ public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper,
         conditionMap.put(CustomerConstants.CUST_NO, anCustNo);
         // INSTEAD_APPLY_STATUS_CONFIRM_PASS 这两种状态表明 此申请已经完成 或者 取消
         // INSTEAD_APPLY_STATUS_CANCEL
-        final String[] businStatues = {
-                CustomerConstants.INSTEAD_APPLY_STATUS_NEW,
-                CustomerConstants.INSTEAD_APPLY_STATUS_AUDIT_PASS,
-                CustomerConstants.INSTEAD_APPLY_STATUS_AUDIT_REJECT,
-                CustomerConstants.INSTEAD_APPLY_STATUS_TYPE_IN,
-                CustomerConstants.INSTEAD_APPLY_STATUS_REVIEW_PASS,
+        final String[] businStatues = { CustomerConstants.INSTEAD_APPLY_STATUS_NEW,
+                CustomerConstants.INSTEAD_APPLY_STATUS_AUDIT_PASS, CustomerConstants.INSTEAD_APPLY_STATUS_AUDIT_REJECT,
+                CustomerConstants.INSTEAD_APPLY_STATUS_TYPE_IN, CustomerConstants.INSTEAD_APPLY_STATUS_REVIEW_PASS,
                 CustomerConstants.INSTEAD_APPLY_STATUS_REVIEW_REJECT,
                 CustomerConstants.INSTEAD_APPLY_STATUS_CONFIRM_REJECT };
         conditionMap.put("businStatus", businStatues);
@@ -213,7 +211,8 @@ public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper,
 
         final Long batchNo = anInsteadApply.getBatchNo();
 
-        tempInsteadApply.setBatchNo(fileItemService.updateAndDelCustFileItemInfo(anFileList, anInsteadApply.getBatchNo()));
+        tempInsteadApply
+                .setBatchNo(fileItemService.updateAndDelCustFileItemInfo(anFileList, anInsteadApply.getBatchNo()));
 
         this.updateByPrimaryKeySelective(tempInsteadApply);
         return tempInsteadApply;
@@ -239,16 +238,16 @@ public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper,
      *
      * @return
      */
-    public Page<CustInsteadApply> queryCustInsteadApply(final Map<String, Object> anParam, final int anFlag, final int anPageNum, final int anPageSize) {
+    public Page<CustInsteadApply> queryCustInsteadApply(final Map<String, Object> anParam, final int anFlag,
+            final int anPageNum, final int anPageSize) {
         final Object custName = anParam.get("LIKEcustName");
         final Object businStatus = anParam.get("businStatus");
-        if (custName == null || BetterStringUtils.isBlank((String) custName)) {
+        if (custName == null || StringUtils.isBlank((String) custName)) {
             anParam.remove("LIKEcustName");
-        }
-        else {
+        } else {
             anParam.put("LIKEcustName", "%" + custName + "%");
         }
-        if (businStatus == null || (businStatus instanceof String && BetterStringUtils.isBlank((String) businStatus))) {
+        if (businStatus == null || (businStatus instanceof String && StringUtils.isBlank((String) businStatus))) {
             anParam.remove("businStatus");
         }
         return this.selectPropertyByPage(CustInsteadApply.class, anParam, anPageNum, anPageSize, anFlag == 1);
@@ -259,7 +258,8 @@ public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper,
      * @param applyId
      * @param custName
      */
-    public CustInsteadApply saveCustInsteadApplyCustInfo(final Long anId, final Long anCustNo, final String anCustName) {
+    public CustInsteadApply saveCustInsteadApplyCustInfo(final Long anId, final Long anCustNo,
+            final String anCustName) {
         final CustInsteadApply tempInsteadApply = this.selectByPrimaryKey(anId);
 
         BTAssert.notNull(tempInsteadApply, "没有找到对应的代录申请！");
@@ -267,7 +267,7 @@ public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper,
         if (anCustNo != null) {
             tempInsteadApply.setCustNo(anCustNo);
         }
-        if (BetterStringUtils.isNotBlank(anCustName)) {
+        if (StringUtils.isNotBlank(anCustName)) {
             tempInsteadApply.setCustName(anCustName);
         }
 
@@ -275,7 +275,7 @@ public class CustInsteadApplyService extends BaseService<CustInsteadApplyMapper,
 
         return tempInsteadApply;
     }
-    
+
     /**
      * 根据开户信息tmp id 查询开户申请
      */

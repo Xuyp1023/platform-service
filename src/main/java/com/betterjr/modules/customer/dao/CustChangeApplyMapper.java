@@ -5,5 +5,4 @@ import com.betterjr.mapper.common.Mapper;
 import com.betterjr.modules.customer.entity.CustChangeApply;
 
 @BetterjrMapper
-public interface CustChangeApplyMapper extends Mapper<CustChangeApply> {
-}
+public interface CustChangeApplyMapper extends Mapper<CustChangeApply> {}

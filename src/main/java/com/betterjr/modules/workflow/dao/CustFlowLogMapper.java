@@ -5,5 +5,4 @@ import com.betterjr.mapper.common.Mapper;
 import com.betterjr.modules.workflow.entity.CustFlowLog;
 
 @BetterjrMapper
-public interface CustFlowLogMapper extends Mapper<CustFlowLog> {
-}
+public interface CustFlowLogMapper extends Mapper<CustFlowLog> {}

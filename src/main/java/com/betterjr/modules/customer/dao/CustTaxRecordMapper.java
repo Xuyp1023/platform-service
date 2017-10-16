@@ -5,5 +5,4 @@ import com.betterjr.mapper.common.Mapper;
 import com.betterjr.modules.customer.entity.CustTaxRecord;
 
 @BetterjrMapper
-public interface CustTaxRecordMapper extends Mapper<CustTaxRecord> {
-}
+public interface CustTaxRecordMapper extends Mapper<CustTaxRecord> {}

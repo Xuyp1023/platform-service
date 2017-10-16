@@ -25,10 +25,10 @@ import com.betterjr.modules.customer.entity.CustMechLawTmp;
 public class CustMechLawService extends BaseService<CustMechLawMapper, CustMechLaw> {
     @Resource
     private CustAccountService accountService;
-    
+
     @Resource
     private CustMechLawTmpService lawTmpService;
-    
+
     /**
      * 查询法人信息
      * 
@@ -39,7 +39,7 @@ public class CustMechLawService extends BaseService<CustMechLawMapper, CustMechL
         BTAssert.notNull(anCustNo, "客户编号不允许为空！");
 
         final List<CustMechLaw> laws = this.selectByProperty(CustomerConstants.CUST_NO, anCustNo);
-        
+
         return Collections3.getFirst(laws);
     }
 
@@ -87,11 +87,12 @@ public class CustMechLawService extends BaseService<CustMechLawMapper, CustMechL
         BTAssert.notNull(anCustNo, "客户编号不允许为空！");
 
         final CustInfo custInfo = accountService.selectByPrimaryKey(anCustNo);
-        anLaw.initAddValue(anCustNo, custInfo.getCustName(), custInfo.getRegOperId(), custInfo.getRegOperName(), custInfo.getOperOrg());
+        anLaw.initAddValue(anCustNo, custInfo.getCustName(), custInfo.getRegOperId(), custInfo.getRegOperName(),
+                custInfo.getOperOrg());
         this.insert(anLaw);
-        
+
         lawTmpService.addCustMechLawTmp(anLaw);
-        
+
         return anLaw;
     }
 

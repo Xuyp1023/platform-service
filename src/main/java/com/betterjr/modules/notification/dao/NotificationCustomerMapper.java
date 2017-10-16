@@ -13,5 +13,6 @@ import com.betterjr.modules.notification.entity.NotificationCustomer;
 public interface NotificationCustomerMapper extends Mapper<NotificationCustomer> {
     @Select("SELECT nc.* FROM t_sys_notifi_cust nc, t_sys_notifi n WHERE nc.C_CHANNEL = #{channel} AND nc.N_RETRY_COUNT <= #{retry} AND nc.C_BUSIN_STATUS IN ('0', '2') AND nc.L_NOTIFICATION_ID = n.ID AND n.C_BUSIN_STATUS = '1'")
     @ResultType(NotificationCustomer.class)
-    public Page<NotificationCustomer> selectUnsendNotificationCustomer(@Param("channel") String channel, @Param("retry") Integer retry);
+    public Page<NotificationCustomer> selectUnsendNotificationCustomer(@Param("channel") String channel,
+            @Param("retry") Integer retry);
 }

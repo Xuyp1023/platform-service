@@ -131,20 +131,16 @@ public class CustWeChatService extends BaseService<CustWeChatInfoMapper, CustWeC
         final CustWeChatInfo weChatInfo = this.selectByPrimaryKey(anToken.getOpenId());
         if (weChatInfo == null) {
             msg = "未关注企e金服微信公众号!";
-        }
-        else if ("2".equals(weChatInfo.getBusinStatus())) {
+        } else if ("2".equals(weChatInfo.getBusinStatus())) {
             msg = "该微信账户已经被冻结，不能使用!";
-        }
-        else if ("1".equals(weChatInfo.getBusinStatus())) {
+        } else if ("1".equals(weChatInfo.getBusinStatus())) {
             final CustOperatorInfo operInfo = custOperatorService.selectByPrimaryKey(weChatInfo.getOperId());
             if (operInfo == null) {
                 msg = "未能获得绑定的操作员信息";
-            }
-            else {
+            } else {
                 return operInfo;
             }
-        }
-        else {
+        } else {
             msg = "未知原因导致账户不能使用";
         }
         anReturn[0] = msg;
@@ -162,11 +158,11 @@ public class CustWeChatService extends BaseService<CustWeChatInfoMapper, CustWeC
         return queryCustWeChatPageInfo(true, 1, 10, termMap);
     }
 
-    public List<CustWeChatInfo> queryCustWeChatPageInfo(final boolean anFirst, final int anPageNum, final int anPageSize, final Map anParams) {
+    public List<CustWeChatInfo> queryCustWeChatPageInfo(final boolean anFirst, final int anPageNum,
+            final int anPageSize, final Map anParams) {
         if (Collections3.isEmpty(anParams)) {
             return new ArrayList<CustWeChatInfo>(1);
-        }
-        else {
+        } else {
             return this.selectPropertyByPage(anParams, anPageNum, anPageSize, anFirst);
         }
     }
@@ -202,9 +198,11 @@ public class CustWeChatService extends BaseService<CustWeChatInfoMapper, CustWeC
      */
     private void sendNotification(final CustWeChatInfo anWechatInfo, final CustOperatorInfo anOperator) {
         // 发送微信绑定结果通知
-        final Long platformCustNo = Long.valueOf(Collections3.getFirst(DictUtils.getDictList("PlatformGroup")).getItemValue());
+        final Long platformCustNo = Long
+                .valueOf(Collections3.getFirst(DictUtils.getDictList("PlatformGroup")).getItemValue());
         final CustInfo platformCustomer = accountService.findCustInfo(platformCustNo);
-        final CustOperatorInfo platformOperator = Collections3.getFirst(custOperatorService.queryOperatorInfoByCustNo(platformCustomer.getCustNo()));
+        final CustOperatorInfo platformOperator = Collections3
+                .getFirst(custOperatorService.queryOperatorInfoByCustNo(platformCustomer.getCustNo()));
 
         // 发送微信绑定消息
         final Builder builder = NotificationModel.newBuilder("微信账号绑定状态通知", platformCustomer, platformOperator);
@@ -256,25 +254,22 @@ public class CustWeChatService extends BaseService<CustWeChatInfoMapper, CustWeC
             this.insert(weChatInfo);
 
             return weChatInfo;
-        }
-        else if (EventType.unsubscribe == anEventType) {
+        } else if (EventType.unsubscribe == anEventType) {
             BTAssert.notNull(weChatInfo, "没有找到微信账户信息");
             subscribeStatus = "0";
             weChatInfo.setBusinStatus("0");
 
             weChatInfo.setUnSubscribeTime(BetterDateUtils.getNumDateTime());
-        }
-        else if (EventType.subscribe == anEventType) {
+        } else if (EventType.subscribe == anEventType) {
             BTAssert.notNull(weChatInfo, "没有找到微信账户信息");
             subscribeStatus = "1";
             weChatInfo.setUnSubscribeTime("");
             // 如果不是暂停的情况下，则允许修改状态，如果是设置为暂停；则不修改状态
-            //            if ("2".equals(weChatInfo.getBusinStatus()) == false) {
-            //                weChatInfo.setBusinStatus("3");
-            //            }
+            // if ("2".equals(weChatInfo.getBusinStatus()) == false) {
+            // weChatInfo.setBusinStatus("3");
+            // }
             weChatInfo.setFirstLogin(true);
-        }
-        else {
+        } else {
 
             return weChatInfo;
         }
@@ -330,7 +325,8 @@ public class CustWeChatService extends BaseService<CustWeChatInfoMapper, CustWeC
      * @param anField
      */
     private void checkWechatPushTempField(final WechatPushTempField anField) {
-        final String[] fieldNames = new String[] { "first", "remark", "keyword1", "keyword2", "keyword3", "keyword4", "keyword5" };
+        final String[] fieldNames = new String[] { "first", "remark", "keyword1", "keyword2", "keyword3", "keyword4",
+                "keyword5" };
         BTAssert.isTrue(Arrays.asList(fieldNames).contains(anField.getName()), anField.getName() + " 模板字段名不正确！");
     }
 
@@ -350,7 +346,8 @@ public class CustWeChatService extends BaseService<CustWeChatInfoMapper, CustWeC
     public boolean saveFristLogin(final String anTradePassword, final CustOperatorInfo anOperator) {
 
         if (tradePassService.checkTradePassword(anOperator, anTradePassword)) {
-            final CustWeChatInfo wechatInfo = Collections3.getFirst(this.selectByProperty("operId", anOperator.getId()));
+            final CustWeChatInfo wechatInfo = Collections3
+                    .getFirst(this.selectByProperty("operId", anOperator.getId()));
             BTAssert.notNull(wechatInfo, "没有找到相应的微信绑定信息！");
 
             wechatInfo.setFirstLogin(Boolean.FALSE);
@@ -403,8 +400,8 @@ public class CustWeChatService extends BaseService<CustWeChatInfoMapper, CustWeC
      * @param anPassType
      * @return
      */
-    public CustWeChatInfo saveMobileTradePass(final String anNewPasswd, final String anOkPasswd, final String anLoginPasswd,
-            final CustPasswordType anPassType) {
+    public CustWeChatInfo saveMobileTradePass(final String anNewPasswd, final String anOkPasswd,
+            final String anLoginPasswd, final CustPasswordType anPassType) {
         final CustOperatorInfo operator = UserUtils.getOperatorInfo();
         final String userKey = WechatConstants.wechatUserPrefix + operator.getId();
         final String openId = JedisUtils.get(userKey); // 取到userKey 对应的 operatorId
@@ -435,8 +432,7 @@ public class CustWeChatService extends BaseService<CustWeChatInfoMapper, CustWeC
 
         if (Collections3.isEmpty(wechatInfos)) {
             return Boolean.FALSE;
-        }
-        else {
+        } else {
             return Boolean.TRUE;
         }
     }
@@ -462,7 +458,7 @@ public class CustWeChatService extends BaseService<CustWeChatInfoMapper, CustWeC
         wechatInfo.setBusinStatus("3");
         wechatInfo.setAppId(anAppId);
         wechatInfo.setOpenId(anOpenId);
-        wechatInfo.setSubscribeStatus(String.valueOf(anSubscribeStatus));  //这个需要检查状态
+        wechatInfo.setSubscribeStatus(String.valueOf(anSubscribeStatus)); // 这个需要检查状态
         wechatInfo.initValue(UserUtils.getOperatorInfo());
 
         this.insert(wechatInfo);
@@ -506,7 +502,8 @@ public class CustWeChatService extends BaseService<CustWeChatInfoMapper, CustWeC
         try {
             final WechatAPIImpl wechatApi = WechatAPIImpl.create(mpAccount);
             final File file = wechatApi.dlMedia(anMediaId);
-            final CustFileItem fileItem = dataStoreService.saveFileToStore(file, anFileTypeName, anFileTypeName + ".jpg");
+            final CustFileItem fileItem = dataStoreService.saveFileToStore(file, anFileTypeName,
+                    anFileTypeName + ".jpg");
             return fileItem;
         }
         catch (final Exception e) {

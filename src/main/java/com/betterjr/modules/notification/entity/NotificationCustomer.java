@@ -1,14 +1,18 @@
 package com.betterjr.modules.notification.entity;
 
-import com.betterjr.common.annotation.*;
+import javax.persistence.Access;
+import javax.persistence.AccessType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import com.betterjr.common.annotation.MetaData;
 import com.betterjr.common.entity.BetterjrEntity;
 import com.betterjr.common.selectkey.SerialGenerator;
 import com.betterjr.common.utils.BetterDateUtils;
-import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.betterjr.modules.notification.constants.NotificationConstants;
-
-import javax.persistence.*;
 
 @Access(AccessType.FIELD)
 @Entity
@@ -18,159 +22,159 @@ public class NotificationCustomer implements BetterjrEntity {
      * 编号
      */
     @Id
-    @Column(name = "ID",  columnDefinition="INTEGER" )
-    @MetaData( value="编号", comments = "编号")
+    @Column(name = "ID", columnDefinition = "INTEGER")
+    @MetaData(value = "编号", comments = "编号")
     private Long id;
 
     /**
      * 数据版本号
      */
-    @Column(name = "N_VERSION",  columnDefinition="INTEGER" )
-    @MetaData( value="数据版本号", comments = "数据版本号")
+    @Column(name = "N_VERSION", columnDefinition = "INTEGER")
+    @MetaData(value = "数据版本号", comments = "数据版本号")
     private Long version;
-    
+
     /**
      * 重发次数
      */
-    @Column(name = "N_RETRY_COUNT",  columnDefinition="INTEGER" )
-    @MetaData( value="重发次数", comments = "重发次数")
+    @Column(name = "N_RETRY_COUNT", columnDefinition = "INTEGER")
+    @MetaData(value = "重发次数", comments = "重发次数")
     private Integer retryCount;
 
     /**
      * 消息编号
      */
-    @Column(name = "L_NOTIFICATION_ID",  columnDefinition="INTEGER" )
-    @MetaData( value="消息编号", comments = "消息编号")
+    @Column(name = "L_NOTIFICATION_ID", columnDefinition = "INTEGER")
+    @MetaData(value = "消息编号", comments = "消息编号")
     private Long notificationId;
 
     /**
      * 通道：0站内消息，1电子邮件，2短信，3微信
      */
-    @Column(name = "C_CHANNEL",  columnDefinition="CHAR" )
-    @MetaData( value="通道：0站内消息", comments = "通道：0站内消息，1电子邮件，2短信，3微信")
+    @Column(name = "C_CHANNEL", columnDefinition = "CHAR")
+    @MetaData(value = "通道：0站内消息", comments = "通道：0站内消息，1电子邮件，2短信，3微信")
     private String channel;
 
     /**
      * 是否删除:0未删，1已删
      */
-    @Column(name = "C_IS_DELETED",  columnDefinition="CHAR" )
-    @MetaData( value="是否删除:0未删", comments = "是否删除:0未删，1已删")
+    @Column(name = "C_IS_DELETED", columnDefinition = "CHAR")
+    @MetaData(value = "是否删除:0未删", comments = "是否删除:0未删，1已删")
     private Boolean isDeleted;
 
     /**
      * 是否已读:0未读，1已读
      */
-    @Column(name = "C_IS_READ",  columnDefinition="CHAR" )
-    @MetaData( value="是否已读:0未读", comments = "是否已读:0未读，1已读")
+    @Column(name = "C_IS_READ", columnDefinition = "CHAR")
+    @MetaData(value = "是否已读:0未读", comments = "是否已读:0未读，1已读")
     private Boolean isRead;
 
     /**
      * 发送号码
      */
-    @Column(name = "C_SEND_NO",  columnDefinition="VARCHAR" )
-    @MetaData( value="发送号码", comments = "发送号码")
+    @Column(name = "C_SEND_NO", columnDefinition = "VARCHAR")
+    @MetaData(value = "发送号码", comments = "发送号码")
     private String sendNo;
-    
+
     /**
      * 接收企业经办人ID
      */
-    @Column(name = "L_OPERID",  columnDefinition="INTEGER" )
-    @MetaData( value="接收企业经办人ID", comments = "接收企业经办人ID")
+    @Column(name = "L_OPERID", columnDefinition = "INTEGER")
+    @MetaData(value = "接收企业经办人ID", comments = "接收企业经办人ID")
     private Long operId;
 
     /**
      * 接收企业经办人姓名
      */
-    @Column(name = "C_OPERNAME",  columnDefinition="VARCHAR" )
-    @MetaData( value="接收企业经办人姓名", comments = "接收企业经办人姓名")
+    @Column(name = "C_OPERNAME", columnDefinition = "VARCHAR")
+    @MetaData(value = "接收企业经办人姓名", comments = "接收企业经办人姓名")
     private String operName;
 
     /**
      * 接收企业编号
      */
-    @Column(name = "L_CUSTNO",  columnDefinition="INTEGER" )
-    @MetaData( value="接收企业编号", comments = "接收企业编号")
+    @Column(name = "L_CUSTNO", columnDefinition = "INTEGER")
+    @MetaData(value = "接收企业编号", comments = "接收企业编号")
     private Long custNo;
 
     /**
      * 接收企业名称
      */
-    @Column(name = "C_CUSTNAME",  columnDefinition="VARCHAR" )
-    @MetaData( value="接收企业名称", comments = "接收企业名称")
+    @Column(name = "C_CUSTNAME", columnDefinition = "VARCHAR")
+    @MetaData(value = "接收企业名称", comments = "接收企业名称")
     private String custName;
 
     /**
      * 创建人(操作员)ID号
      */
-    @Column(name = "L_REG_OPERID",  columnDefinition="INTEGER" )
-    @MetaData( value="创建人(操作员)ID号", comments = "创建人(操作员)ID号")
+    @Column(name = "L_REG_OPERID", columnDefinition = "INTEGER")
+    @MetaData(value = "创建人(操作员)ID号", comments = "创建人(操作员)ID号")
     private Long regOperId;
 
     /**
      * 创建人(操作员)姓名
      */
-    @Column(name = "C_REG_OPERNAME",  columnDefinition="VARCHAR" )
-    @MetaData( value="创建人(操作员)姓名", comments = "创建人(操作员)姓名")
+    @Column(name = "C_REG_OPERNAME", columnDefinition = "VARCHAR")
+    @MetaData(value = "创建人(操作员)姓名", comments = "创建人(操作员)姓名")
     private String regOperName;
 
     /**
      * 创建日期
      */
-    @Column(name = "D_REG_DATE",  columnDefinition="VARCHAR" )
-    @MetaData( value="创建日期", comments = "创建日期")
+    @Column(name = "D_REG_DATE", columnDefinition = "VARCHAR")
+    @MetaData(value = "创建日期", comments = "创建日期")
     private String regDate;
 
     /**
      * 创建时间
      */
-    @Column(name = "T_REG_TIME",  columnDefinition="VARCHAR" )
-    @MetaData( value="创建时间", comments = "创建时间")
+    @Column(name = "T_REG_TIME", columnDefinition = "VARCHAR")
+    @MetaData(value = "创建时间", comments = "创建时间")
     private String regTime;
 
     /**
      * 修改人(操作员)ID号
      */
-    @Column(name = "L_MODI_OPERID",  columnDefinition="INTEGER" )
-    @MetaData( value="修改人(操作员)ID号", comments = "修改人(操作员)ID号")
+    @Column(name = "L_MODI_OPERID", columnDefinition = "INTEGER")
+    @MetaData(value = "修改人(操作员)ID号", comments = "修改人(操作员)ID号")
     private Long modiOperId;
 
     /**
      * 修改人(操作员)姓名
      */
-    @Column(name = "C_MODI_OPERNAME",  columnDefinition="VARCHAR" )
-    @MetaData( value="修改人(操作员)姓名", comments = "修改人(操作员)姓名")
+    @Column(name = "C_MODI_OPERNAME", columnDefinition = "VARCHAR")
+    @MetaData(value = "修改人(操作员)姓名", comments = "修改人(操作员)姓名")
     private String modiOperName;
 
     /**
      * 修改日期
      */
-    @Column(name = "D_MODI_DATE",  columnDefinition="VARCHAR" )
-    @MetaData( value="修改日期", comments = "修改日期")
+    @Column(name = "D_MODI_DATE", columnDefinition = "VARCHAR")
+    @MetaData(value = "修改日期", comments = "修改日期")
     private String modiDate;
 
     /**
      * 修改时间
      */
-    @Column(name = "T_MODI_TIME",  columnDefinition="VARCHAR" )
-    @MetaData( value="修改时间", comments = "修改时间")
+    @Column(name = "T_MODI_TIME", columnDefinition = "VARCHAR")
+    @MetaData(value = "修改时间", comments = "修改时间")
     private String modiTime;
 
     /**
      * 操作机构
      */
-    @Column(name = "C_OPERORG",  columnDefinition="VARCHAR" )
-    @MetaData( value="操作机构", comments = "操作机构")
+    @Column(name = "C_OPERORG", columnDefinition = "VARCHAR")
+    @MetaData(value = "操作机构", comments = "操作机构")
     private String operOrg;
 
     /**
      * 发送状态：0未发送 1发送成功 2发送失败
      */
-    @Column(name = "C_BUSIN_STATUS",  columnDefinition="CHAR" )
-    @MetaData( value="发送状态：0未发送 1发送成功 2发送失败", comments = "发送状态：0未发送 1发送成功 2发送失败")
+    @Column(name = "C_BUSIN_STATUS", columnDefinition = "CHAR")
+    @MetaData(value = "发送状态：0未发送 1发送成功 2发送失败", comments = "发送状态：0未发送 1发送成功 2发送失败")
     private String businStatus;
 
-    @Column(name = "C_LAST_STATUS",  columnDefinition="CHAR" )
-    @MetaData( value="", comments = "")
+    @Column(name = "C_LAST_STATUS", columnDefinition = "CHAR")
+    @MetaData(value = "", comments = "")
     private String lastStatus;
 
     private static final long serialVersionUID = 1468812783880L;
@@ -190,7 +194,7 @@ public class NotificationCustomer implements BetterjrEntity {
     public void setVersion(Long version) {
         this.version = version;
     }
-    
+
     public Integer getRetryCount() {
         return retryCount;
     }
@@ -358,7 +362,7 @@ public class NotificationCustomer implements BetterjrEntity {
     public void setLastStatus(String lastStatus) {
         this.lastStatus = lastStatus == null ? null : lastStatus.trim();
     }
-    
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -406,28 +410,46 @@ public class NotificationCustomer implements BetterjrEntity {
         }
         NotificationCustomer other = (NotificationCustomer) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-            && (this.getVersion() == null ? other.getVersion() == null : this.getVersion().equals(other.getVersion()))
-            && (this.getRetryCount() == null ? other.getRetryCount() == null : this.getRetryCount().equals(other.getRetryCount()))
-            && (this.getNotificationId() == null ? other.getNotificationId() == null : this.getNotificationId().equals(other.getNotificationId()))
-            && (this.getChannel() == null ? other.getChannel() == null : this.getChannel().equals(other.getChannel()))
-            && (this.getIsDeleted() == null ? other.getIsDeleted() == null : this.getIsDeleted().equals(other.getIsDeleted()))
-            && (this.getIsRead() == null ? other.getIsRead() == null : this.getIsRead().equals(other.getIsRead()))
-            && (this.getSendNo() == null ? other.getSendNo() == null : this.getSendNo().equals(other.getSendNo()))
-            && (this.getOperId() == null ? other.getOperId() == null : this.getOperId().equals(other.getOperId()))
-            && (this.getOperName() == null ? other.getOperName() == null : this.getOperName().equals(other.getOperName()))
-            && (this.getCustNo() == null ? other.getCustNo() == null : this.getCustNo().equals(other.getCustNo()))
-            && (this.getCustName() == null ? other.getCustName() == null : this.getCustName().equals(other.getCustName()))
-            && (this.getRegOperId() == null ? other.getRegOperId() == null : this.getRegOperId().equals(other.getRegOperId()))
-            && (this.getRegOperName() == null ? other.getRegOperName() == null : this.getRegOperName().equals(other.getRegOperName()))
-            && (this.getRegDate() == null ? other.getRegDate() == null : this.getRegDate().equals(other.getRegDate()))
-            && (this.getRegTime() == null ? other.getRegTime() == null : this.getRegTime().equals(other.getRegTime()))
-            && (this.getModiOperId() == null ? other.getModiOperId() == null : this.getModiOperId().equals(other.getModiOperId()))
-            && (this.getModiOperName() == null ? other.getModiOperName() == null : this.getModiOperName().equals(other.getModiOperName()))
-            && (this.getModiDate() == null ? other.getModiDate() == null : this.getModiDate().equals(other.getModiDate()))
-            && (this.getModiTime() == null ? other.getModiTime() == null : this.getModiTime().equals(other.getModiTime()))
-            && (this.getOperOrg() == null ? other.getOperOrg() == null : this.getOperOrg().equals(other.getOperOrg()))
-            && (this.getBusinStatus() == null ? other.getBusinStatus() == null : this.getBusinStatus().equals(other.getBusinStatus()))
-            && (this.getLastStatus() == null ? other.getLastStatus() == null : this.getLastStatus().equals(other.getLastStatus()));
+                && (this.getVersion() == null ? other.getVersion() == null
+                        : this.getVersion().equals(other.getVersion()))
+                && (this.getRetryCount() == null ? other.getRetryCount() == null
+                        : this.getRetryCount().equals(other.getRetryCount()))
+                && (this.getNotificationId() == null ? other.getNotificationId() == null
+                        : this.getNotificationId().equals(other.getNotificationId()))
+                && (this.getChannel() == null ? other.getChannel() == null
+                        : this.getChannel().equals(other.getChannel()))
+                && (this.getIsDeleted() == null ? other.getIsDeleted() == null
+                        : this.getIsDeleted().equals(other.getIsDeleted()))
+                && (this.getIsRead() == null ? other.getIsRead() == null : this.getIsRead().equals(other.getIsRead()))
+                && (this.getSendNo() == null ? other.getSendNo() == null : this.getSendNo().equals(other.getSendNo()))
+                && (this.getOperId() == null ? other.getOperId() == null : this.getOperId().equals(other.getOperId()))
+                && (this.getOperName() == null ? other.getOperName() == null
+                        : this.getOperName().equals(other.getOperName()))
+                && (this.getCustNo() == null ? other.getCustNo() == null : this.getCustNo().equals(other.getCustNo()))
+                && (this.getCustName() == null ? other.getCustName() == null
+                        : this.getCustName().equals(other.getCustName()))
+                && (this.getRegOperId() == null ? other.getRegOperId() == null
+                        : this.getRegOperId().equals(other.getRegOperId()))
+                && (this.getRegOperName() == null ? other.getRegOperName() == null
+                        : this.getRegOperName().equals(other.getRegOperName()))
+                && (this.getRegDate() == null ? other.getRegDate() == null
+                        : this.getRegDate().equals(other.getRegDate()))
+                && (this.getRegTime() == null ? other.getRegTime() == null
+                        : this.getRegTime().equals(other.getRegTime()))
+                && (this.getModiOperId() == null ? other.getModiOperId() == null
+                        : this.getModiOperId().equals(other.getModiOperId()))
+                && (this.getModiOperName() == null ? other.getModiOperName() == null
+                        : this.getModiOperName().equals(other.getModiOperName()))
+                && (this.getModiDate() == null ? other.getModiDate() == null
+                        : this.getModiDate().equals(other.getModiDate()))
+                && (this.getModiTime() == null ? other.getModiTime() == null
+                        : this.getModiTime().equals(other.getModiTime()))
+                && (this.getOperOrg() == null ? other.getOperOrg() == null
+                        : this.getOperOrg().equals(other.getOperOrg()))
+                && (this.getBusinStatus() == null ? other.getBusinStatus() == null
+                        : this.getBusinStatus().equals(other.getBusinStatus()))
+                && (this.getLastStatus() == null ? other.getLastStatus() == null
+                        : this.getLastStatus().equals(other.getLastStatus()));
     }
 
     @Override
@@ -459,7 +481,7 @@ public class NotificationCustomer implements BetterjrEntity {
         result = prime * result + ((getLastStatus() == null) ? 0 : getLastStatus().hashCode());
         return result;
     }
-    
+
     public void initAddValue(CustOperatorInfo anSendOperator) {
         this.id = SerialGenerator.getLongValue("NotificationCustomer.id");
 
@@ -477,23 +499,23 @@ public class NotificationCustomer implements BetterjrEntity {
 
         this.isDeleted = NotificationConstants.IS_DELETED_FALSE;
         this.isRead = NotificationConstants.IS_READ_FALSE;
-        
+
         this.retryCount = Integer.valueOf(0);
-        
+
         this.businStatus = NotificationConstants.SEND_STATUS_NORMAL;
     }
 
     public void initModifyValue(Boolean anReadStatus) {
         this.modiDate = BetterDateUtils.getNumDate();
         this.modiTime = BetterDateUtils.getNumTime();
-        
+
         this.isRead = anReadStatus;
     }
-    
+
     public void initModifyValue(String anBusinStatus) {
         this.modiDate = BetterDateUtils.getNumDate();
         this.modiTime = BetterDateUtils.getNumTime();
-        
+
         this.businStatus = anBusinStatus;
     }
 }

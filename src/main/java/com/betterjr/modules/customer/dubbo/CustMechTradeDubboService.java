@@ -22,17 +22,21 @@ public class CustMechTradeDubboService implements ICustMechTradeService {
 
     @Autowired
     private CustMechTradeRecordService custMechTradeRecordService;
-    
+
     @Override
     public String webAddTradeRecord(Map<String, Object> anParam, String anFileList) {
-        CustMechTradeRecord anCustMechTradeRecord = (CustMechTradeRecord)RuleServiceDubboFilterInvoker.getInputObj();
-        return AjaxObject.newOk("新增贸易记录成功", custMechTradeRecordService.addCustMechTradeRecord(anCustMechTradeRecord, anFileList)).toJson();
+        CustMechTradeRecord anCustMechTradeRecord = (CustMechTradeRecord) RuleServiceDubboFilterInvoker.getInputObj();
+        return AjaxObject
+                .newOk("新增贸易记录成功", custMechTradeRecordService.addCustMechTradeRecord(anCustMechTradeRecord, anFileList))
+                .toJson();
     }
-
 
     @Override
     public String webQueryTradeRecordList(Long anCustNo, String anFlag, int anPageNum, int anPageSize) {
-        return AjaxObject.newOkWithPage("查询贸易记录成功", custMechTradeRecordService.queryCustMechTradeRecord(anCustNo, anFlag, anPageNum, anPageSize)).toJson();
+        return AjaxObject
+                .newOkWithPage("查询贸易记录成功",
+                        custMechTradeRecordService.queryCustMechTradeRecord(anCustNo, anFlag, anPageNum, anPageSize))
+                .toJson();
     }
 
     @Override

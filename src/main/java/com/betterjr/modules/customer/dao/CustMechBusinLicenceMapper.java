@@ -5,5 +5,4 @@ import com.betterjr.mapper.common.Mapper;
 import com.betterjr.modules.customer.entity.CustMechBusinLicence;
 
 @BetterjrMapper
-public interface CustMechBusinLicenceMapper extends Mapper<CustMechBusinLicence> {
-}
+public interface CustMechBusinLicenceMapper extends Mapper<CustMechBusinLicence> {}

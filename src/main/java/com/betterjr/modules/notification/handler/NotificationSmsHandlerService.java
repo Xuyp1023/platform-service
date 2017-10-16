@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -49,19 +50,22 @@ public class NotificationSmsHandlerService {
         final Notification notification = (Notification) message.getObject();
         logger.info("NOTIFICATION_SMS_TOPIC: subject=" + notification.getSubject());
 
+        if (StringUtils.equals(notification.getImmediate(), NotificationConstants.IMMEDIATE_TRUE) == true) {
+            final List<NotificationCustomer> notificationCustomers = notificationCustomerService
+                    .queryNotifiCustomerByNotifiId(notification.getId());
 
-        if (BetterStringUtils.equals(notification.getImmediate(), NotificationConstants.IMMEDIATE_TRUE) == true) {
-            final List<NotificationCustomer> notificationCustomers = notificationCustomerService.queryNotifiCustomerByNotifiId(notification.getId());
+            final String mobileList = notificationCustomers.stream()
+                    .map(notificationCustomer -> notificationCustomer.getSendNo()).filter(BetterStringUtils::isMobileNo)
+                    .collect(Collectors.joining(","));
 
-            final String mobileList = notificationCustomers.stream().map(notificationCustomer -> notificationCustomer.getSendNo()).filter(BetterStringUtils::isMobileNo).collect(Collectors.joining(","));
-
-            if (BetterStringUtils.isNotBlank(mobileList)) {
+            if (StringUtils.isNotBlank(mobileList)) {
                 final String result = SmsUtils.send(notification.getContent(), mobileList);
 
                 logger.info("短信发送结果：" + result);
             }
-            for (final NotificationCustomer notificationCustomer: notificationCustomers) {
-                notificationCustomerService.saveNotificationCustomerStatus(notificationCustomer.getId(), NotificationConstants.SEND_STATUS_SUCCESS);
+            for (final NotificationCustomer notificationCustomer : notificationCustomers) {
+                notificationCustomerService.saveNotificationCustomerStatus(notificationCustomer.getId(),
+                        NotificationConstants.SEND_STATUS_SUCCESS);
             }
             notificationService.saveNotificationStatus(notification.getId(), NotificationConstants.SEND_STATUS_SUCCESS);
         }

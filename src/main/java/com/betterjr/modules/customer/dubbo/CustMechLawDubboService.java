@@ -71,8 +71,8 @@ public class CustMechLawDubboService implements ICustMechLawService {
 
     @Override
     public String webQueryChangeApply(Long anCustNo, int anFlag, int anPageNum, int anPageSize) {
-        final Page<CustChangeApply> changeApplys = changeService.queryChangeApply(anCustNo, CustomerConstants.ITEM_LAW, anFlag, anPageNum,
-                anPageSize);
+        final Page<CustChangeApply> changeApplys = changeService.queryChangeApply(anCustNo, CustomerConstants.ITEM_LAW,
+                anFlag, anPageNum, anPageSize);
         return AjaxObject.newOkWithPage("法人信息-变更列表查询 成功", changeApplys).toJson();
     }
 
@@ -85,25 +85,29 @@ public class CustMechLawDubboService implements ICustMechLawService {
     @Override
     public String webSaveChangeApply(Map<String, Object> anParam, Long anApplyId, String anFileList) {
         final CustMechLawTmp custMechLawTmp = (CustMechLawTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return AjaxObject.newOk("法人信息-变更修改 成功", lawTmpService.saveChangeApply(custMechLawTmp, anApplyId, anFileList)).toJson();
+        return AjaxObject.newOk("法人信息-变更修改 成功", lawTmpService.saveChangeApply(custMechLawTmp, anApplyId, anFileList))
+                .toJson();
     }
 
     @Override
     public String webAddInsteadRecord(Map<String, Object> anParam, Long anInsteadRecordId, String anFileList) {
         final CustMechLawTmp custMechLawTmp = (CustMechLawTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return AjaxObject.newOk("法人信息-代录添加 成功", lawTmpService.addInsteadRecord(custMechLawTmp, anInsteadRecordId, anFileList)).toJson();
+        return AjaxObject
+                .newOk("法人信息-代录添加 成功", lawTmpService.addInsteadRecord(custMechLawTmp, anInsteadRecordId, anFileList))
+                .toJson();
     }
 
     @Override
     public String webSaveInsteadRecord(Map<String, Object> anParam, Long anInsteadRecordId, String anFileList) {
         final CustMechLawTmp custMechLawTmp = (CustMechLawTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return AjaxObject.newOk("法人信息-代录修改 成功", lawTmpService.saveInsteadRecord(custMechLawTmp, anInsteadRecordId, anFileList)).toJson();
+        return AjaxObject
+                .newOk("法人信息-代录修改 成功", lawTmpService.saveInsteadRecord(custMechLawTmp, anInsteadRecordId, anFileList))
+                .toJson();
     }
 
     @Override
     public String webFindInsteadRecord(Long anId) {
         return AjaxObject.newOk("法人信息-代录详情 成功", lawTmpService.findCustMechLawTmpByInsteadRecord(anId)).toJson();
     }
-
 
 }

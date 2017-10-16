@@ -85,11 +85,10 @@ public class CustWeChatDubboService implements ICustWeChatService {
         return wechatService.saveWeChatInfo(anWeChatInfo);
     }
 
-
     @Override
     public Map<String, Object> saveLogin(final AccessToken anToken) {
         final Map<String, Object> result = new HashMap<>();
-        final String [] returnMsg = new String[1];
+        final String[] returnMsg = new String[1];
         final CustOperatorInfo operator = wechatService.saveLogin(anToken, returnMsg);
         if (operator != null) {
             result.put("operator", operator);
@@ -100,10 +99,13 @@ public class CustWeChatDubboService implements ICustWeChatService {
     }
 
     @Override
-    public String webSaveMobileTradePass(final String anNewPasswd, final String anOkPasswd, final String anLoginPasswd) {
-        return AjaxObject.newOk("交易密码保存成功", wechatService.saveMobileTradePass(anNewPasswd, anOkPasswd, anLoginPasswd, CustPasswordType.ORG)).toJson();
+    public String webSaveMobileTradePass(final String anNewPasswd, final String anOkPasswd,
+            final String anLoginPasswd) {
+        return AjaxObject
+                .newOk("交易密码保存成功",
+                        wechatService.saveMobileTradePass(anNewPasswd, anOkPasswd, anLoginPasswd, CustPasswordType.ORG))
+                .toJson();
     }
-
 
     /* (non-Javadoc)
      * @see com.betterjr.modules.account.dubbo.interfaces.ICustTradePassService#webSaveFristLoginTradePassword(java.lang.String)
@@ -153,6 +155,5 @@ public class CustWeChatDubboService implements ICustWeChatService {
     public Object fileUpload(final String anFileTypeName, final String anFileMediaId) {
         return wechatService.fileUpload(anFileTypeName, anFileMediaId);
     }
-
 
 }

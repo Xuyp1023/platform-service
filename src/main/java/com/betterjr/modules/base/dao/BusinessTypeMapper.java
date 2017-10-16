@@ -5,5 +5,4 @@ import com.betterjr.mapper.common.Mapper;
 import com.betterjr.modules.base.entity.BusinessType;
 
 @BetterjrMapper
-public interface BusinessTypeMapper extends Mapper<BusinessType> {
-}
+public interface BusinessTypeMapper extends Mapper<BusinessType> {}

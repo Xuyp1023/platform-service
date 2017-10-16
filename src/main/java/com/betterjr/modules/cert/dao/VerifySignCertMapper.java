@@ -5,5 +5,4 @@ import com.betterjr.mapper.common.Mapper;
 import com.betterjr.modules.cert.entity.VerifySignCert;
 
 @BetterjrMapper
-public interface VerifySignCertMapper extends Mapper<VerifySignCert> {
-}
+public interface VerifySignCertMapper extends Mapper<VerifySignCert> {}

@@ -7,6 +7,7 @@ import com.betterjr.modules.workflow.dao.CustFlowInstanceBusinessMapper;
 import com.betterjr.modules.workflow.entity.CustFlowInstanceBusiness;
 
 @Service
-public class CustFlowInstanceBusinessService extends BaseService<CustFlowInstanceBusinessMapper, CustFlowInstanceBusiness> {
+public class CustFlowInstanceBusinessService
+        extends BaseService<CustFlowInstanceBusinessMapper, CustFlowInstanceBusiness> {
 
 }

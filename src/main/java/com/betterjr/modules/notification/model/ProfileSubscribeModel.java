@@ -3,7 +3,7 @@ package com.betterjr.modules.notification.model;
 import java.io.Serializable;
 import java.util.List;
 
-public class ProfileSubscribeModel implements Serializable{
+public class ProfileSubscribeModel implements Serializable {
     /**
      *
      */

@@ -5,5 +5,4 @@ import com.betterjr.mapper.common.Mapper;
 import com.betterjr.modules.notification.entity.NotificationChannelProfile;
 
 @BetterjrMapper
-public interface NotificationChannelProfileMapper extends Mapper<NotificationChannelProfile> {
-}
+public interface NotificationChannelProfileMapper extends Mapper<NotificationChannelProfile> {}

@@ -16,7 +16,6 @@ import com.betterjr.modules.customer.entity.CustFinancing;
 @Service
 public class CustFinancingService extends BaseService<CustFinancingMapper, CustFinancing> {
 
-
     /**
      * 查询融资情况列表
      * @param anCustNo
@@ -24,19 +23,19 @@ public class CustFinancingService extends BaseService<CustFinancingMapper, CustF
      */
     public Page<CustFinancing> queryCustFinancingByCustNo(Long anCustNo, String anFlag, int anPageNum, int anPageSize) {
         BTAssert.notNull(anCustNo, "客户编号不允许为空！");
-        
+
         return this.selectPropertyByPage("custNo", anCustNo, anPageNum, anPageSize, "1".equals(anFlag));
     }
-    
+
     /**
      * 查询融资情况信息
      */
     public CustFinancing findCustFinancing(Long anId) {
         BTAssert.notNull(anId, "融资情况编号不允许为空！");
-        
+
         return this.selectByPrimaryKey(anId);
     }
-    
+
     /**
      * 添加融资情况信息
      * @param anCustFinancing
@@ -44,12 +43,12 @@ public class CustFinancingService extends BaseService<CustFinancingMapper, CustF
      */
     public CustFinancing addCustFinancing(CustFinancing anCustFinancing) {
         BTAssert.notNull(anCustFinancing, "融资情况信息不允许为空！");
-        
+
         anCustFinancing.initAddValue();
         this.insert(anCustFinancing);
         return anCustFinancing;
     }
-    
+
     /**
      * 保存融资情况信息
      * @param anCustFinancing
@@ -61,12 +60,12 @@ public class CustFinancingService extends BaseService<CustFinancingMapper, CustF
         BTAssert.notNull(anCustFinancing, "融资情况信息不允许为空！");
         final CustFinancing tempCustFinancing = this.selectByPrimaryKey(anId);
         BTAssert.notNull(tempCustFinancing, "对应的融资情况信息没有找到！");
-        
+
         tempCustFinancing.initModifyValue(anCustFinancing);
         this.updateByPrimaryKeySelective(tempCustFinancing);
         return tempCustFinancing;
     }
-    
+
     /**
      * 删除融资情况信息
      */

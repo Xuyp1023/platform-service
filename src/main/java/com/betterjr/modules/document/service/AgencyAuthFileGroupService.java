@@ -7,11 +7,11 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.service.BaseService;
-import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.QueryTermBuilder;
 import com.betterjr.modules.document.dao.AgencyAuthorFileGroupMapper;
@@ -31,8 +31,7 @@ public class AgencyAuthFileGroupService extends BaseService<AgencyAuthorFileGrou
         Map<String, AgencyAuthorFileGroup> tmpGroupMap = new HashMap();
         for (AgencyAuthorFileGroup fileGroup : this.selectByProperty("groupStatus", "1")) {
             tmpGroupMap.put(fileGroup.findComposeKey(), fileGroup);
-        }
-        ;
+        } ;
 
         synchronized (fileGroupMap) {
             fileGroupMap.clear();
@@ -92,7 +91,7 @@ public class AgencyAuthFileGroupService extends BaseService<AgencyAuthorFileGrou
      * @return
      */
     public String findTempFilePath(String anAgencyNo, String anFileInfoType) {
-        
+
         return findFilePath(anAgencyNo, anFileInfoType, false);
     }
 
@@ -108,18 +107,17 @@ public class AgencyAuthFileGroupService extends BaseService<AgencyAuthorFileGrou
     }
 
     private String findFilePath(String anAgencyNo, String anFileInfoType, boolean anDemo) {
-        if (BetterStringUtils.isBlank(anAgencyNo) || BetterStringUtils.isBlank(anFileInfoType)) {
+        if (StringUtils.isBlank(anAgencyNo) || StringUtils.isBlank(anFileInfoType)) {
             return "";
         }
-        List<AgencyAuthorFileGroup> tmpList = this.selectByProperty(
-                QueryTermBuilder.newInstance().put("agencyNo", anAgencyNo).put("fileInfoType", anFileInfoType).put("groupStatus", "1").build());
+        List<AgencyAuthorFileGroup> tmpList = this.selectByProperty(QueryTermBuilder.newInstance()
+                .put("agencyNo", anAgencyNo).put("fileInfoType", anFileInfoType).put("groupStatus", "1").build());
         AgencyAuthorFileGroup tmpFileGroup = Collections3.getOnlyOne(tmpList);
         String tmpPath = "";
         if (tmpFileGroup != null) {
             if (anDemo) {
                 tmpPath = tmpFileGroup.findDemoPath();
-            }
-            else {
+            } else {
                 tmpPath = tmpFileGroup.findTempPath();
             }
             FileStoreType storeType = fileGroupService.findFileStoreType(anFileInfoType);
@@ -129,15 +127,13 @@ public class AgencyAuthFileGroupService extends BaseService<AgencyAuthorFileGrou
         }
         return tmpPath;
     }
-    
 
-    
     /***
      * 根据不同条件查询返回文件类型对象
      * @param anMap 条件
      * @return
      */
-    public AgencyAuthorFileGroup findAuthorFileGroupByMap(Map<String, Object> anMap){
+    public AgencyAuthorFileGroup findAuthorFileGroupByMap(Map<String, Object> anMap) {
         return Collections3.getFirst(this.selectByProperty(anMap));
     }
 }

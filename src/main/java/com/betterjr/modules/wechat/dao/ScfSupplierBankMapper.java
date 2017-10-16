@@ -5,5 +5,4 @@ import com.betterjr.mapper.common.Mapper;
 import com.betterjr.modules.wechat.entity.ScfSupplierBank;
 
 @BetterjrMapper
-public interface ScfSupplierBankMapper extends Mapper<ScfSupplierBank> {
-}
+public interface ScfSupplierBankMapper extends Mapper<ScfSupplierBank> {}

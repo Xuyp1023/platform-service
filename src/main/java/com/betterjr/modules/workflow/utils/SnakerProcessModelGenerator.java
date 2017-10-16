@@ -3,12 +3,11 @@ package com.betterjr.modules.workflow.utils;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.snaker.engine.SnakerEngine;
+import org.apache.commons.lang3.StringUtils;
 import org.snaker.engine.model.DecisionModel;
 import org.snaker.engine.model.EndModel;
 import org.snaker.engine.model.ForkModel;
@@ -24,8 +23,6 @@ import com.betterjr.common.mapper.BeanMapper;
 import com.betterjr.common.mapper.JsonMapper;
 import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
-import com.betterjr.common.utils.UserUtils;
-import com.betterjr.modules.workflow.data.AuditType;
 import com.betterjr.modules.workflow.data.FlowNodeRole;
 import com.betterjr.modules.workflow.entity.CustFlowBase;
 import com.betterjr.modules.workflow.entity.CustFlowMoney;
@@ -40,22 +37,19 @@ public class SnakerProcessModelGenerator {
     private List<CustFlowStep> stepList;
     private Map<Long, List<CustFlowStepApprovers>> stepApproversMap;
     private Map<Long, CustFlowMoney> moneyMap;
-    
-    private int xAxis=24;
-    private int yAxis=124;
-    private final int yIncrement=100;
-    private final int xIncrement=150;
-    private int transitionIndex=1;
-    
-    private HashMap<String,Integer> markRepeatCountMap=new HashMap<String,Integer>();
-    
 
+    private int xAxis = 24;
+    private int yAxis = 124;
+    private final int yIncrement = 100;
+    private final int xIncrement = 150;
+    private int transitionIndex = 1;
+
+    private HashMap<String, Integer> markRepeatCountMap = new HashMap<String, Integer>();
 
     public SnakerProcessModelGenerator() {
         long processId = 100l;
         Long step1Id = 200l;
         Long step2Id = 300l;
-
 
         stepApproversMap = new HashMap<Long, List<CustFlowStepApprovers>>();
 
@@ -132,13 +126,12 @@ public class SnakerProcessModelGenerator {
         stepAppsListStep2.add(app3Step2);
         stepAppsListStep2.add(app4Step2);
         stepApproversMap.put(step2Id, stepAppsListStep2);
-        
+
         base = new CustFlowBase();
         base.setId(processId);
         base.setFlowType("Trade");
         base.setMonitorOperId(111l);
         base.setMonitorOperName("hewei");
-        
 
         stepList = new ArrayList<CustFlowStep>();
         CustFlowStep step1 = new CustFlowStep();
@@ -189,11 +182,11 @@ public class SnakerProcessModelGenerator {
                 tranFromPrevStep.setSource(startModel);
             }
             CustFlowStep step = stepList.get(index);
-            List<NodeModel> stepNodeList=new ArrayList<NodeModel>();
+            List<NodeModel> stepNodeList = new ArrayList<NodeModel>();
             TransitionModel nextStep = this.createOneStepProcess(step, tranFromPrevStep, stepNodeList);
-            this.populateStepLayout(tranFromPrevStep,stepNodeList,nodeList);
+            this.populateStepLayout(tranFromPrevStep, stepNodeList, nodeList);
             nodeList.addAll(stepNodeList);
-            tranFromPrevStep=nextStep;
+            tranFromPrevStep = nextStep;
         }
         EndModel endModel = new EndModel();
         endModel.setName("end");
@@ -207,84 +200,83 @@ public class SnakerProcessModelGenerator {
     }
 
     private void xAxisIncrement() {
-        this.xAxis=this.xAxis+xIncrement;
+        this.xAxis = this.xAxis + xIncrement;
     }
-    
+
     /**
      * 设置一个step生成的所有节点的layout
      * @param start
      * @param newNodeList
      * @param prevNodeList
      */
-    private void populateStepLayout(TransitionModel start,List<NodeModel> newNodeList,List<NodeModel> prevNodeList){
-        //step start
-        List<TaskModel> taskList=new ArrayList<TaskModel>();
-        List<DecisionModel> decisionList=new ArrayList<DecisionModel>();
-        List<ForkModel> forkList=new ArrayList<ForkModel>();
-        List<JoinModel> forkJoinList=new ArrayList<JoinModel>();
-        List<JoinModel> decisionJoinList=new ArrayList<JoinModel>();
-        for(NodeModel node:newNodeList){
-            if(node instanceof TaskModel){
-                taskList.add((TaskModel)node);
+    private void populateStepLayout(TransitionModel start, List<NodeModel> newNodeList, List<NodeModel> prevNodeList) {
+        // step start
+        List<TaskModel> taskList = new ArrayList<TaskModel>();
+        List<DecisionModel> decisionList = new ArrayList<DecisionModel>();
+        List<ForkModel> forkList = new ArrayList<ForkModel>();
+        List<JoinModel> forkJoinList = new ArrayList<JoinModel>();
+        List<JoinModel> decisionJoinList = new ArrayList<JoinModel>();
+        for (NodeModel node : newNodeList) {
+            if (node instanceof TaskModel) {
+                taskList.add((TaskModel) node);
             }
-            if(node instanceof DecisionModel){
-                decisionList.add((DecisionModel)node);
+            if (node instanceof DecisionModel) {
+                decisionList.add((DecisionModel) node);
             }
-            if(node instanceof ForkModel){
-                forkList.add((ForkModel)node);
+            if (node instanceof ForkModel) {
+                forkList.add((ForkModel) node);
             }
-            if(node instanceof JoinModel){
-                boolean isDecisionJoin=true;
-                for(TransitionModel tm : node.getOutputs()) {
-                    if(tm.getTarget()!=null){
-                        isDecisionJoin=false;
+            if (node instanceof JoinModel) {
+                boolean isDecisionJoin = true;
+                for (TransitionModel tm : node.getOutputs()) {
+                    if (tm.getTarget() != null) {
+                        isDecisionJoin = false;
                         break;
                     }
                 }
-                if(isDecisionJoin){
-                    decisionJoinList.add((JoinModel)node);
-                }else{
-                    forkJoinList.add((JoinModel)node);
+                if (isDecisionJoin) {
+                    decisionJoinList.add((JoinModel) node);
+                } else {
+                    forkJoinList.add((JoinModel) node);
                 }
             }
         }
-        
-        //re-change y-axis
-        int taskCount=taskList.size();
-        int topY=this.yAxis-(yIncrement*(taskCount/2+1));
-        if(topY<0){
-            this.yAxis=this.yAxis-topY;
-            
-            for(NodeModel prevNode:prevNodeList){
-                String layOut=prevNode.getLayout();
-                List<String> layOutItemList=BetterStringUtils.splitTrim(layOut, ",");
-                int y=BetterStringUtils.toInteger(layOutItemList.get(1));
-                y=y-topY;
-                layOutItemList.set(1,String.valueOf(y));
-                prevNode.setLayout(BetterStringUtils.join(layOutItemList, ","));
+
+        // re-change y-axis
+        int taskCount = taskList.size();
+        int topY = this.yAxis - (yIncrement * (taskCount / 2 + 1));
+        if (topY < 0) {
+            this.yAxis = this.yAxis - topY;
+
+            for (NodeModel prevNode : prevNodeList) {
+                String layOut = prevNode.getLayout();
+                List<String> layOutItemList = BetterStringUtils.splitTrim(layOut, ",");
+                int y = BetterStringUtils.toInteger(layOutItemList.get(1));
+                y = y - topY;
+                layOutItemList.set(1, String.valueOf(y));
+                prevNode.setLayout(StringUtils.join(layOutItemList, ","));
             }
         }
 
-        
-        //set layout
-        //decision
-        if(!Collections3.isEmpty(decisionList)){
+        // set layout
+        // decision
+        if (!Collections3.isEmpty(decisionList)) {
             this.populateStepSubLayout(decisionList);
         }
-        //fork
-        if(!Collections3.isEmpty(forkList)){
+        // fork
+        if (!Collections3.isEmpty(forkList)) {
             this.populateStepSubLayout(forkList);
         }
-        //task
-        if(!Collections3.isEmpty(taskList)){
+        // task
+        if (!Collections3.isEmpty(taskList)) {
             this.populateStepSubLayout(taskList);
         }
-        //fork join
-        if(!Collections3.isEmpty(forkJoinList)){
+        // fork join
+        if (!Collections3.isEmpty(forkJoinList)) {
             this.populateStepSubLayout(forkJoinList);
         }
-        //decision join
-        if(!Collections3.isEmpty(decisionJoinList)){
+        // decision join
+        if (!Collections3.isEmpty(decisionJoinList)) {
             this.populateStepSubLayout(decisionJoinList);
         }
     }
@@ -295,25 +287,26 @@ public class SnakerProcessModelGenerator {
      */
     private void populateStepSubLayout(List<? extends NodeModel> nodeList) {
         xAxisIncrement();
-        int count=nodeList.size();
-        for(int index=0;index<nodeList.size();index++){
-            NodeModel node=nodeList.get(index);
-            int y=this.yAxis+(yIncrement*(index-(count/2)));
+        int count = nodeList.size();
+        for (int index = 0; index < nodeList.size(); index++) {
+            NodeModel node = nodeList.get(index);
+            int y = this.yAxis + (yIncrement * (index - (count / 2)));
             this.populateNodeLayout(node, this.xAxis, y);
         }
     }
 
     private void populateTransitionModel(TransitionModel model) {
-        model.setName("transition"+this.transitionIndex);
+        model.setName("transition" + this.transitionIndex);
         this.transitionIndex++;
         model.setDisplayName("");
     }
 
-    private void populateNodeLayout(NodeModel node,int x,int y) {
-        node.setLayout(x+","+y+",-1,-1");
+    private void populateNodeLayout(NodeModel node, int x, int y) {
+        node.setLayout(x + "," + y + ",-1,-1");
     }
 
-    private TransitionModel createOneStepProcess(CustFlowStep step, TransitionModel tranFromPrevStep, List<NodeModel> nodeList) {
+    private TransitionModel createOneStepProcess(CustFlowStep step, TransitionModel tranFromPrevStep,
+            List<NodeModel> nodeList) {
         // 生成所有的task model
         // 根据金额区间分类task model ，如果分类超过1个，则生成1个decision model，一个jion model
         // 在同类task model中，如果个数>1，生成一个fork model，一个join model
@@ -321,16 +314,16 @@ public class SnakerProcessModelGenerator {
 
         List<CustFlowStepApprovers> stepApprovers = stepApproversMap.get(step.getId());
         if (Collections3.isEmpty(stepApprovers)) {
-            if(FlowNodeRole.Factoring.equals(step.getNodeRole())){
+            if (FlowNodeRole.Factoring.equals(step.getNodeRole())) {
                 return tranFromPrevStep;
-            }else{
-                CustFlowStepApprovers newapp=new CustFlowStepApprovers();
+            } else {
+                CustFlowStepApprovers newapp = new CustFlowStepApprovers();
                 newapp.setAuditMoneyId(CustFlowMoney.DefaultMoney);
                 newapp.setStepId(step.getId());
                 newapp.setId(-1l);
                 newapp.setWeight(CustFlowStepApprovers.MaxWeight);
                 this.stepApproversMap.put(step.getId(), Collections.singletonList(newapp));
-                stepApprovers= stepApproversMap.get(step.getId());
+                stepApprovers = stepApproversMap.get(step.getId());
             }
         }
 
@@ -355,15 +348,15 @@ public class SnakerProcessModelGenerator {
             TransitionModel tail = null;
             if (classList.size() > 1) {
                 ForkModel forkModel = new ForkModel();
-                forkModel.setName("fork-"+step.getId() + "-" + moneyId );
+                forkModel.setName("fork-" + step.getId() + "-" + moneyId);
                 nodeList.add(forkModel);
                 JoinModel join2Model = new ExtJoinModel();
-                join2Model.setName("join-"+step.getId() + "-" + moneyId );
+                join2Model.setName("join-" + step.getId() + "-" + moneyId);
                 nodeList.add(join2Model);
                 List<TransitionModel> forkOutputs = new ArrayList<TransitionModel>();
                 List<TransitionModel> joinInputputs = new ArrayList<TransitionModel>();
-                for (int classIndex=0;classIndex<classList.size();classIndex++) {
-                    CustFlowStepApprovers app=classList.get(classIndex);
+                for (int classIndex = 0; classIndex < classList.size(); classIndex++) {
+                    CustFlowStepApprovers app = classList.get(classIndex);
                     ExtTaskModel taskModel = new ExtTaskModel();
                     taskModel.setHasWeight(true);
                     taskModel.setWeight(app.getWeight());
@@ -395,10 +388,9 @@ public class SnakerProcessModelGenerator {
                 //
                 head = forkModel;
                 tail = trans3;
-            }
-            else {
-                for (int classIndex=0;classIndex<classList.size();classIndex++) {
-                    CustFlowStepApprovers app=classList.get(classIndex);
+            } else {
+                for (int classIndex = 0; classIndex < classList.size(); classIndex++) {
+                    CustFlowStepApprovers app = classList.get(classIndex);
                     TaskModel taskModel = new ExtTaskModel();
                     nodeList.add(taskModel);
                     populateTaskModel(step, app, taskModel);
@@ -418,10 +410,10 @@ public class SnakerProcessModelGenerator {
 
         if (moneyClassMap.size() > 1) {
             DecisionModel decisionModel = new DecisionModel();
-            decisionModel.setName("decision"+step.getId());
+            decisionModel.setName("decision" + step.getId());
             nodeList.add(decisionModel);
             JoinModel joinModel = new JoinModel();
-            joinModel.setName("join"+step.getId());
+            joinModel.setName("join" + step.getId());
             nodeList.add(joinModel);
             // set decision point to head list
             List<TransitionModel> transList = new ArrayList<TransitionModel>();
@@ -451,9 +443,8 @@ public class SnakerProcessModelGenerator {
             tranFromPrevStep.setTarget(decisionModel);
             decisionModel.setInputs(Collections.singletonList(tranFromPrevStep));
             return trans;
-        }
-        else {
-            NodeModel node=Collections3.getFirst(headList.values());
+        } else {
+            NodeModel node = Collections3.getFirst(headList.values());
             tranFromPrevStep.setTarget(node);
             node.setInputs(Collections.singletonList(tranFromPrevStep));
             return tailList.get(0);
@@ -462,18 +453,18 @@ public class SnakerProcessModelGenerator {
     }
 
     private void populateTaskModel(CustFlowStep step, CustFlowStepApprovers app, TaskModel taskModel) {
-        String nodeName = step.getNodeId()+"-"+app.getId();
-        String nodeDispName=step.getNodeName();
+        String nodeName = step.getNodeId() + "-" + app.getId();
+        String nodeDispName = step.getNodeName();
 
         taskModel.setName(nodeName);
         taskModel.setDisplayName(nodeDispName);
-            
-        if(FlowNodeRole.Factoring.name().equalsIgnoreCase(step.getNodeRole())){
+
+        if (FlowNodeRole.Factoring.name().equalsIgnoreCase(step.getNodeRole())) {
             taskModel.setAssignee(app.getAuditOperId().toString());
-        }else{
+        } else {
             taskModel.setAssignee(step.getNodeRole());
         }
-        
+
     }
 
     public CustFlowBase getBase() {
@@ -508,14 +499,14 @@ public class SnakerProcessModelGenerator {
         this.moneyMap = moneyMap;
     }
 
-    public static void main(String[] args){
-        SnakerProcessModelGenerator process=new SnakerProcessModelGenerator();
+    public static void main(String[] args) {
+        SnakerProcessModelGenerator process = new SnakerProcessModelGenerator();
         JsonMapper jMapper = JsonMapper.buildNonEmptyMapper();
-        String json=jMapper.toJson(process.base);
+        String json = jMapper.toJson(process.base);
         System.out.println(json);
-        Object base= JsonMapper.parserJson(json);
-        
-        CustFlowBase testObj=BeanMapper.map(base, CustFlowBase.class);
+        Object base = JsonMapper.parserJson(json);
+
+        CustFlowBase testObj = BeanMapper.map(base, CustFlowBase.class);
         System.out.println(base);
         System.out.println(base.getClass());
         System.out.println(testObj);

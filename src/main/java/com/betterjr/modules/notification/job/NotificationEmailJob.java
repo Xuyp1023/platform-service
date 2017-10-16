@@ -43,16 +43,18 @@ public class NotificationEmailJob extends AbstractSimpleElasticJob {
     public void process(final JobExecutionMultipleShardingContext anShardingContext) {
         logger.info("邮件定时处理重发 : " + new Date());
 
-        while(true) {
-            final List<NotificationCustomer> customers = notificationCustomerService.queryUnsendEmailNotificationCustomer(mailRetry);
+        while (true) {
+            final List<NotificationCustomer> customers = notificationCustomerService
+                    .queryUnsendEmailNotificationCustomer(mailRetry);
             if (Collections3.isEmpty(customers) == true) {
                 break;
             }
 
-            for (final NotificationCustomer customer: customers) {
+            for (final NotificationCustomer customer : customers) {
                 // 单条发送逻辑
                 if (sendMail(customer) == true) {
-                    notificationCustomerService.saveNotificationCustomerStatus(customer.getId(), NotificationConstants.SEND_STATUS_SUCCESS);
+                    notificationCustomerService.saveNotificationCustomerStatus(customer.getId(),
+                            NotificationConstants.SEND_STATUS_SUCCESS);
                 } else {
                     notificationCustomerService.saveNotificationCustomerAddRetry(customer.getId());
                 }
@@ -70,7 +72,8 @@ public class NotificationEmailJob extends AbstractSimpleElasticJob {
 
         final List<NotificationAttachment> attachments = notificationService.buildAttachments(batchNo);
 
-        return MailUtils.sendMail(anCustomer.getSendNo(), notification.getSubject(), notification.getContent(), attachments);
+        return MailUtils.sendMail(anCustomer.getSendNo(), notification.getSubject(), notification.getContent(),
+                attachments);
     }
 
 }

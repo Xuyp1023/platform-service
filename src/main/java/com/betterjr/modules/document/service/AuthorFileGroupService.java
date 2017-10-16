@@ -1,5 +1,12 @@
 package com.betterjr.modules.document.service;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+
 import com.betterjr.common.config.ParamNames;
 import com.betterjr.common.config.SpringPropertyResourceReader;
 import com.betterjr.common.data.CheckDataResult;
@@ -7,30 +14,22 @@ import com.betterjr.common.data.NormalStatus;
 import com.betterjr.common.mapper.JsonMapper;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BetterStringUtils;
-import com.betterjr.common.utils.Collections3;
 import com.betterjr.common.utils.Cryptos;
 import com.betterjr.common.utils.FileUtils;
 import com.betterjr.common.utils.reflection.ReflectionUtils;
 import com.betterjr.modules.document.dao.AuthorFileGroupMapper;
 import com.betterjr.modules.document.data.FileStoreType;
 import com.betterjr.modules.document.data.OSSConfigInfo;
-import com.betterjr.modules.document.entity.AgencyAuthorFileGroup;
 import com.betterjr.modules.document.entity.AuthorFileGroup;
 import com.betterjr.modules.sys.service.SysConfigService;
-
-import java.util.*;
-
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.stereotype.Service;
 
 @Service
 public class AuthorFileGroupService extends BaseService<AuthorFileGroupMapper, AuthorFileGroup> {
     private static final String OSS_CONFIG = "OssConfigInfo";
 
     public Map<String, AuthorFileGroup> findAllFileGroup() {
-        Map<String, AuthorFileGroup> fileGroupMap = ReflectionUtils.listConvertToMap(selectByProperty("groupStatus", NormalStatus.VALID_STATUS.value),
-                "fileInfoType");
+        Map<String, AuthorFileGroup> fileGroupMap = ReflectionUtils
+                .listConvertToMap(selectByProperty("groupStatus", NormalStatus.VALID_STATUS.value), "fileInfoType");
 
         return fileGroupMap;
     }
@@ -80,7 +79,7 @@ public class AuthorFileGroupService extends BaseService<AuthorFileGroupMapper, A
         return configInfo;
     }
 
-    public AuthorFileGroup findAuthFileGroup(String anFileInfoType) {        
+    public AuthorFileGroup findAuthFileGroup(String anFileInfoType) {
         AuthorFileGroup fileGroup = this.selectByPrimaryKey(anFileInfoType);
         if (fileGroup == null) {
             fileGroup = new AuthorFileGroup("00", anFileInfoType);
@@ -113,7 +112,7 @@ public class AuthorFileGroupService extends BaseService<AuthorFileGroupMapper, A
      * @return
      */
     public String findAbsFilePath(String anFilePath) {
-        String basePath = (String) SysConfigService.getString(ParamNames.OPENACCO_FILE_DOWNLOAD_PATH);
+        String basePath = SysConfigService.getString(ParamNames.OPENACCO_FILE_DOWNLOAD_PATH);
 
         return basePath + anFilePath;
     }
@@ -124,27 +123,27 @@ public class AuthorFileGroupService extends BaseService<AuthorFileGroupMapper, A
      * @param anFileType 文件类型
      * @return
      */
-    public CheckDataResult findFileTypePermit(String anFileInfoType, String anFileType){
+    public CheckDataResult findFileTypePermit(String anFileInfoType, String anFileType) {
         AuthorFileGroup fileGroup = findAuthFileGroup(anFileInfoType);
         return new CheckDataResult(fileGroup.checkFileType(anFileType), fileGroup.getPermitFileTypes());
     }
-    
+
     /**
      * 查找上传文件允许的文件类型列表信息
      * @param anFileInfoType
      * @return
      */
-    public String findFileTypePermitInfo(String anFileInfoType){
+    public String findFileTypePermitInfo(String anFileInfoType) {
         AuthorFileGroup fileGroup = findAuthFileGroup(anFileInfoType);
         String tmpStr = fileGroup.getPermitFileTypes();
-        if (BetterStringUtils.isBlank(tmpStr)){
-            tmpStr = BetterStringUtils.join(FileUtils.SupportedUploadFileType, ",");
+        if (StringUtils.isBlank(tmpStr)) {
+            tmpStr = StringUtils.join(FileUtils.SupportedUploadFileType, ",");
         }
         StringBuilder sb = new StringBuilder();
-        for(String tmpChar: BetterStringUtils.splitTrim(tmpStr)){
+        for (String tmpChar : BetterStringUtils.splitTrim(tmpStr)) {
             sb.append("*.").append(tmpChar).append(", ");
         }
-        sb.setLength( sb.length() -2);
+        sb.setLength(sb.length() - 2);
         return sb.toString();
     }
 }

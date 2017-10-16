@@ -6,6 +6,7 @@ package com.betterjr.modules.notification.provider;
   * 优易网关soap接口地址：http://inter.smswang.net:7801/sms?wsdl
   */
 
+import org.apache.axis.Constants;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.slf4j.Logger;
@@ -24,14 +25,16 @@ public class UegateSoap {
             Call call = (Call) service.createCall();
             call.setTargetEndpointAddress(endpoint);
             call.setOperationName("Submit");
-            call.addParameter("spID", org.apache.axis.encoding.XMLType.XSD_DATE, javax.xml.rpc.ParameterMode.IN);
-            call.addParameter("password", org.apache.axis.encoding.XMLType.XSD_DATE, javax.xml.rpc.ParameterMode.IN);
-            call.addParameter("accessCode", org.apache.axis.encoding.XMLType.XSD_DATE, javax.xml.rpc.ParameterMode.IN);
-            call.addParameter("content", org.apache.axis.encoding.XMLType.XSD_DATE, javax.xml.rpc.ParameterMode.IN);
-            call.addParameter("mobileString", org.apache.axis.encoding.XMLType.XSD_DATE, javax.xml.rpc.ParameterMode.IN);
-            call.setReturnType(org.apache.axis.encoding.XMLType.XSD_STRING);
+            call.addParameter("spID", Constants.XSD_DATE, javax.xml.rpc.ParameterMode.IN);
+            call.addParameter("password", Constants.XSD_DATE, javax.xml.rpc.ParameterMode.IN);
+            call.addParameter("accessCode", Constants.XSD_DATE, javax.xml.rpc.ParameterMode.IN);
+            call.addParameter("content", Constants.XSD_DATE, javax.xml.rpc.ParameterMode.IN);
+            call.addParameter("mobileString", Constants.XSD_DATE,
+                    javax.xml.rpc.ParameterMode.IN);
+            call.setReturnType(Constants.XSD_STRING);
             call.setUseSOAPAction(true);
-            call.setSOAPActionURI("http://schemas.microsoft.com/clr/nsassem/com.softwee.smgw.soaps.Soap57Provider/soaps#Submit");
+            call.setSOAPActionURI(
+                    "http://schemas.microsoft.com/clr/nsassem/com.softwee.smgw.soaps.Soap57Provider/soaps#Submit");
             result = (String) call.invoke("Submit", new Object[] { spID, password, accessCode, content, mobileString });
         }
         catch (Exception e) {
@@ -50,11 +53,12 @@ public class UegateSoap {
             Call call = (Call) service.createCall();
             call.setTargetEndpointAddress(endpoint);
             call.setOperationName("QueryMo");
-            call.addParameter("spID", org.apache.axis.encoding.XMLType.XSD_DATE, javax.xml.rpc.ParameterMode.IN);
-            call.addParameter("password", org.apache.axis.encoding.XMLType.XSD_DATE, javax.xml.rpc.ParameterMode.IN);
-            call.setReturnType(org.apache.axis.encoding.XMLType.XSD_STRING);
+            call.addParameter("spID", Constants.XSD_DATE, javax.xml.rpc.ParameterMode.IN);
+            call.addParameter("password", Constants.XSD_DATE, javax.xml.rpc.ParameterMode.IN);
+            call.setReturnType(Constants.XSD_STRING);
             call.setUseSOAPAction(true);
-            call.setSOAPActionURI("http://schemas.microsoft.com/clr/nsassem/com.softwee.smgw.soaps.Soap57Provider/soaps#QueryMo");
+            call.setSOAPActionURI(
+                    "http://schemas.microsoft.com/clr/nsassem/com.softwee.smgw.soaps.Soap57Provider/soaps#QueryMo");
             result = (String) call.invoke("QueryMo", new Object[] { spID, password });
         }
         catch (Exception e) {
@@ -73,11 +77,12 @@ public class UegateSoap {
             Call call = (Call) service.createCall();
             call.setTargetEndpointAddress(endpoint);
             call.setOperationName("Submit");
-            call.addParameter("spID", org.apache.axis.encoding.XMLType.XSD_DATE, javax.xml.rpc.ParameterMode.IN);
-            call.addParameter("password", org.apache.axis.encoding.XMLType.XSD_DATE, javax.xml.rpc.ParameterMode.IN);
-            call.setReturnType(org.apache.axis.encoding.XMLType.XSD_STRING);
+            call.addParameter("spID", Constants.XSD_DATE, javax.xml.rpc.ParameterMode.IN);
+            call.addParameter("password", Constants.XSD_DATE, javax.xml.rpc.ParameterMode.IN);
+            call.setReturnType(Constants.XSD_STRING);
             call.setUseSOAPAction(true);
-            call.setSOAPActionURI("http://schemas.microsoft.com/clr/nsassem/com.softwee.smgw.soaps.Soap57Provider/soaps#QueryReport");
+            call.setSOAPActionURI(
+                    "http://schemas.microsoft.com/clr/nsassem/com.softwee.smgw.soaps.Soap57Provider/soaps#QueryReport");
             result = (String) call.invoke("QueryReport", new Object[] { spID, password });
         }
         catch (Exception e) {
@@ -96,11 +101,12 @@ public class UegateSoap {
             Call call = (Call) service.createCall();
             call.setTargetEndpointAddress(endpoint);
             call.setOperationName("RetrieveAll");
-            call.addParameter("spID", org.apache.axis.encoding.XMLType.XSD_DATE, javax.xml.rpc.ParameterMode.IN);
-            call.addParameter("password", org.apache.axis.encoding.XMLType.XSD_DATE, javax.xml.rpc.ParameterMode.IN);
-            call.setReturnType(org.apache.axis.encoding.XMLType.XSD_STRING);
+            call.addParameter("spID", Constants.XSD_DATE, javax.xml.rpc.ParameterMode.IN);
+            call.addParameter("password", Constants.XSD_DATE, javax.xml.rpc.ParameterMode.IN);
+            call.setReturnType(Constants.XSD_STRING);
             call.setUseSOAPAction(true);
-            call.setSOAPActionURI("http://schemas.microsoft.com/clr/nsassem/com.softwee.smgw.soaps.Soap57Provider/soaps#RetrieveAll");
+            call.setSOAPActionURI(
+                    "http://schemas.microsoft.com/clr/nsassem/com.softwee.smgw.soaps.Soap57Provider/soaps#RetrieveAll");
             result = (String) call.invoke("RetrieveAll", new Object[] { spID, password });
         }
         catch (Exception e) {

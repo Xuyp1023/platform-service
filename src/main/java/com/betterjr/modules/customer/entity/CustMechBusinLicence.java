@@ -24,226 +24,226 @@ public class CustMechBusinLicence implements BetterjrEntity {
      * 编号
      */
     @Id
-    @Column(name = "ID",  columnDefinition="INTEGER" )
-    @MetaData( value="编号", comments = "编号")
+    @Column(name = "ID", columnDefinition = "INTEGER")
+    @MetaData(value = "编号", comments = "编号")
     private Long id;
 
     /**
      * 数据版本号
      */
     @JsonIgnore
-    @Column(name = "N_VERSION",  columnDefinition="INTEGER" )
-    @MetaData( value="数据版本号", comments = "数据版本号")
+    @Column(name = "N_VERSION", columnDefinition = "INTEGER")
+    @MetaData(value = "数据版本号", comments = "数据版本号")
     private Long version;
 
     /**
      * 统一社会信用代码
      */
-    @Column(name = "C_UNIFIED_CODE",  columnDefinition="VARCHAR" )
-    @MetaData( value="统一社会信用代码", comments = "统一社会信用代码")
+    @Column(name = "C_UNIFIED_CODE", columnDefinition = "VARCHAR")
+    @MetaData(value = "统一社会信用代码", comments = "统一社会信用代码")
     private String unifiedCode;
 
     /**
      * 注册号
      */
-    @Column(name = "C_REG_NO",  columnDefinition="VARCHAR" )
-    @MetaData( value="注册号", comments = "注册号")
+    @Column(name = "C_REG_NO", columnDefinition = "VARCHAR")
+    @MetaData(value = "注册号", comments = "注册号")
     private String regNo;
 
     /**
      * 组织机构代码证号
      */
-    @Column(name = "C_ORG_CODE",  columnDefinition="VARCHAR" )
-    @MetaData( value="组织机构代码证号", comments = "组织机构代码证号")
+    @Column(name = "C_ORG_CODE", columnDefinition = "VARCHAR")
+    @MetaData(value = "组织机构代码证号", comments = "组织机构代码证号")
     private String orgCode;
 
     /**
      * 税务登记证号
      */
-    @Column(name = "C_TAX_NO",  columnDefinition="VARCHAR" )
-    @MetaData( value="税务登记证号", comments = "税务登记证号")
+    @Column(name = "C_TAX_NO", columnDefinition = "VARCHAR")
+    @MetaData(value = "税务登记证号", comments = "税务登记证号")
     private String taxNo;
 
     /**
      * 企业类型: 0国有企业 1集体所有制企业 2私营企业 3股份制企业 4联营企业 5外商投资企业 6港澳台投资企业 7股份合作企业
      */
-    @Column(name = "C_CORP_TYPE",  columnDefinition="VARCHAR" )
-    @MetaData( value="企业类型", comments = "企业类型: 0国有企业 1集体所有制企业 2私营企业 3股份制企业 4联营企业 5外商投资企业 6港澳台投资企业 7股份合作企业")
+    @Column(name = "C_CORP_TYPE", columnDefinition = "VARCHAR")
+    @MetaData(value = "企业类型", comments = "企业类型: 0国有企业 1集体所有制企业 2私营企业 3股份制企业 4联营企业 5外商投资企业 6港澳台投资企业 7股份合作企业")
     private String corpType;
 
     /**
      * 地址
      */
-    @Column(name = "C_ADDRESS",  columnDefinition="VARCHAR" )
-    @MetaData( value="地址", comments = "地址")
+    @Column(name = "C_ADDRESS", columnDefinition = "VARCHAR")
+    @MetaData(value = "地址", comments = "地址")
     private String address;
 
     /**
      * 法人姓名
      */
-    @Column(name = "C_LAW_NAME",  columnDefinition="VARCHAR" )
-    @MetaData( value="法人姓名", comments = "法人姓名")
+    @Column(name = "C_LAW_NAME", columnDefinition = "VARCHAR")
+    @MetaData(value = "法人姓名", comments = "法人姓名")
     private String lawName;
 
     /**
      * 注册资本
      */
-    @Column(name = "F_REG_CAPITAL",  columnDefinition="VARCHAR" )
-    @MetaData( value="注册资本", comments = "注册资本")
+    @Column(name = "F_REG_CAPITAL", columnDefinition = "VARCHAR")
+    @MetaData(value = "注册资本", comments = "注册资本")
     private String regCapital;
 
     /**
      * 实收资本
      */
-    @Column(name = "F_PAID_CAPITAL",  columnDefinition="VARCHAR" )
-    @MetaData( value="实收资本", comments = "实收资本")
+    @Column(name = "F_PAID_CAPITAL", columnDefinition = "VARCHAR")
+    @MetaData(value = "实收资本", comments = "实收资本")
     private String paidCapital;
 
     /**
      * 成立日期
      */
     @JsonSerialize(using = CustDateJsonSerializer.class)
-    @Column(name = "D_SETUP_DATE",  columnDefinition="VARCHAR" )
-    @MetaData( value="成立日期", comments = "成立日期")
+    @Column(name = "D_SETUP_DATE", columnDefinition = "VARCHAR")
+    @MetaData(value = "成立日期", comments = "成立日期")
     private String setupDate;
 
     /**
      * 经营开始日期
      */
     @JsonSerialize(using = CustDateJsonSerializer.class)
-    @Column(name = "D_START_DATE",  columnDefinition="VARCHAR" )
-    @MetaData( value="经营开始日期", comments = "经营开始日期")
+    @Column(name = "D_START_DATE", columnDefinition = "VARCHAR")
+    @MetaData(value = "经营开始日期", comments = "经营开始日期")
     private String startDate;
 
     /**
      * 经营结束时间
      */
     @JsonSerialize(using = CustDateJsonSerializer.class)
-    @Column(name = "D_END_DATE",  columnDefinition="VARCHAR" )
-    @MetaData( value="经营结束时间", comments = "经营结束时间")
+    @Column(name = "D_END_DATE", columnDefinition = "VARCHAR")
+    @MetaData(value = "经营结束时间", comments = "经营结束时间")
     private String endDate;
 
     /**
      * 登机机关
      */
-    @Column(name = "C_REG_BRANCH",  columnDefinition="VARCHAR" )
-    @MetaData( value="登机机关", comments = "登机机关")
+    @Column(name = "C_REG_BRANCH", columnDefinition = "VARCHAR")
+    @MetaData(value = "登机机关", comments = "登机机关")
     private String regBranch;
 
     /**
      * 制证日期
      */
     @JsonSerialize(using = CustDateJsonSerializer.class)
-    @Column(name = "D_CERTIFIED_DATE",  columnDefinition="VARCHAR" )
-    @MetaData( value="制证日期", comments = "制证日期")
+    @Column(name = "D_CERTIFIED_DATE", columnDefinition = "VARCHAR")
+    @MetaData(value = "制证日期", comments = "制证日期")
     private String certifiedDate;
 
     /**
      * 营业范围
      */
-    @Column(name = "C_BUSIN_SCOPE",  columnDefinition="VARCHAR" )
-    @MetaData( value="营业范围", comments = "营业范围")
+    @Column(name = "C_BUSIN_SCOPE", columnDefinition = "VARCHAR")
+    @MetaData(value = "营业范围", comments = "营业范围")
     private String businScope;
 
     /**
      * 附件
      */
-    @Column(name = "N_BATCHNO",  columnDefinition="INTEGER" )
-    @MetaData( value="附件", comments = "附件")
+    @Column(name = "N_BATCHNO", columnDefinition = "INTEGER")
+    @MetaData(value = "附件", comments = "附件")
     private Long batchNo;
 
     /**
      * 创建人(操作员)ID号
      */
     @JsonIgnore
-    @Column(name = "L_REG_OPERID",  columnDefinition="INTEGER" )
-    @MetaData( value="创建人(操作员)ID号", comments = "创建人(操作员)ID号")
+    @Column(name = "L_REG_OPERID", columnDefinition = "INTEGER")
+    @MetaData(value = "创建人(操作员)ID号", comments = "创建人(操作员)ID号")
     private Long regOperId;
 
     /**
      * 创建人(操作员)姓名
      */
     @JsonIgnore
-    @Column(name = "C_REG_OPERNAME",  columnDefinition="VARCHAR" )
-    @MetaData( value="创建人(操作员)姓名", comments = "创建人(操作员)姓名")
+    @Column(name = "C_REG_OPERNAME", columnDefinition = "VARCHAR")
+    @MetaData(value = "创建人(操作员)姓名", comments = "创建人(操作员)姓名")
     private String regOperName;
 
     /**
      * 创建日期
      */
     @JsonSerialize(using = CustDateJsonSerializer.class)
-    @Column(name = "D_REG_DATE",  columnDefinition="VARCHAR" )
-    @MetaData( value="创建日期", comments = "创建日期")
+    @Column(name = "D_REG_DATE", columnDefinition = "VARCHAR")
+    @MetaData(value = "创建日期", comments = "创建日期")
     private String regDate;
 
     /**
      * 创建时间
      */
     @JsonIgnore
-    @Column(name = "T_REG_TIME",  columnDefinition="VARCHAR" )
-    @MetaData( value="创建时间", comments = "创建时间")
+    @Column(name = "T_REG_TIME", columnDefinition = "VARCHAR")
+    @MetaData(value = "创建时间", comments = "创建时间")
     private String regTime;
 
     /**
      * 修改人(操作员)ID号
      */
     @JsonIgnore
-    @Column(name = "L_MODI_OPERID",  columnDefinition="INTEGER" )
-    @MetaData( value="修改人(操作员)ID号", comments = "修改人(操作员)ID号")
+    @Column(name = "L_MODI_OPERID", columnDefinition = "INTEGER")
+    @MetaData(value = "修改人(操作员)ID号", comments = "修改人(操作员)ID号")
     private Long modiOperId;
 
     /**
      * 修改人(操作员)姓名
      */
     @JsonIgnore
-    @Column(name = "C_MODI_OPERNAME",  columnDefinition="VARCHAR" )
-    @MetaData( value="修改人(操作员)姓名", comments = "修改人(操作员)姓名")
+    @Column(name = "C_MODI_OPERNAME", columnDefinition = "VARCHAR")
+    @MetaData(value = "修改人(操作员)姓名", comments = "修改人(操作员)姓名")
     private String modiOperName;
 
     /**
      * 修改日期
      */
     @JsonSerialize(using = CustDateJsonSerializer.class)
-    @Column(name = "D_MODI_DATE",  columnDefinition="VARCHAR" )
-    @MetaData( value="修改日期", comments = "修改日期")
+    @Column(name = "D_MODI_DATE", columnDefinition = "VARCHAR")
+    @MetaData(value = "修改日期", comments = "修改日期")
     private String modiDate;
 
     /**
      * 修改时间
      */
     @JsonIgnore
-    @Column(name = "T_MODI_TIME",  columnDefinition="VARCHAR" )
-    @MetaData( value="修改时间", comments = "修改时间")
+    @Column(name = "T_MODI_TIME", columnDefinition = "VARCHAR")
+    @MetaData(value = "修改时间", comments = "修改时间")
     private String modiTime;
 
     /**
      * 操作机构
      */
     @JsonIgnore
-    @Column(name = "C_OPERORG",  columnDefinition="VARCHAR" )
-    @MetaData( value="操作机构", comments = "操作机构")
+    @Column(name = "C_OPERORG", columnDefinition = "VARCHAR")
+    @MetaData(value = "操作机构", comments = "操作机构")
     private String operOrg;
 
-    @Column(name = "C_BUSIN_STATUS",  columnDefinition="CHAR" )
-    @MetaData( value="", comments = "")
+    @Column(name = "C_BUSIN_STATUS", columnDefinition = "CHAR")
+    @MetaData(value = "", comments = "")
     private String businStatus;
 
-    @Column(name = "C_LAST_STATUS",  columnDefinition="CHAR" )
-    @MetaData( value="", comments = "")
+    @Column(name = "C_LAST_STATUS", columnDefinition = "CHAR")
+    @MetaData(value = "", comments = "")
     private String lastStatus;
 
     /**
      * 客户编号
      */
-    @Column(name = "L_CUSTNO",  columnDefinition="INTEGER" )
-    @MetaData( value="客户编号", comments = "客户编号")
+    @Column(name = "L_CUSTNO", columnDefinition = "INTEGER")
+    @MetaData(value = "客户编号", comments = "客户编号")
     private Long custNo;
 
     /**
      * 客户全称
      */
-    @Column(name = "C_CUSTNAME",  columnDefinition="VARCHAR" )
-    @MetaData( value="客户全称", comments = "客户全称")
+    @Column(name = "C_CUSTNAME", columnDefinition = "VARCHAR")
+    @MetaData(value = "客户全称", comments = "客户全称")
     private String custName;
 
     private static final long serialVersionUID = 1468812783858L;
@@ -551,36 +551,63 @@ public class CustMechBusinLicence implements BetterjrEntity {
         }
         final CustMechBusinLicence other = (CustMechBusinLicence) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-                && (this.getVersion() == null ? other.getVersion() == null : this.getVersion().equals(other.getVersion()))
-                && (this.getUnifiedCode() == null ? other.getUnifiedCode() == null : this.getUnifiedCode().equals(other.getUnifiedCode()))
+                && (this.getVersion() == null ? other.getVersion() == null
+                        : this.getVersion().equals(other.getVersion()))
+                && (this.getUnifiedCode() == null ? other.getUnifiedCode() == null
+                        : this.getUnifiedCode().equals(other.getUnifiedCode()))
                 && (this.getRegNo() == null ? other.getRegNo() == null : this.getRegNo().equals(other.getRegNo()))
-                && (this.getOrgCode() == null ? other.getOrgCode() == null : this.getOrgCode().equals(other.getOrgCode()))
+                && (this.getOrgCode() == null ? other.getOrgCode() == null
+                        : this.getOrgCode().equals(other.getOrgCode()))
                 && (this.getTaxNo() == null ? other.getTaxNo() == null : this.getTaxNo().equals(other.getTaxNo()))
-                && (this.getCorpType() == null ? other.getCorpType() == null : this.getCorpType().equals(other.getCorpType()))
-                && (this.getAddress() == null ? other.getAddress() == null : this.getAddress().equals(other.getAddress()))
-                && (this.getLawName() == null ? other.getLawName() == null : this.getLawName().equals(other.getLawName()))
-                && (this.getRegCapital() == null ? other.getRegCapital() == null : this.getRegCapital().equals(other.getRegCapital()))
-                && (this.getPaidCapital() == null ? other.getPaidCapital() == null : this.getPaidCapital().equals(other.getPaidCapital()))
-                && (this.getSetupDate() == null ? other.getSetupDate() == null : this.getSetupDate().equals(other.getSetupDate()))
-                && (this.getStartDate() == null ? other.getStartDate() == null : this.getStartDate().equals(other.getStartDate()))
-                && (this.getEndDate() == null ? other.getEndDate() == null : this.getEndDate().equals(other.getEndDate()))
-                && (this.getRegBranch() == null ? other.getRegBranch() == null : this.getRegBranch().equals(other.getRegBranch()))
-                && (this.getCertifiedDate() == null ? other.getCertifiedDate() == null : this.getCertifiedDate().equals(other.getCertifiedDate()))
-                && (this.getBusinScope() == null ? other.getBusinScope() == null : this.getBusinScope().equals(other.getBusinScope()))
-                && (this.getBatchNo() == null ? other.getBatchNo() == null : this.getBatchNo().equals(other.getBatchNo()))
-                && (this.getRegOperId() == null ? other.getRegOperId() == null : this.getRegOperId().equals(other.getRegOperId()))
-                && (this.getRegOperName() == null ? other.getRegOperName() == null : this.getRegOperName().equals(other.getRegOperName()))
-                && (this.getRegDate() == null ? other.getRegDate() == null : this.getRegDate().equals(other.getRegDate()))
-                && (this.getRegTime() == null ? other.getRegTime() == null : this.getRegTime().equals(other.getRegTime()))
-                && (this.getModiOperId() == null ? other.getModiOperId() == null : this.getModiOperId().equals(other.getModiOperId()))
-                && (this.getModiOperName() == null ? other.getModiOperName() == null : this.getModiOperName().equals(other.getModiOperName()))
-                && (this.getModiDate() == null ? other.getModiDate() == null : this.getModiDate().equals(other.getModiDate()))
-                && (this.getModiTime() == null ? other.getModiTime() == null : this.getModiTime().equals(other.getModiTime()))
-                && (this.getOperOrg() == null ? other.getOperOrg() == null : this.getOperOrg().equals(other.getOperOrg()))
-                && (this.getBusinStatus() == null ? other.getBusinStatus() == null : this.getBusinStatus().equals(other.getBusinStatus()))
-                && (this.getLastStatus() == null ? other.getLastStatus() == null : this.getLastStatus().equals(other.getLastStatus()))
+                && (this.getCorpType() == null ? other.getCorpType() == null
+                        : this.getCorpType().equals(other.getCorpType()))
+                && (this.getAddress() == null ? other.getAddress() == null
+                        : this.getAddress().equals(other.getAddress()))
+                && (this.getLawName() == null ? other.getLawName() == null
+                        : this.getLawName().equals(other.getLawName()))
+                && (this.getRegCapital() == null ? other.getRegCapital() == null
+                        : this.getRegCapital().equals(other.getRegCapital()))
+                && (this.getPaidCapital() == null ? other.getPaidCapital() == null
+                        : this.getPaidCapital().equals(other.getPaidCapital()))
+                && (this.getSetupDate() == null ? other.getSetupDate() == null
+                        : this.getSetupDate().equals(other.getSetupDate()))
+                && (this.getStartDate() == null ? other.getStartDate() == null
+                        : this.getStartDate().equals(other.getStartDate()))
+                && (this.getEndDate() == null ? other.getEndDate() == null
+                        : this.getEndDate().equals(other.getEndDate()))
+                && (this.getRegBranch() == null ? other.getRegBranch() == null
+                        : this.getRegBranch().equals(other.getRegBranch()))
+                && (this.getCertifiedDate() == null ? other.getCertifiedDate() == null
+                        : this.getCertifiedDate().equals(other.getCertifiedDate()))
+                && (this.getBusinScope() == null ? other.getBusinScope() == null
+                        : this.getBusinScope().equals(other.getBusinScope()))
+                && (this.getBatchNo() == null ? other.getBatchNo() == null
+                        : this.getBatchNo().equals(other.getBatchNo()))
+                && (this.getRegOperId() == null ? other.getRegOperId() == null
+                        : this.getRegOperId().equals(other.getRegOperId()))
+                && (this.getRegOperName() == null ? other.getRegOperName() == null
+                        : this.getRegOperName().equals(other.getRegOperName()))
+                && (this.getRegDate() == null ? other.getRegDate() == null
+                        : this.getRegDate().equals(other.getRegDate()))
+                && (this.getRegTime() == null ? other.getRegTime() == null
+                        : this.getRegTime().equals(other.getRegTime()))
+                && (this.getModiOperId() == null ? other.getModiOperId() == null
+                        : this.getModiOperId().equals(other.getModiOperId()))
+                && (this.getModiOperName() == null ? other.getModiOperName() == null
+                        : this.getModiOperName().equals(other.getModiOperName()))
+                && (this.getModiDate() == null ? other.getModiDate() == null
+                        : this.getModiDate().equals(other.getModiDate()))
+                && (this.getModiTime() == null ? other.getModiTime() == null
+                        : this.getModiTime().equals(other.getModiTime()))
+                && (this.getOperOrg() == null ? other.getOperOrg() == null
+                        : this.getOperOrg().equals(other.getOperOrg()))
+                && (this.getBusinStatus() == null ? other.getBusinStatus() == null
+                        : this.getBusinStatus().equals(other.getBusinStatus()))
+                && (this.getLastStatus() == null ? other.getLastStatus() == null
+                        : this.getLastStatus().equals(other.getLastStatus()))
                 && (this.getCustNo() == null ? other.getCustNo() == null : this.getCustNo().equals(other.getCustNo()))
-                && (this.getCustName() == null ? other.getCustName() == null : this.getCustName().equals(other.getCustName()));
+                && (this.getCustName() == null ? other.getCustName() == null
+                        : this.getCustName().equals(other.getCustName()));
     }
 
     @Override
@@ -625,7 +652,8 @@ public class CustMechBusinLicence implements BetterjrEntity {
         this.initAddValue(null, null, null, null, null);
     }
 
-    public void initAddValue(final Long anCustNo, final String anCustName, final Long anRegOperId, final String anRegOperName, final String anOperOrg) {
+    public void initAddValue(final Long anCustNo, final String anCustName, final Long anRegOperId,
+            final String anRegOperName, final String anOperOrg) {
         this.id = SerialGenerator.getLongValue("CustMechBusinLicence.id");
 
         this.regOperId = anRegOperId;
@@ -638,7 +666,7 @@ public class CustMechBusinLicence implements BetterjrEntity {
         if (UserUtils.getOperatorInfo() != null) {
             this.modiOperId = UserUtils.getOperatorInfo().getId();
             this.modiOperName = UserUtils.getOperatorInfo().getName();
-        }else{
+        } else {
             this.modiOperId = anRegOperId;
             this.modiOperName = anRegOperName;
         }

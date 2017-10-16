@@ -46,8 +46,7 @@ public class NotificationSendDubboService implements INotificationSendService {
 
             if (sendResult.getSendStatus().equals(SendStatus.SEND_OK)) {
                 return true;
-            }
-            else {
+            } else {
                 logger.warn("消息通知发送失败 SendResult=" + sendResult.toString());
                 return false;
             }

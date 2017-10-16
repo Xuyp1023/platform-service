@@ -5,5 +5,4 @@ import com.betterjr.mapper.common.Mapper;
 import com.betterjr.modules.customer.entity.CustBankFlowRecord;
 
 @BetterjrMapper
-public interface CustBankFlowRecordMapper extends Mapper<CustBankFlowRecord> {
-}
+public interface CustBankFlowRecordMapper extends Mapper<CustBankFlowRecord> {}

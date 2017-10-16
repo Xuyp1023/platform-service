@@ -21,16 +21,21 @@ public class CustBankFlowDubboService implements ICustBankFlowService {
 
     @Autowired
     private CustBankFlowRecordService custBankFlowRecordService;
-    
+
     @Override
     public String webAddBankFlowRecord(Map<String, Object> anParam, String anFileList) {
         CustBankFlowRecord anCustBankFlowRecord = (CustBankFlowRecord) RuleServiceDubboFilterInvoker.getInputObj();
-        return AjaxObject.newOk("添加银行流水记录成功", custBankFlowRecordService.addCustBankFlowRecord(anCustBankFlowRecord, anFileList)).toJson();
+        return AjaxObject
+                .newOk("添加银行流水记录成功", custBankFlowRecordService.addCustBankFlowRecord(anCustBankFlowRecord, anFileList))
+                .toJson();
     }
 
     @Override
     public String webQueryBankFlowRecordList(Long anCustNo, String anFlag, int anPageNum, int anPageSize) {
-        return AjaxObject.newOkWithPage("查询银行流水记录成功", custBankFlowRecordService.queryCustBankFlowRecord(anCustNo, anFlag, anPageNum, anPageSize)).toJson();
+        return AjaxObject
+                .newOkWithPage("查询银行流水记录成功",
+                        custBankFlowRecordService.queryCustBankFlowRecord(anCustNo, anFlag, anPageNum, anPageSize))
+                .toJson();
     }
 
     @Override

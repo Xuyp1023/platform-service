@@ -5,7 +5,7 @@ public class SmsUtils {
     private static String password = null;
     private static String accessCode = null;
     private static UegateSoap uegateSoap = null;
-    
+
     public SmsUtils(String spID, String password, String accessCode) {
         SmsUtils.spID = spID;
         SmsUtils.password = password;
@@ -24,7 +24,7 @@ public class SmsUtils {
             return uegateSoap.submit(spID, password, accessCode, anContent, anMobileList);
         }
     }
-    
+
     /**
      * 
      */
@@ -33,7 +33,7 @@ public class SmsUtils {
             return uegateSoap.queryMo(spID, password);
         }
     }
-    
+
     /**
      * 
      */
@@ -42,7 +42,7 @@ public class SmsUtils {
             return uegateSoap.queryReport(spID, password);
         }
     }
-    
+
     /**
      * 
      */

@@ -20,13 +20,17 @@ public class NoticeDubboService implements INoticeService {
     @Override
     public String webQueryUnreadNotice(Map<String, Object> anParam, int anFlag, int anPageNum, int anPageSize) {
         final Map<String, Object> param = RuleServiceDubboFilterInvoker.getInputObj();
-        return AjaxObject.newOkWithPage("未读公告列表-查询成功", noticeService.queryUnreadNotice(param, anFlag, anPageNum, anPageSize)).toJson();
+        return AjaxObject
+                .newOkWithPage("未读公告列表-查询成功", noticeService.queryUnreadNotice(param, anFlag, anPageNum, anPageSize))
+                .toJson();
     }
 
     @Override
     public String webQueryReadNotice(Map<String, Object> anParam, int anFlag, int anPageNum, int anPageSize) {
         final Map<String, Object> param = RuleServiceDubboFilterInvoker.getInputObj();
-        return AjaxObject.newOkWithPage("已读公告列表-查询成功", noticeService.queryReadNotice(param, anFlag, anPageNum, anPageSize)).toJson();
+        return AjaxObject
+                .newOkWithPage("已读公告列表-查询成功", noticeService.queryReadNotice(param, anFlag, anPageNum, anPageSize))
+                .toJson();
     }
 
     @Override
@@ -43,7 +47,7 @@ public class NoticeDubboService implements INoticeService {
     public String webSetDeletedNotice(Long anId, Long anCustNo) {
         return AjaxObject.newOk("设置公告已删除状态-成功", noticeService.saveSetDeletedNotice(anId, anCustNo)).toJson();
     }
-    
+
     @Override
     public String webSetReadNotice(Long anId, Long anCustNo) {
         return AjaxObject.newOk("设置公告已读状态-成功", noticeService.saveSetReadNotice(anId, anCustNo)).toJson();
@@ -52,31 +56,41 @@ public class NoticeDubboService implements INoticeService {
     @Override
     public String webQueryNotice(Map<String, Object> anParam, int anFlag, int anPageNum, int anPageSize) {
         Map<String, Object> param = RuleServiceDubboFilterInvoker.getInputObj();
-        return AjaxObject.newOkWithPage("机构发布公告列表查询-成功", noticeService.queryNotice(param, anFlag, anPageNum, anPageSize)).toJson();
+        return AjaxObject
+                .newOkWithPage("机构发布公告列表查询-成功", noticeService.queryNotice(param, anFlag, anPageNum, anPageSize))
+                .toJson();
     }
-    
+
     @Override
     public String webAddPublishNotice(Map<String, Object> anParam, String anTargetCust, String anFileList) {
         Notice notice = RuleServiceDubboFilterInvoker.getInputObj();
-        return AjaxObject.newOk("添加发布公告-成功", noticeService.addNotice(notice, anTargetCust, anFileList, NoticeConstants.NOTICE_STATUS_PUBLISHED)).toJson();
+        return AjaxObject.newOk("添加发布公告-成功",
+                noticeService.addNotice(notice, anTargetCust, anFileList, NoticeConstants.NOTICE_STATUS_PUBLISHED))
+                .toJson();
     }
-    
+
     @Override
     public String webAddStoreNotice(Map<String, Object> anParam, String anTargetCust, String anFileList) {
         Notice notice = RuleServiceDubboFilterInvoker.getInputObj();
-        return AjaxObject.newOk("添加暂存公告-成功", noticeService.addNotice(notice, anTargetCust, anFileList, NoticeConstants.NOTICE_STATUS_STORED)).toJson();
+        return AjaxObject
+                .newOk("添加暂存公告-成功",
+                        noticeService.addNotice(notice, anTargetCust, anFileList, NoticeConstants.NOTICE_STATUS_STORED))
+                .toJson();
     }
 
     @Override
     public String webSavePublishNotice(Map<String, Object> anParam, Long anId, String anTargetCust, String anFileList) {
         Notice notice = RuleServiceDubboFilterInvoker.getInputObj();
-        return AjaxObject.newOk("修改发布公告-成功", noticeService.saveNotice(notice, anId, anTargetCust, anFileList, NoticeConstants.NOTICE_STATUS_PUBLISHED)).toJson();
+        return AjaxObject.newOk("修改发布公告-成功", noticeService.saveNotice(notice, anId, anTargetCust, anFileList,
+                NoticeConstants.NOTICE_STATUS_PUBLISHED)).toJson();
     }
-    
+
     @Override
     public String webSaveStoreNotice(Map<String, Object> anParam, Long anId, String anTargetCust, String anFileList) {
         Notice notice = RuleServiceDubboFilterInvoker.getInputObj();
-        return AjaxObject.newOk("修改暂存公告-成功", noticeService.saveNotice(notice, anId, anTargetCust, anFileList, NoticeConstants.NOTICE_STATUS_STORED)).toJson();
+        return AjaxObject.newOk("修改暂存公告-成功",
+                noticeService.saveNotice(notice, anId, anTargetCust, anFileList, NoticeConstants.NOTICE_STATUS_STORED))
+                .toJson();
     }
 
     @Override

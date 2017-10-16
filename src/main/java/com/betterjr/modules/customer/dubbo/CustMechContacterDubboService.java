@@ -1,14 +1,16 @@
 package com.betterjr.modules.customer.dubbo;
 
+import static com.betterjr.common.web.AjaxObject.newOk;
+import static com.betterjr.common.web.AjaxObject.newOkWithPage;
+
 import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.alibaba.dubbo.config.annotation.Service;
 import com.betterjr.common.utils.BTAssert;
-import com.betterjr.common.utils.BetterStringUtils;
-
-import static com.betterjr.common.web.AjaxObject.*;
 import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.customer.ICustMechContacterService;
 import com.betterjr.modules.customer.constants.CustomerConstants;
@@ -62,20 +64,26 @@ public class CustMechContacterDubboService implements ICustMechContacterService 
 
     @Override
     public String webSaveContacterTmp(Map<String, Object> anParam, Long anId, String anFileList) {
-        final CustMechContacterTmp custMechContacterTmp = (CustMechContacterTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return newOk("公司联系人-流水信息 修改成功", contacterTmpService.saveContacterTmp(custMechContacterTmp, anId, anFileList)).toJson();
+        final CustMechContacterTmp custMechContacterTmp = (CustMechContacterTmp) RuleServiceDubboFilterInvoker
+                .getInputObj();
+        return newOk("公司联系人-流水信息 修改成功", contacterTmpService.saveContacterTmp(custMechContacterTmp, anId, anFileList))
+                .toJson();
     }
 
     @Override
     public String webAddChangeContacterTmp(Map<String, Object> anMap, String anFileList) {
-        final CustMechContacterTmp custMechContacterTmp = (CustMechContacterTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return newOk("公司联系人-流水信息 变更添加成功", contacterTmpService.addChangeContacterTmp(custMechContacterTmp, anFileList)).toJson();
+        final CustMechContacterTmp custMechContacterTmp = (CustMechContacterTmp) RuleServiceDubboFilterInvoker
+                .getInputObj();
+        return newOk("公司联系人-流水信息 变更添加成功", contacterTmpService.addChangeContacterTmp(custMechContacterTmp, anFileList))
+                .toJson();
     }
 
     @Override
     public String webSaveChangeContacterTmp(Map<String, Object> anParam, String anFileList) {
-        final CustMechContacterTmp custMechContacterTmp = (CustMechContacterTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return newOk("公司联系人-流水信息 变更修改成功", contacterTmpService.saveSaveChangeContacterTmp(custMechContacterTmp, anFileList)).toJson();
+        final CustMechContacterTmp custMechContacterTmp = (CustMechContacterTmp) RuleServiceDubboFilterInvoker
+                .getInputObj();
+        return newOk("公司联系人-流水信息 变更修改成功",
+                contacterTmpService.saveSaveChangeContacterTmp(custMechContacterTmp, anFileList)).toJson();
     }
 
     @Override
@@ -110,8 +118,8 @@ public class CustMechContacterDubboService implements ICustMechContacterService 
 
     @Override
     public String webQueryChangeApply(Long anCustNo, int anFlag, int anPageNum, int anPageSize) {
-        final Page<CustChangeApply> changeApplys = changeService.queryChangeApply(anCustNo, CustomerConstants.ITEM_CONTACTER, anFlag, anPageNum,
-                anPageSize);
+        final Page<CustChangeApply> changeApplys = changeService.queryChangeApply(anCustNo,
+                CustomerConstants.ITEM_CONTACTER, anFlag, anPageNum, anPageSize);
         return newOkWithPage("联系人信息-变更列表查询 成功", changeApplys).toJson();
     }
 
@@ -124,7 +132,7 @@ public class CustMechContacterDubboService implements ICustMechContacterService 
 
         ChangeDetailBean<CustMechContacterTmp> changeDetailBean = new ChangeDetailBean<>();
         changeDetailBean.setChangeApply(changeApply);
-        if (BetterStringUtils.equals(nowData.getTmpOperType(), CustomerConstants.TMP_OPER_TYPE_DELETE) == false) {
+        if (StringUtils.equals(nowData.getTmpOperType(), CustomerConstants.TMP_OPER_TYPE_DELETE) == false) {
             changeDetailBean.setNowData(nowData);
         }
         changeDetailBean.setBefData(befData);
@@ -134,25 +142,33 @@ public class CustMechContacterDubboService implements ICustMechContacterService 
 
     @Override
     public String webAddInsteadContacterTmp(Map<String, Object> anMap, Long anInsteadRecordId, String anFileList) {
-        final CustMechContacterTmp custMechContacterTmp = (CustMechContacterTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return newOk("公司联系人-流水信息 代录添加成功", contacterTmpService.addInsteadContacterTmp(custMechContacterTmp, anInsteadRecordId, anFileList)).toJson();
+        final CustMechContacterTmp custMechContacterTmp = (CustMechContacterTmp) RuleServiceDubboFilterInvoker
+                .getInputObj();
+        return newOk("公司联系人-流水信息 代录添加成功",
+                contacterTmpService.addInsteadContacterTmp(custMechContacterTmp, anInsteadRecordId, anFileList))
+                        .toJson();
     }
 
     @Override
     public String webSaveInsteadContacterTmp(Map<String, Object> anParam, Long anInsteadRecordId, String anFileList) {
-        final CustMechContacterTmp custMechContacterTmp = (CustMechContacterTmp) RuleServiceDubboFilterInvoker.getInputObj();
-        return newOk("公司联系人-流水信息 代录修改成功", contacterTmpService.saveSaveInsteadContacterTmp(custMechContacterTmp, anInsteadRecordId, anFileList)).toJson();
+        final CustMechContacterTmp custMechContacterTmp = (CustMechContacterTmp) RuleServiceDubboFilterInvoker
+                .getInputObj();
+        return newOk("公司联系人-流水信息 代录修改成功",
+                contacterTmpService.saveSaveInsteadContacterTmp(custMechContacterTmp, anInsteadRecordId, anFileList))
+                        .toJson();
 
     }
 
     @Override
     public String webDeleteInsteadContacterTmp(Long anRefId, Long anInsteadRecordId) {
-        return newOk("公司联系人-流水信息 代录删除成功", contacterTmpService.saveDeleteInsteadContacterTmp(anRefId, anInsteadRecordId)).toJson();
+        return newOk("公司联系人-流水信息 代录删除成功", contacterTmpService.saveDeleteInsteadContacterTmp(anRefId, anInsteadRecordId))
+                .toJson();
     }
 
     @Override
     public String webCancelInsteadContacterTmp(Long anId, Long anInsteadRecordId) {
-        return newOk("公司联系人-流水信息 代录删除成功", contacterTmpService.saveCancelInsteadContacterTmp(anId, anInsteadRecordId)).toJson();
+        return newOk("公司联系人-流水信息 代录删除成功", contacterTmpService.saveCancelInsteadContacterTmp(anId, anInsteadRecordId))
+                .toJson();
     }
 
     @Override

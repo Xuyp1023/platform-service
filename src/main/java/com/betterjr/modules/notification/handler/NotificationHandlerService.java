@@ -28,7 +28,6 @@ import com.betterjr.common.mq.message.MQMessage;
 import com.betterjr.common.service.FreemarkerService;
 import com.betterjr.common.utils.BTAssert;
 import com.betterjr.common.utils.BetterDateUtils;
-import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.modules.account.entity.CustInfo;
 import com.betterjr.modules.account.entity.CustOperatorInfo;
@@ -111,27 +110,26 @@ public class NotificationHandlerService {
         sendMessage(messageList);
     }
 
-
     /**
      * @param anMessageList
      */
     private void sendMessage(final List<Map<String, Object>> anMessageList) {
-        for (final Map<String, Object> message: anMessageList) {
+        for (final Map<String, Object> message : anMessageList) {
             final Notification anNotification = (Notification) message.get("notification");
             final CustOperatorInfo anSendOperator = (CustOperatorInfo) message.get("sendOperator");
             final CustInfo anSendCustomer = (CustInfo) message.get("sendCustomer");
 
-            if (BetterStringUtils.equals(NotificationConstants.CHANNEL_EMAIL, anNotification.getChannel())) {
+            if (StringUtils.equals(NotificationConstants.CHANNEL_EMAIL, anNotification.getChannel())) {
                 processEmail(anNotification, anSendOperator, anSendCustomer);
             }
 
-            if (BetterStringUtils.equals(NotificationConstants.CHANNEL_WECHAT, anNotification.getChannel())) {
+            if (StringUtils.equals(NotificationConstants.CHANNEL_WECHAT, anNotification.getChannel())) {
                 processWechat(anNotification, anSendOperator, anSendCustomer);
             }
 
             // 需要即时发送的短信消息
-            if (BetterStringUtils.equals(NotificationConstants.CHANNEL_SMS, anNotification.getChannel())
-                    && BetterStringUtils.equals(anNotification.getImmediate(), NotificationConstants.IMMEDIATE_TRUE)) {
+            if (StringUtils.equals(NotificationConstants.CHANNEL_SMS, anNotification.getChannel())
+                    && StringUtils.equals(anNotification.getImmediate(), NotificationConstants.IMMEDIATE_TRUE)) {
                 processSms(anNotification, anSendOperator, anSendCustomer);
             }
         }
@@ -153,7 +151,8 @@ public class NotificationHandlerService {
         }
 
         if (StringUtils.equals(NotificationConstants.PROFILE_STATUS_ENABLED, profile.getBusinStatus()) == true) {
-            final List<NotificationChannelProfile> channelProfiles = channelProfileService.queryChannelProfileByProfileId(profile.getId());
+            final List<NotificationChannelProfile> channelProfiles = channelProfileService
+                    .queryChannelProfileByProfileId(profile.getId());
 
             try {
                 processNotification(profile, channelProfiles, notificationModel, anMessageList);
@@ -161,8 +160,7 @@ public class NotificationHandlerService {
             catch (final Exception e) {
                 logger.error("消息发送失败!" + profile, e);
             }
-        }
-        else {
+        } else {
             logger.info(profileName + " 消息模板已经禁用!");
         }
     }
@@ -170,8 +168,9 @@ public class NotificationHandlerService {
     /**
      * 处理消息
      */
-    private void processNotification(final NotificationProfile anProfile, final List<NotificationChannelProfile> anChannelProfiles,
-            final NotificationModel anNotificationModel, final List<Map<String, Object>> anMessageList) throws Exception {
+    private void processNotification(final NotificationProfile anProfile,
+            final List<NotificationChannelProfile> anChannelProfiles, final NotificationModel anNotificationModel,
+            final List<Map<String, Object>> anMessageList) throws Exception {
 
         final CustInfo sendCustomer = anNotificationModel.getSendCustomer();
         final CustOperatorInfo sendOperator = anNotificationModel.getSendOperator();
@@ -192,20 +191,23 @@ public class NotificationHandlerService {
         final Long batchNo = fileItemService.updateAndDuplicateConflictFileItemInfo(fileItems, null, operator);
 
         for (final NotificationChannelProfile channelProfile : anChannelProfiles) {
-            if (StringUtils.equals(NotificationConstants.PROFILE_STATUS_ENABLED, channelProfile.getBusinStatus()) == true) {
-                final Notification notification = addNotification(anProfile, channelProfile, param, sendOperator, sendCustomer, batchNo);
+            if (StringUtils.equals(NotificationConstants.PROFILE_STATUS_ENABLED,
+                    channelProfile.getBusinStatus()) == true) {
+                final Notification notification = addNotification(anProfile, channelProfile, param, sendOperator,
+                        sendCustomer, batchNo);
                 BTAssert.notNull(notification);
 
-                processNotificationCustomer(notification, anNotificationModel, sendOperator, sendCustomer, anMessageList);
-            }
-            else {
+                processNotificationCustomer(notification, anNotificationModel, sendOperator, sendCustomer,
+                        anMessageList);
+            } else {
                 final String channelName = getChannelName(channelProfile.getChannel());
                 logger.info(anProfile.getProfileName() + " 消息模板, " + channelName + " 通道已经禁用!");
             }
         }
     }
 
-    private void processNotificationCustomer(final Notification anNotification, final NotificationModel anNotificationModel, final CustOperatorInfo anSendOperator,
+    private void processNotificationCustomer(final Notification anNotification,
+            final NotificationModel anNotificationModel, final CustOperatorInfo anSendOperator,
             final CustInfo anSendCustomer, final List<Map<String, Object>> anMessageList) {
         final Collection<Pair<CustOperatorInfo, CustInfo>> operators = queryOperatorInfo(anNotificationModel);
         if (Collections3.isEmpty(operators) == false) {
@@ -216,14 +218,11 @@ public class NotificationHandlerService {
                         tempOperator.getRight(),
                         tempOperator.getLeft(),
                         anSendCustomer.getCustNo());
-
+                
                 if (subscribeFlag) {*/
-                addNotificationCustomer(anNotification,
-                        getSendNo(anNotification, tempOperator.getLeft()),
-                        tempOperator.getLeft(),
-                        tempOperator.getRight(),
-                        anSendOperator);
-                //}
+                addNotificationCustomer(anNotification, getSendNo(anNotification, tempOperator.getLeft()),
+                        tempOperator.getLeft(), tempOperator.getRight(), anSendOperator);
+                // }
             }
         }
 
@@ -243,44 +242,41 @@ public class NotificationHandlerService {
             }
         }
 
-        if (BetterStringUtils.equals(NotificationConstants.CHANNEL_EMAIL, anNotification.getChannel())) {
+        if (StringUtils.equals(NotificationConstants.CHANNEL_EMAIL, anNotification.getChannel())) {
             final Map<String, Object> message = new HashMap<>();
             message.put("notification", anNotification);
             message.put("sendOperator", anSendOperator);
             message.put("sendCustomer", anSendCustomer);
             anMessageList.add(message);
-            //processEmail(anNotification, anSendOperator, anSendCustomer);
+            // processEmail(anNotification, anSendOperator, anSendCustomer);
         }
 
-        if (BetterStringUtils.equals(NotificationConstants.CHANNEL_WECHAT, anNotification.getChannel())) {
+        if (StringUtils.equals(NotificationConstants.CHANNEL_WECHAT, anNotification.getChannel())) {
             final Map<String, Object> message = new HashMap<>();
             message.put("notification", anNotification);
             message.put("sendOperator", anSendOperator);
             message.put("sendCustomer", anSendCustomer);
             anMessageList.add(message);
-            //processWechat(anNotification, anSendOperator, anSendCustomer);
+            // processWechat(anNotification, anSendOperator, anSendCustomer);
         }
 
         // 需要即时发送的短信消息
-        if (BetterStringUtils.equals(NotificationConstants.CHANNEL_SMS, anNotification.getChannel())
-                && BetterStringUtils.equals(anNotification.getImmediate(), NotificationConstants.IMMEDIATE_TRUE)) {
+        if (StringUtils.equals(NotificationConstants.CHANNEL_SMS, anNotification.getChannel())
+                && StringUtils.equals(anNotification.getImmediate(), NotificationConstants.IMMEDIATE_TRUE)) {
             final Map<String, Object> message = new HashMap<>();
             message.put("notification", anNotification);
             message.put("sendOperator", anSendOperator);
             message.put("sendCustomer", anSendCustomer);
             anMessageList.add(message);
-            //processSms(anNotification, anSendOperator, anSendCustomer);
+            // processSms(anNotification, anSendOperator, anSendCustomer);
         }
     }
 
     /**
      * 添加消息客户关系
      */
-    private NotificationCustomer addNotificationCustomer(final Notification anNotification,
-            final String anSendNo,
-            final CustOperatorInfo anOperator,
-            final CustInfo anCustInfo,
-            final CustOperatorInfo anSendOperator) {
+    private NotificationCustomer addNotificationCustomer(final Notification anNotification, final String anSendNo,
+            final CustOperatorInfo anOperator, final CustInfo anCustInfo, final CustOperatorInfo anSendOperator) {
         final NotificationCustomer tempNotificationCustomer = new NotificationCustomer();
         tempNotificationCustomer.setChannel(anNotification.getChannel());
         tempNotificationCustomer.setNotificationId(anNotification.getId());
@@ -298,15 +294,16 @@ public class NotificationHandlerService {
 
         tempNotificationCustomer.setSendNo(anSendNo);
 
-        final NotificationCustomer notificationCustomer = notificationCustomerService.addNotificationCustomer(tempNotificationCustomer,
-                anSendOperator);
+        final NotificationCustomer notificationCustomer = notificationCustomerService
+                .addNotificationCustomer(tempNotificationCustomer, anSendOperator);
         return notificationCustomer;
     }
 
     /**
      * 处理email消息
      */
-    private void processEmail(final Notification anNotification, final CustOperatorInfo anSendOperator, final CustInfo anSendCustomer) {
+    private void processEmail(final Notification anNotification, final CustOperatorInfo anSendOperator,
+            final CustInfo anSendCustomer) {
         final MQMessage message = new MQMessage(NotificationConstants.NOTIFICATION_EMAIL_TOPIC, MQCodecType.FST);
         message.setObject(anNotification);
         message.addHead("sendOperator", anSendOperator);
@@ -326,7 +323,8 @@ public class NotificationHandlerService {
     /**
      * 处理wechat消息
      */
-    private void processWechat(final Notification anNotification, final CustOperatorInfo anSendOperator, final CustInfo anSendCustomer) {
+    private void processWechat(final Notification anNotification, final CustOperatorInfo anSendOperator,
+            final CustInfo anSendCustomer) {
         final MQMessage message = new MQMessage(NotificationConstants.NOTIFICATION_WECHAT_TOPIC, MQCodecType.FST);
         message.setObject(anNotification);
         message.addHead("sendOperator", anSendOperator);
@@ -346,7 +344,8 @@ public class NotificationHandlerService {
     /**
      * 处理sms消息
      */
-    private void processSms(final Notification anNotification, final CustOperatorInfo anSendOperator, final CustInfo anSendCustomer) {
+    private void processSms(final Notification anNotification, final CustOperatorInfo anSendOperator,
+            final CustInfo anSendCustomer) {
         final MQMessage message = new MQMessage(NotificationConstants.NOTIFICATION_SMS_TOPIC, MQCodecType.FST);
         message.setObject(anNotification);
         message.addHead("sendOperator", anSendOperator);
@@ -367,23 +366,24 @@ public class NotificationHandlerService {
      * 添加消息
      */
     private Notification addNotification(final NotificationProfile anProfile,
-            final NotificationChannelProfile anChannelProfile,
-            final Map<String, Object> anParam,
-            final CustOperatorInfo anOperator,
-            final CustInfo anCustomer,
-            final Long anBatchNo) throws UnsupportedEncodingException {
+            final NotificationChannelProfile anChannelProfile, final Map<String, Object> anParam,
+            final CustOperatorInfo anOperator, final CustInfo anCustomer, final Long anBatchNo)
+            throws UnsupportedEncodingException {
         final Notification tempNotification = new Notification();
-        final List<NotificationProfileVariable> profileVariables = profileVariableService.queryVariableByProfileId(anChannelProfile.getId());
+        final List<NotificationProfileVariable> profileVariables = profileVariableService
+                .queryVariableByProfileId(anChannelProfile.getId());
 
         tempNotification.setProfileId(anProfile.getId());
         tempNotification.setChannelProfileId(anChannelProfile.getId());
         tempNotification.setChannel(anChannelProfile.getChannel());
         tempNotification.setSubject(resolveTemplateContent(anChannelProfile.getSubject(), profileVariables, anParam));
         tempNotification.setContent(resolveTemplateContent(anChannelProfile.getContent(), profileVariables, anParam));
-        tempNotification.setReference(resolveTemplateContent(anChannelProfile.getReference(), profileVariables, anParam));
+        tempNotification
+                .setReference(resolveTemplateContent(anChannelProfile.getReference(), profileVariables, anParam));
         tempNotification.setSentDate(BetterDateUtils.getNumDate());
         tempNotification.setSentTime(BetterDateUtils.getNumTime());
-        tempNotification.setImmediate(BetterStringUtils.isBlank(anProfile.getImmediate()) ? NotificationConstants.IMMEDIATE_FALSE : NotificationConstants.IMMEDIATE_TRUE);
+        tempNotification.setImmediate(StringUtils.isBlank(anProfile.getImmediate())
+                ? NotificationConstants.IMMEDIATE_FALSE : NotificationConstants.IMMEDIATE_TRUE);
         tempNotification.setBatchNo(anBatchNo);
 
         final Notification notification = notificationService.addNotification(tempNotification, anOperator, anCustomer);
@@ -393,12 +393,13 @@ public class NotificationHandlerService {
     /**
      * 查询操作员与机构
      */
-    private Collection<Pair<CustOperatorInfo, CustInfo>> queryOperatorInfo(final NotificationModel anNotificationModel) {
+    private Collection<Pair<CustOperatorInfo, CustInfo>> queryOperatorInfo(
+            final NotificationModel anNotificationModel) {
         final List<CustOperPair> receivers = anNotificationModel.getReceivers();
 
         final Set<Pair<CustOperatorInfo, CustInfo>> operators = new HashSet<>();
 
-        for (final CustOperPair custOper: receivers) {
+        for (final CustOperPair custOper : receivers) {
             if (custOper.getOperator() != null && custOper.getCustomer() != null) {
                 final CustOperatorInfo operator = findOperatorById(custOper.getOperator());
                 final CustInfo custInfo = accountService.findCustInfo(custOper.getCustomer());
@@ -425,7 +426,8 @@ public class NotificationHandlerService {
     /**
      * 解析模板内容
      */
-    private String resolveTemplateContent(final String anTemplateContent, final List<NotificationProfileVariable> anProfileVariables, final Map<String, Object> anParam)
+    private String resolveTemplateContent(final String anTemplateContent,
+            final List<NotificationProfileVariable> anProfileVariables, final Map<String, Object> anParam)
             throws UnsupportedEncodingException {
 
         final String templateContent = preproccessTemplateContent(anTemplateContent, anProfileVariables);
@@ -437,7 +439,8 @@ public class NotificationHandlerService {
     /**
      * 模板预处理
      */
-    private String preproccessTemplateContent(final String anTemplateContent, final List<NotificationProfileVariable> anProfileVariables) {
+    private String preproccessTemplateContent(final String anTemplateContent,
+            final List<NotificationProfileVariable> anProfileVariables) {
         String templateContent = anTemplateContent;
         for (final NotificationProfileVariable profileVariable : anProfileVariables) {
             templateContent = replaceVariable(templateContent, profileVariable);
@@ -449,7 +452,8 @@ public class NotificationHandlerService {
      * 模板变量替换
      */
     private String replaceVariable(String anTemplateContent, final NotificationProfileVariable anProfileVariable) {
-        anTemplateContent = anTemplateContent.replace(anProfileVariable.getVariableName(), anProfileVariable.getVariableValue());
+        anTemplateContent = anTemplateContent.replace(anProfileVariable.getVariableName(),
+                anProfileVariable.getVariableValue());
         return anTemplateContent;
     }
 

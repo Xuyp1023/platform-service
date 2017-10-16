@@ -15,20 +15,20 @@ public class BetterQueryService extends QueryService {
 
     public List<WorkItem> getWorkItemsByLikeTaskName(Page<WorkItem> page, QueryFilter filter) {
         AssertHelper.notNull(filter);
-        DBAccess dbAccess=access();
-        if(dbAccess instanceof BetterMybatisAccess){
-            return ((BetterMybatisAccess)dbAccess).getWorkItemsByLikeTaskName(page, filter);
+        DBAccess dbAccess = access();
+        if (dbAccess instanceof BetterMybatisAccess) {
+            return ((BetterMybatisAccess) dbAccess).getWorkItemsByLikeTaskName(page, filter);
         }
         return access().getWorkItems(page, filter);
     }
-    
+
     public List<WorkItem> getHistoryWorkItemsByLikeTaskName(Page<WorkItem> page, QueryFilter filter) {
         AssertHelper.notNull(filter);
-        DBAccess dbAccess=access();
-        if(dbAccess instanceof BetterMybatisAccess){
-            return ((BetterMybatisAccess)dbAccess).getHistoryWorkItemsByLikeTaskName(page, filter);
+        DBAccess dbAccess = access();
+        if (dbAccess instanceof BetterMybatisAccess) {
+            return ((BetterMybatisAccess) dbAccess).getHistoryWorkItemsByLikeTaskName(page, filter);
         }
         return access().getHistoryWorkItems(page, filter);
     }
-    
+
 }

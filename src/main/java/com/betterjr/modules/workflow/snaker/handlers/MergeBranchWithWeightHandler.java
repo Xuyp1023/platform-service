@@ -18,19 +18,19 @@ import org.snaker.engine.model.ProcessModel;
 import org.snaker.engine.model.SubProcessModel;
 import org.snaker.engine.model.TaskModel;
 import org.snaker.engine.model.TransitionModel;
-import org.snaker.engine.model.WorkModel;
 
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.modules.workflow.snaker.model.ExtTaskModel;
 
 public class MergeBranchWithWeightHandler extends MergeBranchHandler {
     protected JoinModel model;
-    
+
     public MergeBranchWithWeightHandler(JoinModel model) {
         super(model);
-        this.model=model;
+        this.model = model;
     }
 
+    @Override
     public void handle(Execution execution) {
         /**
          * 查询当前流程实例的无法参与合并的node列表
@@ -42,67 +42,65 @@ public class MergeBranchWithWeightHandler extends MergeBranchHandler {
         String[] activeNodes = findActiveNodes();
         boolean isSubProcessMerged = false;
         boolean isTaskMerged = false;
-        
-        if(model.containsNodeNames(SubProcessModel.class, activeNodes)) {
+
+        if (model.containsNodeNames(SubProcessModel.class, activeNodes)) {
             QueryFilter filter = new QueryFilter().setParentId(order.getId())
-                    .setExcludedIds(new String[]{execution.getChildOrderId()});
+                    .setExcludedIds(new String[] { execution.getChildOrderId() });
             List<Order> orders = queryService.getActiveOrders(filter);
-            //如果所有子流程都已完成，则表示可合并
-            if(orders == null || orders.isEmpty()) {
+            // 如果所有子流程都已完成，则表示可合并
+            if (orders == null || orders.isEmpty()) {
                 isSubProcessMerged = true;
             }
         } else {
             isSubProcessMerged = true;
         }
-        if(isSubProcessMerged && model.containsNodeNames(TaskModel.class, activeNodes)) {
-            QueryFilter filter = new QueryFilter().
-                    setOrderId(order.getId()).
-                    setExcludedIds(new String[]{execution.getTask().getId() }).
-                    setNames(activeNodes);
+        if (isSubProcessMerged && model.containsNodeNames(TaskModel.class, activeNodes)) {
+            QueryFilter filter = new QueryFilter().setOrderId(order.getId())
+                    .setExcludedIds(new String[] { execution.getTask().getId() }).setNames(activeNodes);
             List<Task> tasks = queryService.getActiveTasks(filter);
-            if(tasks == null || tasks.isEmpty()) {
-                //如果所有task都已完成，则表示可合并
+            if (tasks == null || tasks.isEmpty()) {
+                // 如果所有task都已完成，则表示可合并
                 isTaskMerged = true;
-            }else{
-                isTaskMerged = mergeWithWeight(execution,tasks);
+            } else {
+                isTaskMerged = mergeWithWeight(execution, tasks);
             }
         }
         execution.setMerged(isSubProcessMerged && isTaskMerged);
     }
 
-    private boolean mergeWithWeight(Execution execution,List<Task> unFinishedTasks) {
-        String nodeName=execution.getTask().getTaskName();
-        Map<String,Task> unFinishedTaskMap=Collections3.extractToMap(unFinishedTasks, "taskName");
-        List<ExtTaskModel> activeNodes=new ArrayList<ExtTaskModel>();
+    private boolean mergeWithWeight(Execution execution, List<Task> unFinishedTasks) {
+        String nodeName = execution.getTask().getTaskName();
+        Map<String, Task> unFinishedTaskMap = Collections3.extractToMap(unFinishedTasks, "taskName");
+        List<ExtTaskModel> activeNodes = new ArrayList<ExtTaskModel>();
         this.findForkTaskNames(this.model, activeNodes);
-        int totalWeight=0;
-        for(ExtTaskModel model:activeNodes){
-            String activeName=model.getName();
-            if(!unFinishedTaskMap.containsKey(activeName)){
-                totalWeight=totalWeight+model.getWeight();
+        int totalWeight = 0;
+        for (ExtTaskModel model : activeNodes) {
+            String activeName = model.getName();
+            if (!unFinishedTaskMap.containsKey(activeName)) {
+                totalWeight = totalWeight + model.getWeight();
             }
         }
-        if(totalWeight>=100){
-            //如果总审批权重超过100，则通过审批，进入下一步， 其他任务由系统自动完成跟进。
-            for(Task task:unFinishedTasks){
-                execution.getEngine().task().complete(task.getId(),SnakerEngine.AUTO,execution.getArgs());
+        if (totalWeight >= 100) {
+            // 如果总审批权重超过100，则通过审批，进入下一步， 其他任务由系统自动完成跟进。
+            for (Task task : unFinishedTasks) {
+                execution.getEngine().task().complete(task.getId(), SnakerEngine.AUTO, execution.getArgs());
             }
             return true;
         }
         return false;
     }
-    
+
     /**
      * 对join节点的所有输入变迁进行递归，查找join至fork节点的所有中间task元素
      * @param node
      * @param buffer
      */
     private void findForkTaskNames(NodeModel node, List<ExtTaskModel> activeNodes) {
-        if(node instanceof ForkModel) return;
+        if (node instanceof ForkModel) return;
         List<TransitionModel> inputs = node.getInputs();
-        for(TransitionModel tm : inputs) {
-            if(tm.getSource() instanceof ExtTaskModel) {
-                activeNodes.add((ExtTaskModel)tm.getSource());
+        for (TransitionModel tm : inputs) {
+            if (tm.getSource() instanceof ExtTaskModel) {
+                activeNodes.add((ExtTaskModel) tm.getSource());
             }
             findForkTaskNames(tm.getSource(), activeNodes);
         }

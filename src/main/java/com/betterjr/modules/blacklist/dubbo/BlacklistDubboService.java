@@ -22,7 +22,10 @@ public class BlacklistDubboService implements IBlacklistService {
 
         Map<String, Object> anQueryConditionMap = (Map<String, Object>) RuleServiceDubboFilterInvoker.getInputObj();
 
-        return AjaxObject.newOkWithPage("黑名单信息查询成功", scfBlacklistService.queryBlacklist(anQueryConditionMap, anFlag, anPageNum, anPageSize)).toJson();
+        return AjaxObject
+                .newOkWithPage("黑名单信息查询成功",
+                        scfBlacklistService.queryBlacklist(anQueryConditionMap, anFlag, anPageNum, anPageSize))
+                .toJson();
     }
 
     @Override
@@ -62,7 +65,8 @@ public class BlacklistDubboService implements IBlacklistService {
     @Override
     public String webCheckBlacklistExists(String anName, String anIdentNo, String anLawName) {
 
-        return AjaxObject.newOk("检查是否存在黑名单成功", scfBlacklistService.checkBlacklistExists(anName, anIdentNo, anLawName)).toJson();
+        return AjaxObject.newOk("检查是否存在黑名单成功", scfBlacklistService.checkBlacklistExists(anName, anIdentNo, anLawName))
+                .toJson();
     }
 
 }

@@ -4,12 +4,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.exception.BytterTradeException;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
-import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.blacklist.constant.BlacklistConstants;
@@ -37,13 +37,15 @@ public class BlacklistService extends BaseService<BlacklistMapper, Blacklist> {
         // 处理入参:businStatus状态(0:未生效;1:已生效;)
         Object anBusinStatus = anMap.get("businStatus");
         if (null == anBusinStatus || anBusinStatus.toString().isEmpty()) {
-            anMap.put("businStatus", new String[] { BlacklistConstants.BLACKLIST_STATUS_INEFFECTIVE, BlacklistConstants.BLACKLIST_STATUS_EFFECTIVE });
+            anMap.put("businStatus", new String[] { BlacklistConstants.BLACKLIST_STATUS_INEFFECTIVE,
+                    BlacklistConstants.BLACKLIST_STATUS_EFFECTIVE });
         }
 
         // 处理入参:custType类型(0:个人;1:机构;)
         Object anCreditType = anMap.get("custType");
         if (null == anCreditType || anCreditType.toString().isEmpty()) {
-            anMap.put("custType", new String[] { BlacklistConstants.BLACKLIST_TYPE_PERSONAL, BlacklistConstants.BLACKLIST_TYPE_BRANCHES });
+            anMap.put("custType", new String[] { BlacklistConstants.BLACKLIST_TYPE_PERSONAL,
+                    BlacklistConstants.BLACKLIST_TYPE_BRANCHES });
         }
 
         return this.selectPropertyByPage(Blacklist.class, anMap, anPageNum, anPageSize, "1".equals(anFlag));
@@ -80,7 +82,7 @@ public class BlacklistService extends BaseService<BlacklistMapper, Blacklist> {
         BTAssert.notNull(anBlacklist.getName(), "被执行人姓名/名称不允许为空");
 
         // 检查法人
-        if (BetterStringUtils.equals(anBlacklist.getCustType(), BlacklistConstants.BLACKLIST_TYPE_BRANCHES) == true) {
+        if (StringUtils.equals(anBlacklist.getCustType(), BlacklistConstants.BLACKLIST_TYPE_BRANCHES) == true) {
             BTAssert.notNull(anBlacklist.getLawName(), "当客户类型为机构时,法人信息不允许为空");
         }
 
@@ -152,7 +154,7 @@ public class BlacklistService extends BaseService<BlacklistMapper, Blacklist> {
         // 不允许激活已生效(businStatus:1)的黑名单
         checkStatus(anBlacklist.getBusinStatus(), BlacklistConstants.BLACKLIST_TYPE_BRANCHES, true, "当前黑名单已激活");
 
-        //设置黑名单激活信息
+        // 设置黑名单激活信息
         anBlacklist.initActivateValue();
 
         // 数据存盘
@@ -178,7 +180,8 @@ public class BlacklistService extends BaseService<BlacklistMapper, Blacklist> {
         checkOperator(anBlacklist.getOperOrg(), "当前操作员不能注销该黑名单");
 
         // 不允许注销未生效(businStatus:0)的黑名单
-        checkStatus(anBlacklist.getBusinStatus(), BlacklistConstants.BLACKLIST_STATUS_INEFFECTIVE, true, "当前黑名单未生效,不需要注销");
+        checkStatus(anBlacklist.getBusinStatus(), BlacklistConstants.BLACKLIST_STATUS_INEFFECTIVE, true,
+                "当前黑名单未生效,不需要注销");
 
         // 设置黑名单注销信息
         anBlacklist.initCancelValue();
@@ -205,7 +208,8 @@ public class BlacklistService extends BaseService<BlacklistMapper, Blacklist> {
         checkOperator(anBlacklist.getOperOrg(), "当前操作员不能删除该黑名单");
 
         // 不允许删除已生效(businStatus:1)的黑名单
-        checkStatus(anBlacklist.getBusinStatus(), BlacklistConstants.BLACKLIST_STATUS_EFFECTIVE, true, "当前黑名单已生效,不允许删除");
+        checkStatus(anBlacklist.getBusinStatus(), BlacklistConstants.BLACKLIST_STATUS_EFFECTIVE, true,
+                "当前黑名单已生效,不允许删除");
 
         // 删除黑名单
         return this.deleteByPrimaryKey(anId);
@@ -277,14 +281,14 @@ public class BlacklistService extends BaseService<BlacklistMapper, Blacklist> {
     }
 
     private void checkOperator(String anOperOrg, String anMessage) {
-        if (BetterStringUtils.equals(UserUtils.getOperatorInfo().getOperOrg(), anOperOrg) == false) {
+        if (StringUtils.equals(UserUtils.getOperatorInfo().getOperOrg(), anOperOrg) == false) {
             logger.warn(anMessage);
             throw new BytterTradeException(40001, anMessage);
         }
     }
 
     private void checkStatus(String anBusinStatus, String anTargetStatus, boolean anFlag, String anMessage) {
-        if (BetterStringUtils.equals(anBusinStatus, anTargetStatus) == anFlag) {
+        if (StringUtils.equals(anBusinStatus, anTargetStatus) == anFlag) {
             logger.warn(anMessage);
             throw new BytterTradeException(40001, anMessage);
         }

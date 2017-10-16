@@ -5,5 +5,4 @@ import com.betterjr.mapper.common.Mapper;
 import com.betterjr.modules.customer.entity.CustAuditLog;
 
 @BetterjrMapper
-public interface CustAuditLogMapper extends Mapper<CustAuditLog> {
-}
+public interface CustAuditLogMapper extends Mapper<CustAuditLog> {}

@@ -16,12 +16,12 @@ import com.betterjr.modules.document.entity.AuthorFileGroup;
 import com.betterjr.modules.document.service.AgencyAuthFileGroupService;
 import com.betterjr.modules.document.service.AuthorFileGroupService;
 
-@Service(interfaceClass=IAgencyAuthFileGroupService.class)
+@Service(interfaceClass = IAgencyAuthFileGroupService.class)
 public class AgencyAuthFileGroupDubboService implements IAgencyAuthFileGroupService {
-    
+
     @Autowired
     private AgencyAuthFileGroupService agencyAuthFileGroupService;
- 
+
     @Autowired
     private AuthorFileGroupService authorFileGroupService;
 
@@ -93,36 +93,40 @@ public class AgencyAuthFileGroupDubboService implements IAgencyAuthFileGroupServ
 
     @Override
     public FileStoreType findFileStoreType(String anFileInfoType) {
-        
+
         return authorFileGroupService.findFileStoreType(anFileInfoType);
     }
-    
+
     /***
      * 根据不同条件查询返回文件类型对象
      * @param anMap 条件
      * @return
      */
     @Override
-    public AgencyAuthorFileGroup findAuthorFileGroupByMap(Map<String, Object> anMap){
+    public AgencyAuthorFileGroup findAuthorFileGroupByMap(Map<String, Object> anMap) {
         return agencyAuthFileGroupService.findAuthorFileGroupByMap(anMap);
     }
-    
-    public CheckDataResult findFileTypePermit(String anFileInfoType, String anFileType){
-        
+
+    @Override
+    public CheckDataResult findFileTypePermit(String anFileInfoType, String anFileType) {
+
         return authorFileGroupService.findFileTypePermit(anFileInfoType, anFileType);
     }
-    
-    public String webFindFileTypePermitInfo(String anFileInfoType){
-        
-        return AjaxObject.newOk("查询用户认证文件允许的文件类型成功", authorFileGroupService.findFileTypePermitInfo(anFileInfoType)).toJson();
+
+    @Override
+    public String webFindFileTypePermitInfo(String anFileInfoType) {
+
+        return AjaxObject.newOk("查询用户认证文件允许的文件类型成功", authorFileGroupService.findFileTypePermitInfo(anFileInfoType))
+                .toJson();
     }
-    
+
     /***
      * 查询文件类型对象
      * @param anFileInfoType
      * @return
      */
-    public AuthorFileGroup findAuthFileGroup(String anFileInfoType) {   
+    @Override
+    public AuthorFileGroup findAuthFileGroup(String anFileInfoType) {
         return authorFileGroupService.findAuthFileGroup(anFileInfoType);
 
     }

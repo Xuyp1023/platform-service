@@ -1,12 +1,17 @@
 package com.betterjr.modules.wechat.entity;
 
-import com.betterjr.common.annotation.*;
+import javax.persistence.Access;
+import javax.persistence.AccessType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import com.betterjr.common.annotation.MetaData;
 import com.betterjr.common.selectkey.SerialGenerator;
 import com.betterjr.common.utils.BetterDateUtils;
 import com.betterjr.common.utils.MathExtend;
 import com.betterjr.modules.wechat.data.ScfClientDataParentFace;
-
-import javax.persistence.*;
 
 @Access(AccessType.FIELD)
 @Entity
@@ -16,78 +21,78 @@ public class ScfRelation implements ScfClientDataParentFace {
      * 编号
      */
     @Id
-    @Column(name = "ID",  columnDefinition="INTEGER" )
-    @MetaData( value="编号", comments = "编号")
+    @Column(name = "ID", columnDefinition = "INTEGER")
+    @MetaData(value = "编号", comments = "编号")
     private Long id;
 
     /**
      * 客户编号
      */
-    @Column(name = "L_CUSTNO",  columnDefinition="INTEGER" )
-    @MetaData( value="客户编号", comments = "客户编号")
+    @Column(name = "L_CUSTNO", columnDefinition = "INTEGER")
+    @MetaData(value = "客户编号", comments = "客户编号")
     private Long custNo;
 
     /**
      * 客户全称
      */
-    @Column(name = "C_CUSTNAME",  columnDefinition="VARCHAR" )
-    @MetaData( value="客户全称", comments = "客户全称")
+    @Column(name = "C_CUSTNAME", columnDefinition = "VARCHAR")
+    @MetaData(value = "客户全称", comments = "客户全称")
     private String custName;
 
     /**
      * 核心企额客户编号
      */
-    @Column(name = "L_CORE_CUSTNO",  columnDefinition="INTEGER" )
-    @MetaData( value="核心企额客户编号", comments = "核心企额客户编号")
+    @Column(name = "L_CORE_CUSTNO", columnDefinition = "INTEGER")
+    @MetaData(value = "核心企额客户编号", comments = "核心企额客户编号")
     private Long coreCustNo;
 
     /**
      * 银行账户
      */
-    @Column(name = "C_BANKACCO",  columnDefinition="VARCHAR" )
-    @MetaData( value="银行账户", comments = "银行账户")
+    @Column(name = "C_BANKACCO", columnDefinition = "VARCHAR")
+    @MetaData(value = "银行账户", comments = "银行账户")
     private String bankAccount;
 
     /**
      * 银行户名
      */
-    @Column(name = "C_BANKACCONAME",  columnDefinition="VARCHAR" )
-    @MetaData( value="银行户名", comments = "银行户名")
+    @Column(name = "C_BANKACCONAME", columnDefinition = "VARCHAR")
+    @MetaData(value = "银行户名", comments = "银行户名")
     private String bankAccountName;
 
     /**
      * 登记日期
      */
-    @Column(name = "D_REGDATE",  columnDefinition="VARCHAR" )
-    @MetaData( value="登记日期", comments = "登记日期")
+    @Column(name = "D_REGDATE", columnDefinition = "VARCHAR")
+    @MetaData(value = "登记日期", comments = "登记日期")
     private String regDate;
 
     /**
      * 状态，0未处理，1正常，2申请中， 3取消中，4取消
      */
-    @Column(name = "C_STATUS",  columnDefinition="VARCHAR" )
-    @MetaData( value="状态", comments = "状态，0未处理，1正常，2申请中， 3取消中，4取消")
+    @Column(name = "C_STATUS", columnDefinition = "VARCHAR")
+    @MetaData(value = "状态", comments = "状态，0未处理，1正常，2申请中， 3取消中，4取消")
     private String relaStatus;
 
     /**
      * 修改日期
      */
-    @Column(name = "D_MODIDATE",  columnDefinition="VARCHAR" )
-    @MetaData( value="修改日期", comments = "修改日期")
+    @Column(name = "D_MODIDATE", columnDefinition = "VARCHAR")
+    @MetaData(value = "修改日期", comments = "修改日期")
     private String modiDate;
 
     /**
      * 客户类型：0：机构；1：个人
      */
-    @Column(name = "C_CUSTTYPE",  columnDefinition="VARCHAR" )
-    @MetaData( value="客户类型：0：机构", comments = "客户类型：0：机构；1：个人")
+    @Column(name = "C_CUSTTYPE", columnDefinition = "VARCHAR")
+    @MetaData(value = "客户类型：0：机构", comments = "客户类型：0：机构；1：个人")
     private String custType;
 
     /**
      * 操作员所在机构，证书登录，则是证书的企业名称O字段
      */
-    @Column(name = "C_OPERORG",  columnDefinition="VARCHAR" )
-    @MetaData( value="操作员所在机构", comments = "操作员所在机构，证书登录，则是证书的企业名称O字段")
+    @Column(name = "C_OPERORG", columnDefinition = "VARCHAR")
+    @MetaData(value = "操作员所在机构", comments = "操作员所在机构，证书登录，则是证书的企业名称O字段")
     private String operOrg;
 
     /**
@@ -103,7 +108,7 @@ public class ScfRelation implements ScfClientDataParentFace {
     @Column(name = "C_CORPID", columnDefinition = "VARCHAR")
     @MetaData(value = "所属单位Id", comments = "所属单位Id")
     private String corpNo;
-    
+
     private static final long serialVersionUID = 6590580938702096880L;
 
     public Long getId() {
@@ -114,10 +119,12 @@ public class ScfRelation implements ScfClientDataParentFace {
         this.id = id;
     }
 
+    @Override
     public Long getCustNo() {
         return custNo;
     }
 
+    @Override
     public void setCustNo(Long custNo) {
         this.custNo = custNo;
     }
@@ -134,10 +141,12 @@ public class ScfRelation implements ScfClientDataParentFace {
         return coreCustNo;
     }
 
+    @Override
     public void setCoreCustNo(Long coreCustNo) {
         this.coreCustNo = coreCustNo;
     }
 
+    @Override
     public String getBankAccount() {
         return bankAccount;
     }
@@ -161,7 +170,7 @@ public class ScfRelation implements ScfClientDataParentFace {
     public void setRegDate(String regDate) {
         this.regDate = regDate == null ? null : regDate.trim();
     }
- 
+
     public String getRelaStatus() {
         return this.relaStatus;
     }
@@ -174,6 +183,7 @@ public class ScfRelation implements ScfClientDataParentFace {
         return modiDate;
     }
 
+    @Override
     public void setModiDate(String modiDate) {
         this.modiDate = modiDate == null ? null : modiDate.trim();
     }
@@ -186,14 +196,17 @@ public class ScfRelation implements ScfClientDataParentFace {
         this.custType = custType == null ? null : custType.trim();
     }
 
+    @Override
     public String getOperOrg() {
         return operOrg;
     }
 
+    @Override
     public void setOperOrg(String operOrg) {
         this.operOrg = operOrg == null ? null : operOrg.trim();
     }
 
+    @Override
     public String getBtNo() {
         return this.btNo;
     }
@@ -246,18 +259,27 @@ public class ScfRelation implements ScfClientDataParentFace {
         }
         ScfRelation other = (ScfRelation) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-            && (this.getCustNo() == null ? other.getCustNo() == null : this.getCustNo().equals(other.getCustNo()))
-            && (this.getCustName() == null ? other.getCustName() == null : this.getCustName().equals(other.getCustName()))
-            && (this.getCoreCustNo() == null ? other.getCoreCustNo() == null : this.getCoreCustNo().equals(other.getCoreCustNo()))
-            && (this.getBankAccount() == null ? other.getBankAccount() == null : this.getBankAccount().equals(other.getBankAccount()))
-            && (this.getBankAccountName() == null ? other.getBankAccountName() == null : this.getBankAccountName().equals(other.getBankAccountName()))
-            && (this.getRegDate() == null ? other.getRegDate() == null : this.getRegDate().equals(other.getRegDate()))
-            && (this.getRelaStatus() == null ? other.getRelaStatus() == null : this.getRelaStatus().equals(other.getRelaStatus()))
-            && (this.getModiDate() == null ? other.getModiDate() == null : this.getModiDate().equals(other.getModiDate()))
-            && (this.getCustType() == null ? other.getCustType() == null : this.getCustType().equals(other.getCustType()))
-            && (this.getOperOrg() == null ? other.getOperOrg() == null : this.getOperOrg().equals(other.getOperOrg()))
-            && (this.getBtNo() == null ? other.getBtNo() == null : this.getBtNo().equals(other.getBtNo()))
-        && (this.getCorpNo() == null ? other.getCorpNo() == null : this.getCorpNo().equals(other.getCorpNo()));
+                && (this.getCustNo() == null ? other.getCustNo() == null : this.getCustNo().equals(other.getCustNo()))
+                && (this.getCustName() == null ? other.getCustName() == null
+                        : this.getCustName().equals(other.getCustName()))
+                && (this.getCoreCustNo() == null ? other.getCoreCustNo() == null
+                        : this.getCoreCustNo().equals(other.getCoreCustNo()))
+                && (this.getBankAccount() == null ? other.getBankAccount() == null
+                        : this.getBankAccount().equals(other.getBankAccount()))
+                && (this.getBankAccountName() == null ? other.getBankAccountName() == null
+                        : this.getBankAccountName().equals(other.getBankAccountName()))
+                && (this.getRegDate() == null ? other.getRegDate() == null
+                        : this.getRegDate().equals(other.getRegDate()))
+                && (this.getRelaStatus() == null ? other.getRelaStatus() == null
+                        : this.getRelaStatus().equals(other.getRelaStatus()))
+                && (this.getModiDate() == null ? other.getModiDate() == null
+                        : this.getModiDate().equals(other.getModiDate()))
+                && (this.getCustType() == null ? other.getCustType() == null
+                        : this.getCustType().equals(other.getCustType()))
+                && (this.getOperOrg() == null ? other.getOperOrg() == null
+                        : this.getOperOrg().equals(other.getOperOrg()))
+                && (this.getBtNo() == null ? other.getBtNo() == null : this.getBtNo().equals(other.getBtNo()))
+                && (this.getCorpNo() == null ? other.getCorpNo() == null : this.getCorpNo().equals(other.getCorpNo()));
     }
 
     @Override
@@ -279,16 +301,17 @@ public class ScfRelation implements ScfClientDataParentFace {
         result = prime * result + ((getCorpNo() == null) ? 0 : getCorpNo().hashCode());
         return result;
     }
-    
-    public void initWeChatValue(){
+
+    public void initWeChatValue() {
         this.id = SerialGenerator.getLongValue("ScfRelation.id");
         this.custType = "0";
         this.relaStatus = "1";
         this.regDate = BetterDateUtils.getNumDate();
-        this.modiDate = BetterDateUtils.getNumDateTime();        
+        this.modiDate = BetterDateUtils.getNumDateTime();
     }
-    
-    public void fillDefaultValue(){
+
+    @Override
+    public void fillDefaultValue() {
         this.id = MathExtend.defaultLongValue(this.id, SerialGenerator.getLongValue("ScfRelation.id"));
         this.custType = "0";
         this.regDate = BetterDateUtils.getNumDate();
@@ -298,15 +321,14 @@ public class ScfRelation implements ScfClientDataParentFace {
 
     @Override
     public void modifytValue() {
-        if (MathExtend.smallValue(this.custNo)){
-            
+        if (MathExtend.smallValue(this.custNo)) {
+
             this.relaStatus = "2";
-        }
-        else{            
+        } else {
             this.relaStatus = "1";
         }
-        
-       this.modiDate = BetterDateUtils.getNumDateTime();        
+
+        this.modiDate = BetterDateUtils.getNumDateTime();
     }
 
     @Override

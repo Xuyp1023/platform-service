@@ -6,12 +6,12 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import com.betterjr.common.exception.BytterTradeException;
 import com.betterjr.common.service.BaseService;
 import com.betterjr.common.utils.BTAssert;
-import com.betterjr.common.utils.BetterStringUtils;
 import com.betterjr.common.utils.Collections3;
 import com.betterjr.mapper.pagehelper.Page;
 import com.betterjr.modules.account.service.CustAccountService;
@@ -127,20 +127,21 @@ public class CustChangeApplyService extends BaseService<CustChangeApplyMapper, C
     /**
      * 查询变更申请列表
      */
-    public Page<CustChangeApply> queryCustChangeApply(Map<String, Object> anParam, int anFlag, int anPageNum, int anPageSize) {
+    public Page<CustChangeApply> queryCustChangeApply(Map<String, Object> anParam, int anFlag, int anPageNum,
+            int anPageSize) {
         final Object custName = anParam.get("LIKEcustName");
         final Object businStatus = anParam.get("businStatus");
-        if (custName == null || BetterStringUtils.isBlank((String) custName)) {
+        if (custName == null || StringUtils.isBlank((String) custName)) {
             anParam.remove("LIKEcustName");
-        }
-        else {
+        } else {
             anParam.put("LIKEcustName", "%" + custName + "%");
         }
-        if (businStatus == null || (businStatus instanceof String && BetterStringUtils.isBlank((String) businStatus))) {
+        if (businStatus == null || (businStatus instanceof String && StringUtils.isBlank((String) businStatus))) {
             anParam.remove("businStatus");
         }
 
-        final Page<CustChangeApply> changeApplys = this.selectPropertyByPage(anParam, anPageNum, anPageSize, anFlag == 1);
+        final Page<CustChangeApply> changeApplys = this.selectPropertyByPage(anParam, anPageNum, anPageSize,
+                anFlag == 1);
 
         changeApplys.forEach(changeApply -> {
             CustAuditLog auditLog = auditLogService.findCustAuditLogByCustChangeApply(changeApply);
