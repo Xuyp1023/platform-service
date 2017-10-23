@@ -159,9 +159,10 @@ public class CustRelationConfigService {
                 custRelationService.insert(custRelation);
                 bool = true;
                 // 发送微信消息
-                if (UserUtils.coreUser() && StringUtils.equalsIgnoreCase(custRelation.getRelateType(),
-                        CustomerConstants.RELATE_TYPE_SUPPLIER_CORE)) {
-                    Map<String, Object> param = new HashMap<String, Object>();
+                if (UserUtils.coreUser()
+                        && StringUtils.equalsIgnoreCase(custRelation.getRelateType(),
+                                CustomerConstants.RELATE_TYPE_SUPPLIER_CORE)) {
+                    final Map<String, Object> param = new HashMap<String, Object>();
                     param.put("custNo", custRelation.getCustNo());
                     param.put("custName", custRelation.getCustName());
                     param.put("coreCustNo", custRelation.getRelateCustno());
@@ -219,7 +220,7 @@ public class CustRelationConfigService {
         if (StringUtils.isNotBlank(custName)) {
             anMap.put("LIKEcustName", "%" + custName + "%");
         }
-        String type = convertType(anCustType);
+        final String type = convertType(anCustType);
         if (type != null) {
             anMap.put("custType", type);
         }
@@ -227,8 +228,8 @@ public class CustRelationConfigService {
 
         for (final CustMajor custMajorInfo : custMajorService.findCustMajorByMap(anMap)) {
             if (checkExist(anCustType, anCustNo, custMajorInfo.getCustNo())) {
-                custList.add(
-                        new SimpleDataEntity(custMajorInfo.getCustName(), String.valueOf(custMajorInfo.getCustNo())));
+                custList.add(new SimpleDataEntity(custMajorInfo.getCustName(),
+                        String.valueOf(custMajorInfo.getCustNo())));
             }
         }
         return custList;
@@ -515,8 +516,9 @@ public class CustRelationConfigService {
                     custRelation.getRelateCustno(), custRelation.getRelateType());
             logger.info("custRelation:" + custRelation);
             logger.info("requestCustRelation:" + requestCustRelation);
-            if (requestCustRelation != null && StringUtils.equalsIgnoreCase(requestCustRelation.getBusinStatus(),
-                    CustomerConstants.RELATION_STATUS_BACK)) { // 存在并且已经驳回的，将关系删除
+            if (requestCustRelation != null
+                    && StringUtils.equalsIgnoreCase(requestCustRelation.getBusinStatus(),
+                            CustomerConstants.RELATION_STATUS_BACK)) { // 存在并且已经驳回的，将关系删除
                 custRelationService.delete(requestCustRelation);
                 requestCustRelation = null;
             }
@@ -592,15 +594,15 @@ public class CustRelationConfigService {
         businessRequestData.setOrgCode(custMechBase.getOrgCode());
         businessRequestData.setLawName(custMechBase.getLawName());
 
-        final CustMechBankAccount mechBankAccount = custMechBankAccountService
-                .findDefaultCustMechBankAccount(custInfo.getCustNo());
+        final CustMechBankAccount mechBankAccount = custMechBankAccountService.findDefaultCustMechBankAccount(custInfo
+                .getCustNo());
         if (mechBankAccount != null) {
             businessRequestData.setBankAccount(mechBankAccount.getBankAcco());
             businessRequestData.setBankAccountName(mechBankAccount.getBankAccoName());
             businessRequestData.setBankName(mechBankAccount.getBankName());
         }
-        final CustMechBusinLicence custMechBusinLicence = custMechBusinLicenceService
-                .findBusinLicenceByCustNo(custInfo.getCustNo());
+        final CustMechBusinLicence custMechBusinLicence = custMechBusinLicenceService.findBusinLicenceByCustNo(custInfo
+                .getCustNo());
         if (custMechBusinLicence != null) {
             businessRequestData.setTaxCode(custMechBusinLicence.getTaxNo());
         }
@@ -660,14 +662,13 @@ public class CustRelationConfigService {
         custRelation.setBusinStatus(anMap.get("aduitStatus").toString());
         custRelationService.updateByPrimaryKey(custRelation);
         String taskName = "";
-        if (StringUtils.equalsIgnoreCase(CustomerConstants.RELATION_STATUS_ACCEPT,
-                anMap.get("aduitStatus").toString())) { // 受理
+        if (StringUtils.equalsIgnoreCase(CustomerConstants.RELATION_STATUS_ACCEPT, anMap.get("aduitStatus").toString())) { // 受理
             taskName = "保理机构受理";
-        } else if (StringUtils.equalsIgnoreCase(CustomerConstants.RELATION_STATUS_ADUIT,
-                anMap.get("aduitStatus").toString())) { // 审批
+        } else if (StringUtils.equalsIgnoreCase(CustomerConstants.RELATION_STATUS_ADUIT, anMap.get("aduitStatus")
+                .toString())) { // 审批
             taskName = "保理机构审批";
-        } else if (StringUtils.equalsIgnoreCase(CustomerConstants.RELATION_STATUS_BACK,
-                anMap.get("aduitStatus").toString())) { // 驳回
+        } else if (StringUtils.equalsIgnoreCase(CustomerConstants.RELATION_STATUS_BACK, anMap.get("aduitStatus")
+                .toString())) { // 驳回
             taskName = "保理机构审批";
         }
         // 添加审核记录
@@ -679,8 +680,7 @@ public class CustRelationConfigService {
                     String.valueOf(anMap.get("failFiles")));
         }
         // 审核通过时将文件添加到审核附件关系表中
-        if (StringUtils.equalsIgnoreCase(anMap.get("aduitStatus").toString(),
-                CustomerConstants.RELATION_STATUS_ADUIT)) {
+        if (StringUtils.equalsIgnoreCase(anMap.get("aduitStatus").toString(), CustomerConstants.RELATION_STATUS_ADUIT)) {
             custFileAduitTempService.saveAduitFile(custNo, relateCustNo);
         }
     }
@@ -743,14 +743,16 @@ public class CustRelationConfigService {
         String relateType = "";
         if (StringUtils.equalsIgnoreCase(certInfo.getRuleList(), PlatformBaseRuleType.SUPPLIER_USER.toString())) { // 供应商
             relateType = CustomerConstants.RELATE_TYPE_SUPPLIER_FACTOR;
-        } else if (StringUtils.equalsIgnoreCase(certInfo.getRuleList(),
-                PlatformBaseRuleType.CORE_USER.toString())) { // 核心企业
+        } else if (StringUtils.equalsIgnoreCase(certInfo.getRuleList(), PlatformBaseRuleType.CORE_USER.toString())) { // 核心企业
             relateType = CustomerConstants.RELATE_TYPE_CORE_FACTOR;
-        } else if (StringUtils.equalsIgnoreCase(certInfo.getRuleList(),
-                PlatformBaseRuleType.SELLER_USER.toString())) { // 经销商
+        } else if (StringUtils.equalsIgnoreCase(certInfo.getRuleList(), PlatformBaseRuleType.SELLER_USER.toString())) { // 经销商
             relateType = CustomerConstants.RELATE_TYPE_SELLER_FACTOR;
         }
         return relateType;
+    }
+
+    public List<AgencyAuthorFileGroup> findAgencyFileType(final String anAgencyNo) {
+        return agencyAuthFileGroupService.findAuthorFileGroup(anAgencyNo, "08");
     }
 
 }

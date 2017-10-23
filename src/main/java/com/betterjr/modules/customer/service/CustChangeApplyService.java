@@ -36,7 +36,7 @@ public class CustChangeApplyService extends BaseService<CustChangeApplyMapper, C
     /**
      * 添加变更申请
      */
-    public CustChangeApply addChangeApply(Long anCustNo, String anChangeItem, String anTmpIds) {
+    public CustChangeApply addChangeApply(final Long anCustNo, final String anChangeItem, final String anTmpIds) {
         BTAssert.notNull(anCustNo, "客户编号不允许为空！");
         BTAssert.notNull(anChangeItem, "变更项目不允许为空！");
         BTAssert.notNull(anTmpIds, "变更流水项不允许为空！");
@@ -57,7 +57,7 @@ public class CustChangeApplyService extends BaseService<CustChangeApplyMapper, C
     /**
      * 变更申请 查询
      */
-    public CustChangeApply findChangeApply(Long anId) {
+    public CustChangeApply findChangeApply(final Long anId) {
         BTAssert.notNull(anId, "变更申请 编号不允许为空！");
         return this.selectByPrimaryKey(anId);
     }
@@ -65,7 +65,7 @@ public class CustChangeApplyService extends BaseService<CustChangeApplyMapper, C
     /**
      * 检查是否有未处理的变更申请
      */
-    public Boolean checkExistChangeApply(Long anCustNo, String anChangeItem, String anBusinStatus) {
+    public Boolean checkExistChangeApply(final Long anCustNo, final String anChangeItem, final String anBusinStatus) {
         BTAssert.notNull(anCustNo, "客户编号不允许为空！");
         BTAssert.notNull(anChangeItem, "变更项目不允许为空！");
 
@@ -74,7 +74,7 @@ public class CustChangeApplyService extends BaseService<CustChangeApplyMapper, C
         conditionMap.put("changeItem", anChangeItem);
         conditionMap.put("businStatus", anBusinStatus);
 
-        List<CustChangeApply> custChangeApplys = this.selectByProperty(conditionMap);
+        final List<CustChangeApply> custChangeApplys = this.selectByProperty(conditionMap);
 
         return !Collections3.isEmpty(custChangeApplys);
     }
@@ -84,12 +84,12 @@ public class CustChangeApplyService extends BaseService<CustChangeApplyMapper, C
      * @param anCustNo
      * @return
      */
-    public Boolean checkExistActiveChangeApply(Long anCustNo, String anChangeItem) {
-        Map<String, Object> conditionMap = new HashMap<>();
+    public Boolean checkExistActiveChangeApply(final Long anCustNo, final String anChangeItem) {
+        final Map<String, Object> conditionMap = new HashMap<>();
 
         conditionMap.put(CustomerConstants.CUST_NO, anCustNo);
         conditionMap.put("changeItem", anChangeItem);
-        String[] businStatues = { CustomerConstants.CHANGE_APPLY_STATUS_NEW };
+        final String[] businStatues = { CustomerConstants.CHANGE_APPLY_STATUS_NEW };
         conditionMap.put("businStatus", businStatues);
         return Collections3.isEmpty(this.selectByProperty(conditionMap)) == false;
     }
@@ -97,7 +97,7 @@ public class CustChangeApplyService extends BaseService<CustChangeApplyMapper, C
     /**
      * 保存变更申请-修改状态
      */
-    public CustChangeApply saveChangeApply(Long anApplyId, String anTmpIds) {
+    public CustChangeApply saveChangeApply(final Long anApplyId, final String anTmpIds) {
         BTAssert.notNull(anApplyId, "编号不允许为空！");
         BTAssert.notNull(anTmpIds, "流水记录不允许为空！");
 
@@ -113,13 +113,14 @@ public class CustChangeApplyService extends BaseService<CustChangeApplyMapper, C
     /**
      * 保存变更申请-修改状态
      */
-    public CustChangeApply saveChangeApplyStatus(Long anId, String anBusinStatus) {
+    public CustChangeApply saveChangeApplyStatus(final Long anId, final String anBusinStatus) {
         BTAssert.notNull(anId, "编号不允许为空！");
         BTAssert.notNull(anBusinStatus, "状态不允许为空！");
 
         final CustChangeApply tempCustChangeApply = this.selectByPrimaryKey(anId);
         tempCustChangeApply.initModifyValue(anBusinStatus);
-        this.updateByPrimaryKeySelective(tempCustChangeApply);
+        final int i = this.updateByPrimaryKeySelective(tempCustChangeApply);
+        logger.debug("result:" + i);
 
         return tempCustChangeApply;
     }
@@ -127,8 +128,8 @@ public class CustChangeApplyService extends BaseService<CustChangeApplyMapper, C
     /**
      * 查询变更申请列表
      */
-    public Page<CustChangeApply> queryCustChangeApply(Map<String, Object> anParam, int anFlag, int anPageNum,
-            int anPageSize) {
+    public Page<CustChangeApply> queryCustChangeApply(final Map<String, Object> anParam, final int anFlag,
+            final int anPageNum, final int anPageSize) {
         final Object custName = anParam.get("LIKEcustName");
         final Object businStatus = anParam.get("businStatus");
         if (custName == null || StringUtils.isBlank((String) custName)) {
@@ -136,7 +137,7 @@ public class CustChangeApplyService extends BaseService<CustChangeApplyMapper, C
         } else {
             anParam.put("LIKEcustName", "%" + custName + "%");
         }
-        if (businStatus == null || (businStatus instanceof String && StringUtils.isBlank((String) businStatus))) {
+        if (businStatus == null || businStatus instanceof String && StringUtils.isBlank((String) businStatus)) {
             anParam.remove("businStatus");
         }
 
@@ -144,7 +145,7 @@ public class CustChangeApplyService extends BaseService<CustChangeApplyMapper, C
                 anFlag == 1);
 
         changeApplys.forEach(changeApply -> {
-            CustAuditLog auditLog = auditLogService.findCustAuditLogByCustChangeApply(changeApply);
+            final CustAuditLog auditLog = auditLogService.findCustAuditLogByCustChangeApply(changeApply);
             if (auditLog != null) {
                 changeApply.setAuditDate(auditLog.getAuditDate());
                 changeApply.setAuditTime(auditLog.getAuditTime());

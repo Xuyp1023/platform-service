@@ -52,9 +52,9 @@ public class CustFileDubboService implements ICustFileService {
     }
 
     @Override
-    public String webFindCustFileAuditInfo(final Long anCustNo) {
+    public String webFindCustFileAuditInfo(final Long anCustNo, final String anAgencyNo) {
 
-        final List<CustFileAduit> auditList = custFileAuditService.findCustFileAuditInfo(anCustNo);
+        final List<CustFileItem> auditList = custFileAuditService.findCustFileItemInfo(anCustNo, anAgencyNo);
         return AjaxObject.newOk("查询用户认证文件审核信息成功", auditList).toJson();
     }
 
