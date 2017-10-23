@@ -33,7 +33,8 @@ public class CustRelationConfigDubboService implements ICustRelationConfigServic
         // 如果选择的是供应商或经销商则调用之前的方法
         if (StringUtils.equalsIgnoreCase(anCustType, PlatformBaseRuleType.SUPPLIER_USER.toString())
                 || StringUtils.equalsIgnoreCase(anCustType, PlatformBaseRuleType.SELLER_USER.toString())) {
-            return AjaxObject.newOk("查询客户关系信息", relationConfigService.findCustInfoOld(anCustType, anCustNo, anCustName))
+            return AjaxObject
+                    .newOk("查询客户关系信息", relationConfigService.findCustInfoOld(anCustType, anCustNo, anCustName))
                     .toJson();
         } else {
             return AjaxObject.newOk("查询客户关系信息", relationConfigService.findCustInfo(anCustType, anCustNo, anCustName))
@@ -71,8 +72,10 @@ public class CustRelationConfigDubboService implements ICustRelationConfigServic
     public String webQueryCustRelation(final Long anCustNo, final String anFlag, final int anPageNum,
             final int anPageSize, final String anRelationType) {
         final PlatformBaseRuleType role = UserUtils.getUserRole();
-        return AjaxObject.newOkWithPage("分页查询客户关系信息", relationConfigService.queryCustRelationInfo(anCustNo, role,
-                anRelationType, anFlag, anPageNum, anPageSize)).toJson();
+        return AjaxObject.newOkWithPage(
+                "分页查询客户关系信息",
+                relationConfigService.queryCustRelationInfo(anCustNo, role, anRelationType, anFlag, anPageNum,
+                        anPageSize)).toJson();
     }
 
     /****
@@ -114,7 +117,7 @@ public class CustRelationConfigDubboService implements ICustRelationConfigServic
      * @return
      */
     @Override
-    public String webFindCustAduitTempFile(final Long anRelateCustNo, Long anSelectCustNo) {
+    public String webFindCustAduitTempFile(final Long anRelateCustNo, final Long anSelectCustNo) {
         return AjaxObject.newOk("获取审核文件", relationConfigService.findCustAduitTemp(anRelateCustNo, anSelectCustNo))
                 .toJson();
     }
@@ -217,16 +220,19 @@ public class CustRelationConfigDubboService implements ICustRelationConfigServic
      * @return
      */
     @Override
-    public String webFindCustRelateAduitRecord(final Long anCustNo, final Long anSelectCustNo, String anRelateType) {
-        return AjaxObject
-                .newOk("查询审批记录",
-                        relationConfigService.findCustRelateAduitRecord(anCustNo, anSelectCustNo, anRelateType))
-                .toJson();
+    public String webFindCustRelateAduitRecord(final Long anCustNo, final Long anSelectCustNo, final String anRelateType) {
+        return AjaxObject.newOk("查询审批记录",
+                relationConfigService.findCustRelateAduitRecord(anCustNo, anSelectCustNo, anRelateType)).toJson();
     }
 
     @Override
     public FactorBusinessRequestData findBusinessCustInfo(final Long anCustNo) {
         return relationConfigService.findFactorRequestInfo(anCustNo);
+    }
+
+    @Override
+    public String webFindAgencyFileType(final String anAgencyNo) {
+        return AjaxObject.newOk("查询机构文件类型", relationConfigService.findAgencyFileType(anAgencyNo)).toJson();
     }
 
 }

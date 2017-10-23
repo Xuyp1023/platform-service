@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.betterjr.common.web.AjaxObject;
 import com.betterjr.modules.document.ICustFileAduitTempService;
 import com.betterjr.modules.document.entity.AgencyAuthorFileGroup;
 import com.betterjr.modules.document.entity.CustFileAduitTemp;
@@ -18,8 +19,8 @@ public class CustFileAduitTempDubboService implements ICustFileAduitTempService 
     public CustFileAduitTempService custFileAduitTempService;
 
     @Override
-    public List<CustFileItem> findCustAduitTemp(Long anCustNo, Long anSelectCustNo,
-            List<AgencyAuthorFileGroup> anAgencyAuthorFileGroupList) {
+    public List<CustFileItem> findCustAduitTemp(final Long anCustNo, final Long anSelectCustNo,
+            final List<AgencyAuthorFileGroup> anAgencyAuthorFileGroupList) {
 
         return custFileAduitTempService.findCustFileAduitTempByCustNoAndType(anCustNo, anSelectCustNo,
                 anAgencyAuthorFileGroupList);
@@ -30,7 +31,7 @@ public class CustFileAduitTempDubboService implements ICustFileAduitTempService 
      * @param anCustFileAduitTemp
      */
     @Override
-    public boolean addCustFileAduitTemp(CustFileAduitTemp anCustFileAduitTemp) {
+    public boolean addCustFileAduitTemp(final CustFileAduitTemp anCustFileAduitTemp) {
         return custFileAduitTempService.addCustFileAduitTemp(anCustFileAduitTemp);
     }
 
@@ -41,8 +42,8 @@ public class CustFileAduitTempDubboService implements ICustFileAduitTempService 
      * @return
      */
     @Override
-    public boolean checkCustFileAduitTempExist(Long anCustNo, Long anSelectCustNo,
-            List<AgencyAuthorFileGroup> anAgencyAuthorFileGroupList) {
+    public boolean checkCustFileAduitTempExist(final Long anCustNo, final Long anSelectCustNo,
+            final List<AgencyAuthorFileGroup> anAgencyAuthorFileGroupList) {
         return custFileAduitTempService.checkCustFileAduitTempExist(anCustNo, anSelectCustNo,
                 anAgencyAuthorFileGroupList);
     }
@@ -53,7 +54,7 @@ public class CustFileAduitTempDubboService implements ICustFileAduitTempService 
      * @return
      */
     @Override
-    public boolean saveDeleteFileAduitTemp(Long anId) {
+    public boolean saveDeleteFileAduitTemp(final Long anId) {
         return custFileAduitTempService.saveDeleteFileAduitTemp(anId);
     }
 
@@ -63,7 +64,8 @@ public class CustFileAduitTempDubboService implements ICustFileAduitTempService 
      * @param fileIds 上传的文件列表(以,分隔)
      */
     @Override
-    public void saveCustFileAduitTemp(Long anCustNo, Long anRelateCustNo, String anFileIds, String anCustType) {
+    public void saveCustFileAduitTemp(final Long anCustNo, final Long anRelateCustNo, final String anFileIds,
+            final String anCustType) {
         custFileAduitTempService.saveCustFileAduitTemp(anCustNo, anRelateCustNo, anFileIds, anCustType);
     }
 
@@ -73,7 +75,7 @@ public class CustFileAduitTempDubboService implements ICustFileAduitTempService 
      * @return
      */
     @Override
-    public List<CustFileItem> findRelateAduitTempFile(Long anCustNo) {
+    public List<CustFileItem> findRelateAduitTempFile(final Long anCustNo) {
         return custFileAduitTempService.findRelateAduitTempFile(anCustNo);
     }
 
@@ -84,13 +86,23 @@ public class CustFileAduitTempDubboService implements ICustFileAduitTempService 
      * @param anBusinStatus 关系状态
      */
     @Override
-    public void saveAcceptFileTemp(String anPassFiles, String anFailFiles) {
+    public void saveAcceptFileTemp(final String anPassFiles, final String anFailFiles) {
         custFileAduitTempService.saveAcceptFileTemp(anPassFiles, anFailFiles);
     }
 
     @Override
-    public void saveAduitFile(Long anCustNo, Long anRelateCustNo) {
+    public void saveAduitFile(final Long anCustNo, final Long anRelateCustNo) {
         custFileAduitTempService.saveAduitFile(anCustNo, anRelateCustNo);
     }
 
+    @Override
+    public String saveCustFileAuditTempInfo(final Long anCustNo, final String anFileIds) {
+        custFileAduitTempService.saveCustFileAduitTempFile(anCustNo, anFileIds);
+        return AjaxObject.newOk("新增用户认证文件审核信息成功").toJson();
+    }
+
+    @Override
+    public String webFindChangeApply(final Long anId) {
+        return AjaxObject.newOk("查找审核申请数据", custFileAduitTempService.findChangeApply(anId)).toJson();
+    }
 }

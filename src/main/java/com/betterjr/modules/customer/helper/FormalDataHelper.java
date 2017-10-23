@@ -12,6 +12,7 @@ import com.betterjr.modules.customer.service.CustMechLawTmpService;
 import com.betterjr.modules.customer.service.CustMechManagerTmpService;
 import com.betterjr.modules.customer.service.CustMechShareholderTmpService;
 import com.betterjr.modules.customer.service.CustOpenAccountTmpService;
+import com.betterjr.modules.document.service.CustFileAduitTempService;
 
 /**
  * 
@@ -20,11 +21,11 @@ import com.betterjr.modules.customer.service.CustOpenAccountTmpService;
  */
 public final class FormalDataHelper {
 
-    public static IFormalDataService getFormalDataService(CustChangeApply anCustChangeApply) {
+    public static IFormalDataService getFormalDataService(final CustChangeApply anCustChangeApply) {
         return getFormalDataService(anCustChangeApply.getChangeItem());
     }
 
-    public static IFormalDataService getFormalDataService(CustInsteadRecord anCustInsteadRecord) {
+    public static IFormalDataService getFormalDataService(final CustInsteadRecord anCustInsteadRecord) {
         return getFormalDataService(anCustInsteadRecord.getInsteadItem());
     }
 
@@ -34,7 +35,7 @@ public final class FormalDataHelper {
      * @param anItem
      * @return
      */
-    public static IFormalDataService getFormalDataService(String anItem) {
+    public static IFormalDataService getFormalDataService(final String anItem) {
         IFormalDataService saveFormalData = null;
         switch (anItem) {
         case CustomerConstants.ITEM_BASE:
@@ -60,6 +61,9 @@ public final class FormalDataHelper {
             break;
         case CustomerConstants.ITEM_OPENACCOUNT:
             saveFormalData = SpringContextHolder.getBean(CustOpenAccountTmpService.class);
+            break;
+        case CustomerConstants.ITEM_FUND_FILE:
+            saveFormalData = SpringContextHolder.getBean(CustFileAduitTempService.class);
             break;
         default:
 

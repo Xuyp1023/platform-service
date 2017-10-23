@@ -24,6 +24,7 @@ import com.betterjr.common.utils.QueryTermBuilder;
 import com.betterjr.common.utils.UserUtils;
 import com.betterjr.common.utils.reflection.ReflectionUtils;
 import com.betterjr.modules.account.entity.CustInfo;
+import com.betterjr.modules.account.entity.CustOperatorInfo;
 import com.betterjr.modules.document.IAgencyAuthFileGroupService;
 import com.betterjr.modules.document.dao.CustFileAduitMapper;
 import com.betterjr.modules.document.data.AccountAduitData;
@@ -33,6 +34,7 @@ import com.betterjr.modules.document.entity.AuthorFileGroup;
 import com.betterjr.modules.document.entity.CustFileAduit;
 import com.betterjr.modules.document.entity.CustFileItem;
 import com.betterjr.modules.document.utils.CustFileUtils;
+import com.betterjr.modules.operator.dubbo.IOperatorService;
 import com.betterjr.modules.rule.RuleCheckResult;
 import com.betterjr.modules.rule.service.RuleServiceAspect;
 
@@ -47,6 +49,9 @@ public class CustFileAuditService extends BaseService<CustFileAduitMapper, CustF
     private IAgencyAuthFileGroupService agencyAuthFileGroupService;
     @Autowired
     private AuthorFileGroupService authorFileGroupService;
+
+    @Reference(interfaceClass = IOperatorService.class)
+    private IOperatorService operatorService;
 
     /**
      * 更新用户认证文件信息，包括增删改（由上传的文件数量决定）
@@ -188,6 +193,36 @@ public class CustFileAuditService extends BaseService<CustFileAduitMapper, CustF
     }
 
     /**
+     * 查询审核关联的附件
+     * @Title: findCustFileItemInfo 
+     * @Description: TODO(这里用一句话描述这个方法的作用) 
+     * @param @param anCustNo
+     * @param @return 参数说明 
+     * @return List<CustFileItem> 返回类型 
+     * @throws 
+     * @author hubl
+     * @date 2017年10月19日 上午11:44:37
+     */
+    public List<CustFileItem> findCustFileItemInfo(final Long anCustNo, final String anAgencyNo) {
+
+        final List<String> fileTypeBusinList = agencyAuthFileGroupService.composeList(anAgencyNo, "08");
+
+        final List<Long> fileBatchList = findBatchNo(anCustNo, fileTypeBusinList);
+        // 查询对外经办人的附件batchNo并加入到附件中
+        final CustOperatorInfo custOperator = (CustOperatorInfo) UserUtils.getPrincipal().getUser();
+        if (custOperator != null) {
+            final String operOrg = custOperator.getOperOrg();
+            final CustOperatorInfo custOperatorInfo = operatorService.findCustClerkMan(operOrg, "1");
+            fileBatchList.add(custOperatorInfo.getBatchNo());
+        }
+        logger.info("fileBatchList:" + fileBatchList);
+        final List<CustFileItem> list = custFileItemService.findCustFilesByBatch(fileBatchList, fileTypeBusinList);
+        logger.debug("list===:" + list);
+
+        return list;
+    }
+
+    /**
      * 获取需要删除（与用户认证信息去关联）的附件ID列表
      * 
      * @param delItemIds
@@ -247,8 +282,7 @@ public class CustFileAuditService extends BaseService<CustFileAduitMapper, CustF
      * @param paramNames
      * @return Map<workType, number>
      */
-    private Map<String, String> getTypeNumber(final Map<String, String[]> paramMap,
-            final Enumeration<String> paramNames) {
+    private Map<String, String> getTypeNumber(final Map<String, String[]> paramMap, final Enumeration<String> paramNames) {
         final Map<String, String> numMap = new HashMap<String, String>();
         while (paramNames.hasMoreElements()) {
             final String paramName = paramNames.nextElement();
@@ -275,7 +309,7 @@ public class CustFileAuditService extends BaseService<CustFileAduitMapper, CustF
     public List<Long> findBatchNo(final Long anCustNo, final List<String> anFileBusinType) {
         final List<Long> batchNoList = new ArrayList<Long>();
         for (final CustFileAduit fileAduit : findCustFileInfo(anCustNo, anFileBusinType)) {
-            batchNoList.add(fileAduit.getId());
+            batchNoList.add(fileAduit.getBatchNo());
         }
 
         return batchNoList;
@@ -334,8 +368,8 @@ public class CustFileAuditService extends BaseService<CustFileAduitMapper, CustF
         if (StringUtils.isNotBlank(anAgencyNos)) {
             final List<AgencyAuthorFileGroup> agencyFileGroupList = this.agencyAuthFileGroupService
                     .findAuthorFileGroup(anAgencyNos.split(","), anBusinFlag);
-            final Map<String, CustFileAduit> custAduitFileMap = ReflectionUtils
-                    .listConvertToMap(findCustFileInfo(anCustNo, null), "workType");
+            final Map<String, CustFileAduit> custAduitFileMap = ReflectionUtils.listConvertToMap(
+                    findCustFileInfo(anCustNo, null), "workType");
             final Map<String, AuthorFileGroup> allAuthorFile = authorFileGroupService.findAllFileGroup();
             AuthorFileGroup tmpFileGroup;
             for (final AgencyAuthorFileGroup authorFileGroup : agencyFileGroupList) {
@@ -394,8 +428,8 @@ public class CustFileAuditService extends BaseService<CustFileAduitMapper, CustF
                     custFileAduit.getWorkType());
             if (custFileItem != null) {
                 custFileItem.setBusinStatus("1");
-                custFileItem.setFileDescription(
-                        agencyAuthFileGroupService.findAuthFileGroup(custFileItem.getFileInfoType()).getDescription());
+                custFileItem.setFileDescription(agencyAuthFileGroupService.findAuthFileGroup(
+                        custFileItem.getFileInfoType()).getDescription());
                 custFileItemList.add(custFileItem);
             }
         }
